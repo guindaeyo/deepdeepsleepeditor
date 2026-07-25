@@ -8,31 +8,1265 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>RPTH Code Editor</title>
+  <meta
+    name="description"
+    content="Deep Deep Sleep Code Shop — คลังโค้ดสำหรับ Roleplay, Profile, Review และ Commission"
+  >
+
+  <title>Deep Deep Sleep Code Shop</title>
 
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-  <main class="website">
+  <div class="dds-noise"></div>
+  <div class="dds-glow dds-glow-one"></div>
+  <div class="dds-glow dds-glow-two"></div>
 
-    <section class="hero">
-      <p class="hero-label">ROLEPLAYTH CODE</p>
+  <div class="dds-app">
 
-      <h1>RPTH Code Editor</h1>
+    <!-- ==================================================
+         พื้นที่เนื้อหาฝั่งซ้าย
+    =================================================== -->
 
-      <p class="hero-description">
-        เว็บไซต์สำหรับดูตัวอย่างและแก้ไขโค้ด
-      </p>
+    <main class="dds-main">
 
-      <button id="testButton" type="button">
-        ทดลองกดปุ่ม
-      </button>
-    </section>
+      <header class="dds-topbar">
 
-  </main>
+        <div class="dds-topbar-left">
+          <span class="dds-status-dot"></span>
+          <span>CODE ARCHIVE ONLINE</span>
+        </div>
+
+        <div class="dds-topbar-right">
+          <span id="currentPageNumber">00</span>
+          <span>/</span>
+          <span>04</span>
+        </div>
+
+      </header>
+
+
+      <!-- ==================================================
+           หน้า HOME
+      =================================================== -->
+
+      <section
+        class="dds-panel is-active"
+        data-panel="home"
+      >
+
+        <div class="dds-home-hero">
+
+          <div class="dds-home-copy">
+
+            <p class="dds-eyebrow">
+              WELCOME TO THE ARCHIVE
+            </p>
+
+            <h1>
+              DEEP DEEP
+              <span>SLEEP</span>
+              CODE SHOP
+            </h1>
+
+            <p class="dds-home-description">
+              คลังโค้ดสำหรับตกแต่งโรลเพลย์ โปรไฟล์ รีวิว
+              และงานคอมมิชชั่น โค้ดทุกชิ้นสามารถเปิดดูตัวอย่าง
+              และเชื่อมต่อไปยังหน้าสำหรับแก้ไขได้
+            </p>
+
+            <div class="dds-home-buttons">
+
+              <button
+                class="dds-primary-button"
+                type="button"
+                data-go="roleplay"
+              >
+                EXPLORE CODE
+                <span>↗</span>
+              </button>
+
+              <button
+                class="dds-text-button"
+                type="button"
+                data-go="commission"
+              >
+                VIEW COMMISSION
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="dds-home-visual">
+
+            <div class="dds-orbit dds-orbit-one"></div>
+            <div class="dds-orbit dds-orbit-two"></div>
+
+            <div class="dds-main-preview">
+
+              <div class="dds-preview-browser">
+
+                <div class="dds-preview-browser-top">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+
+                  <div class="dds-preview-browser-url">
+                    deepdeepsleep.codes
+                  </div>
+                </div>
+
+                <div class="dds-preview-browser-body">
+
+                  <div class="dds-preview-side">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+
+                  <div class="dds-preview-content">
+
+                    <div class="dds-preview-profile">
+
+                      <div class="dds-preview-profile-photo"></div>
+
+                      <div class="dds-preview-profile-info">
+                        <small>CHARACTER PROFILE</small>
+                        <strong>NOCTURNE</strong>
+
+                        <div class="dds-preview-lines">
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="dds-preview-footer-line"></div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="dds-preview-label">
+                <span>FEATURED</span>
+                <strong>PROFILE CODE 01</strong>
+              </div>
+
+            </div>
+
+            <div class="dds-floating-card dds-floating-card-one">
+              <small>TOTAL CODE</small>
+              <strong>12+</strong>
+            </div>
+
+            <div class="dds-floating-card dds-floating-card-two">
+              <small>THEME</small>
+              <strong>RED / BLACK</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ภาพตัวอย่างบนหน้าแรก -->
+
+        <div class="dds-home-section">
+
+          <div class="dds-section-heading">
+
+            <div>
+              <p class="dds-eyebrow">SELECTED WORKS</p>
+              <h2>Code Preview</h2>
+            </div>
+
+            <p>
+              เลือกดูตัวอย่างโค้ดจากแต่ละหมวด
+            </p>
+
+          </div>
+
+
+          <div class="dds-featured-grid">
+
+            <!-- ตัวอย่าง ROLEPLAY -->
+
+            <article class="dds-featured-card">
+
+              <button
+                class="dds-featured-image dds-preview-roleplay"
+                type="button"
+                data-go="roleplay"
+                aria-label="เปิดหมวด Roleplay"
+              >
+
+                <div class="dds-roleplay-mockup">
+
+                  <div class="dds-roleplay-photo">
+                    <span>ROLEPLAY</span>
+                  </div>
+
+                  <div class="dds-roleplay-dialogue">
+                    <strong>FRANKLIN D.</strong>
+                    <p>
+                      The night remembers everything.
+                    </p>
+                  </div>
+
+                </div>
+
+              </button>
+
+              <div class="dds-featured-info">
+
+                <div>
+                  <span class="dds-code-type">FOR ROLEPLAY</span>
+                  <h3>Crimson Dialogue</h3>
+                </div>
+
+                <button
+                  type="button"
+                  class="dds-arrow-button"
+                  data-go="roleplay"
+                  aria-label="เปิดหมวด Roleplay"
+                >
+                  ↗
+                </button>
+
+              </div>
+
+            </article>
+
+
+            <!-- ตัวอย่าง PROFILE -->
+
+            <article class="dds-featured-card">
+
+              <button
+                class="dds-featured-image dds-preview-profile"
+                type="button"
+                data-go="profile"
+                aria-label="เปิดหมวด Profile"
+              >
+
+                <div class="dds-profile-mockup">
+
+                  <div class="dds-profile-avatar"></div>
+
+                  <div class="dds-profile-name">
+                    <small>CHARACTER ARCHIVE</small>
+                    <strong>DOMINIC</strong>
+                    <span>VAMPIRE · 178 YEARS</span>
+                  </div>
+
+                  <div class="dds-profile-stat">
+                    <span>01</span>
+                    <span>02</span>
+                    <span>03</span>
+                  </div>
+
+                </div>
+
+              </button>
+
+              <div class="dds-featured-info">
+
+                <div>
+                  <span class="dds-code-type">FOR PROFILE</span>
+                  <h3>Nocturne Profile</h3>
+                </div>
+
+                <button
+                  type="button"
+                  class="dds-arrow-button"
+                  data-go="profile"
+                  aria-label="เปิดหมวด Profile"
+                >
+                  ↗
+                </button>
+
+              </div>
+
+            </article>
+
+
+            <!-- ตัวอย่าง REVIEW -->
+
+            <article class="dds-featured-card">
+
+              <button
+                class="dds-featured-image dds-preview-review"
+                type="button"
+                data-go="review"
+                aria-label="เปิดหมวด Review"
+              >
+
+                <div class="dds-review-mockup">
+
+                  <div class="dds-review-image"></div>
+
+                  <div class="dds-review-detail">
+                    <span>REVIEW NO. 01</span>
+                    <strong>VELVET TASTE</strong>
+                    <p>★★★★★</p>
+                    <small>9.7 / 10</small>
+                  </div>
+
+                </div>
+
+              </button>
+
+              <div class="dds-featured-info">
+
+                <div>
+                  <span class="dds-code-type">FOR REVIEW</span>
+                  <h3>Velvet Review</h3>
+                </div>
+
+                <button
+                  type="button"
+                  class="dds-arrow-button"
+                  data-go="review"
+                  aria-label="เปิดหมวด Review"
+                >
+                  ↗
+                </button>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           หน้า FOR ROLEPLAY
+      =================================================== -->
+
+      <section
+        class="dds-panel"
+        data-panel="roleplay"
+      >
+
+        <div class="dds-page-intro">
+
+          <div>
+            <p class="dds-eyebrow">CATEGORY 01</p>
+            <h1>FOR ROLEPLAY</h1>
+          </div>
+
+          <p>
+            โค้ดสำหรับข้อความโรลเพลย์ บทสนทนา ฉากเปิด
+            การบรรยายตัวละคร และโพสต์ตอบกระทู้
+          </p>
+
+        </div>
+
+
+        <div class="dds-code-grid">
+
+          <!-- ROLEPLAY CODE 01 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-roleplay-card-one">
+
+              <div class="dds-code-number">01</div>
+
+              <div class="dds-mini-roleplay">
+
+                <div class="dds-mini-roleplay-image"></div>
+
+                <div class="dds-mini-roleplay-copy">
+                  <small>FRANKLIN D. BLOODWORTH</small>
+
+                  <strong>
+                    “THE NIGHT IS STILL YOUNG.”
+                  </strong>
+
+                  <p>
+                    The crimson moon rested above the silent town.
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>ROLEPLAY CODE</span>
+                  <h2>Crimson Dialogue</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                กล่องโรลเพลย์แนวภาพยนตร์ โทนแดงดำ
+                มีรูปตัวละคร ชื่อ และพื้นที่สำหรับบทบรรยาย
+              </p>
+
+              <div class="dds-code-tags">
+                <span>ROLEPLAYTH</span>
+                <span>RESPONSIVE</span>
+                <span>DARK</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <!-- เปลี่ยนลิงก์ DEMO ตรง href นี้ -->
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/ROLEPLAY-DEMO-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <!-- เปลี่ยนลิงก์หน้าแก้ไขตรง href นี้ -->
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/ROLEPLAY-EDIT-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- ROLEPLAY CODE 02 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-roleplay-card-two">
+
+              <div class="dds-code-number">02</div>
+
+              <div class="dds-letter-roleplay">
+
+                <span class="dds-letter-label">
+                  PRIVATE ARCHIVE
+                </span>
+
+                <h3>
+                  A LETTER<br>
+                  FROM THE DARK
+                </h3>
+
+                <div class="dds-letter-line"></div>
+
+                <p>
+                  Some stories are only meant to be read at midnight.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>ROLEPLAY CODE</span>
+                  <h2>Midnight Letter</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                โค้ดโรลเพลย์สไตล์จดหมายและบันทึกส่วนตัว
+                เหมาะกับฉากเปิดหรือโพสต์เนื้อเรื่องยาว
+              </p>
+
+              <div class="dds-code-tags">
+                <span>LETTER</span>
+                <span>STORY</span>
+                <span>MINIMAL</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/ROLEPLAY-DEMO-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/ROLEPLAY-EDIT-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           หน้า FOR PROFILE
+      =================================================== -->
+
+      <section
+        class="dds-panel"
+        data-panel="profile"
+      >
+
+        <div class="dds-page-intro">
+
+          <div>
+            <p class="dds-eyebrow">CATEGORY 02</p>
+            <h1>FOR PROFILE</h1>
+          </div>
+
+          <p>
+            โค้ดสำหรับประวัติตัวละคร โปรไฟล์
+            ข้อมูลส่วนตัว ความสัมพันธ์ และไทม์ไลน์
+          </p>
+
+        </div>
+
+
+        <div class="dds-code-grid">
+
+          <!-- PROFILE CODE 01 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-profile-card-one">
+
+              <div class="dds-code-number">01</div>
+
+              <div class="dds-mini-profile">
+
+                <div class="dds-mini-profile-image"></div>
+
+                <div class="dds-mini-profile-name">
+                  <small>CHARACTER PROFILE</small>
+                  <strong>NOCTURNE</strong>
+                  <span>DEEP RED EDITION</span>
+                </div>
+
+                <div class="dds-mini-profile-data">
+                  <span>AGE</span>
+                  <strong>178</strong>
+
+                  <span>TYPE</span>
+                  <strong>VAMPIRE</strong>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>PROFILE CODE</span>
+                  <h2>Nocturne Profile</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                โปรไฟล์ตัวละครขนาดเต็ม มีรูปหลัก
+                ข้อมูลส่วนตัว ประวัติ และสถิติตัวละคร
+              </p>
+
+              <div class="dds-code-tags">
+                <span>PROFILE</span>
+                <span>CHARACTER</span>
+                <span>FULL PAGE</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/PROFILE-DEMO-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/PROFILE-EDIT-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- PROFILE CODE 02 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-profile-card-two">
+
+              <div class="dds-code-number">02</div>
+
+              <div class="dds-archive-profile">
+
+                <div class="dds-archive-photo"></div>
+
+                <div class="dds-archive-copy">
+
+                  <span>ARCHIVE NO. 1996</span>
+
+                  <h3>
+                    DOMINIC<br>
+                    FLYNN
+                  </h3>
+
+                  <div class="dds-archive-lines">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>PROFILE CODE</span>
+                  <h2>Blood Archive</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                โปรไฟล์แนวแฟ้มข้อมูลลับ โทนดำเข้ม
+                ตัดด้วยสีแดงเลือดและตัวอักษรขนาดใหญ่
+              </p>
+
+              <div class="dds-code-tags">
+                <span>ARCHIVE</span>
+                <span>VAMPIRE</span>
+                <span>EDITORIAL</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/PROFILE-DEMO-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/PROFILE-EDIT-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           หน้า FOR REVIEW
+      =================================================== -->
+
+      <section
+        class="dds-panel"
+        data-panel="review"
+      >
+
+        <div class="dds-page-intro">
+
+          <div>
+            <p class="dds-eyebrow">CATEGORY 03</p>
+            <h1>FOR REVIEW</h1>
+          </div>
+
+          <p>
+            โค้ดสำหรับรีวิวอาหาร ภาพยนตร์ เพลง
+            สถานที่ และบันทึกคะแนนแบบต่าง ๆ
+          </p>
+
+        </div>
+
+
+        <div class="dds-code-grid">
+
+          <!-- REVIEW CODE 01 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-review-card-one">
+
+              <div class="dds-code-number">01</div>
+
+              <div class="dds-mini-review">
+
+                <div class="dds-mini-review-main"></div>
+
+                <div class="dds-mini-review-copy">
+
+                  <small>RESTAURANT REVIEW</small>
+
+                  <h3>
+                    VELVET<br>
+                    TASTE
+                  </h3>
+
+                  <div class="dds-review-stars">
+                    ★★★★★
+                  </div>
+
+                  <strong>9.7 / 10</strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>REVIEW CODE</span>
+                  <h2>Velvet Taste</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                โค้ดรีวิวอาหารพร้อมรูปภาพ คะแนนดาว
+                คะแนนตัวเลข คำแนะนำ และข้อความสรุป
+              </p>
+
+              <div class="dds-code-tags">
+                <span>FOOD</span>
+                <span>RATING</span>
+                <span>GALLERY</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/REVIEW-DEMO-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/REVIEW-EDIT-01"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- REVIEW CODE 02 -->
+
+          <article class="dds-code-card">
+
+            <div class="dds-code-preview dds-review-card-two">
+
+              <div class="dds-code-number">02</div>
+
+              <div class="dds-film-review">
+
+                <div class="dds-film-number">
+                  08
+                </div>
+
+                <div class="dds-film-copy">
+                  <span>MOVIE REVIEW</span>
+                  <h3>RED CINEMA</h3>
+                  <p>
+                    VISUAL · STORY · SOUND
+                  </p>
+                </div>
+
+                <div class="dds-film-score">
+                  <strong>8.9</strong>
+                  <span>10</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="dds-code-card-body">
+
+              <div class="dds-code-card-heading">
+                <div>
+                  <span>REVIEW CODE</span>
+                  <h2>Red Cinema</h2>
+                </div>
+
+                <span class="dds-code-status">
+                  AVAILABLE
+                </span>
+              </div>
+
+              <p>
+                โค้ดรีวิวภาพยนตร์และซีรีส์
+                มีพื้นที่สำหรับคะแนนแยกหมวดและข้อความสรุป
+              </p>
+
+              <div class="dds-code-tags">
+                <span>MOVIE</span>
+                <span>SCORE</span>
+                <span>EDITORIAL</span>
+              </div>
+
+              <div class="dds-card-actions">
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/REVIEW-DEMO-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-code-link
+                >
+                  LIVE PREVIEW
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://codepen.io/USERNAME/pen/REVIEW-EDIT-02"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="dds-edit-link"
+                  data-code-link
+                >
+                  EDIT CODE
+                  <span>⌘</span>
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           หน้า COMMISSION
+      =================================================== -->
+
+      <section
+        class="dds-panel"
+        data-panel="commission"
+      >
+
+        <div class="dds-page-intro">
+
+          <div>
+            <p class="dds-eyebrow">CUSTOM SERVICE</p>
+            <h1>COMMISSION</h1>
+          </div>
+
+          <p>
+            รับออกแบบโค้ดใหม่ แก้ไขโค้ดเดิม
+            ปรับ Responsive และสร้างหน้าโปรไฟล์ตามแบบที่ต้องการ
+          </p>
+
+        </div>
+
+
+        <div class="dds-commission-hero">
+
+          <div class="dds-commission-copy">
+
+            <span class="dds-commission-index">
+              COMMISSION / 2026
+            </span>
+
+            <h2>
+              YOUR IDEA.<br>
+              MY CODE.
+            </h2>
+
+            <p>
+              ส่งภาพตัวอย่างหรืออธิบายแนวทางที่ต้องการ
+              สามารถเลือกสี รูปแบบ ตัวอักษร จำนวนรูป
+              และฟังก์ชันของโค้ดได้
+            </p>
+
+            <!-- เปลี่ยนลิงก์สำหรับติดต่อคอมมิชชั่นตรงนี้ -->
+
+            <a
+              href="https://example.com/commission-contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-code-link
+              class="dds-commission-contact"
+            >
+              CONTACT FOR COMMISSION
+              <span>↗</span>
+            </a>
+
+          </div>
+
+
+          <div class="dds-commission-art">
+
+            <div class="dds-commission-circle"></div>
+
+            <div class="dds-commission-window">
+
+              <div class="dds-commission-window-top">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              <div class="dds-commission-window-content">
+
+                <div class="dds-commission-sidebar">
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </div>
+
+                <div class="dds-commission-layout">
+
+                  <div class="dds-commission-layout-image"></div>
+
+                  <div class="dds-commission-layout-text">
+                    <small>CUSTOM DESIGN</small>
+                    <strong>MADE FOR YOU</strong>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="dds-service-grid">
+
+          <article class="dds-service-card">
+            <span>01</span>
+            <h3>Custom Code</h3>
+            <p>
+              ออกแบบโค้ดใหม่ตามภาพอ้างอิง
+              หรือคอนเซปต์ที่กำหนด
+            </p>
+          </article>
+
+          <article class="dds-service-card">
+            <span>02</span>
+            <h3>Code Repair</h3>
+            <p>
+              แก้โค้ดพัง รูปเกินกรอบ
+              ตัวอักษรทับกัน และปัญหาบนมือถือ
+            </p>
+          </article>
+
+          <article class="dds-service-card">
+            <span>03</span>
+            <h3>Responsive</h3>
+            <p>
+              ปรับโค้ดให้แสดงผลได้ทั้งคอมพิวเตอร์
+              แท็บเล็ต และโทรศัพท์
+            </p>
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- Footer ฝั่งซ้าย -->
+
+      <footer class="dds-footer">
+
+        <p>
+          © 2026 DEEP DEEP SLEEP CODE SHOP
+        </p>
+
+        <p>
+          DESIGNED FOR ROLEPLAYTH
+        </p>
+
+      </footer>
+
+    </main>
+
+
+    <!-- ==================================================
+         เมนูฝั่งขวา
+    =================================================== -->
+
+    <aside class="dds-sidebar">
+
+      <div class="dds-sidebar-inner">
+
+        <div class="dds-brand">
+
+          <button
+            type="button"
+            class="dds-brand-button"
+            data-page="home"
+            aria-label="กลับหน้าแรก"
+          >
+            <span class="dds-brand-www">www.</span>
+
+            <strong>
+              deep deep<br>
+              sleep
+            </strong>
+
+            <span class="dds-brand-bottom">
+              code shop .com
+            </span>
+          </button>
+
+        </div>
+
+
+        <nav
+          class="dds-navigation"
+          aria-label="เมนูหลัก"
+        >
+
+          <button
+            type="button"
+            class="dds-nav-button is-active"
+            data-page="home"
+          >
+            <span class="dds-nav-number">00</span>
+
+            <span class="dds-nav-text">
+              <small>WELCOME</small>
+              HOME
+            </span>
+
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+
+          <button
+            type="button"
+            class="dds-nav-button"
+            data-page="roleplay"
+          >
+            <span class="dds-nav-number">01</span>
+
+            <span class="dds-nav-text">
+              <small>CATEGORY</small>
+              FOR ROLEPLAY
+            </span>
+
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+
+          <button
+            type="button"
+            class="dds-nav-button"
+            data-page="profile"
+          >
+            <span class="dds-nav-number">02</span>
+
+            <span class="dds-nav-text">
+              <small>CATEGORY</small>
+              FOR PROFILE
+            </span>
+
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+
+          <button
+            type="button"
+            class="dds-nav-button"
+            data-page="review"
+          >
+            <span class="dds-nav-number">03</span>
+
+            <span class="dds-nav-text">
+              <small>CATEGORY</small>
+              FOR REVIEW
+            </span>
+
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+
+          <button
+            type="button"
+            class="dds-nav-button"
+            data-page="commission"
+          >
+            <span class="dds-nav-number">04</span>
+
+            <span class="dds-nav-text">
+              <small>CUSTOM</small>
+              COMMISSION
+            </span>
+
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+        </nav>
+
+
+        <div class="dds-sidebar-footer">
+
+          <div class="dds-sidebar-meta">
+            <span>STATUS</span>
+            <strong>OPEN</strong>
+          </div>
+
+          <div class="dds-sidebar-meta">
+            <span>LOCATION</span>
+            <strong>THAILAND</strong>
+          </div>
+
+          <p>
+            Original code archive and custom design.
+          </p>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+
+  <!-- กล่องแจ้งเตือนลิงก์ที่ยังไม่ได้เปลี่ยน -->
+
+  <div
+    class="dds-toast"
+    id="linkToast"
+    role="status"
+    aria-live="polite"
+  >
+    <span>!</span>
+
+    <p>
+      กรุณาเปลี่ยนลิงก์ในไฟล์ index.html ก่อนใช้งาน
+    </p>
+  </div>
+
 
   <script src="./script.js"></script>
+
 </body>
 </html>
