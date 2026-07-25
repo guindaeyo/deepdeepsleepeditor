@@ -1,1 +1,107 @@
+@import url(
+  "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&display=swap"
+);
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Bai Jamjuree", sans-serif;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at top,
+      #723b73 0%,
+      #25152c 48%,
+      #100b15 100%
+    );
+}
+
+button {
+  font: inherit;
+}
+
+.website {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px 18px;
+}
+
+.hero {
+  width: min(650px, 100%);
+  padding: 70px 30px;
+
+  text-align: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.35);
+
+  backdrop-filter: blur(16px);
+}
+
+.hero-label {
+  margin: 0 0 12px;
+
+  color: #dec2e8;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+.hero h1 {
+  margin: 0;
+
+  font-size: clamp(38px, 8vw, 72px);
+  line-height: 1;
+}
+
+.hero-description {
+  margin: 22px 0 30px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.hero button {
+  padding: 12px 24px;
+
+  color: #351b3a;
+
+  font-weight: 600;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.hero button:hover {
+  transform: translateY(-2px);
+  background: #eadcf0;
+}
