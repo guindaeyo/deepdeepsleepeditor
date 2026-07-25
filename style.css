@@ -1930,3 +1930,83 @@ body.dds-editor-mode .dds-editor-heading h1 {
   }
 }
 
+/* ==================================================
+   CODE002 + FULL CARD PREVIEW UPDATE
+================================================== */
+
+.dds-roleplay-card-preview-frame {
+  top: 0;
+  left: 0;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  transform: none;
+  transform-origin: center;
+}
+
+.dds-rich-editor-tall {
+  min-height: 340px;
+}
+
+@media (max-width: 560px) {
+  .dds-rich-editor-tall {
+    min-height: 290px;
+  }
+}
+
+
+
+/* ==================================================
+   CODE003 — OPTIONAL BACKGROUND CONTROL
+================================================== */
+
+.dds-option-row {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  margin: -4px 0 18px;
+  padding: 13px 14px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.1);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  cursor: pointer;
+}
+
+.dds-option-row input {
+  width: 16px;
+  height: 16px;
+
+  flex: 0 0 16px;
+
+  margin-top: 2px;
+
+  accent-color: var(--dds-red-bright);
+}
+
+.dds-option-row > span {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.dds-option-row small {
+  color: rgba(255, 255, 255, 0.36);
+
+  font-size: 9px;
+  line-height: 1.55;
+}
