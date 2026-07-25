@@ -1565,3 +1565,368 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==================================================
+   LATEST UPDATE — ROLEPLAY PREVIEW CARDS
+================================================== */
+
+.dds-roleplay-card {
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dds-roleplay-card-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  background: #242424;
+}
+
+.dds-roleplay-card-preview-live {
+  background:
+    radial-gradient(
+      circle at 75% 20%,
+      rgba(143, 14, 22, 0.22),
+      transparent 32%
+    ),
+    #242424;
+}
+
+.dds-roleplay-card-preview-frame {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  width: 760px;
+  height: 920px;
+
+  border: 0;
+  background: #242424;
+
+  pointer-events: none;
+
+  transform:
+    translateX(-50%)
+    scale(0.43);
+
+  transform-origin: top center;
+}
+
+.dds-roleplay-preview-badge {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  right: 12px;
+
+  padding: 6px 8px;
+
+  color: #fff;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  background: rgba(8, 8, 8, 0.8);
+
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+
+  backdrop-filter: blur(10px);
+}
+
+.dds-roleplay-card-body {
+  min-height: 177px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 21px 22px 22px;
+}
+
+.dds-roleplay-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(143, 14, 22, 0.2),
+      transparent 48%
+    ),
+    repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent 45px,
+      rgba(255, 255, 255, 0.025) 46px
+    ),
+    #100d0e;
+}
+
+.dds-roleplay-placeholder::before {
+  position: absolute;
+  top: 13px;
+  right: 17px;
+
+  content: attr(data-preview);
+
+  color: transparent;
+
+  font-family: var(--dds-font-serif);
+  font-size: clamp(75px, 8vw, 125px);
+  line-height: 0.75;
+
+  -webkit-text-stroke:
+    1px
+    rgba(193, 23, 36, 0.22);
+}
+
+.dds-roleplay-placeholder::after {
+  position: absolute;
+  inset: 15px;
+
+  content: "";
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  pointer-events: none;
+}
+
+.dds-roleplay-placeholder > span,
+.dds-roleplay-placeholder > strong,
+.dds-roleplay-placeholder > i {
+  position: relative;
+  z-index: 2;
+}
+
+.dds-roleplay-placeholder > span {
+  margin-bottom: 7px;
+
+  color: var(--dds-red-bright);
+
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+}
+
+.dds-roleplay-placeholder > strong {
+  color: rgba(255, 255, 255, 0.62);
+
+  font-family: var(--dds-font-serif);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 0.78;
+}
+
+.dds-roleplay-placeholder > i {
+  width: 45px;
+  height: 1px;
+
+  margin-top: 15px;
+
+  background: var(--dds-red-bright);
+}
+
+
+/* ==================================================
+   LATEST UPDATE — FULL-WIDTH EDITOR MODE
+================================================== */
+
+body.dds-editor-mode .dds-app {
+  display: block;
+}
+
+body.dds-editor-mode .dds-sidebar,
+body.dds-editor-mode .dds-topbar,
+body.dds-editor-mode .dds-footer {
+  display: none;
+}
+
+body.dds-editor-mode .dds-main {
+  width: 100%;
+  max-width: none;
+
+  padding:
+    0
+    clamp(22px, 4vw, 72px)
+    60px;
+}
+
+body.dds-editor-mode
+.dds-panel[data-panel="editor-code001"] {
+  min-height: 100vh;
+}
+
+body.dds-editor-mode .dds-editor-heading {
+  padding:
+    22px
+    0
+    42px;
+}
+
+.dds-back-button {
+  width: 44px;
+  height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 0 46px;
+  padding: 0;
+
+  color: #fff;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.14);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  font-size: 19px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.dds-back-button:hover {
+  color: #fff;
+
+  border-color: var(--dds-red-bright);
+
+  background:
+    rgba(143, 14, 22, 0.18);
+
+  transform: translateX(-3px);
+}
+
+body.dds-editor-mode .dds-editor-heading h1 {
+  font-size: clamp(62px, 9vw, 142px);
+}
+
+.dds-editor-layout {
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(410px, 0.72fr);
+
+  align-items: start;
+
+  gap: clamp(24px, 3vw, 42px);
+}
+
+.dds-editor-preview-column {
+  position: relative;
+  top: auto;
+
+  width: 100%;
+
+  overflow: visible;
+}
+
+.dds-editor-preview-frame {
+  width: 100%;
+  min-height: 900px;
+  height: 900px;
+
+  overflow: hidden;
+
+  background: #242424;
+}
+
+.dds-editor-controls {
+  width: 100%;
+  max-width: 610px;
+
+  justify-self: end;
+  align-self: start;
+}
+
+.dds-control-section {
+  padding: 22px;
+}
+
+@media (min-width: 1500px) {
+  body.dds-editor-mode .dds-main {
+    padding-right: 80px;
+    padding-left: 80px;
+  }
+
+  .dds-editor-layout {
+    grid-template-columns:
+      minmax(740px, 1.55fr)
+      minmax(460px, 0.7fr);
+  }
+
+  .dds-editor-controls {
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .dds-editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dds-editor-controls {
+    max-width: none;
+
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 820px) {
+  .dds-roleplay-card-preview-frame {
+    transform:
+      translateX(-50%)
+      scale(0.56);
+  }
+
+  body.dds-editor-mode .dds-main {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  body.dds-editor-mode .dds-editor-heading {
+    padding-top: 18px;
+  }
+
+  .dds-back-button {
+    margin-bottom: 34px;
+  }
+}
+
+@media (max-width: 560px) {
+  .dds-roleplay-card-preview-frame {
+    transform:
+      translateX(-50%)
+      scale(0.47);
+  }
+
+  .dds-roleplay-card-preview {
+    aspect-ratio: 4 / 3;
+  }
+
+  body.dds-editor-mode .dds-editor-heading h1 {
+    font-size: clamp(52px, 18vw, 88px);
+  }
+
+  .dds-editor-preview-frame {
+    min-height: 620px;
+    height: 620px;
+  }
+}
+
