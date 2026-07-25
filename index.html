@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Deep Deep Sleep Code Shop — คลังโค้ด Roleplay, Profile, Review และ Commission"
+  >
+  <title>Deep Deep Sleep Code Shop</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="dds-noise" aria-hidden="true"></div>
+  <div class="dds-glow dds-glow-one" aria-hidden="true"></div>
+  <div class="dds-glow dds-glow-two" aria-hidden="true"></div>
+
+  <div class="dds-app">
+    <main class="dds-main">
+      <header class="dds-topbar">
+        <div class="dds-topbar-left">
+          <span class="dds-status-dot"></span>
+          <span>CODE ARCHIVE ONLINE</span>
+        </div>
+
+        <div class="dds-topbar-right">
+          <span id="currentPageNumber">00</span>
+          <span>/</span>
+          <span>04</span>
+        </div>
+      </header>
+
+      <!-- HOME -->
+      <section class="dds-panel is-active" data-panel="home">
+        <div class="dds-home-hero">
+          <div class="dds-home-copy">
+            <p class="dds-eyebrow">WELCOME TO THE ARCHIVE</p>
+
+            <h1>
+              DEEP DEEP
+              <span>SLEEP</span>
+              CODE SHOP
+            </h1>
+
+            <p class="dds-home-description">
+              คลังโค้ดสำหรับตกแต่งโรลเพลย์ โปรไฟล์ รีวิว และงานคอมมิชชั่น
+              เปิดดูตัวอย่าง เลือกแก้สี เปลี่ยนรูป พิมพ์ข้อความ
+              แล้วคัดลอกโค้ดสำเร็จรูปไปใช้งานได้ทันที
+            </p>
+
+            <div class="dds-home-buttons">
+              <button class="dds-primary-button" type="button" data-go="roleplay">
+                EXPLORE CODE <span>↗</span>
+              </button>
+
+              <button class="dds-text-button" type="button" data-go="commission">
+                VIEW COMMISSION
+              </button>
+            </div>
+          </div>
+
+          <div class="dds-home-visual">
+            <div class="dds-orbit dds-orbit-one"></div>
+            <div class="dds-orbit dds-orbit-two"></div>
+
+            <div
+              class="dds-main-preview"
+              style="
+                --dds-home-img-one: url('https://i.pinimg.com/originals/76/5d/be/765dbe87b96ca7539134ea1de147f21e.gif');
+                --dds-home-img-one-y: 42%;
+                --dds-home-img-two: url('https://i.pinimg.com/736x/7e/d5/30/7ed530faf5a46f2117ec42193c0dcc20.jpg');
+                --dds-home-img-two-y: 35%;
+              "
+            >
+              <div class="dds-preview-browser">
+                <div class="dds-preview-browser-top">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <div class="dds-preview-browser-url">deepdeepsleep.codes</div>
+                </div>
+
+                <div class="dds-preview-browser-body">
+                  <div class="dds-preview-side">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+
+                  <div class="dds-preview-content">
+                    <div class="dds-preview-profile">
+                      <div class="dds-preview-profile-photo"></div>
+
+                      <div class="dds-preview-profile-info">
+                        <div class="dds-preview-profile-second-photo"></div>
+
+                        <div class="dds-preview-profile-name">
+                          <small>CHARACTER PROFILE</small>
+                          <strong>Franklin D.<br>Bloodworth</strong>
+                          <span>VAMPIRE · PRIVATE ARCHIVE</span>
+                        </div>
+
+                        <div class="dds-preview-lines">
+                          <i></i>
+                          <i></i>
+                          <i></i>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="dds-preview-footer-line"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="dds-preview-label">
+                <span>FEATURED CHARACTER</span>
+                <strong>FRANKLIN D. BLOODWORTH</strong>
+              </div>
+            </div>
+
+            <div class="dds-floating-card dds-floating-card-one">
+              <small>TOTAL CODE</small>
+              <strong>12+</strong>
+            </div>
+
+            <div class="dds-floating-card dds-floating-card-two">
+              <small>THEME</small>
+              <strong>RED / BLACK</strong>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- FOR ROLEPLAY -->
+      <section class="dds-panel" data-panel="roleplay">
+        <div class="dds-page-intro">
+          <div>
+            <p class="dds-eyebrow">CATEGORY 01</p>
+            <h1>FOR ROLEPLAY</h1>
+          </div>
+
+          <p>
+            เลือกโค้ดที่ต้องการ แล้วกด EDIT CODE
+            เพื่อแก้สี รูปภาพ ข้อความ และคัดลอกโค้ดสำเร็จรูป
+          </p>
+        </div>
+
+        <div class="dds-roleplay-grid">
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+              <iframe
+                id="roleplayCardPreview001"
+                class="dds-roleplay-card-preview-frame"
+                title="ตัวอย่าง DEEP DEEP SLEEP CODE001"
+                tabindex="-1"
+                aria-hidden="true"
+              ></iframe>
+              <span class="dds-roleplay-preview-badge">AVAILABLE</span>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE001</span>
+              <h2 class="dds-roleplay-name">
+                DEEP DEEP SLEEP : CODE001 ☆ : page of one
+              </h2>
+
+              <button type="button" class="dds-roleplay-edit" data-edit-code="code001">
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+              <iframe
+                id="roleplayCardPreview002"
+                class="dds-roleplay-card-preview-frame"
+                title="ตัวอย่าง DEEP DEEP SLEEP CODE002"
+                tabindex="-1"
+                aria-hidden="true"
+                scrolling="no"
+              ></iframe>
+              <span class="dds-roleplay-preview-badge">AVAILABLE</span>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE002</span>
+              <h2 class="dds-roleplay-name">
+                DEEP DEEP SLEEP : CODE002 ☆ : weirdo
+              </h2>
+
+              <button type="button" class="dds-roleplay-edit" data-edit-code="code002">
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+              <iframe
+                id="roleplayCardPreview003"
+                class="dds-roleplay-card-preview-frame"
+                title="ตัวอย่าง DEEP DEEP SLEEP CODE003"
+                tabindex="-1"
+                aria-hidden="true"
+                scrolling="no"
+              ></iframe>
+              <span class="dds-roleplay-preview-badge">AVAILABLE</span>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE003</span>
+              <h2 class="dds-roleplay-name">
+                DEEP DEEP SLEEP : CODE003 ☆ : HiHi!, BABY
+              </h2>
+
+              <button type="button" class="dds-roleplay-edit" data-edit-code="code003">
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="004">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE004</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE004</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="005">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE005</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE005</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="006">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE006</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE006</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="007">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE007</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE007</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="008">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE008</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE008</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="dds-roleplay-card">
+            <div class="dds-roleplay-card-preview dds-roleplay-placeholder" data-preview="009">
+              <span>ROLEPLAY CODE</span>
+              <strong>PREVIEW<br>COMING SOON</strong>
+              <i></i>
+            </div>
+
+            <div class="dds-roleplay-card-body">
+              <span class="dds-roleplay-index">CODE009</span>
+              <h2 class="dds-roleplay-name">DEEP DEEP SLEEP : CODE009</h2>
+
+              <button type="button" class="dds-roleplay-edit" data-not-ready>
+                EDIT CODE <span>↗</span>
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- EDITOR: CODE001 -->
+      <section class="dds-panel" data-panel="editor-code001">
+        <div class="dds-editor-heading">
+          <button
+            type="button"
+            class="dds-back-button"
+            data-go="roleplay"
+            aria-label="กลับหน้า FOR ROLEPLAY"
+            title="กลับหน้า FOR ROLEPLAY"
+          >
+            ←
+          </button>
+
+          <div>
+            <p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p>
+            <h1>PAGE OF ONE</h1>
+            <p>
+              แก้ข้อมูลทางขวา ตัวอย่างทางซ้ายจะเปลี่ยนตามทันที
+              เสร็จแล้วกด COPY CODE
+            </p>
+          </div>
+        </div>
+
+        <div class="dds-editor-layout">
+          <div class="dds-editor-preview-column">
+            <div class="dds-editor-preview-top">
+              <span>LIVE PREVIEW</span>
+              <strong>CODE001</strong>
+            </div>
+
+            <iframe
+              id="pageOfOnePreview"
+              class="dds-editor-preview-frame"
+              title="ตัวอย่างโค้ด Page of One"
+              scrolling="no"
+            ></iframe>
+          </div>
+
+          <div class="dds-editor-controls">
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>01</span>
+                <h2>สีของโค้ด</h2>
+              </div>
+
+              <div class="dds-color-grid">
+                <label class="dds-color-field">
+                  <span>สีพื้นหลัง — --backg</span>
+                  <div>
+                    <input type="color" id="backgColorPicker" value="#e0e0e0">
+                    <input type="text" id="backgColor" value="#e0e0e0" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีขอบ — --border</span>
+                  <div>
+                    <input type="color" id="borderColorPicker" value="#777777">
+                    <input type="text" id="borderColor" value="#777777" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีตัวอักษร — --text</span>
+                  <div>
+                    <input type="color" id="textColorPicker" value="#000000">
+                    <input type="text" id="textColor" value="#000000" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีโควต/แคปชั่น — --quote</span>
+                  <div>
+                    <input type="color" id="quoteColorPicker" value="#9e9e9e">
+                    <input type="text" id="quoteColor" value="#9e9e9e" spellcheck="false">
+                  </div>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>02</span>
+                <h2>ข้อความส่วนบน</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field">
+                  <span>ข้อความมุมบน</span>
+                  <textarea id="creditText" rows="2">ordinary vampire
+(just a girl)</textarea>
+                </label>
+
+                <label class="dds-field">
+                  <span>ดิสเพลย์เนม</span>
+                  <input type="text" id="displayName" value="Franklin D. Bloodworth">
+                </label>
+
+                <label class="dds-field">
+                  <span>ข้อความใต้ชื่อ</span>
+                  <input type="text" id="subtitleText" value="This hits like coma">
+                </label>
+
+                <label class="dds-field dds-field-full">
+                  <span>โควต</span>
+                  <textarea id="quoteText" rows="2">“A deep sleep fell upon me — a sleep like that of death.”</textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>03</span>
+                <h2>รูปภาพและแคปชั่น</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field dds-field-full">
+                  <span>ลิงก์รูปที่ 1</span>
+                  <input
+                    type="url"
+                    id="imageOne"
+                    value="https://i.pinimg.com/736x/c1/26/66/c126669ccfa791304dc162adac595a0d.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 1</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="imageOneX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="imageOneX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="imageOneY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="imageOneY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>แคปชั่นรูปที่ 1</span>
+                  <textarea id="captionOne" rows="2">01
+Uh, you're in my zone</textarea>
+                </label>
+
+                <label class="dds-field dds-field-full">
+                  <span>ลิงก์รูปที่ 2</span>
+                  <input
+                    type="url"
+                    id="imageTwo"
+                    value="https://i.pinimg.com/736x/a1/f9/5b/a1f95bbc9e273540682aa8b279b23e95.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 2</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="imageTwoX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="imageTwoX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="imageTwoY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="imageTwoY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>แคปชั่นรูปที่ 2</span>
+                  <textarea id="captionTwo" rows="2">02
+Come and follow</textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>04</span>
+                <h2>ข้อความโรลเพลย์</h2>
+              </div>
+
+              <div class="dds-rich-toolbar" data-toolbar-for="roleplayEditor">
+                <button type="button" data-command="bold" title="ตัวหนา"><b>B</b></button>
+                <button type="button" data-command="italic" title="ตัวเอียง"><i>I</i></button>
+                <button type="button" data-command="underline" title="ขีดเส้นใต้"><u>U</u></button>
+                <button type="button" data-command="strikeThrough" title="ขีดฆ่า"><s>S</s></button>
+
+                <label class="dds-rich-color" title="สีตัวอักษร">
+                  <span>COLOR</span>
+                  <input type="color" value="#8f0e16" data-rich-color>
+                </label>
+
+                <button type="button" data-command="removeFormat">CLEAR</button>
+              </div>
+
+              <div
+                id="roleplayEditor"
+                class="dds-rich-editor"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+              >คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>05</span>
+                <h2>หมายเหตุ</h2>
+              </div>
+
+              <div class="dds-rich-toolbar" data-toolbar-for="remarkEditor">
+                <button type="button" data-command="bold" title="ตัวหนา"><b>B</b></button>
+                <button type="button" data-command="italic" title="ตัวเอียง"><i>I</i></button>
+                <button type="button" data-command="underline" title="ขีดเส้นใต้"><u>U</u></button>
+                <button type="button" data-command="strikeThrough" title="ขีดฆ่า"><s>S</s></button>
+
+                <label class="dds-rich-color" title="สีตัวอักษร">
+                  <span>COLOR</span>
+                  <input type="color" value="#8f0e16" data-rich-color>
+                </label>
+
+                <button type="button" data-command="removeFormat">CLEAR</button>
+              </div>
+
+              <div
+                id="remarkEditor"
+                class="dds-rich-editor dds-rich-editor-small"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+              >หมายเห็ดนะ : สมมุติว่ายาว</div>
+            </section>
+
+            <section class="dds-control-section dds-copy-section">
+              <div class="dds-control-title">
+                <span>06</span>
+                <h2>คัดลอกโค้ด</h2>
+              </div>
+
+              <p class="dds-copy-description">
+                กดปุ่มด้านล่างเพื่อคัดลอกโค้ด CODE001
+                ที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที
+              </p>
+
+              <textarea
+                id="generatedCode"
+                class="dds-generated-code dds-generated-code-hidden"
+                readonly
+                spellcheck="false"
+                aria-hidden="true"
+                tabindex="-1"
+              ></textarea>
+
+              <div class="dds-editor-actions">
+                <button type="button" id="copyGeneratedCode" class="dds-copy-button">
+                  COPY CODE <span>↗</span>
+                </button>
+
+                <button type="button" id="resetPageOfOne" class="dds-reset-button">
+                  RESET
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- EDITOR: CODE002 -->
+      <section class="dds-panel" data-panel="editor-code002">
+        <div class="dds-editor-heading">
+          <button
+            type="button"
+            class="dds-back-button"
+            data-go="roleplay"
+            aria-label="กลับหน้า FOR ROLEPLAY"
+            title="กลับหน้า FOR ROLEPLAY"
+          >
+            ←
+          </button>
+
+          <div>
+            <p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p>
+            <h1>WEIRDO</h1>
+            <p>
+              แก้สี ข้อความ และลิงก์รูปทางขวา
+              ตัวอย่างทางซ้ายจะเปลี่ยนตามทันที
+              เสร็จแล้วกด COPY CODE
+            </p>
+          </div>
+        </div>
+
+        <div class="dds-editor-layout">
+          <div class="dds-editor-preview-column">
+            <div class="dds-editor-preview-top">
+              <span>LIVE PREVIEW</span>
+              <strong>CODE002</strong>
+            </div>
+
+            <iframe
+              id="weirdoPreview"
+              class="dds-editor-preview-frame"
+              title="ตัวอย่างโค้ด Weirdo"
+              scrolling="no"
+            ></iframe>
+          </div>
+
+          <div class="dds-editor-controls">
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>01</span>
+                <h2>สีของโค้ด</h2>
+              </div>
+
+              <div class="dds-color-grid">
+                <label class="dds-color-field">
+                  <span>สีพื้นหลัง — --wzbackg</span>
+                  <div>
+                    <input type="color" id="wzBackgColorPicker" value="#000000">
+                    <input type="text" id="wzBackgColor" value="#000000" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีขอบกรอบและรูป — --wzborder</span>
+                  <div>
+                    <input type="color" id="wzBorderColorPicker" value="#444444">
+                    <input type="text" id="wzBorderColor" value="#444444" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีเส้นคั่น — --wzline</span>
+                  <div>
+                    <input type="color" id="wzLineColorPicker" value="#444444">
+                    <input type="text" id="wzLineColor" value="#444444" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีตัวอักษร — --wztext</span>
+                  <div>
+                    <input type="color" id="wzTextColorPicker" value="#ffffff">
+                    <input type="text" id="wzTextColor" value="#ffffff" spellcheck="false">
+                  </div>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>02</span>
+                <h2>ข้อความส่วนบน</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field">
+                  <span>ข้อความหรือสัญลักษณ์ฝั่งซ้าย</span>
+                  <input type="text" id="wzTopLeft" value="✦">
+                </label>
+
+                <label class="dds-field">
+                  <span>ข้อความหรือสัญลักษณ์ฝั่งขวา</span>
+                  <input type="text" id="wzTopRight" value="✦">
+                </label>
+
+                <label class="dds-field dds-field-full">
+                  <span>ดิสเพลย์เนม</span>
+                  <input type="text" id="wzDisplayName" value="Franklin D. Bloodworth">
+                </label>
+
+                <label class="dds-field dds-field-full">
+                  <span>ข้อความใต้ชื่อ</span>
+                  <textarea id="wzSubtitle" rows="2">I can smell that hot blood just under your skin</textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>03</span>
+                <h2>ลิงก์รูปภาพ</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field dds-field-full">
+                  <span>รูปที่ 1 แถวซ้าย</span>
+                  <input
+                    type="url"
+                    id="wzImageLeftOne"
+                    value="https://i.pinimg.com/1200x/96/4c/9f/964c9f53fed10111d8fba1f1272c8a4e.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 1 แถวซ้าย</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="wzImageLeftOneX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="wzImageLeftOneX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="wzImageLeftOneY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="wzImageLeftOneY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>รูปที่ 2 แถวซ้าย</span>
+                  <input
+                    type="url"
+                    id="wzImageLeftTwo"
+                    value="https://i.pinimg.com/1200x/68/a1/0c/68a10cb7ace82b2b0d49ae02726d033b.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 2 แถวซ้าย</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="wzImageLeftTwoX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="wzImageLeftTwoX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="wzImageLeftTwoY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="wzImageLeftTwoY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>รูปตรงกลาง</span>
+                  <input
+                    type="url"
+                    id="wzImageCenter"
+                    value="https://i.pinimg.com/736x/79/0c/3b/790c3b92b668039e2d10d04758ca8dd5.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปตรงกลาง</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="wzImageCenterX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="wzImageCenterX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="wzImageCenterY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="wzImageCenterY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>รูปที่ 1 แถวขวา</span>
+                  <input
+                    type="url"
+                    id="wzImageRightOne"
+                    value="https://i.pinimg.com/736x/7a/c9/88/7ac98884b1ebd57f098a1ad5e91418a7.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 1 แถวขวา</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="wzImageRightOneX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="wzImageRightOneX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="wzImageRightOneY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="wzImageRightOneY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>รูปที่ 2 แถวขวา</span>
+                  <input
+                    type="url"
+                    id="wzImageRightTwo"
+                    value="https://s12.gifyu.com/images/bEjC5.png"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปที่ 2 แถวขวา</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="wzImageRightTwoX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="wzImageRightTwoX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="wzImageRightTwoY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="wzImageRightTwoY">50%</output>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>04</span>
+                <h2>ข้อความโรลเพลย์</h2>
+              </div>
+
+              <div class="dds-rich-toolbar" data-toolbar-for="weirdoRoleplayEditor">
+                <button type="button" data-command="bold" title="ตัวหนา"><b>B</b></button>
+                <button type="button" data-command="italic" title="ตัวเอียง"><i>I</i></button>
+                <button type="button" data-command="underline" title="ขีดเส้นใต้"><u>U</u></button>
+                <button type="button" data-command="strikeThrough" title="ขีดฆ่า"><s>S</s></button>
+
+                <label class="dds-rich-color" title="สีตัวอักษร">
+                  <span>COLOR</span>
+                  <input type="color" value="#8f0e16" data-rich-color>
+                </label>
+
+                <button type="button" data-command="removeFormat">CLEAR</button>
+              </div>
+
+              <div
+                id="weirdoRoleplayEditor"
+                class="dds-rich-editor dds-rich-editor-tall"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+              ><div>คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div><div><br></div><div>ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div></div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>05</span>
+                <h2>ข้อความด้านล่าง</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field dds-field-full">
+                  <span>ข้อความ Footer</span>
+                  <input type="text" id="wzFooterText" value="vampire">
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section dds-copy-section">
+              <div class="dds-control-title">
+                <span>06</span>
+                <h2>คัดลอกโค้ด</h2>
+              </div>
+
+              <p class="dds-copy-description">
+                กดปุ่มด้านล่างเพื่อคัดลอกโค้ด CODE002
+                ที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที
+              </p>
+
+              <textarea
+                id="generatedWeirdoCode"
+                class="dds-generated-code dds-generated-code-hidden"
+                readonly
+                spellcheck="false"
+                aria-hidden="true"
+                tabindex="-1"
+              ></textarea>
+
+              <div class="dds-editor-actions">
+                <button type="button" id="copyGeneratedWeirdoCode" class="dds-copy-button">
+                  COPY CODE <span>↗</span>
+                </button>
+
+                <button type="button" id="resetWeirdo" class="dds-reset-button">
+                  RESET
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- EDITOR: CODE003 -->
+      <section class="dds-panel" data-panel="editor-code003">
+        <div class="dds-editor-heading">
+          <button
+            type="button"
+            class="dds-back-button"
+            data-go="roleplay"
+            aria-label="กลับหน้า FOR ROLEPLAY"
+            title="กลับหน้า FOR ROLEPLAY"
+          >
+            ←
+          </button>
+
+          <div>
+            <p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p>
+            <h1>HIHI!, BABY</h1>
+            <p>
+              แก้สี รูปภาพ ชื่อ เผ่าพันธุ์ และข้อความทางขวา
+              ตัวอย่างทางซ้ายจะเปลี่ยนตามทันที
+              เสร็จแล้วกด COPY CODE
+            </p>
+          </div>
+        </div>
+
+        <div class="dds-editor-layout">
+          <div class="dds-editor-preview-column">
+            <div class="dds-editor-preview-top">
+              <span>LIVE PREVIEW</span>
+              <strong>CODE003</strong>
+            </div>
+
+            <iframe
+              id="hihiPreview"
+              class="dds-editor-preview-frame"
+              title="ตัวอย่างโค้ด HiHi!, BABY"
+              scrolling="no"
+            ></iframe>
+          </div>
+
+          <div class="dds-editor-controls">
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>01</span>
+                <h2>สีของโค้ด</h2>
+              </div>
+
+              <label class="dds-option-row">
+                <input type="checkbox" id="hhUseBackground" checked>
+                <span>
+                  ใช้สีพื้นหลังหลัก
+                  <small>
+                    เอาเครื่องหมายออกเพื่อไม่สร้างตัวแปร --hhbackg ในโค้ด
+                  </small>
+                </span>
+              </label>
+
+              <div class="dds-color-grid">
+                <label class="dds-color-field">
+                  <span>สีพื้นหลังหลัก — --hhbackg</span>
+                  <div>
+                    <input type="color" id="hhBackgColorPicker" value="#000000">
+                    <input type="text" id="hhBackgColor" value="#000000" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>พื้นหลังกล่องเผ่าพันธุ์ — --hhbackh</span>
+                  <div>
+                    <input type="color" id="hhBackhColorPicker" value="#000000">
+                    <input type="text" id="hhBackhColor" value="#000000" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>พื้นหลังกล่องข้อความบนรูป — --hhbackhbttm</span>
+                  <div>
+                    <input type="color" id="hhBackhbttmColorPicker" value="#ffffff">
+                    <input type="text" id="hhBackhbttmColor" value="#ffffff" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีขอบกรอบรูป — --hhborder</span>
+                  <div>
+                    <input type="color" id="hhBorderColorPicker" value="#ffffff">
+                    <input type="text" id="hhBorderColor" value="#ffffff" spellcheck="false">
+                  </div>
+                </label>
+
+                <label class="dds-color-field">
+                  <span>สีตัวอักษร — --hhtext</span>
+                  <div>
+                    <input type="color" id="hhTextColorPicker" value="#ffffff">
+                    <input type="text" id="hhTextColor" value="#ffffff" spellcheck="false">
+                  </div>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>02</span>
+                <h2>รูปภาพและข้อมูลตัวละคร</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field dds-field-full">
+                  <span>ลิงก์รูปหลัก</span>
+                  <input
+                    type="url"
+                    id="hhImage"
+                    value="https://i.pinimg.com/1200x/a9/4e/93/a94e93741f7803b0fa8c84392a999731.jpg"
+                  >
+                </label>
+                <div class="dds-image-position dds-field-full">
+                  <div class="dds-image-position-heading">
+                    <span>ตำแหน่งรูปหลัก</span>
+                    <small>ปรับซ้าย–ขวา และบน–ล่าง</small>
+                  </div>
+
+                  <label class="dds-position-row">
+                    <span>แนวนอน</span>
+                    <small>ซ้าย</small>
+                    <input
+                      type="range"
+                      id="hhImageX"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ขวา</small>
+                    <output data-position-output="hhImageX">50%</output>
+                  </label>
+
+                  <label class="dds-position-row">
+                    <span>แนวตั้ง</span>
+                    <small>บน</small>
+                    <input
+                      type="range"
+                      id="hhImageY"
+                      min="0"
+                      max="100"
+                      value="50"
+                      data-image-position-range
+                    >
+                    <small>ล่าง</small>
+                    <output data-position-output="hhImageY">50%</output>
+                  </label>
+                </div>
+
+                <label class="dds-field dds-field-full">
+                  <span>เผ่าพันธุ์</span>
+                  <input type="text" id="hhSpecies" value="vampire">
+                </label>
+
+                <label class="dds-field">
+                  <span>ชื่อบรรทัดแรก</span>
+                  <input type="text" id="hhNameLineOne" value="Franklin D.">
+                </label>
+
+                <label class="dds-field">
+                  <span>ชื่อบรรทัดที่สอง</span>
+                  <input type="text" id="hhNameLineTwo" value="Bloodworth">
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>03</span>
+                <h2>ข้อความบนรูป</h2>
+              </div>
+
+              <div class="dds-form-grid">
+                <label class="dds-field dds-field-full">
+                  <span>หัวข้อ</span>
+                  <input type="text" id="hhHeading" value="Hi, baby">
+                </label>
+
+                <label class="dds-field dds-field-full">
+                  <span>ข้อความแนะนำ — ประมาณ 2 บรรทัดกำลังสวย</span>
+                  <textarea id="hhDescription" rows="3">I'm your bad habit, yeah
+you want me and you can't stop it</textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title">
+                <span>04</span>
+                <h2>ข้อความโรลเพลย์</h2>
+              </div>
+
+              <div class="dds-rich-toolbar" data-toolbar-for="hihiRoleplayEditor">
+                <button type="button" data-command="bold" title="ตัวหนา"><b>B</b></button>
+                <button type="button" data-command="italic" title="ตัวเอียง"><i>I</i></button>
+                <button type="button" data-command="underline" title="ขีดเส้นใต้"><u>U</u></button>
+                <button type="button" data-command="strikeThrough" title="ขีดฆ่า"><s>S</s></button>
+
+                <label class="dds-rich-color" title="สีตัวอักษร">
+                  <span>COLOR</span>
+                  <input type="color" value="#8f0e16" data-rich-color>
+                </label>
+
+                <button type="button" data-command="removeFormat">CLEAR</button>
+              </div>
+
+              <div
+                id="hihiRoleplayEditor"
+                class="dds-rich-editor dds-rich-editor-tall"
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+              >คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊<br><br>ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div>
+            </section>
+
+            <section class="dds-control-section dds-copy-section">
+              <div class="dds-control-title">
+                <span>05</span>
+                <h2>คัดลอกโค้ด</h2>
+              </div>
+
+              <p class="dds-copy-description">
+                กดปุ่มด้านล่างเพื่อคัดลอกโค้ด CODE003
+                ที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที
+              </p>
+
+              <textarea
+                id="generatedHihiCode"
+                class="dds-generated-code dds-generated-code-hidden"
+                readonly
+                spellcheck="false"
+                aria-hidden="true"
+                tabindex="-1"
+              ></textarea>
+
+              <div class="dds-editor-actions">
+                <button type="button" id="copyGeneratedHihiCode" class="dds-copy-button">
+                  COPY CODE <span>↗</span>
+                </button>
+
+                <button type="button" id="resetHihi" class="dds-reset-button">
+                  RESET
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="dds-panel" data-panel="profile">
+        <div class="dds-page-intro">
+          <div>
+            <p class="dds-eyebrow">CATEGORY 02</p>
+            <h1>FOR PROFILE</h1>
+          </div>
+          <p>พื้นที่รวมโค้ดโปรไฟล์ จะเพิ่มตัวแก้ไขแต่ละชิ้นภายหลัง</p>
+        </div>
+        <div class="dds-empty-panel">PROFILE CODE ARCHIVE</div>
+      </section>
+
+      <!-- REVIEW -->
+      <section class="dds-panel" data-panel="review">
+        <div class="dds-page-intro">
+          <div>
+            <p class="dds-eyebrow">CATEGORY 03</p>
+            <h1>FOR REVIEW</h1>
+          </div>
+          <p>พื้นที่รวมโค้ดรีวิว จะเพิ่มตัวแก้ไขแต่ละชิ้นภายหลัง</p>
+        </div>
+        <div class="dds-empty-panel">REVIEW CODE ARCHIVE</div>
+      </section>
+
+      <!-- COMMISSION -->
+      <section class="dds-panel" data-panel="commission">
+        <div class="dds-page-intro">
+          <div>
+            <p class="dds-eyebrow">CUSTOM SERVICE</p>
+            <h1>COMMISSION</h1>
+          </div>
+          <p>พื้นที่สำหรับรายละเอียด ราคา ตัวอย่างงาน และช่องทางติดต่อคอมมิชชั่น</p>
+        </div>
+
+        <div class="dds-commission-box">
+          <small>COMMISSION / 2026</small>
+          <h2>YOUR IDEA.<br>MY CODE.</h2>
+          <p>
+            รับออกแบบโค้ดใหม่ แก้โค้ดเดิม และปรับให้แสดงผลได้ทั้งคอมพิวเตอร์กับโทรศัพท์
+          </p>
+          <a href="#" onclick="return false;">CONTACT FOR COMMISSION ↗</a>
+        </div>
+      </section>
+
+      <footer class="dds-footer">
+        <p>© 2026 DEEP DEEP SLEEP CODE SHOP</p>
+        <p>DESIGNED FOR ROLEPLAYTH</p>
+      </footer>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="dds-sidebar">
+      <div class="dds-sidebar-inner">
+        <div class="dds-brand">
+          <button type="button" class="dds-brand-button" data-page="home">
+            <span class="dds-brand-www">www.</span>
+            <strong>deep deep<br>sleep</strong>
+            <span class="dds-brand-bottom">code shop .com</span>
+          </button>
+        </div>
+
+        <nav class="dds-navigation" aria-label="เมนูหลัก">
+          <button type="button" class="dds-nav-button is-active" data-page="home">
+            <span class="dds-nav-number">00</span>
+            <span class="dds-nav-text"><small>WELCOME</small>HOME</span>
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+          <button type="button" class="dds-nav-button" data-page="roleplay">
+            <span class="dds-nav-number">01</span>
+            <span class="dds-nav-text"><small>CATEGORY</small>FOR ROLEPLAY</span>
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+          <button type="button" class="dds-nav-button" data-page="profile">
+            <span class="dds-nav-number">02</span>
+            <span class="dds-nav-text"><small>CATEGORY</small>FOR PROFILE</span>
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+          <button type="button" class="dds-nav-button" data-page="review">
+            <span class="dds-nav-number">03</span>
+            <span class="dds-nav-text"><small>CATEGORY</small>FOR REVIEW</span>
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+
+          <button type="button" class="dds-nav-button" data-page="commission">
+            <span class="dds-nav-number">04</span>
+            <span class="dds-nav-text"><small>CUSTOM</small>COMMISSION</span>
+            <span class="dds-nav-arrow">↗</span>
+          </button>
+        </nav>
+
+        <div class="dds-sidebar-footer">
+          <div class="dds-sidebar-meta">
+            <span>STATUS</span>
+            <strong>OPEN</strong>
+          </div>
+
+          <div class="dds-sidebar-meta">
+            <span>LOCATION</span>
+            <strong>THAILAND</strong>
+          </div>
+
+          <p>Original code archive and custom design.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="dds-toast" id="siteToast" role="status" aria-live="polite">
+    <span>!</span>
+    <p id="siteToastText">ดำเนินการเรียบร้อยแล้ว</p>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
