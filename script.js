@@ -1,102 +1,12 @@
 "use strict";
 
 /*
- * DEEP DEEP SLEEP CODE SHOP
- * LIVE PREVIEW + COMMISSION & ACTIVITY / COMMISSION 3 / MY OWN CODE BUILD
- *
- * ไฟล์นี้ใช้แทน script.js เดิมได้ทันที
- * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
- * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
- * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
- * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE 1–3 และ ACTIVITY: MY TOP 5 MOVIES ทั้งหน้ากิจกรรมและแบบตอบกลับ แบบดูอย่างเดียว
- * - หน้า COMMISSION & SHOWCASE และ ACTIVITY ใช้การ์ด 3 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
- * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
- * - ปุ่ม BBCode เรียงต่อในแถบเดิม และหน้า editor เปิดมาเป็นฟอร์มว่างทันที โดยพรีวิวหน้าหมวดยังคงสมบูรณ์
- * - พรีวิว PAGE OF ONE ในหน้ารวมใช้ข้อมูลตัวอย่างถาวร ไม่ถูกล้างตามหน้า editor
- * - หน้า editor ของ ROLEPLAY และ PROFILE ใช้การจัดการฟอร์มแบบเดียวกับ REVIEW เพื่อไม่ให้ค่าหายเมื่อเปลี่ยนช่อง
- * - ใช้ร่วมกับ index.html และ style.css ชุดล่าสุดใน ZIP นี้
+ * DEEP DEEP SLEEP CODE SHOP — STABLE LOCAL PATCH
+ * Core โหลดแบบ script tag ปกติใน index.html
+ * ไม่มี fetch, Blob, eval หรือ dynamic JavaScript loader
  */
 
 (() => {
-  if (window.__DDS_PERFORMANCE_BUILD_LOADING__) {
-    return;
-  }
-
-  window.__DDS_PERFORMANCE_BUILD_LOADING__ = true;
-
-  const CORE_COMMIT =
-    "9550fb74db2ae4898bb9b76fcdefab8af64134b3";
-
-  const CORE_CDN_URL =
-    `https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@${CORE_COMMIT}/script.js`;
-
-  const CORE_RAW_URL =
-    `https://raw.githubusercontent.com/guindaeyo/deepdeepsleepeditor/${CORE_COMMIT}/script.js`;
-
-  function appendClassicScript(src, cleanup) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-
-      script.src = src;
-      script.async = false;
-      script.dataset.ddsCoreScript = "true";
-
-      script.addEventListener(
-        "load",
-        () => {
-          if (typeof cleanup === "function") {
-            cleanup();
-          }
-
-          resolve();
-        },
-        { once: true }
-      );
-
-      script.addEventListener(
-        "error",
-        () => {
-          if (typeof cleanup === "function") {
-            cleanup();
-          }
-
-          script.remove();
-          reject(
-            new Error(
-              `โหลดระบบเว็บไซต์ไม่สำเร็จ: ${src}`
-            )
-          );
-        },
-        { once: true }
-      );
-
-      document.head.appendChild(script);
-    });
-  }
-
-  async function loadCoreFromRawFallback() {
-    const response = await fetch(CORE_RAW_URL, {
-      cache: "force-cache",
-      mode: "cors"
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `โหลดระบบสำรองไม่สำเร็จ (${response.status})`
-      );
-    }
-
-    const source = await response.text();
-    const blob = new Blob([source], {
-      type: "application/javascript;charset=utf-8"
-    });
-    const blobUrl = URL.createObjectURL(blob);
-
-    return appendClassicScript(blobUrl, () => {
-      URL.revokeObjectURL(blobUrl);
-    });
-  }
-
   function installLivePreviewPerformanceFix() {
     if (window.__DDS_LIVE_PREVIEW_FIX_INSTALLED__) {
       return;
@@ -4858,7 +4768,10 @@ ${stylesheetLinks}
     }
 
     function clearPanelFields(panel, force = false) {
-      if (!panel || (!force && panel.dataset.ddsBlanked === "true")) {
+      if (
+        !panel ||
+        (!force && panel.dataset.ddsBlanked === "true")
+      ) {
         return;
       }
 
@@ -4875,7 +4788,8 @@ ${stylesheetLinks}
           if (field.classList?.contains("dds-rich-editor")) {
             field.innerHTML = "";
             field.dataset.placeholder =
-              field.dataset.placeholder || "กรอกข้อความของคุณที่นี่";
+              field.dataset.placeholder ||
+              "กรอกข้อความของคุณที่นี่";
             changedFields.push(field);
             return;
           }
@@ -4909,16 +4823,6 @@ ${stylesheetLinks}
       }
     }
 
-    function clearActiveEditorPanel() {
-      const activePanel = document.querySelector(
-        `${editorPanelSelector}.is-active`
-      );
-
-      if (activePanel) {
-        clearPanelFields(activePanel);
-      }
-    }
-
     function getEditorPanelFromButton(button) {
       if (!button) {
         return null;
@@ -4931,7 +4835,9 @@ ${stylesheetLinks}
         "";
 
       return editKey
-        ? document.querySelector(`[data-panel="editor-${editKey}"]`)
+        ? document.querySelector(
+            `[data-panel="editor-${editKey}"]`
+          )
         : null;
     }
 
@@ -4943,22 +4849,11 @@ ${stylesheetLinks}
       }
 
       /*
-       * ล้างเฉพาะครั้งแรกที่ผู้ใช้เปิด editor นี้ในรอบการใช้งานหน้าเว็บ
-       * หลังจากเริ่มกรอกแล้ว การออกไปหน้าหมวดและกดกลับเข้ามาอีกครั้ง
-       * ต้องเก็บข้อความ/ลิงก์ที่กรอกไว้จนกว่าผู้ใช้จะลบหรือกด RESET เอง
+       * ล้างเฉพาะตอนเปิด editor ครั้งแรกเท่านั้น
+       * หลังผู้ใช้เริ่มกรอกแล้ว การคลิกช่องอื่นหรือกลับเข้ามาหน้าเดิม
+       * จะไม่ล้างข้อมูลซ้ำ
        */
-      if (panel.dataset.ddsBlanked === "true") {
-        return;
-      }
-
       clearPanelFields(panel);
-
-      // กันระบบนำทางใน core เติมค่าตัวอย่างกลับมาเฉพาะจังหวะเปิดครั้งแรก
-      requestAnimationFrame(() => {
-        if (panel.dataset.ddsBlanked !== "true") {
-          clearPanelFields(panel);
-        }
-      });
     }
 
     document
@@ -4966,14 +4861,12 @@ ${stylesheetLinks}
         "[data-edit-code], [data-edit-profile], [data-edit-review]"
       )
       .forEach((button) => {
-        // pointerdown ทำให้ฟอร์มถูกล้างก่อน panel ถูกเปิด จึงไม่เห็นข้อมูลตัวอย่างกระพริบขึ้นมา
         button.addEventListener(
           "pointerdown",
           () => prepareBlankEditor(button),
           { capture: true }
         );
 
-        // รองรับการเปิดด้วยคีย์บอร์ด Enter/Space
         button.addEventListener(
           "click",
           () => prepareBlankEditor(button),
@@ -4981,392 +4874,44 @@ ${stylesheetLinks}
         );
       });
 
-    document
-      .querySelectorAll(`${editorPanelSelector} .dds-reset-button`)
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          window.setTimeout(() => {
-            const panel = button.closest(editorPanelSelector);
-            clearPanelFields(panel, true);
-          }, 0);
-        });
-      });
-
-    window.addEventListener("hashchange", () => {
-      queueMicrotask(clearActiveEditorPanel);
-    });
-
-    queueMicrotask(clearActiveEditorPanel);
-  }
-
-
-  function installEditorInputPersistenceFix() {
-    if (window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__) {
-      return;
-    }
-
-    window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__ = true;
-
     /*
-     * หน้า REVIEW ใช้ฟอร์มเดิมโดยไม่ถูกล้างค่าระหว่างเปลี่ยนช่อง
-     * ส่วน ROLEPLAY / PROFILE เคยมีตัวล้างฟอร์มเพิ่มภายหลัง จึงต้องเก็บ
-     * state ของแต่ละช่องไว้ แล้วคืนค่าหลัง event ของ core ทำงานครบแล้ว
+     * สำคัญ: ต้องหา RESET ภายใน panel ทีละ panel
+     * ห้ามต่อ `${editorPanelSelector} .dds-reset-button` ตรง ๆ
+     * เพราะ editorPanelSelector มี comma และจะทำให้ทั้ง panel ของ
+     * ROLEPLAY / PROFILE ถูกมองเป็นปุ่ม RESET ทุกครั้งที่คลิกข้างใน
      */
-    const editorPanelSelector = [
-      '[data-panel^="editor-code"]',
-      '[data-panel^="editor-profile"]'
-    ].join(',');
-
-    const fieldSelector = [
-      'input',
-      'textarea',
-      'select',
-      '.dds-rich-editor[contenteditable="true"]'
-    ].join(',');
-
-    const panelStates = new Map();
-    const restoreTokens = new WeakMap();
-    const resettingPanels = new WeakSet();
-
-    function isPersistableField(field) {
-      if (!(field instanceof Element)) {
-        return false;
-      }
-
-      if (field.matches('.dds-rich-editor[contenteditable="true"]')) {
-        return true;
-      }
-
-      if (!field.matches('input, textarea, select')) {
-        return false;
-      }
-
-      return !field.matches(
-        '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"], button, output'
-      );
-    }
-
-    function getPanel(target) {
-      return target?.closest?.(editorPanelSelector) || null;
-    }
-
-    function getPanelName(panel) {
-      return String(panel?.dataset?.panel || '');
-    }
-
-    function getState(panel, create = true) {
-      const panelName = getPanelName(panel);
-
-      if (!panelName) {
-        return null;
-      }
-
-      if (!panelStates.has(panelName) && create) {
-        panelStates.set(panelName, new Map());
-      }
-
-      return panelStates.get(panelName) || null;
-    }
-
-    function getFields(panel) {
-      if (!panel) {
-        return [];
-      }
-
-      return Array.from(panel.querySelectorAll(fieldSelector))
-        .filter(isPersistableField);
-    }
-
-    function getFieldKey(field) {
-      if (field.id) {
-        return `id:${field.id}`;
-      }
-
-      const panel = getPanel(field);
-      const fields = getFields(panel);
-      const index = fields.indexOf(field);
-      const type = field.getAttribute('type') || field.tagName.toLowerCase();
-      const name = field.getAttribute('name') || '';
-
-      return `field:${type}:${name}:${index}`;
-    }
-
-    function readField(field) {
-      if (field.matches('.dds-rich-editor[contenteditable="true"]')) {
-        return {
-          kind: 'html',
-          value: field.innerHTML
-        };
-      }
-
-      if (field.matches('input[type="checkbox"], input[type="radio"]')) {
-        return {
-          kind: 'checked',
-          value: Boolean(field.checked)
-        };
-      }
-
-      if (field instanceof HTMLSelectElement && field.multiple) {
-        return {
-          kind: 'multiple',
-          value: Array.from(field.options, (option) => option.selected)
-        };
-      }
-
-      return {
-        kind: 'value',
-        value: field.value
-      };
-    }
-
-    function writeField(field, saved) {
-      if (!saved) {
-        return;
-      }
-
-      if (saved.kind === 'html') {
-        if (field.innerHTML !== saved.value) {
-          field.innerHTML = saved.value;
-        }
-        return;
-      }
-
-      if (saved.kind === 'checked') {
-        if (field.checked !== saved.value) {
-          field.checked = saved.value;
-        }
-        return;
-      }
-
-      if (saved.kind === 'multiple') {
-        Array.from(field.options).forEach((option, index) => {
-          option.selected = Boolean(saved.value[index]);
-        });
-        return;
-      }
-
-      if (field.value !== saved.value) {
-        field.value = saved.value;
-      }
-    }
-
-    function saveField(field) {
-      if (!isPersistableField(field)) {
-        return;
-      }
-
-      const panel = getPanel(field);
-
-      if (!panel || resettingPanels.has(panel)) {
-        return;
-      }
-
-      const state = getState(panel, true);
-      state.set(getFieldKey(field), readField(field));
-    }
-
-    function snapshotPanel(panel) {
-      if (!panel || resettingPanels.has(panel)) {
-        return;
-      }
-
-      const state = getState(panel, true);
-
-      getFields(panel).forEach((field) => {
-        state.set(getFieldKey(field), readField(field));
-      });
-    }
-
-    function restorePanel(panel) {
-      if (!panel || resettingPanels.has(panel)) {
-        return;
-      }
-
-      const state = getState(panel, false);
-
-      if (!state) {
-        return;
-      }
-
-      getFields(panel).forEach((field) => {
-        const saved = state.get(getFieldKey(field));
-
-        if (saved) {
-          writeField(field, saved);
-        }
-      });
-    }
-
-    function scheduleRestore(panel) {
-      if (!panel || resettingPanels.has(panel)) {
-        return;
-      }
-
-      const token = (restoreTokens.get(panel) || 0) + 1;
-      restoreTokens.set(panel, token);
-
-      const run = () => {
-        if (
-          restoreTokens.get(panel) === token &&
-          !resettingPanels.has(panel)
-        ) {
-          restorePanel(panel);
-        }
-      };
-
-      /*
-       * คืนค่าหลัง listener ของ core ทั้งแบบ synchronous และงานที่ถูกคิวไว้
-       * จึงกันได้ทั้งอาการหายตอน input และหายตอนกดไปยังช่องถัดไป
-       */
-      queueMicrotask(run);
-      requestAnimationFrame(run);
-      window.setTimeout(run, 0);
-      window.setTimeout(run, 40);
-    }
-
-    document.querySelectorAll(editorPanelSelector).forEach((panel) => {
-      panel.addEventListener(
-        'input',
-        (event) => {
-          saveField(event.target);
-          scheduleRestore(panel);
-        },
-        true
-      );
-
-      panel.addEventListener(
-        'change',
-        (event) => {
-          saveField(event.target);
-          scheduleRestore(panel);
-        },
-        true
-      );
-
-      panel.addEventListener(
-        'pointerdown',
-        (event) => {
-          if (event.target.closest('.dds-reset-button')) {
-            return;
-          }
-
-          const activeField = document.activeElement;
-
-          if (activeField && getPanel(activeField) === panel) {
-            saveField(activeField);
-          }
-
-          snapshotPanel(panel);
-          scheduleRestore(panel);
-        },
-        true
-      );
-
-      /*
-       * Core ผูก updater ซ้ำกับ blur ใน ROLEPLAY / PROFILE ทุกช่อง
-       * input/change อัปเดต LIVE PREVIEW อยู่แล้ว จึงหยุด blur ตัวซ้ำ
-       * เพื่อไม่ให้จังหวะเปลี่ยนช่องเขียนค่ากลับทับสิ่งที่ผู้ใช้เพิ่งกรอก
-       */
-      panel.addEventListener(
-        'blur',
-        (event) => {
-          if (!isPersistableField(event.target)) {
-            return;
-          }
-
-          saveField(event.target);
-          event.stopImmediatePropagation();
-          scheduleRestore(panel);
-        },
-        true
-      );
-
-      panel.addEventListener(
-        'focusin',
-        () => {
-          restorePanel(panel);
-        },
-        true
-      );
-
-      panel.querySelectorAll('.dds-reset-button').forEach((button) => {
-        const beginReset = () => {
-          resettingPanels.add(panel);
-          panelStates.delete(getPanelName(panel));
-          restoreTokens.set(panel, (restoreTokens.get(panel) || 0) + 1);
-        };
-
-        button.addEventListener('pointerdown', beginReset, true);
-        button.addEventListener(
-          'click',
-          () => {
-            beginReset();
-
-            window.setTimeout(() => {
-              resettingPanels.delete(panel);
-              snapshotPanel(panel);
-            }, 30);
-          },
-          true
-        );
-      });
-    });
-
     document
-      .querySelectorAll('[data-edit-code], [data-edit-profile]')
-      .forEach((button) => {
-        const preparePanelState = () => {
-          const editKey =
-            button.dataset.editCode ||
-            button.dataset.editProfile ||
-            '';
-          const panel = editKey
-            ? document.querySelector(`[data-panel="editor-${editKey}"]`)
-            : null;
-
-          if (!panel) {
-            return;
-          }
-
-          /*
-           * listener นี้ถูกติดตั้งหลังตัวล้างฟอร์ม จึงได้ค่า "ฟอร์มว่าง"
-           * ในการเปิดครั้งแรก และคืนค่าที่ผู้ใช้กรอกในการเปิดครั้งถัดไป
-           */
-          const existingState = getState(panel, false);
-
-          if (existingState) {
-            restorePanel(panel);
-          } else {
-            snapshotPanel(panel);
-          }
-
-          scheduleRestore(panel);
-        };
-
-        button.addEventListener('pointerdown', preparePanelState, true);
-        button.addEventListener('click', preparePanelState, true);
+      .querySelectorAll(editorPanelSelector)
+      .forEach((panel) => {
+        panel
+          .querySelectorAll(".dds-reset-button")
+          .forEach((button) => {
+            button.addEventListener("click", () => {
+              window.setTimeout(() => {
+                clearPanelFields(panel, true);
+              }, 0);
+            });
+          });
       });
 
-    window.addEventListener('hashchange', () => {
-      requestAnimationFrame(() => {
-        const activePanel = document.querySelector(
-          `${editorPanelSelector}.is-active`
-        );
+    /* รองรับการเปิด editor จาก hash โดยตรงครั้งแรก */
+    queueMicrotask(() => {
+      const activePanel = document.querySelector(
+        `${editorPanelSelector}.is-active`
+      );
 
-        if (activePanel) {
-          const existingState = getState(activePanel, false);
-
-          if (existingState) {
-            restorePanel(activePanel);
-          } else {
-            snapshotPanel(activePanel);
-          }
-
-          scheduleRestore(activePanel);
-        }
-      });
+      if (activePanel) {
+        clearPanelFields(activePanel);
+      }
     });
   }
+
+
+  /*
+   * ROLEPLAY / PROFILE ไม่ต้องมีระบบ restore state เพิ่ม
+   * ค่าใน input/textarea/contenteditable จะค้างอยู่ใน DOM ตามธรรมชาติ
+   * เหมือนหน้า FOR REVIEW และจะถูกล้างเฉพาะครั้งแรกหรือเมื่อกด RESET
+   */
 
   const PAGE_OF_ONE_CATALOGUE_MARKUP = String.raw`<div class="pageof-wrapper" style="--backg:#e0e0e0;--border:#777;--text:#000;--quote:#9e9e9e;">
 <div class="pageof-cr">ordinary vampire<br>(just a girl)</div>
@@ -5689,41 +5234,20 @@ ${stylesheetLinks}
     scheduleStaticFoodReviewPreview();
   }
 
-  appendClassicScript(CORE_CDN_URL)
-    .catch(() => loadCoreFromRawFallback())
-    .then(() => {
-      installLivePreviewPerformanceFix();
-      installNewRulesWebsiteImageFix();
-      installCommissionActivityLayout();
-      installActivityTopMovies();
-      installActivityTopMoviesReply();
-      installCommissionThreeHouse();
-      installMyOwnCodeCommission();
-      installMyOwnCodeHistory();
-      installMyOwnCodeTopicHeader();
-      normalizeShowcaseCardLabels();
-      installThreeColumnShowcaseGrids();
-      installBlankEditorFormsAndBbcodeTools();
-      installEditorInputPersistenceFix();
-      installStaticCataloguePreviewFix();
-      installStaticFoodReviewCataloguePreviewFix();
-      window.__DDS_PERFORMANCE_BUILD_READY__ = true;
-    })
-    .catch((error) => {
-      console.error(
-        "[DEEP DEEP SLEEP] โหลด script.js ไม่สำเร็จ",
-        error
-      );
 
-      const toastText = document.querySelector(
-        "#siteToastText"
-      );
-      const toast = document.querySelector("#siteToast");
-
-      if (toastText && toast) {
-        toastText.textContent =
-          "โหลดระบบแก้ไขโค้ดไม่สำเร็จ กรุณารีเฟรชหน้าเว็บ";
-        toast.classList.add("is-visible");
-      }
-    });
+  installLivePreviewPerformanceFix();
+  installNewRulesWebsiteImageFix();
+  installCommissionActivityLayout();
+  installActivityTopMovies();
+  installActivityTopMoviesReply();
+  installCommissionThreeHouse();
+  installMyOwnCodeCommission();
+  installMyOwnCodeHistory();
+  installMyOwnCodeTopicHeader();
+  normalizeShowcaseCardLabels();
+  installThreeColumnShowcaseGrids();
+  installBlankEditorFormsAndBbcodeTools();
+  installStaticCataloguePreviewFix();
+  installStaticFoodReviewCataloguePreviewFix();
+  window.__DDS_PERFORMANCE_BUILD_READY__ = true;
 })();
