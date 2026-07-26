@@ -4941,17 +4941,23 @@ ${stylesheetLinks}
         return;
       }
 
-      // ล้างตอนที่หน้า editor ยังซ่อนอยู่ เพื่อให้เปิดมาเจอแบบโล่งทันที
-      clearPanelFields(panel, true);
+      /*
+       * ล้างเฉพาะครั้งแรกที่ผู้ใช้เปิด editor นี้ในรอบการใช้งานหน้าเว็บ
+       * หลังจากเริ่มกรอกแล้ว การออกไปหน้าหมวดและกดกลับเข้ามาอีกครั้ง
+       * ต้องเก็บข้อความ/ลิงก์ที่กรอกไว้จนกว่าผู้ใช้จะลบหรือกด RESET เอง
+       */
+      if (panel.dataset.ddsBlanked === "true") {
+        return;
+      }
 
-      // กันระบบนำทางหรือ reset ภายใน core เติมค่าตัวอย่างกลับมาในจังหวะถัดไป
+      clearPanelFields(panel);
+
+      // กันระบบนำทางใน core เติมค่าตัวอย่างกลับมาเฉพาะจังหวะเปิดครั้งแรก
       requestAnimationFrame(() => {
-        clearPanelFields(panel, true);
+        if (panel.dataset.ddsBlanked !== "true") {
+          clearPanelFields(panel);
+        }
       });
-
-      window.setTimeout(() => {
-        clearPanelFields(panel, true);
-      }, 0);
     }
 
     document
@@ -5127,6 +5133,193 @@ ${stylesheetLinks}
     scheduleStaticPageOfOneCataloguePreview();
   }
 
+
+
+  const FOOD_REVIEW_CATALOGUE_MARKUP = String.raw`<div class="fdpopup-wrap" style="--fdpopup-bg:url('https://s13.gifyu.com/images/blgAw.png');--fdpopup-main:#FFCAD4;--fdpopup-dark:#B689B0;--fdpopup-star:#ffb000;--fdpopup-paper:#fffdf9;--fdpopup-text:#27201c;--fdpopup-tagbg:#faf0f2;"><div class="fdpopup-container"><div class="fdpopup-place">Food Review</div><div class="fdpopup-stage"><div class="fdpopup-info fdpopup-info-left"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">★</div><div class="fdpopup-info-title"><span>FOOD REVIEW</span><strong>คะแนนโดยรวม</strong></div></div><div class="fdpopup-stars">★★★★★</div><div class="fdpopup-score-row"><strong>9.9</strong><span>/ 10</span></div><div class="fdpopup-score-list"><div><span>รสชาติ</span><b>10</b></div><div><span>รูปลักษณ์</span><b>10</b></div><div><span>ความสมเหตุสมผลของราคา</span><b>10</b></div></div></div><div class="fdpopup-card"><div class="fdpopup-card-head"><div class="fdpopup-brand"><div class="fdpopup-logo" style="background-image:url('https://i.pinimg.com/vwebp/1200x/cb/76/88/cb76889bbad391355af7c3c819ccb02b.webp');background-position:center 50%;"></div><div class="fdpopup-brand-text"><strong>deadbutrich</strong><span>Food Review</span></div></div><div class="fdpopup-menu">⋮</div></div><div class="fdpopup-gallery"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-1" checked><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-2"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-3"><div class="fdpopup-slides"><div class="fdpopup-photo fdpopup-photo-1" style="--fdpopup-img-1:url('https://i.pinimg.com/736x/e8/f4/3d/e8f43dae4d9a58d3f7a9bab7f080e0b0.jpg');--fdpopup-img-1-y:50%;"></div><div class="fdpopup-photo fdpopup-photo-2" style="--fdpopup-img-2:url('https://i.pinimg.com/736x/a2/14/3c/a2143cae7c46e2937acf54914c179652.jpg');--fdpopup-img-2-y:50%;"></div><div class="fdpopup-photo fdpopup-photo-3" style="--fdpopup-img-3:url('https://i.pinimg.com/736x/88/4a/d3/884ad393abce8919d72b0305646f79bf.jpg');--fdpopup-img-3-y:50%;"></div></div><div class="fdpopup-gallery-number"><span>3 PHOTOS</span></div><div class="fdpopup-dots"><label for="fdpopup-photo-1"></label><label for="fdpopup-photo-2"></label><label for="fdpopup-photo-3"></label></div></div><div class="fdpopup-actions"><div class="fdpopup-actions-left"><span class="fdpopup-heart">❤︎</span><span class="fdpopup-chat">&#128172;</span><span class="fdpopup-send">✉︎</span></div><span class="fdpopup-bookmark">⛉</span></div><div class="fdpopup-caption"><strong>deadbutrich</strong><span>กดวงกลมใต้รูปเพื่อเปลี่ยนภาพอาหาร</span></div></div><div class="fdpopup-info fdpopup-info-right"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">✦</div><div class="fdpopup-info-title"><span>RECOMMENDED</span><strong>เมนูแนะนำ</strong></div></div><h3 class="fdpopup-food-name">It’s me</h3><p class="fdpopup-description">แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</p><div class="fdpopup-tags"><span>ของทานเล่น</span><span>ใช่ นี่ของอร่อย</span></div></div></div><div class="fdpopup-contact"><div class="fdpopup-contact-avatar" style="--fdpopup-avatar:url('https://i.pinimg.com/vwebp/1200x/17/2a/f3/172af366be2a5e78b088d5fe0413a17b.webp');--fdpopup-avatar-y:35%;"></div><div class="fdpopup-contact-text"><span>RECOMMENDED BY</span><strong>Franklin D. Bloodworth</strong></div><div class="fdpopup-contact-icon">✝</div></div></div></div>`;
+
+  function buildStaticFoodReviewCardDocument() {
+    return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://guindaeyo.github.io/deepdshop/ddsh-revfoodie.css" rel="stylesheet">
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 1300px;
+    min-width: 1300px;
+    max-width: 1300px;
+    height: 920px;
+    min-height: 920px;
+    max-height: 920px;
+    background: #242424;
+    overflow: hidden;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .dds-card-preview-shell {
+    width: 1300px;
+    height: 920px;
+    display: block;
+    overflow: hidden;
+  }
+
+  .dds-card-preview-target {
+    width: 1300px;
+    min-width: 1300px;
+    max-width: 1300px;
+    height: 920px;
+    min-height: 920px;
+    max-height: 920px;
+    transform: none;
+    transform-origin: top left;
+  }
+
+  .fdpopup-wrap {
+    width: 1300px !important;
+    min-width: 1300px !important;
+    max-width: 1300px !important;
+    margin: 0 !important;
+    background-image: var(--fdpopup-bg) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .fdpopup-container {
+    width: 760px !important;
+    max-width: 760px !important;
+  }
+</style>
+</head>
+<body data-dds-static-preview="food-review">
+  <div class="dds-card-preview-shell">
+    <div class="dds-card-preview-target">
+      ${FOOD_REVIEW_CATALOGUE_MARKUP}
+    </div>
+  </div>
+</body>
+</html>`;
+  }
+
+  function installStaticFoodReviewCataloguePreviewFix() {
+    if (window.__DDS_STATIC_FOOD_REVIEW_PREVIEW_FIX__) {
+      return;
+    }
+
+    window.__DDS_STATIC_FOOD_REVIEW_PREVIEW_FIX__ = true;
+
+    const iframe = document.querySelector("#reviewCardPreview001");
+
+    if (!iframe) {
+      return;
+    }
+
+    const originalQueuePreviewDocument =
+      typeof window.queuePreviewDocument === "function"
+        ? window.queuePreviewDocument
+        : null;
+
+    /*
+     * พรีวิวบนหน้าหมวด REVIEW ต้องเป็นตัวอย่างสมบูรณ์ถาวร
+     * ไม่ให้การล้าง/พิมพ์ในหน้า EDIT CODE เขียนทับการ์ดพรีวิวนี้
+     */
+    if (originalQueuePreviewDocument) {
+      window.queuePreviewDocument = function (
+        targetIframe,
+        srcdoc,
+        resizeFunction
+      ) {
+        if (
+          targetIframe?.id === "reviewCardPreview001" &&
+          !window.__DDS_RENDER_STATIC_FOOD_REVIEW__
+        ) {
+          return true;
+        }
+
+        return originalQueuePreviewDocument.call(
+          this,
+          targetIframe,
+          srcdoc,
+          resizeFunction
+        );
+      };
+    }
+
+    function renderStaticFoodReviewPreview() {
+      const srcdoc = buildStaticFoodReviewCardDocument();
+      const resizeFunction =
+        typeof window.resizeReviewDesktopCardPreview === "function"
+          ? window.resizeReviewDesktopCardPreview
+          : typeof window.resizeCardPreview === "function"
+            ? window.resizeCardPreview
+            : null;
+
+      iframe.dataset.reviewDesktopWidth = "1300";
+      iframe.dataset.reviewDesktopHeight = "920";
+      iframe.dataset.previewVisualBounds = "true";
+
+      if (originalQueuePreviewDocument) {
+        window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = true;
+
+        try {
+          originalQueuePreviewDocument.call(
+            window,
+            iframe,
+            srcdoc,
+            resizeFunction
+          );
+        } finally {
+          window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = false;
+        }
+
+        if (typeof window.activatePendingPreviews === "function") {
+          window.activatePendingPreviews("review");
+        }
+      } else {
+        iframe.srcdoc = srcdoc;
+        iframe.addEventListener(
+          "load",
+          () => {
+            if (resizeFunction) {
+              resizeFunction(iframe);
+            }
+          },
+          { once: true }
+        );
+      }
+    }
+
+    function scheduleStaticFoodReviewPreview() {
+      [0, 90, 260].forEach((delay) => {
+        window.setTimeout(renderStaticFoodReviewPreview, delay);
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      if (
+        event.target.closest(
+          '[data-go="review"], [data-page="review"], [data-edit-review]'
+        )
+      ) {
+        scheduleStaticFoodReviewPreview();
+      }
+    });
+
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#review") {
+        scheduleStaticFoodReviewPreview();
+      }
+    });
+
+    scheduleStaticFoodReviewPreview();
+  }
+
   appendClassicScript(CORE_CDN_URL)
     .catch(() => loadCoreFromRawFallback())
     .then(() => {
@@ -5143,6 +5336,7 @@ ${stylesheetLinks}
       installThreeColumnShowcaseGrids();
       installBlankEditorFormsAndBbcodeTools();
       installStaticCataloguePreviewFix();
+      installStaticFoodReviewCataloguePreviewFix();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
     })
     .catch((error) => {
