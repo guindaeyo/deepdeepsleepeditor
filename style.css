@@ -4883,9 +4883,9 @@ output {
 }
 
 .dds-fortyone-editor-preview-frame {
-  width: 1000px !important;
-  min-width: 1000px !important;
-  max-width: 1000px !important;
+  width: 950px !important;
+  min-width: 950px !important;
+  max-width: 950px !important;
 
   height: 2000px !important;
   min-height: 2000px !important;
@@ -4894,9 +4894,9 @@ output {
 
 .dds-profile-grid
 .dds-fortyone-card-preview-frame {
-  width: 1000px !important;
-  min-width: 1000px !important;
-  max-width: 1000px !important;
+  width: 950px !important;
+  min-width: 950px !important;
+  max-width: 950px !important;
 
   height: 2000px !important;
   min-height: 2000px !important;
@@ -4908,7 +4908,7 @@ output {
 .dds-fortyone-editor-preview-frame,
 .dds-profile-grid
 .dds-fortyone-card-preview-frame {
-  max-width: 1000px !important;
+  max-width: 950px !important;
   min-height: 2000px !important;
 }
 
@@ -5626,7 +5626,7 @@ output {
 
 
 /* ==================================================
-   COMMISSION — 1000PX / AUTO CONTENT HEIGHT / 13PX
+   COMMISSION — 1050PX / AUTO CONTENT HEIGHT / 13PX
 ================================================== */
 
 .dds-commission-card-type,
@@ -5638,9 +5638,9 @@ output {
 
 /* การ์ดพรีวิว */
 .dds-commission-card-preview-frame {
-  width: 1000px !important;
-  min-width: 1000px !important;
-  max-width: 1000px !important;
+  width: 1050px !important;
+  min-width: 1050px !important;
+  max-width: 1050px !important;
 
   height:
     var(
@@ -5664,8 +5664,8 @@ output {
 
 /* หน้าโชว์งานขยายตามความสูงจริงของโค้ด */
 .dds-commission-preview-stage {
-  width: min(1000px, 100%) !important;
-  max-width: 1000px !important;
+  width: min(1050px, 100%) !important;
+  max-width: 1050px !important;
 
   height:
     var(
@@ -5683,9 +5683,9 @@ output {
 }
 
 .dds-commission-view-frame {
-  width: 1000px !important;
-  min-width: 1000px !important;
-  max-width: 1000px !important;
+  width: 1050px !important;
+  min-width: 1050px !important;
+  max-width: 1050px !important;
 
   height:
     var(
@@ -5740,9 +5740,9 @@ output {
     center center !important;
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1090px) {
   .dds-commission-preview-stage {
     width: 100% !important;
-    max-width: 1000px !important;
+    max-width: 1050px !important;
   }
 }
