@@ -3125,10 +3125,7 @@ output {
   opacity: 1;
 
   transition:
-    opacity 0.18s ease;
-
-  will-change:
-    opacity;
+    opacity 0.1s ease;
 }
 
 .dds-roleplay-card-preview-frame.dds-preview-loading,
@@ -5758,4 +5755,31 @@ output {
 
 .dds-commission-card-preview-frame {
   background: #242424;
+}
+
+
+/* ==================================================
+   PREVIEW PERFORMANCE
+================================================== */
+
+.dds-roleplay-card {
+  contain:
+    layout
+    paint
+    style;
+}
+
+.dds-roleplay-card-preview {
+  contain:
+    layout
+    paint;
+}
+
+.dds-roleplay-card-preview-frame,
+.dds-editor-preview-frame {
+  backface-visibility:
+    hidden;
+
+  transform-style:
+    preserve-3d;
 }

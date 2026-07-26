@@ -41,6 +41,132 @@ const pageNumbers = {
   "editor-commission002": "04"
 };
 
+
+/* ==================================================
+   ON-DEMAND PREVIEW INITIALIZATION
+   โหลดเฉพาะหมวดที่ผู้ใช้เปิดอยู่
+================================================== */
+
+const initializedPreviewPages =
+  new Set();
+
+function runDeferredPreviewInitializer(
+  initializer,
+  pageName,
+  index
+) {
+  const run = () => {
+    initializer();
+
+    /*
+     * ถ้าผู้ใช้ยังอยู่ในหมวดนี้
+     * ให้เปิดพรีวิวที่เพิ่งเตรียมทันที
+     */
+    const activePanel =
+      document.querySelector(
+        `[data-panel="${pageName}"].is-active`
+      );
+
+    if (activePanel) {
+      activatePendingPreviews(
+        pageName
+      );
+    }
+  };
+
+  if (
+    "requestIdleCallback" in window
+  ) {
+    window.requestIdleCallback(
+      run,
+      {
+        timeout:
+          350 + index * 90
+      }
+    );
+
+    return;
+  }
+
+  window.setTimeout(
+    run,
+    45 + index * 35
+  );
+}
+
+function initializePreviewPage(
+  pageName
+) {
+  if (
+    initializedPreviewPages.has(
+      pageName
+    )
+  ) {
+    return;
+  }
+
+  const pageInitializers = {
+    roleplay: [
+      updatePageOfOne,
+      updateWeirdo,
+      updateHihi,
+      updateUuiaa,
+      updateComma,
+      updateNewRules,
+      updateLoveSong,
+      updateDumbDumber,
+      updateHigherHeaven
+    ],
+
+    profile: [
+      updatePolaroidLove,
+      updateMoodboard,
+      updateFortyOne,
+      updateNothinBoutMe
+    ],
+
+    review: [
+      updateFoodReview
+    ],
+
+    commission: [
+      updateCommissionWork001,
+      updateCommissionWork002
+    ]
+  };
+
+  const initializers =
+    pageInitializers[pageName];
+
+  if (!initializers) {
+    return;
+  }
+
+  initializedPreviewPages.add(
+    pageName
+  );
+
+  initializers.forEach(
+    (initializer, index) => {
+      /*
+       * สามใบแรกของหมวดแสดงทันที
+       * ใบถัดไปค่อยเตรียมเมื่อ browser ว่าง
+       */
+      if (index < 3) {
+        initializer();
+        return;
+      }
+
+      runDeferredPreviewInitializer(
+        initializer,
+        pageName,
+        index
+      );
+    }
+  );
+}
+
+
 const pageTitles = {
   home: "― www. deep deep sleep code shop .com ―",
   roleplay: "― www. deep deep sleep code shop .com ―",
@@ -126,6 +252,14 @@ function openPage(pageName, updateHash = true) {
     top: 0,
     behavior: "smooth"
   });
+
+  /*
+   * สร้างพรีวิวเฉพาะหมวดที่กำลังเปิด
+   * หน้า HOME จึงไม่ต้องสร้าง iframe ทั้งเว็บล่วงหน้า
+   */
+  initializePreviewPage(
+    validPage
+  );
 
   if (validPage === "editor-code001") {
     updatePageOfOne();
@@ -803,7 +937,7 @@ const cardPreviewObserver =
         {
           root: null,
           rootMargin:
-            "520px 0px 520px 0px",
+            "240px 0px 240px 0px",
           threshold: 0.01
         }
       )
@@ -857,7 +991,7 @@ function isPreviewNearViewport(iframe) {
   const rect =
     iframe.getBoundingClientRect();
 
-  const margin = 520;
+  const margin = 240;
 
   return (
     rect.bottom >= -margin &&
@@ -977,7 +1111,7 @@ function watchPreviewAssets(
       setTimeout(() => {
         state.resizeObserver
           ?.disconnect();
-      }, 2600);
+      }, 1600);
   }
 
   previewDocument.fonts
@@ -1032,12 +1166,10 @@ function watchPreviewAssets(
   );
 
   const delays = [
-    70,
-    180,
-    420,
-    850,
-    1500,
-    2400
+    60,
+    220,
+    620,
+    1200
   ];
 
   delays.forEach((delay) => {
@@ -1051,7 +1183,7 @@ function watchPreviewAssets(
         resizeFunction,
         true
       );
-    }, 130);
+    }, 70);
 }
 
 function updateLoadedPreviewDocument(
@@ -1166,6 +1298,19 @@ function applyPreviewDocument(
 
   markPreviewLoading(iframe);
 
+  /*
+   * iframe ที่อยู่ใกล้จอให้ browser จัดลำดับเป็น eager
+   * ส่วนใบด้านล่างยังคง lazy เพื่อไม่แย่ง network
+   */
+  if (
+    isCardPreviewIframe(iframe)
+  ) {
+    iframe.setAttribute(
+      "loading",
+      "eager"
+    );
+  }
+
   iframe.srcdoc = srcdoc;
 }
 
@@ -1182,8 +1327,8 @@ function commitPendingPreview(
     immediate
       ? 0
       : isCardPreviewIframe(iframe)
-        ? 35
-        : 90;
+        ? 0
+        : 20;
 
   state.timer =
     setTimeout(() => {
@@ -12077,20 +12222,8 @@ window.addEventListener(
    INITIALIZE
 ================================================== */
 
-updatePageOfOne();
-updateWeirdo();
-updateHihi();
-updateUuiaa();
-updateComma();
-updateNewRules();
-updateLoveSong();
-updateDumbDumber();
-updateHigherHeaven();
-updatePolaroidLove();
-updateMoodboard();
-updateFortyOne();
-updateNothinBoutMe();
-updateCommissionWork001();
-updateCommissionWork002();
-updateFoodReview();
+/*
+ * ไม่สร้างพรีวิวทุกหมวดตั้งแต่เปิดหน้าแรก
+ * openPageFromHash() จะเรียกเฉพาะหมวดที่กำลังใช้งาน
+ */
 openPageFromHash();
