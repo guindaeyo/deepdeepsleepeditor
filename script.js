@@ -10,7 +10,7 @@
  * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
  * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE และ ACTIVITY: MY TOP 5 MOVIES แบบดูอย่างเดียว
  * - หน้า ACTIVITY ใช้การ์ด 2 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
- * - หน้า CODE006 รูปหน้าชื่อเว็บและรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
+ * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ไม่ต้องแก้ index.html และ style.css
  */
 
@@ -2606,26 +2606,36 @@ ${stylesheetLinks}
     const generatedCode = document.querySelector(
       "#generatedNewRulesCode"
     );
+    const bigAvatarX = document.querySelector(
+      "#nrBigAvatarX"
+    );
     const miniAvatarX = document.querySelector(
       "#nrMiniAvatarX"
     );
     const footerAvatarX = document.querySelector(
       "#nrFooterAvatarX"
     );
+    const bigAvatarPositionBox =
+      bigAvatarX?.closest(".dds-image-position");
     const miniAvatarPositionBox =
       miniAvatarX?.closest(".dds-image-position");
     const footerAvatarPositionBox =
       footerAvatarX?.closest(".dds-image-position");
 
     /*
-     * รูปหน้าชื่อเว็บและรูปวงกลมเล็กส่วนล่าง
+     * รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่าง
      * เป็นรูปตกแต่งที่ให้เปลี่ยนเฉพาะ URL เท่านั้น
      */
+    bigAvatarPositionBox?.remove();
     miniAvatarPositionBox?.remove();
     footerAvatarPositionBox?.remove();
 
     function stripLockedImageInlineStyles(source) {
       return String(source || "")
+        .replace(
+          /(<img\b[^>]*class=["'][^"']*\bbigav\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
+          "$1"
+        )
         .replace(
           /(<img\b[^>]*class=["'][^"']*\bbabiezfrn-miniav\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
           "$1"
@@ -2642,7 +2652,7 @@ ${stylesheetLinks}
      */
     if (
       generatedCode &&
-      !generatedCode.dataset.ddsMiniAvatarSanitized
+      !generatedCode.dataset.ddsLockedAvatarSanitized
     ) {
       const valueDescriptor =
         Object.getOwnPropertyDescriptor(
@@ -2668,7 +2678,7 @@ ${stylesheetLinks}
           }
         });
 
-        generatedCode.dataset.ddsMiniAvatarSanitized =
+        generatedCode.dataset.ddsLockedAvatarSanitized =
           "true";
         generatedCode.value = currentValue;
       }
@@ -2682,7 +2692,7 @@ ${stylesheetLinks}
     /*
      * กรอง srcdoc ก่อนเข้าระบบพรีวิว
      * จึงไม่เหลือ inline object-position / transform
-     * บนรูปทั้งสองจุดในพรีวิวใหญ่และการ์ดหน้า FOR ROLEPLAY
+     * บนรูปทั้งสามจุดในพรีวิวใหญ่และการ์ดหน้า FOR ROLEPLAY
      */
     if (
       typeof window.queuePreviewDocument === "function" &&
@@ -2736,7 +2746,7 @@ ${stylesheetLinks}
 
       const lockedImages =
         iframe.contentDocument?.querySelectorAll(
-          ".babiezfrn-miniav, .babiezfrn-foot .fava"
+          ".babiezfrn-float .bigav, .babiezfrn-miniav, .babiezfrn-foot .fava"
         );
 
       lockedImages?.forEach((image) => {
