@@ -8,8 +8,8 @@
  * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
  * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
- * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE และ ACTIVITY: MY TOP 5 MOVIES แบบดูอย่างเดียว
- * - หน้า ACTIVITY ใช้การ์ด 2 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
+ * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE, MY OWN CODE 2 และ ACTIVITY: MY TOP 5 MOVIES ทั้งหน้ากิจกรรมและแบบตอบกลับ แบบดูอย่างเดียว
+ * - หน้า COMMISSION & SHOWCASE และ ACTIVITY ใช้การ์ด 3 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
  * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ไม่ต้องแก้ index.html และ style.css
  */
@@ -1453,6 +1453,580 @@ ${stylesheetLinks}
     }
   }
 
+  function installActivityTopMoviesReply() {
+    if (window.__DDS_ACTIVITY_TOP_MOVIES_REPLY_INSTALLED__) {
+      return;
+    }
+
+    const activityPanel = document.querySelector(
+      '[data-work-panel="activity"]'
+    );
+    const footer = document.querySelector(
+      ".dds-footer"
+    );
+
+    if (!activityPanel || !footer) {
+      return;
+    }
+
+    window.__DDS_ACTIVITY_TOP_MOVIES_REPLY_INSTALLED__ = true;
+
+    const stylesheetUrls = [
+      "https://guindaeyo.github.io/css/activizz01.css",
+      "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Herr+Von+Muellerhoff&family=Playfair+Display:wght@500;700;900&display=swap"
+    ];
+    const canvasWidth = 1040;
+    const rootSelector = ".ativfzr-movies";
+
+    const activityMarkup = String.raw`<div class="ativfzr-movies"><section class="ativfzr-hero"><div class="ativfzr-title">MY TOP</div><div class="ativfzr-sub">xxx movies</div><div class="ativfzr-burst"><span>05</span></div><span class="ativfzr-dot l"></span><span class="ativfzr-dot r"></span><div class="ativfzr-search"><span class="ativfzr-bar"></span></div><div class="ativfzr-tv-bg"><img src="https://i.pinimg.com/736x/d7/9c/bf/d79cbfa03c3f06013dffa7d4e61e2b6f.jpg" alt=""></div><div class="ativfzr-tv"><img src="https://s13.gifyu.com/images/b70mu.png" alt=""></div><div class="ativfzr-arrow l">‹</div><div class="ativfzr-arrow r">›</div><div class="ativfzr-name">Franklin D. Bloodworth</div></section><section class="ativfzr-list"><div class="ativfzr-label">THE FILMS :</div><div class="ativfzr-main"><img class="ativfzr-poster" src="https://connect.bu.ac.th/wp-content/uploads/2022/11/Movie-Beautiful.png" alt="Er rer เอ๋อเหรอ"><div class="ativfzr-maintext"><span class="ativfzr-no">01.</span><span class="ativfzr-film-title">Er rer <span style="font-size:1.2em"><strong>เอ๋อเหรอ</strong></span></span><div class="ativfzr-desc">เป็นหนังที่อยากเอาเข้าลิสต์มาก ๆ แต่น่าเสียดายที่ไม่ได้มีหมวดดราม่า ส่วนนึงเพราะกลัวว่าคนจะดูน้อย เลยไม่ได้เข้ามาเล่น และมีอีกหลายหมวดที่ไม่ได้เอามาเพราะคนจัดไม่ค่อยดู ไม่รู้จะเอาเรื่องอะไรมาใส่ 55555555 เลยคิดว่าหลาย ๆ คนน่าจะมีเรื่องที่อยากเอามาแชร์แต่ไม่ได้เอามาลงเลย เลยกลายเป็นโจทย์นี้ขึ้นมา<br><br>ที่เอาเรื่องนี้มาลงเพราะชอบไดนามิกของความสัมพันธ์พ่อกับต๋องมาก มันน่ารักจริง ๆ ร้องไห้ด้วย นี่เอ็นดูต๋องทั้งเรื่อง รู้สึกดีใจมากที่ข้าง ๆ ต๋องมีลูกแก้ว ไม่งั้นก็แย่เหมือนกัน</div><div class="ativfzr-rate-big">rate : ★★★★★</div></div></div><div class="ativfzr-grid"><div class="ativfzr-card"><img src="https://m.media-amazon.com/images/M/MV5BZDI0Y2FiMzgtMzkxNC00ODdmLTk0NWEtZDMwNjdmZGE2M2ZkXkEyXkFqcGc@._V1_QL75_UX327_.jpg" alt="La La Land"><h3 class="ativfzr-title-1">02.<span>La La Land</span></h3><p class="ativfzr-text-1">ดูกี่ครั้งก็ร้องไห้ทุกครั้ง ความสัมพันธ์ของคนสองคนที่ไม่ได้ไปต่อ ความสัมพันธ์ที่จบลงด้วยการแยกทาง เติบโตแล้วไปใช้ชีวิตของตัวเอง แม้ว่าจะกลับมาเจอกันอีกครั้งทุกอย่างก็ยังคงสวยงามเสมอเมื่อมองย้อนกลับไป ฮือ ๆๆ</p><span class="ativfzr-rate ativfzr-rate-1">rate : ★★★★★</span></div><div class="ativfzr-card"><img src="https://www.khaosod.co.th/wpapp/uploads/2022/02/A.gif" alt="One for the Road วันสุดท้าย…ก่อนบายเธอ"><h3 class="ativfzr-title-2">03.<span>One for the Road วันสุดท้าย…ก่อนบายเธอ</span></h3><p class="ativfzr-text-2">โหห ทุกคนในเรื่องเล่นโคตรรรรรดี ช่วงนั้นหลายคนไม่ชอบเพราะมันจบไม่แฮปปี้ แต่ในขณะที่นี่ชอบมากกก หนังโคตรเป็นมนุษย์ มันดูจะเป็นชีวิตคนสุด ๆ แล้ว มันไม่มีใครดีไปทั้งหมด เลวไปทั้งหมดหรอก สุดท้ายคนเรามันก็เทา ๆ แบบนี้นี่แหละ โคตรสนุกเลยไปดูเถอะ</p><span class="ativfzr-rate ativfzr-rate-2">rate : ★★★★★</span></div><div class="ativfzr-card"><img src="https://lh5.googleusercontent.com/-TOkdMnaqSGE/TYm-ABi_NBI/AAAAAAABfH4/KkcF4UsXWls/s1600/SuckSeed0023.jpg" alt="Suck Seed ห่วยขั้นเทพ"><h3 class="ativfzr-title-3">04.<span>Suck Seed ห่วยขั้นเทพ</span></h3><p class="ativfzr-text-3">เป็นหนังที่ทำให้นี่ไปซื้อกีต้าร์ไฟฟ้า ไปเรียนกีต้าร์ แต่ตอนนี้ก็เล่นไม่เป็นเหมือนเดิม อืม แต่ขัดใจคุ้ง ลบ 2 แต้ม<br><br>ชีวิตต้องลองซัก Seed หนึ่ง<br>มันต้องมีดีซัก Seed หนึ่ง<br>ถึงแม้มันยังจะห่วย ชีวิตบรมห่วย<br>ถึงแม้มันยังจะซวย เราก็ซวยไปด้วยกัน<br>...อ้างอิง <a href="https://www.siamzone.com/music/thailyric/8225" target="_blank" rel="noopener noreferrer">Siamzone</a></p><span class="ativfzr-rate ativfzr-rate-3">rate : ★★★</span></div></div><div class="ativfzr-five"><div><h3>05.<br>Loveaholic โคตรรักเอ็งเลย</h3><p>หนังดีมาก ดีแบบมาก ๆๆๆ เสียดายมากที่เราไม่ค่อยได้เจอหนังแบบนี้อีกแล้ว ดูไปร้องไห้ไปจริง ๆ ทุกคน มันแบบ ง้ากกอะ อยากให้ลุงพิงแกกลับมาทำหน้งอะไรแบบนี้อีกเหมือนกันนะ ดำเนินเรื่องโคตรดีเลย เพลง<a href="https://www.youtube.com/watch?v=mNtAAzflYhQ" target="_blank" rel="noopener noreferrer">เขียนถึงคนบนฟ้า</a>ก็ดี ลองกดไปฟังดู ;อีโมจิร้องไห้น่าเกลียด;</p><span class="ativfzr-rate ativfzr-rate-4">rate : ★★★★★</span></div><img src="https://storage.googleapis.com/sahamongkolfilm-media/2020/06/Loveaholic-Still05.jpg" alt="Loveaholic โคตรรักเอ็งเลย"></div><div class="ativfzr-bottom-wrap"><div class="ativfzr-check"></div><div class="ativfzr-bottom-no">07</div></div></section></div>`;
+
+    const previewOnlyCss = `
+      <style data-activity-preview-only>
+        html,
+        body {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+
+        body {
+          position: relative !important;
+        }
+
+        .dds-preview-shell,
+        .dds-preview-target,
+        .dds-card-preview-shell,
+        .dds-card-preview-target,
+        .dds-activity-preview-content {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+
+        .dds-activity-preview-content > .ativfzr-movies {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 auto !important;
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+          transform: none !important;
+          overflow: visible !important;
+        }
+      </style>
+    `;
+
+    const previewMarkup =
+      `${previewOnlyCss}<div class="dds-activity-preview-content">${activityMarkup}</div>`;
+
+    function buildFallbackPreviewDocument(markup) {
+      const stylesheetLinks = stylesheetUrls
+        .map((url) => `<link href="${url}" rel="stylesheet">`)
+        .join("\n");
+
+      return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${stylesheetLinks}
+<style>
+  html, body { margin: 0; min-height: 100%; background: #242424; }
+  body { padding: 0; overflow: hidden; }
+  .dds-preview-shell,
+  .dds-card-preview-shell {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .dds-preview-target,
+  .dds-card-preview-target {
+    flex: 0 0 auto;
+    transform-origin: top center;
+  }
+</style>
+</head>
+<body>
+  <div class="dds-preview-shell">
+    <div class="dds-preview-target">${markup}</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function buildPreviewDocument(isFullView) {
+      const builder = isFullView
+        ? window.buildEditorPreviewDocument
+        : window.buildCardPreviewDocument;
+
+      if (typeof builder === "function") {
+        return builder(
+          stylesheetUrls,
+          previewMarkup
+        );
+      }
+
+      return buildFallbackPreviewDocument(
+        previewMarkup
+      );
+    }
+
+    let activityGrid = activityPanel.querySelector(
+      ".dds-activity-grid"
+    );
+
+    if (!activityGrid) {
+      activityGrid = document.createElement("div");
+      activityGrid.className =
+        "dds-commission-grid dds-activity-grid";
+      activityPanel.appendChild(activityGrid);
+    }
+
+    const card = document.createElement("article");
+    card.className =
+      "dds-roleplay-card dds-commission-card dds-activity-top-movies-reply-card";
+    card.innerHTML = `
+      <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+        <iframe
+          aria-hidden="true"
+          class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="activityTopMoviesReplyCardPreview"
+          loading="lazy"
+          scrolling="no"
+          tabindex="-1"
+          title="ตัวอย่างโค้ดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
+        ></iframe>
+        <span class="dds-roleplay-preview-badge">ACTIVITY</span>
+      </div>
+
+      <div class="dds-roleplay-card-body dds-commission-card-body">
+        <h2 class="dds-commission-card-title">MY TOP 5 MOVIES</h2>
+        <p class="dds-commission-card-type">โค้ดกิจกรรม - แบบตอบกลับ</p>
+        <button
+          class="dds-roleplay-edit"
+          data-view-activity-top-movies-reply
+          type="button"
+        >
+          VIEW WORK <span>↗</span>
+        </button>
+      </div>
+    `;
+    activityGrid.appendChild(card);
+
+    const viewPanel = document.createElement("section");
+    viewPanel.className =
+      "dds-panel dds-commission-view-panel dds-activity-top-movies-view-panel dds-activity-top-movies-reply-view-panel";
+    viewPanel.dataset.panel =
+      "view-activity-top-movies-reply";
+    viewPanel.innerHTML = `
+      <div class="dds-commission-view-toolbar">
+        <button
+          aria-label="กลับหน้า ACTIVITY"
+          class="dds-back-button"
+          data-activity-top-movies-reply-back
+          title="กลับหน้า ACTIVITY"
+          type="button"
+        >
+          ←
+        </button>
+      </div>
+
+      <div
+        class="dds-commission-preview-stage"
+        id="activityTopMoviesReplyPreviewStage"
+      >
+        <iframe
+          class="dds-editor-preview-frame dds-commission-view-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="activityTopMoviesReplyPreview"
+          scrolling="no"
+          title="โค้ดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
+        ></iframe>
+      </div>
+    `;
+    footer.before(viewPanel);
+
+    const cardIframe = card.querySelector(
+      "#activityTopMoviesReplyCardPreview"
+    );
+    const fullIframe = viewPanel.querySelector(
+      "#activityTopMoviesReplyPreview"
+    );
+    const viewButton = card.querySelector(
+      "[data-view-activity-top-movies-reply]"
+    );
+    const backButton = viewPanel.querySelector(
+      "[data-activity-top-movies-reply-back]"
+    );
+
+    let cardRendered = false;
+    let fullRendered = false;
+
+    function measureCanvasHeight(iframe) {
+      const previewDocument = iframe?.contentDocument;
+
+      if (!previewDocument) {
+        return 0;
+      }
+
+      const root = previewDocument.querySelector(
+        rootSelector
+      );
+      const content = previewDocument.querySelector(
+        ".dds-activity-preview-content"
+      );
+
+      if (!root || !content) {
+        return 0;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+
+      return Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            rootRect.height,
+            contentRect.height,
+            root.offsetHeight,
+            root.scrollHeight,
+            content.offsetHeight,
+            content.scrollHeight,
+            previewDocument.body.scrollHeight,
+            previewDocument.documentElement.scrollHeight
+          )
+        )
+      );
+    }
+
+    function resizePreview(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      const stage = iframe.closest(
+        ".dds-commission-preview-stage, .dds-roleplay-card-preview"
+      );
+
+      if (!stage) {
+        return;
+      }
+
+      const canvasHeight = measureCanvasHeight(iframe);
+
+      if (!canvasHeight) {
+        return;
+      }
+
+      iframe.style.setProperty(
+        "--dds-commission-canvas-height",
+        `${canvasHeight}px`
+      );
+
+      const isFullView = iframe.classList.contains(
+        "dds-commission-view-frame"
+      );
+
+      if (isFullView) {
+        const scale = Math.max(
+          0.01,
+          Math.min(
+            1,
+            stage.clientWidth / canvasWidth
+          )
+        );
+        const scaledHeight = Math.ceil(
+          canvasHeight * scale
+        );
+
+        iframe.style.setProperty(
+          "--dds-commission-canvas-scale",
+          String(scale)
+        );
+        stage.style.setProperty(
+          "--dds-commission-stage-height",
+          `${scaledHeight}px`
+        );
+        return;
+      }
+
+      if (stage.clientHeight < 20) {
+        return;
+      }
+
+      const padding = 18;
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          (stage.clientWidth - padding) / canvasWidth,
+          (stage.clientHeight - padding) / canvasHeight
+        )
+      );
+
+      iframe.style.setProperty(
+        "--dds-commission-canvas-scale",
+        String(scale)
+      );
+    }
+
+    function scheduleResize(iframe) {
+      const run = () => resizePreview(iframe);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(run);
+      });
+
+      [80, 180, 420, 850, 1500, 2400].forEach(
+        (delay) => {
+          window.setTimeout(run, delay);
+        }
+      );
+    }
+
+    function watchPreview(iframe) {
+      const previewDocument = iframe.contentDocument;
+
+      if (!previewDocument) {
+        return;
+      }
+
+      previewDocument
+        .querySelectorAll("img")
+        .forEach((image) => {
+          if (!image.complete) {
+            image.addEventListener(
+              "load",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+            image.addEventListener(
+              "error",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+          }
+        });
+
+      if (previewDocument.fonts?.ready) {
+        previewDocument.fonts.ready.then(() => {
+          scheduleResize(iframe);
+        });
+      }
+    }
+
+    function renderPreview(iframe, isFullView) {
+      if (!iframe) {
+        return;
+      }
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          watchPreview(iframe);
+          scheduleResize(iframe);
+        },
+        { once: true }
+      );
+      iframe.srcdoc = buildPreviewDocument(
+        isFullView
+      );
+    }
+
+    function ensureCardPreview() {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+        return;
+      }
+
+      cardRendered = true;
+      renderPreview(cardIframe, false);
+    }
+
+    function ensureFullPreview() {
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+        return;
+      }
+
+      fullRendered = true;
+      renderPreview(fullIframe, true);
+    }
+
+    function closeCustomViewState() {
+      viewPanel.classList.remove("is-active");
+    }
+
+    function openCustomView() {
+      ensureFullPreview();
+
+      document.body.classList.add(
+        "dds-editor-mode"
+      );
+      document
+        .querySelectorAll("[data-panel]")
+        .forEach((panel) => {
+          panel.classList.toggle(
+            "is-active",
+            panel === viewPanel
+          );
+        });
+
+      document
+        .querySelectorAll("[data-page]")
+        .forEach((button) => {
+          const active =
+            button.dataset.page === "commission";
+
+          button.classList.toggle(
+            "is-active",
+            active
+          );
+          button.setAttribute(
+            "aria-current",
+            active ? "page" : "false"
+          );
+        });
+
+      const pageNumber = document.querySelector(
+        "#currentPageNumber"
+      );
+
+      if (pageNumber) {
+        pageNumber.textContent = "04";
+      }
+
+      document.title =
+        "― www. deep deep sleep code shop .com ―";
+      history.replaceState(
+        null,
+        "",
+        "#commission"
+      );
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      scheduleResize(fullIframe);
+    }
+
+    viewButton.addEventListener(
+      "click",
+      openCustomView
+    );
+
+    backButton.addEventListener("click", () => {
+      closeCustomViewState();
+
+      if (typeof window.openPage === "function") {
+        window.openPage("commission");
+      } else {
+        document.body.classList.remove(
+          "dds-editor-mode"
+        );
+        document
+          .querySelectorAll("[data-panel]")
+          .forEach((panel) => {
+            panel.classList.toggle(
+              "is-active",
+              panel.dataset.panel === "commission"
+            );
+          });
+      }
+
+      document
+        .querySelector('[data-work-tab="activity"]')
+        ?.click();
+      ensureCardPreview();
+    });
+
+    const activityTab = document.querySelector(
+      '[data-work-tab="activity"]'
+    );
+
+    activityTab?.addEventListener("click", () => {
+      requestAnimationFrame(ensureCardPreview);
+    });
+
+    document
+      .querySelectorAll(
+        '[data-page="commission"], [data-go="commission"]'
+      )
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          closeCustomViewState();
+
+          requestAnimationFrame(() => {
+            if (!activityPanel.hidden) {
+              ensureCardPreview();
+            }
+          });
+        });
+      });
+
+    document
+      .querySelectorAll("[data-page], [data-go]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            if (!button.matches(
+              '[data-page="commission"], [data-go="commission"]'
+            )) {
+              closeCustomViewState();
+            }
+          },
+          true
+        );
+      });
+
+    window.addEventListener(
+      "hashchange",
+      closeCustomViewState
+    );
+    window.addEventListener("resize", () => {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+      }
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+      }
+    });
+
+    if (
+      document
+        .querySelector('[data-panel="commission"]')
+        ?.classList.contains("is-active") &&
+      !activityPanel.hidden
+    ) {
+      ensureCardPreview();
+    }
+  }
+
 
   function installCommissionThreeHouse() {
     if (window.__DDS_COMMISSION_003_INSTALLED__) {
@@ -2593,6 +3167,539 @@ ${stylesheetLinks}
   }
 
 
+  function installMyOwnCodeHistory() {
+    if (window.__DDS_MY_OWN_CODE_HISTORY_INSTALLED__) {
+      return;
+    }
+
+    const commissionGrid = document.querySelector(
+      '[data-work-panel="commission"] .dds-commission-grid'
+    ) || document.querySelector('.dds-commission-grid');
+    const footer = document.querySelector('.dds-footer');
+
+    if (!commissionGrid || !footer) {
+      return;
+    }
+
+    window.__DDS_MY_OWN_CODE_HISTORY_INSTALLED__ = true;
+
+    const stylesheetUrls = [
+      'https://guindaeyo.github.io/deepdshop/dddshop-pr01eiei.css'
+    ];
+    const canvasWidth = 1040;
+    const rootSelector = '.profco01ddps-stage';
+
+    const showcaseMarkup = String.raw`<section class="profco01ddps-stage"><div class="profco01ddps-board"><aside class="profco01ddps-left"><img src="https://iili.io/CTb913J.png" class="profco01ddps-main-img" alt="Franklin Dominic Bloodworth"></aside><main class="profco01ddps-right"><nav class="profco01ddps-nav"><span class="profco01ddps-navitem">access</span><span class="profco01ddps-navitem">updates</span><span class="profco01ddps-navitem">indications</span><span class="profco01ddps-navitem">recreation</span><span class="profco01ddps-lock">●<small>view</small></span></nav><section class="profco01ddps-card profco01ddps-post"><div class="profco01ddpspost-head"><div class="profco01ddpsprofile"><img src="https://i.pinimg.com/736x/0e/70/0a/0e700a9be59ba8e21e6cd54cb2803e16.jpg" alt="deadbutrich"><span>deadbutrich</span></div><span class="profco01ddpsdots">⋮</span><b>interactive</b></div><p><b>Character name :</b> Franklin Dominic Bloodworth (แฟรงคลิน โดมินิก บลัดเวิร์ธ)
+<b>Date of Birth :</b> 7 May 1995
+<b>Age :</b> 31 ปี (ร่างกายอายุ 25 ปี)
+<b>Race :</b> แวมไพร์
+<b>Personality :</b> แฟรงคลินเป็นชายหนุ่มรูปร่างสูงสง่า หน้าตาดี ทว่ากลับมีแววตาคม และท่าทีที่มักนิ่งเฉย ทำให้ผู้คนรอบตัวรู้สึกว่าเขาเป็นคนหยิ่งยโส ไม่ชอบเข้าหาใครก่อน เขาเป็นคนหัวขบถ มีความเชื่อมั่นในตัวเองสูงจนบางครั้งอาจถูกมองว่าหยิ่งหรือเข้าถึงยาก แต่หากได้รู้จักตัวตนของเขาจริง ๆ จะพบว่าเขามีมุมที่อ่อนโยน และจริงใจอยู่มากกว่าที่ใครหลายคนคิด หรือเปล่า?</p><div class="profco01ddpspost-actions"><button type="button">post</button><span>♡</span></div><div class="profco01ddpspost-tabs"><a href="https://roleplayth.com/member.php?action=profile&amp;uid=600" target="_blank" rel="noopener noreferrer">PROFILE</a><a href="https://discord.com/users/759838371001401364" target="_blank" rel="noopener noreferrer">DISCORD</a><a href="https://roleplayth.com/showthread.php?tid=4932" target="_blank" rel="noopener noreferrer">CODE SHOPS</a></div></section><section class="profco01ddps-card profco01ddps-info"><div class="profco01ddpsabout"><h2>ABOUT ME <span>Biography</span></h2><p>แฟรงคลินเกิดมาในตระกูลแชโบลที่มั่งคั่งของเกาหลี เติบโตท่ามกลางความสะดวกสบาย และการตามใจจากครอบครัว ทำให้เขาเป็นคนค่อนข้างเอาแต่ใจเล็กน้อย เขาย้ายไปศึกษาต่อที่สหรัฐอเมริกา และใช้ชีวิตอยู่ในสังคมชนชั้นสูง ซึ่งทำให้เขาได้พบและมีความสัมพันธ์กับชายหนุ่มคนรักในวงสังคมเดียวกัน
+
+โชคชะตาของแฟรงคลินเปลี่ยนไปตลอดกาลเมื่อเขาย้ายเข้าไปอยู่ในแมนชั่นหรูแห่งหนึ่ง โดยไม่เคยรู้มาก่อนว่าชายหนุ่มข้างห้องที่สนิทกันคือแวมไพร์ คืนนั้นแฟรงคลินได้ยินเสียงทะเลาะกันอย่างรุนแรงดังมาจากห้องข้าง ๆ จนพื้นสั่นสะเทือน ความหงุดหงิด และรำคาญทำให้เขาตัดสินใจจะเข้าไปห้ามปราม แต่กลับต้องเผชิญกับการโจมตีอย่างไม่ตั้งใจจากสิ่งที่เรียกกันว่านักล่าแวมไพร์
+
+เพื่อนข้างห้องที่เป็นแวมไพร์ รู้สึกผิดอย่างยิ่งที่แฟรงคลินต้องพลอยเดือดร้อน จึงตัดสินใจเปลี่ยนแฟรงคลินให้กลายเป็นแวมไพร์เพื่อรักษาชีวิต และแนะนำให้เขาย้ายไปอาศัยอยู่ที่หมู่บ้านเอลิเชียน ซึ่งเป็นหมู่บ้านที่รวมตัวของสิ่งมีชีวิตเหนือธรรมชาติเพื่อปรับตัวเข้ากับชีวิตอมตะที่ไม่อาจหวนกลับไปเป็นเหมือนเดิมได้อีก และต้องจากคนรักของตนไปตลอดกาล เพราะไม่อยากให้อีกฝ่ายทนอยู่กับตนเองที่ไม่มีวันกลับไปเป็นเช่นเดิมได้อีก
+
+แฟรงคลินตัดสินใจแยกทางกับคนรัก และมายังที่หมู่บ้านเอลิเชียนตามคำแนะนำของทวดที่เจอกันแบบงง ๆ แม้ยังมีความเย่อหยิ่ง ไม่ยอมให้ใครเข้าถึงตัวง่าย ๆ แต่แฟรงคลินก็กำลังเรียนรู้ที่จะใช้ชีวิตใหม่ในฐานะแวมไพร์ ทั้งในด้านพลังพิเศษ ความหิวกระหายอยู่เสมอ</p></div><div class="profco01ddpsgallery"><img src="https://i.pinimg.com/736x/42/ec/16/42ec16a5abf7c4b6522bba528c186f47.jpg" alt="Franklin gallery 1"><img src="https://i.pinimg.com/736x/6b/1a/ba/6b1abaa182ebd3e1d1f014dda7ee18d1.jpg" alt="Franklin gallery 2"></div></section><section class="profco01ddps-bottom lua-music"><div class="profco01ddpsmusic-cover"><img src="https://www.allkpop.com/upload/2025/11/content/091933/1762734818-132734965.jpg" alt="Coma by YEONJUN"></div><div class="profco01ddpsmusic-info"><div class="profco01ddpsmusic-top"><div><h3>Coma</h3><p>YEONJUN</p></div><a class="profco01ddpsmusic-play" href="https://www.youtube.com/watch?v=NgOO0NWe-o8" target="_blank" rel="noopener noreferrer">▶</a></div><div class="profco01ddpsmusic-line"><span>0:42</span><div class="profco01ddpsmusic-progress" style="--progress: 38%;">&nbsp;<div></div></div><span>2:34</span></div></div></section></main></div></section>`;
+
+    const previewOnlyCss = `
+      <style data-my-own-code-history-preview-only>
+        html,
+        body {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+
+        body {
+          position: relative !important;
+        }
+
+        .dds-preview-shell,
+        .dds-preview-target,
+        .dds-card-preview-shell,
+        .dds-card-preview-target,
+        .dds-my-own-code-history-preview-content {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          position: relative !important;
+          overflow: visible !important;
+          transform: none !important;
+        }
+
+        .dds-my-own-code-history-preview-content > ${rootSelector} {
+          margin-left: auto !important;
+          margin-right: auto !important;
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+        }
+      </style>
+    `;
+
+    const previewMarkup =
+      `${previewOnlyCss}<div class="dds-my-own-code-history-preview-content">${showcaseMarkup}</div>`;
+
+    function buildFallbackPreviewDocument(markup) {
+      const stylesheetLinks = stylesheetUrls
+        .map((url) => `<link href="${url}" rel="stylesheet">`)
+        .join('\n');
+
+      return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${stylesheetLinks}
+<style>
+  html, body { margin: 0; min-height: 100%; background: #242424; }
+  body { padding: 0; overflow: hidden; }
+  .dds-preview-shell,
+  .dds-card-preview-shell {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .dds-preview-target,
+  .dds-card-preview-target {
+    flex: 0 0 auto;
+    transform-origin: top center;
+  }
+</style>
+</head>
+<body>
+  <div class="dds-preview-shell">
+    <div class="dds-preview-target">${markup}</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function buildPreviewDocument(isFullView) {
+      const builder = isFullView
+        ? window.buildEditorPreviewDocument
+        : window.buildCardPreviewDocument;
+
+      if (typeof builder === 'function') {
+        return builder(stylesheetUrls, previewMarkup);
+      }
+
+      return buildFallbackPreviewDocument(previewMarkup);
+    }
+
+    const card = document.createElement('article');
+    card.className =
+      'dds-roleplay-card dds-commission-card dds-my-own-code-history-card';
+    card.innerHTML = `
+      <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+        <iframe
+          aria-hidden="true"
+          class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="myOwnCodeHistoryCardPreview"
+          loading="lazy"
+          scrolling="no"
+          tabindex="-1"
+          title="ตัวอย่าง MY OWN CODE 2 — โค้ดประเภทประวัติ"
+        ></iframe>
+      </div>
+
+      <div class="dds-roleplay-card-body dds-commission-card-body">
+        <h2 class="dds-commission-card-title">MY OWN CODE 2</h2>
+        <p class="dds-commission-card-type">โค้ดประเภทประวัติ</p>
+        <button
+          class="dds-roleplay-edit"
+          data-view-my-own-code-history
+          type="button"
+        >
+          VIEW WORK <span>↗</span>
+        </button>
+      </div>
+    `;
+    commissionGrid.appendChild(card);
+
+    const viewPanel = document.createElement('section');
+    viewPanel.className =
+      'dds-panel dds-commission-view-panel dds-my-own-code-history-view-panel';
+    viewPanel.dataset.panel = 'view-my-own-code-history';
+    viewPanel.innerHTML = `
+      <div class="dds-commission-view-toolbar">
+        <button
+          aria-label="กลับหน้า COMMISSION & SHOWCASE"
+          class="dds-back-button"
+          data-my-own-code-history-back
+          title="กลับหน้า COMMISSION & SHOWCASE"
+          type="button"
+        >
+          ←
+        </button>
+      </div>
+
+      <div
+        class="dds-commission-preview-stage"
+        id="myOwnCodeHistoryPreviewStage"
+      >
+        <iframe
+          class="dds-editor-preview-frame dds-commission-view-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="myOwnCodeHistoryPreview"
+          scrolling="no"
+          title="MY OWN CODE 2 — โค้ดประเภทประวัติ"
+        ></iframe>
+      </div>
+    `;
+    footer.before(viewPanel);
+
+    const cardIframe = card.querySelector('#myOwnCodeHistoryCardPreview');
+    const fullIframe = viewPanel.querySelector('#myOwnCodeHistoryPreview');
+    const viewButton = card.querySelector('[data-view-my-own-code-history]');
+    const backButton = viewPanel.querySelector('[data-my-own-code-history-back]');
+
+    let cardRendered = false;
+    let fullRendered = false;
+
+    function measureCanvasHeight(iframe) {
+      const previewDocument = iframe?.contentDocument;
+
+      if (!previewDocument) {
+        return 0;
+      }
+
+      const root = previewDocument.querySelector(rootSelector);
+      const content = previewDocument.querySelector(
+        '.dds-my-own-code-history-preview-content'
+      );
+
+      if (!root || !content) {
+        return 0;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+
+      return Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            rootRect.height,
+            contentRect.height,
+            root.offsetHeight,
+            root.scrollHeight,
+            content.offsetHeight,
+            content.scrollHeight,
+            previewDocument.body.scrollHeight,
+            previewDocument.documentElement.scrollHeight
+          )
+        )
+      );
+    }
+
+    function resizePreview(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      const stage = iframe.closest(
+        '.dds-commission-preview-stage, .dds-roleplay-card-preview'
+      );
+
+      if (!stage || stage.clientWidth < 20) {
+        return;
+      }
+
+      const measuredHeight = measureCanvasHeight(iframe);
+      const previousHeight = Number(
+        iframe.dataset.commissionMeasuredHeight || 0
+      ) || 0;
+      const canvasHeight = Math.max(
+        1,
+        measuredHeight || previousHeight || 800
+      );
+
+      iframe.dataset.commissionMeasuredHeight = String(canvasHeight);
+      iframe.style.width = `${canvasWidth}px`;
+      iframe.style.minWidth = `${canvasWidth}px`;
+      iframe.style.maxWidth = `${canvasWidth}px`;
+      iframe.style.height = `${canvasHeight}px`;
+      iframe.style.minHeight = `${canvasHeight}px`;
+      iframe.style.maxHeight = `${canvasHeight}px`;
+      iframe.style.setProperty(
+        '--dds-commission-canvas-height',
+        `${canvasHeight}px`
+      );
+
+      const isFullView = iframe.classList.contains(
+        'dds-commission-view-frame'
+      );
+
+      if (isFullView) {
+        const scale = Math.max(
+          0.01,
+          Math.min(1, stage.clientWidth / canvasWidth)
+        );
+        const scaledHeight = Math.ceil(canvasHeight * scale);
+
+        iframe.style.setProperty(
+          '--dds-commission-canvas-scale',
+          String(scale)
+        );
+        stage.style.setProperty(
+          '--dds-commission-stage-height',
+          `${scaledHeight}px`
+        );
+        return;
+      }
+
+      if (stage.clientHeight < 20) {
+        return;
+      }
+
+      const padding = 18;
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          (stage.clientWidth - padding) / canvasWidth,
+          (stage.clientHeight - padding) / canvasHeight
+        )
+      );
+
+      iframe.style.setProperty(
+        '--dds-commission-canvas-scale',
+        String(scale)
+      );
+    }
+
+    function scheduleResize(iframe) {
+      const run = () => resizePreview(iframe);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(run);
+      });
+
+      [80, 180, 420, 850, 1500, 2400].forEach((delay) => {
+        window.setTimeout(run, delay);
+      });
+    }
+
+    function watchAssets(iframe) {
+      const previewDocument = iframe.contentDocument;
+
+      if (!previewDocument) {
+        return;
+      }
+
+      previewDocument.querySelectorAll('img').forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener(
+            'load',
+            () => scheduleResize(iframe),
+            { once: true }
+          );
+          image.addEventListener(
+            'error',
+            () => scheduleResize(iframe),
+            { once: true }
+          );
+        }
+      });
+
+      if (previewDocument.fonts?.ready) {
+        previewDocument.fonts.ready.then(() => {
+          scheduleResize(iframe);
+        });
+      }
+    }
+
+    function renderPreview(iframe, isFullView) {
+      if (!iframe) {
+        return;
+      }
+
+      iframe.addEventListener(
+        'load',
+        () => {
+          watchAssets(iframe);
+          scheduleResize(iframe);
+        },
+        { once: true }
+      );
+      iframe.srcdoc = buildPreviewDocument(isFullView);
+    }
+
+    function ensureCardPreview() {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+        return;
+      }
+
+      cardRendered = true;
+      renderPreview(cardIframe, false);
+    }
+
+    function ensureFullPreview() {
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+        return;
+      }
+
+      fullRendered = true;
+      renderPreview(fullIframe, true);
+    }
+
+    function closeCustomViewState() {
+      viewPanel.classList.remove('is-active');
+    }
+
+    function openCustomView() {
+      ensureFullPreview();
+      document.body.classList.add('dds-editor-mode');
+
+      document.querySelectorAll('[data-panel]').forEach((panel) => {
+        panel.classList.toggle('is-active', panel === viewPanel);
+      });
+
+      document.querySelectorAll('[data-page]').forEach((button) => {
+        const active = button.dataset.page === 'commission';
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
+      });
+
+      const pageNumber = document.querySelector('#currentPageNumber');
+      if (pageNumber) {
+        pageNumber.textContent = '04';
+      }
+
+      document.title = '― www. deep deep sleep code shop .com ―';
+      history.replaceState(null, '', '#commission');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scheduleResize(fullIframe);
+    }
+
+    viewButton?.addEventListener('click', openCustomView);
+
+    backButton?.addEventListener('click', () => {
+      closeCustomViewState();
+
+      if (typeof window.openPage === 'function') {
+        window.openPage('commission');
+      } else {
+        document.body.classList.remove('dds-editor-mode');
+        document.querySelectorAll('[data-panel]').forEach((panel) => {
+          panel.classList.toggle(
+            'is-active',
+            panel.dataset.panel === 'commission'
+          );
+        });
+      }
+
+      ensureCardPreview();
+    });
+
+    document
+      .querySelectorAll('[data-page="commission"], [data-go="commission"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          closeCustomViewState();
+          requestAnimationFrame(ensureCardPreview);
+        });
+      });
+
+    document.querySelectorAll('[data-page], [data-go]').forEach((button) => {
+      button.addEventListener(
+        'click',
+        () => {
+          if (!button.matches(
+            '[data-page="commission"], [data-go="commission"]'
+          )) {
+            closeCustomViewState();
+          }
+        },
+        true
+      );
+    });
+
+    window.addEventListener('hashchange', closeCustomViewState);
+    window.addEventListener('resize', () => {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+      }
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+      }
+    });
+
+    const commissionPanel = document.querySelector(
+      '[data-panel="commission"]'
+    );
+
+    if (commissionPanel?.classList.contains('is-active')) {
+      ensureCardPreview();
+    }
+  }
+
+
+  function installThreeColumnShowcaseGrids() {
+    if (window.__DDS_THREE_COLUMN_SHOWCASE_GRIDS__) {
+      return;
+    }
+
+    window.__DDS_THREE_COLUMN_SHOWCASE_GRIDS__ = true;
+
+    const style = document.createElement('style');
+    style.id = 'ddsThreeColumnShowcaseGridStyles';
+    style.textContent = `
+      [data-work-panel="commission"] > .dds-commission-grid,
+      .dds-activity-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        align-items: start !important;
+        gap: 18px !important;
+      }
+
+      [data-work-panel="commission"] > .dds-commission-grid
+        > .dds-commission-card,
+      .dds-activity-grid > .dds-commission-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+      }
+
+      @media (max-width: 980px) {
+        [data-work-panel="commission"] > .dds-commission-grid,
+        .dds-activity-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+      }
+
+      @media (max-width: 650px) {
+        [data-work-panel="commission"] > .dds-commission-grid,
+        .dds-activity-grid {
+          grid-template-columns: minmax(0, 1fr) !important;
+          gap: 16px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+
   function installNewRulesWebsiteImageFix() {
     if (window.__DDS_NEW_RULES_WEBSITE_IMAGE_FIX__) {
       return;
@@ -2799,8 +3906,11 @@ ${stylesheetLinks}
       installNewRulesWebsiteImageFix();
       installCommissionActivityLayout();
       installActivityTopMovies();
+      installActivityTopMoviesReply();
       installCommissionThreeHouse();
       installMyOwnCodeCommission();
+      installMyOwnCodeHistory();
+      installThreeColumnShowcaseGrids();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
     })
     .catch((error) => {
