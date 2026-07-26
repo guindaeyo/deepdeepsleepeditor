@@ -4399,6 +4399,612 @@ ${stylesheetLinks}
   }
 
 
+  function installBlankEditorFormsAndBbcodeTools() {
+    if (window.__DDS_BLANK_EDITOR_BBCODE_TOOLS__) {
+      return;
+    }
+
+    window.__DDS_BLANK_EDITOR_BBCODE_TOOLS__ = true;
+
+    const updaterByPanel = {
+      "editor-code001": "updatePageOfOne",
+      "editor-code002": "updateWeirdo",
+      "editor-code003": "updateHihi",
+      "editor-code004": "updateUuiaa",
+      "editor-code005": "updateComma",
+      "editor-code006": "updateNewRules",
+      "editor-code007": "updateLoveSong",
+      "editor-code008": "updateDumbDumber",
+      "editor-code009": "updateHigherHeaven",
+      "editor-profile001": "updatePolaroidLove",
+      "editor-profile002": "updateMoodboard",
+      "editor-profile003": "updateFortyOne",
+      "editor-profile004": "updateNothinBoutMe",
+      "editor-review001": "updateFoodReview"
+    };
+
+    const editorPanelSelector = [
+      '[data-panel^="editor-code"]',
+      '[data-panel^="editor-profile"]',
+      '[data-panel^="editor-review"]'
+    ].join(',');
+
+    const style = document.createElement("style");
+    style.id = "ddsBlankEditorBbcodeStyles";
+    style.textContent = `
+      .dds-rich-editor:empty::before {
+        content: attr(data-placeholder);
+        color: rgba(255,255,255,.28);
+        pointer-events: none;
+      }
+
+      .dds-bbcode-tools {
+        flex: 1 1 100%;
+        width: 100%;
+        margin-top: 8px;
+        border-top: 1px solid rgba(255,255,255,.08);
+        padding-top: 8px;
+      }
+
+      .dds-bbcode-tools > summary {
+        width: max-content;
+        list-style: none;
+        cursor: pointer;
+        color: rgba(255,255,255,.7);
+        font: 600 10px/1.2 Arial, sans-serif;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        user-select: none;
+      }
+
+      .dds-bbcode-tools > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .dds-bbcode-tools > summary::after {
+        content: " +";
+        color: #a90e18;
+      }
+
+      .dds-bbcode-tools[open] > summary::after {
+        content: " −";
+      }
+
+      .dds-bbcode-button-grid {
+        width: 100%;
+        margin-top: 9px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .dds-rich-toolbar .dds-bbcode-button {
+        min-width: 0;
+        height: 34px;
+        padding: 0 11px;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.025);
+        color: rgba(255,255,255,.78);
+        font: 600 9px/1 Arial, sans-serif;
+        letter-spacing: .7px;
+        white-space: nowrap;
+      }
+
+      .dds-rich-toolbar .dds-bbcode-button:hover {
+        border-color: rgba(169,14,24,.8);
+        background: rgba(169,14,24,.14);
+        color: #fff;
+      }
+
+      .dds-bbcode-help {
+        width: 100%;
+        margin: 8px 0 0;
+        color: rgba(255,255,255,.35);
+        font: 400 10px/1.5 Arial, sans-serif;
+      }
+    `;
+    document.head.appendChild(style);
+
+    function isArchiveCardIframe(iframe) {
+      if (!iframe) {
+        return false;
+      }
+
+      return Boolean(
+        iframe.matches(
+          '.dds-roleplay-card-preview-frame, .dds-profile-card-preview-frame, .dds-review-card-preview-frame, .dds-commission-card iframe'
+        ) ||
+        iframe.closest(
+          '.dds-roleplay-card, .dds-profile-card, .dds-review-card, .dds-commission-card'
+        )
+      );
+    }
+
+    if (
+      typeof window.queuePreviewDocument === "function" &&
+      !window.__DDS_BLANK_EDITOR_QUEUE_WRAPPED__
+    ) {
+      window.__DDS_BLANK_EDITOR_QUEUE_WRAPPED__ = true;
+      const originalQueuePreviewDocument =
+        window.queuePreviewDocument;
+
+      function safePreviewUrl(value) {
+        const text = String(value || "").trim();
+
+        if (/^(https?:)?\/\//i.test(text)) {
+          return text;
+        }
+
+        return "";
+      }
+
+      function escapePreviewAttribute(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function renderListBlocks(source, ordered) {
+        const tag = ordered ? "ol" : "ul";
+        const pattern = ordered
+          ? /\[list=1\]([\s\S]*?)\[\/list\]/gi
+          : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+
+        return source.replace(pattern, (_, body) => {
+          const items = String(body)
+            .split(/\[\*\]/i)
+            .slice(1)
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .map((item) => `<li>${item}</li>`)
+            .join("");
+
+          return items
+            ? `<${tag} style="margin:12px 0;padding-left:24px;">${items}</${tag}>`
+            : "";
+        });
+      }
+
+      function renderBbcodeForPreview(source) {
+        let output = String(source || "");
+
+        output = renderListBlocks(output, true);
+        output = renderListBlocks(output, false);
+
+        output = output.replace(
+          /\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi,
+          (_, align, body) =>
+            `<div style="text-align:${align};">${body}</div>`
+        );
+
+        output = output.replace(
+          /\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi,
+          (_, type, body) =>
+            `<details style="margin:10px 0;border:1px solid rgba(127,127,127,.28);padding:10px 12px;"><summary style="cursor:pointer;font-weight:700;">${type.toUpperCase()}</summary><div style="margin-top:10px;">${body}</div></details>`
+        );
+
+        output = output.replace(
+          /\[video=youtube\]([\s\S]*?)\[\/video\]/gi,
+          (_, url) => {
+            const safeUrl = safePreviewUrl(url);
+            return safeUrl
+              ? `<a href="${escapePreviewAttribute(safeUrl)}" target="_blank" rel="noopener noreferrer">▶ YouTube video</a>`
+              : "[video=youtube][/video]";
+          }
+        );
+
+        output = output.replace(
+          /\[img\]([\s\S]*?)\[\/img\]/gi,
+          (_, url) => {
+            const safeUrl = safePreviewUrl(url);
+            return safeUrl
+              ? `<img src="${escapePreviewAttribute(safeUrl)}" alt="" style="display:block;max-width:100%;height:auto;margin:12px auto;">`
+              : "[img][/img]";
+          }
+        );
+
+        output = output.replace(
+          /\[url=([^\]]*)\]([\s\S]*?)\[\/url\]/gi,
+          (_, url, label) => {
+            const safeUrl = safePreviewUrl(url);
+            return safeUrl
+              ? `<a href="${escapePreviewAttribute(safeUrl)}" target="_blank" rel="noopener noreferrer">${label || safeUrl}</a>`
+              : label;
+          }
+        );
+
+        output = output
+          .replace(/\[hr\]/gi, '<hr style="margin:18px 0;border:0;border-top:1px solid rgba(127,127,127,.35);">')
+          .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+          .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+          .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+          .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>");
+
+        return output;
+      }
+
+      window.queuePreviewDocument = function (
+        iframe,
+        srcdoc,
+        resizeFunction
+      ) {
+        if (
+          window.__DDS_SUPPRESS_ARCHIVE_CARD_UPDATE__ &&
+          isArchiveCardIframe(iframe)
+        ) {
+          return true;
+        }
+
+        return originalQueuePreviewDocument.call(
+          this,
+          iframe,
+          renderBbcodeForPreview(srcdoc),
+          resizeFunction
+        );
+      };
+    }
+
+    const bbcodeSelections = new WeakMap();
+
+    function saveBbcodeSelection(editor) {
+      const selection = window.getSelection();
+
+      if (!selection || selection.rangeCount === 0) {
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+
+      if (editor.contains(range.commonAncestorContainer)) {
+        bbcodeSelections.set(editor, range.cloneRange());
+      }
+    }
+
+    function getEditorRange(editor) {
+      const savedRange = bbcodeSelections.get(editor);
+
+      if (
+        savedRange &&
+        editor.contains(savedRange.commonAncestorContainer)
+      ) {
+        return savedRange.cloneRange();
+      }
+
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      return range;
+    }
+
+    function insertBbcodeText(editor, text, selectedOffset = null, selectedLength = 0) {
+      editor.focus();
+      const range = getEditorRange(editor);
+      range.deleteContents();
+
+      const textNode = document.createTextNode(text);
+      range.insertNode(textNode);
+
+      const nextRange = document.createRange();
+      const start = Number.isInteger(selectedOffset)
+        ? Math.max(0, Math.min(text.length, selectedOffset))
+        : text.length;
+      const end = Math.max(
+        start,
+        Math.min(text.length, start + selectedLength)
+      );
+
+      nextRange.setStart(textNode, start);
+      nextRange.setEnd(textNode, end);
+
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(nextRange);
+      bbcodeSelections.set(editor, nextRange.cloneRange());
+
+      editor.dispatchEvent(
+        new InputEvent("input", {
+          bubbles: true,
+          inputType: "insertText",
+          data: text
+        })
+      );
+    }
+
+    function getSelectionText(editor) {
+      const range = getEditorRange(editor);
+      return editor.contains(range.commonAncestorContainer)
+        ? range.toString()
+        : "";
+    }
+
+    function buildBbcodeInsertion(type, selectedText) {
+      const selected = String(selectedText || "");
+      const text = selected.trim();
+
+      const wrappers = {
+        left: ["[align=left]", "[/align]", "ข้อความ"],
+        center: ["[align=center]", "[/align]", "ข้อความ"],
+        right: ["[align=right]", "[/align]", "ข้อความ"],
+        justify: ["[align=justify]", "[/align]", "ข้อความ"],
+        hide: ["[hide]", "[/hide]", "ข้อความที่ต้องการซ่อน"],
+        spoiler: ["[spoiler]", "[/spoiler]", "ข้อความสปอยล์"]
+      };
+
+      if (wrappers[type]) {
+        const [open, close, placeholder] = wrappers[type];
+        const body = text || placeholder;
+        return {
+          text: `${open}${body}${close}`,
+          offset: text ? null : open.length,
+          length: text ? 0 : body.length
+        };
+      }
+
+      if (type === "youtube") {
+        const body = text || "ใส่ลิงก์ YouTube";
+        return {
+          text: `[video=youtube]${body}[/video]`,
+          offset: text ? null : "[video=youtube]".length,
+          length: text ? 0 : body.length
+        };
+      }
+
+      if (type === "hr") {
+        return { text: "\n[hr]\n", offset: null, length: 0 };
+      }
+
+      if (type === "img") {
+        const body = text || "ใส่ลิงก์รูป";
+        return {
+          text: `[img]${body}[/img]`,
+          offset: text ? null : "[img]".length,
+          length: text ? 0 : body.length
+        };
+      }
+
+      if (type === "url") {
+        const label = text || "ข้อความลิงก์";
+        const opening = "[url=ใส่ลิงก์]";
+        return {
+          text: `${opening}${label}[/url]`,
+          offset: "[url=".length,
+          length: "ใส่ลิงก์".length
+        };
+      }
+
+      if (type === "list" || type === "list1") {
+        const opening = type === "list1" ? "[list=1]" : "[list]";
+        const lines = text
+          ? selected
+              .split(/\r?\n/)
+              .map((line) => line.trim())
+              .filter(Boolean)
+          : ["รายการที่ 1", "รายการที่ 2"];
+        const body = lines.map((line) => `[*]${line}`).join("\n");
+        const result = `${opening}\n${body}\n[/list]`;
+        const firstItem = lines[0] || "";
+        const firstOffset = `${opening}\n[*]`.length;
+
+        return {
+          text: result,
+          offset: text ? null : firstOffset,
+          length: text ? 0 : firstItem.length
+        };
+      }
+
+      return { text: selected, offset: null, length: 0 };
+    }
+
+    const bbcodeButtons = [
+      ["left", "LEFT", "จัดชิดซ้าย"],
+      ["center", "CENTER", "จัดกึ่งกลาง"],
+      ["right", "RIGHT", "จัดชิดขวา"],
+      ["justify", "JUSTIFY", "จัดเต็มบรรทัด"],
+      ["hide", "HIDE", "ซ่อนข้อความ"],
+      ["spoiler", "SPOILER", "ครอบข้อความสปอยล์"],
+      ["youtube", "YOUTUBE", "ใส่วิดีโอ YouTube"],
+      ["hr", "HR", "เส้นคั่น"],
+      ["img", "IMG", "ใส่รูป"],
+      ["url", "URL", "ใส่ลิงก์"],
+      ["list", "LIST", "รายการหัวข้อ"],
+      ["list1", "LIST 1", "รายการแบบตัวเลข"]
+    ];
+
+    document
+      .querySelectorAll(".dds-rich-toolbar")
+      .forEach((toolbar) => {
+        if (toolbar.querySelector(".dds-bbcode-tools")) {
+          return;
+        }
+
+        const editor = document.getElementById(
+          toolbar.dataset.toolbarFor || ""
+        );
+
+        if (!editor) {
+          return;
+        }
+
+        editor.dataset.placeholder = "กรอกข้อความของคุณที่นี่";
+
+        ["focus", "keyup", "mouseup", "input"].forEach((eventName) => {
+          editor.addEventListener(eventName, () => {
+            saveBbcodeSelection(editor);
+          });
+        });
+
+        const details = document.createElement("details");
+        details.className = "dds-bbcode-tools";
+        details.innerHTML = `
+          <summary>คำสั่ง BBCode</summary>
+          <div class="dds-bbcode-button-grid"></div>
+          <p class="dds-bbcode-help">เลือกข้อความก่อนกดเพื่อครอบคำสั่ง หรือกดได้เลยเพื่อแทรกแม่แบบ</p>
+        `;
+
+        const buttonGrid = details.querySelector(
+          ".dds-bbcode-button-grid"
+        );
+
+        bbcodeButtons.forEach(([type, label, title]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "dds-bbcode-button";
+          button.dataset.ddsBbcode = type;
+          button.textContent = label;
+          button.title = title;
+
+          button.addEventListener("mousedown", (event) => {
+            event.preventDefault();
+            const selectedText = getSelectionText(editor);
+            const insertion = buildBbcodeInsertion(
+              type,
+              selectedText
+            );
+
+            insertBbcodeText(
+              editor,
+              insertion.text,
+              insertion.offset,
+              insertion.length
+            );
+          });
+
+          buttonGrid.appendChild(button);
+        });
+
+        toolbar.appendChild(details);
+      });
+
+    function isProtectedField(field) {
+      if (
+        field.matches(
+          'input[type="color"], input[type="range"], input[type="checkbox"], input[type="radio"], input[type="hidden"], input[type="button"], input[type="submit"], input[type="reset"], input[type="file"], button, output, select'
+        )
+      ) {
+        return true;
+      }
+
+      if (
+        field.matches(
+          '.dds-generated-code, [readonly], [disabled]'
+        )
+      ) {
+        return true;
+      }
+
+      if (
+        field.matches('input[type="text"]') &&
+        (
+          field.closest(".dds-color-field") ||
+          (/color/i.test(field.id || "") &&
+            /^#[0-9a-f]{3,8}$/i.test(field.value || ""))
+        )
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function fieldLabelText(field) {
+      const label = field.closest("label");
+      const labelText = label?.querySelector(":scope > span")?.textContent;
+      return String(labelText || "").trim();
+    }
+
+    function clearPanelFields(panel, force = false) {
+      if (!panel || (!force && panel.dataset.ddsBlanked === "true")) {
+        return;
+      }
+
+      panel.dataset.ddsBlanked = "true";
+      const changedFields = [];
+
+      panel
+        .querySelectorAll("input, textarea, .dds-rich-editor")
+        .forEach((field) => {
+          if (isProtectedField(field)) {
+            return;
+          }
+
+          if (field.classList?.contains("dds-rich-editor")) {
+            field.innerHTML = "";
+            field.dataset.placeholder =
+              field.dataset.placeholder || "กรอกข้อความของคุณที่นี่";
+            changedFields.push(field);
+            return;
+          }
+
+          field.value = "";
+          const labelText = fieldLabelText(field);
+          field.placeholder = labelText
+            ? `กรอก${labelText}`
+            : "กรอกข้อมูลของคุณ";
+          changedFields.push(field);
+        });
+
+      const panelName = panel.dataset.panel || "";
+      const updaterName = updaterByPanel[panelName];
+      const updater = updaterName
+        ? window[updaterName]
+        : null;
+
+      window.__DDS_SUPPRESS_ARCHIVE_CARD_UPDATE__ = true;
+
+      try {
+        if (typeof updater === "function") {
+          updater();
+        } else if (changedFields[0]) {
+          changedFields[0].dispatchEvent(
+            new Event("input", { bubbles: true })
+          );
+        }
+      } finally {
+        window.__DDS_SUPPRESS_ARCHIVE_CARD_UPDATE__ = false;
+      }
+    }
+
+    function clearActiveEditorPanel() {
+      const activePanel = document.querySelector(
+        `${editorPanelSelector}.is-active`
+      );
+
+      if (activePanel) {
+        clearPanelFields(activePanel);
+      }
+    }
+
+    document
+      .querySelectorAll(
+        "[data-edit-code], [data-edit-profile], [data-edit-review]"
+      )
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          queueMicrotask(clearActiveEditorPanel);
+        });
+      });
+
+    document
+      .querySelectorAll(`${editorPanelSelector} .dds-reset-button`)
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          window.setTimeout(() => {
+            const panel = button.closest(editorPanelSelector);
+            clearPanelFields(panel, true);
+          }, 0);
+        });
+      });
+
+    window.addEventListener("hashchange", () => {
+      queueMicrotask(clearActiveEditorPanel);
+    });
+
+    queueMicrotask(clearActiveEditorPanel);
+  }
+
+
   appendClassicScript(CORE_CDN_URL)
     .catch(() => loadCoreFromRawFallback())
     .then(() => {
@@ -4413,6 +5019,7 @@ ${stylesheetLinks}
       installMyOwnCodeTopicHeader();
       normalizeShowcaseCardLabels();
       installThreeColumnShowcaseGrids();
+      installBlankEditorFormsAndBbcodeTools();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
     })
     .catch((error) => {
