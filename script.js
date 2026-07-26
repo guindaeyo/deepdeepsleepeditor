@@ -2,12 +2,13 @@
 
 /*
  * DEEP DEEP SLEEP CODE SHOP
- * LIVE PREVIEW + COMMISSION & ACTIVITY BUILD
+ * LIVE PREVIEW + COMMISSION, ACTIVITY & MY OWN CODE BUILD
  *
  * ไฟล์นี้ใช้แทน script.js เดิมได้ทันที
  * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
  * - เพิ่มหน้า COMMISSION & ACTIVITY พร้อมแท็บ ACTIVITY
+ * - เพิ่ม MY OWN CODE เป็นผลงานลำดับที่ 3 แบบดูอย่างเดียว ไม่มีหน้าแก้ไข
  * - ไม่ต้องแก้ index.html และ style.css
  */
 
@@ -789,11 +790,588 @@
     document.head.appendChild(style);
   }
 
+
+  function installMyOwnCodeCommission() {
+    if (window.__DDS_MY_OWN_CODE_INSTALLED__) {
+      return;
+    }
+
+    const commissionGrid = document.querySelector(
+      ".dds-commission-grid"
+    );
+    const footer = document.querySelector(
+      ".dds-footer"
+    );
+
+    if (!commissionGrid || !footer) {
+      return;
+    }
+
+    window.__DDS_MY_OWN_CODE_INSTALLED__ = true;
+
+    const stylesheetUrl =
+      "https://guindaeyo.github.io/css/prof-frkl.-css";
+
+    const myOwnCodeMarkup = String.raw`<div class="myyouth-wrap" style="--myyouth-bg: #f7f7f9;--myyouth-red: #d71920;--myyouth-red-dark: #a80d13;--myyouth-main-img: url('https://i.pinimg.com/736x/e8/0d/2c/e80d2c1cd2699b51c4618f7987c41bc5.jpg');--myyouth-main-y: 45%;--myyouth-right-img: url('https://i.pinimg.com/736x/61/4c/a7/614ca7170e3172d3cf153c81e8d88041.jpg');--myyouth-right-y: 50%;--myyouth-left-img: url('https://i.pinimg.com/1200x/48/dd/16/48dd16899cc51c9a3211a91dcd37ddb3.jpg');--myyouth-left-y: 48%;--myyouth-object-img: url('https://iili.io/CNMzVl2.png');--myyouth-object-left: 65%;--myyouth-object-top: 40%;--myyouth-object-width: 100%;--myyouth-object-height: 88%;--myyouth-object-scale: 1.3;--myyouth-object-rotate: -20deg;"><div class="myyouth-page"><div class="myyouth-browser"><div class="myyouth-browser-left"><span class="myyouth-sidebar-icon"></span><span class="myyouth-browser-arrow">‹</span><span class="myyouth-browser-arrow">›</span><span class="myyouth-shield">◐</span></div><div class="myyouth-address"><span class="myyouth-lock">▣</span><span>i can smell that hot blood just under your skin</span><span class="myyouth-refresh">↻</span></div><div class="myyouth-browser-right"><span>◉</span><span>⇧</span><span>＋</span><span>▦</span></div></div><div class="myyouth-heading"><div class="myyouth-pixel-title"><span>Franklin D.</span><span class="myyouth-pixel-title-red"><br>Bloodworth</span></div><div class="myyouth-title-glitch myyouth-title-glitch-one"></div><div class="myyouth-title-glitch myyouth-title-glitch-two"></div><div class="myyouth-title-glitch myyouth-title-glitch-three"></div></div><div class="myyouth-star myyouth-star-top"></div><div class="myyouth-star myyouth-star-left"></div><div class="myyouth-main-photo"></div><div class="myyouth-bubble myyouth-bubble-white">I love you okay?</div><div class="myyouth-bubble myyouth-bubble-red">You’re really lovely too</div><div class="myyouth-window myyouth-window-right"><div class="myyouth-window-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div><div class="myyouth-window-icons"><span>◉</span><span>⌕</span><span>⌂</span><span>□</span></div></div><div class="myyouth-right-photo"></div><div class="myyouth-right-caption"><strong>Sorry, I’m an anti-romantic</strong><br>I want to run away, far away<br>My heart is already chasing you<br>In a small fire</div></div><div class="myyouth-folder-row"><div class="myyouth-folder-item"><div class="myyouth-folder myyouth-folder-gray"><span></span></div><p>fresh.blood_1</p></div><div class="myyouth-folder-item"><div class="myyouth-folder myyouth-folder-red"><span></span></div><p>fresh.blood_2</p></div></div><div class="myyouth-alert"><div class="myyouth-alert-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div></div><div class="myyouth-alert-content"><div class="myyouth-warning-icon"><span>!</span></div><div class="myyouth-alert-text"><strong>“App” is not optimized for your Mac</strong><p>This app needs to be updated by its developer to<br>improve compatibility.</p></div></div><div class="myyouth-alert-actions"><button type="button">Learn More...</button><button type="button" class="myyouth-alert-ok">OK</button></div></div><div class="myyouth-window myyouth-window-left"><div class="myyouth-window-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div><div class="myyouth-window-icons"><span>◉</span><span>⌕</span><span>⌂</span><span>□</span></div></div><div class="myyouth-left-photo"></div></div><div class="myyouth-lyrics">I know<br>Sweet love song<br>The words of the promise<br>When you turn around<br>You end up being someone unfamiliar</div><div class="myyouth-object-area"><div class="myyouth-red-blob"></div><div class="myyouth-object-png"></div><div class="myyouth-bottom-title">franklin</div></div></div></div>`;
+
+    const previewOnlyCss = `
+      <style data-my-own-code-preview-only>
+        html,
+        body {
+          width: 1040px !important;
+          min-width: 1040px !important;
+          max-width: 1040px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+
+        body {
+          position: relative !important;
+        }
+
+        .dds-preview-shell,
+        .dds-preview-target,
+        .dds-card-preview-shell,
+        .dds-card-preview-target,
+        .dds-commission-preview-content {
+          width: 1040px !important;
+          min-width: 1040px !important;
+          max-width: 1040px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          position: relative !important;
+          overflow: visible !important;
+          transform: none !important;
+        }
+
+        .dds-commission-preview-content > .myyouth-wrap {
+          margin-left: auto !important;
+          margin-right: auto !important;
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+        }
+      </style>
+    `;
+
+    const previewMarkup =
+      previewOnlyCss +
+      `<div class="dds-commission-preview-content">${myOwnCodeMarkup}</div>`;
+
+    function buildFallbackPreviewDocument(markup) {
+      return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="${stylesheetUrl}" rel="stylesheet">
+<style>
+  html, body { margin: 0; min-height: 100%; background: #242424; }
+  body { padding: 0; overflow: hidden; }
+  .dds-preview-shell,
+  .dds-card-preview-shell {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .dds-preview-target,
+  .dds-card-preview-target {
+    flex: 0 0 auto;
+    transform-origin: top center;
+  }
+</style>
+</head>
+<body>
+  <div class="dds-preview-shell">
+    <div class="dds-preview-target">${markup}</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function buildPreviewDocument(isFullView) {
+      const builder = isFullView
+        ? window.buildEditorPreviewDocument
+        : window.buildCardPreviewDocument;
+
+      if (typeof builder === "function") {
+        return builder(
+          [stylesheetUrl],
+          previewMarkup
+        );
+      }
+
+      return buildFallbackPreviewDocument(
+        previewMarkup
+      );
+    }
+
+    const card = document.createElement("article");
+    card.className =
+      "dds-roleplay-card dds-commission-card dds-my-own-code-card";
+    card.innerHTML = `
+      <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+        <iframe
+          aria-hidden="true"
+          class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="1040"
+          id="commissionCardPreview003"
+          loading="lazy"
+          scrolling="no"
+          tabindex="-1"
+          title="ตัวอย่าง MY OWN CODE — Franklin D. Bloodworth"
+        ></iframe>
+        <span class="dds-roleplay-preview-badge">PRIVATE</span>
+      </div>
+
+      <div class="dds-roleplay-card-body dds-commission-card-body">
+        <h2 class="dds-commission-card-title">MY OWN CODE</h2>
+        <p class="dds-commission-card-type">โค้ดประเภทประวัติตัวละคร</p>
+        <p class="dds-commission-card-client">
+          สถานะ <strong>PRIVATE</strong>
+        </p>
+        <button
+          class="dds-roleplay-edit"
+          data-view-my-own-code="commission003"
+          type="button"
+        >
+          VIEW WORK <span>↗</span>
+        </button>
+      </div>
+    `;
+    commissionGrid.appendChild(card);
+
+    const viewPanel = document.createElement("section");
+    viewPanel.className =
+      "dds-panel dds-commission-view-panel dds-my-own-code-view-panel";
+    viewPanel.dataset.panel =
+      "editor-commission003-my-own-code";
+    viewPanel.innerHTML = `
+      <div class="dds-commission-view-toolbar">
+        <button
+          aria-label="กลับหน้า COMMISSION"
+          class="dds-back-button"
+          data-my-own-code-back
+          title="กลับหน้า COMMISSION"
+          type="button"
+        >
+          ←
+        </button>
+      </div>
+
+      <div
+        class="dds-commission-preview-stage"
+        id="commissionPreviewStage003"
+      >
+        <iframe
+          class="dds-editor-preview-frame dds-commission-view-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="1040"
+          id="commissionPreview003"
+          scrolling="no"
+          title="MY OWN CODE — Franklin D. Bloodworth"
+        ></iframe>
+      </div>
+    `;
+    footer.before(viewPanel);
+
+    const cardIframe = card.querySelector(
+      "#commissionCardPreview003"
+    );
+    const fullIframe = viewPanel.querySelector(
+      "#commissionPreview003"
+    );
+    const viewButton = card.querySelector(
+      "[data-view-my-own-code]"
+    );
+    const backButton = viewPanel.querySelector(
+      "[data-my-own-code-back]"
+    );
+
+    let cardRendered = false;
+    let fullRendered = false;
+
+    function measureCanvasHeight(iframe) {
+      const previewDocument =
+        iframe?.contentDocument;
+
+      if (!previewDocument) {
+        return 0;
+      }
+
+      const root = previewDocument.querySelector(
+        ".myyouth-wrap"
+      );
+      const content = previewDocument.querySelector(
+        ".dds-commission-preview-content"
+      );
+
+      if (!root || !content) {
+        return 0;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const contentRect =
+        content.getBoundingClientRect();
+
+      return Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            rootRect.height,
+            contentRect.height,
+            root.offsetHeight,
+            root.scrollHeight,
+            content.offsetHeight,
+            content.scrollHeight,
+            previewDocument.body.scrollHeight,
+            previewDocument.documentElement.scrollHeight
+          )
+        )
+      );
+    }
+
+    function resizePreview(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      const stage = iframe.closest(
+        ".dds-commission-preview-stage, .dds-roleplay-card-preview"
+      );
+
+      if (!stage || stage.clientWidth < 20) {
+        return;
+      }
+
+      const canvasWidth = 1040;
+      const measuredHeight =
+        measureCanvasHeight(iframe);
+      const previousHeight = Number(
+        iframe.dataset.commissionMeasuredHeight || 0
+      ) || 0;
+      const canvasHeight = Math.max(
+        1,
+        measuredHeight || previousHeight || 800
+      );
+
+      iframe.dataset.commissionMeasuredHeight =
+        String(canvasHeight);
+      iframe.style.width = `${canvasWidth}px`;
+      iframe.style.minWidth = `${canvasWidth}px`;
+      iframe.style.maxWidth = `${canvasWidth}px`;
+      iframe.style.height = `${canvasHeight}px`;
+      iframe.style.minHeight = `${canvasHeight}px`;
+      iframe.style.maxHeight = `${canvasHeight}px`;
+      iframe.style.setProperty(
+        "--dds-commission-canvas-height",
+        `${canvasHeight}px`
+      );
+
+      const isFullView = iframe.classList.contains(
+        "dds-commission-view-frame"
+      );
+
+      if (isFullView) {
+        const scale = Math.max(
+          0.01,
+          Math.min(
+            1,
+            stage.clientWidth / canvasWidth
+          )
+        );
+        const scaledHeight = Math.ceil(
+          canvasHeight * scale
+        );
+
+        iframe.style.setProperty(
+          "--dds-commission-canvas-scale",
+          String(scale)
+        );
+        stage.style.setProperty(
+          "--dds-commission-stage-height",
+          `${scaledHeight}px`
+        );
+        return;
+      }
+
+      if (stage.clientHeight < 20) {
+        return;
+      }
+
+      const padding = 18;
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          (stage.clientWidth - padding) /
+            canvasWidth,
+          (stage.clientHeight - padding) /
+            canvasHeight
+        )
+      );
+
+      iframe.style.setProperty(
+        "--dds-commission-canvas-scale",
+        String(scale)
+      );
+    }
+
+    function scheduleResize(iframe) {
+      const run = () => resizePreview(iframe);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(run);
+      });
+
+      [80, 180, 420, 850, 1500, 2400].forEach(
+        (delay) => {
+          window.setTimeout(run, delay);
+        }
+      );
+    }
+
+    function watchAssets(iframe) {
+      const previewDocument =
+        iframe.contentDocument;
+
+      if (!previewDocument) {
+        return;
+      }
+
+      previewDocument
+        .querySelectorAll("img")
+        .forEach((image) => {
+          if (!image.complete) {
+            image.addEventListener(
+              "load",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+            image.addEventListener(
+              "error",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+          }
+        });
+
+      if (previewDocument.fonts?.ready) {
+        previewDocument.fonts.ready.then(() => {
+          scheduleResize(iframe);
+        });
+      }
+    }
+
+    function renderPreview(iframe, isFullView) {
+      if (!iframe) {
+        return;
+      }
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          watchAssets(iframe);
+          scheduleResize(iframe);
+        },
+        { once: true }
+      );
+      iframe.srcdoc = buildPreviewDocument(
+        isFullView
+      );
+    }
+
+    function ensureCardPreview() {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+        return;
+      }
+
+      cardRendered = true;
+      renderPreview(cardIframe, false);
+    }
+
+    function ensureFullPreview() {
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+        return;
+      }
+
+      fullRendered = true;
+      renderPreview(fullIframe, true);
+    }
+
+    function closeCustomViewState() {
+      viewPanel.classList.remove("is-active");
+    }
+
+    function openCustomView() {
+      ensureFullPreview();
+
+      document.body.classList.add(
+        "dds-editor-mode"
+      );
+      document
+        .querySelectorAll("[data-panel]")
+        .forEach((panel) => {
+          panel.classList.toggle(
+            "is-active",
+            panel === viewPanel
+          );
+        });
+
+      document
+        .querySelectorAll("[data-page]")
+        .forEach((button) => {
+          const active =
+            button.dataset.page === "commission";
+
+          button.classList.toggle(
+            "is-active",
+            active
+          );
+          button.setAttribute(
+            "aria-current",
+            active ? "page" : "false"
+          );
+        });
+
+      const pageNumber = document.querySelector(
+        "#currentPageNumber"
+      );
+
+      if (pageNumber) {
+        pageNumber.textContent = "04";
+      }
+
+      document.title =
+        "― www. deep deep sleep code shop .com ―";
+      history.replaceState(
+        null,
+        "",
+        "#commission"
+      );
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      scheduleResize(fullIframe);
+    }
+
+    viewButton.addEventListener(
+      "click",
+      openCustomView
+    );
+
+    backButton.addEventListener("click", () => {
+      closeCustomViewState();
+
+      if (typeof window.openPage === "function") {
+        window.openPage("commission");
+      } else {
+        document.body.classList.remove(
+          "dds-editor-mode"
+        );
+        document
+          .querySelectorAll("[data-panel]")
+          .forEach((panel) => {
+            panel.classList.toggle(
+              "is-active",
+              panel.dataset.panel === "commission"
+            );
+          });
+      }
+
+      ensureCardPreview();
+    });
+
+    document
+      .querySelectorAll(
+        '[data-page="commission"], [data-go="commission"]'
+      )
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          closeCustomViewState();
+          requestAnimationFrame(
+            ensureCardPreview
+          );
+        });
+      });
+
+    document
+      .querySelectorAll("[data-page], [data-go]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            if (!button.matches(
+              '[data-page="commission"], [data-go="commission"]'
+            )) {
+              closeCustomViewState();
+            }
+          },
+          true
+        );
+      });
+
+    window.addEventListener(
+      "hashchange",
+      closeCustomViewState
+    );
+    window.addEventListener("resize", () => {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+      }
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+      }
+    });
+
+    const customStyle =
+      document.createElement("style");
+    customStyle.id = "ddsMyOwnCodeStyles";
+    customStyle.textContent = `
+      .dds-my-own-code-card
+      .dds-roleplay-preview-badge {
+        color: #ffffff;
+        background: rgba(118, 8, 16, 0.92);
+      }
+
+      .dds-my-own-code-card
+      .dds-commission-card-client strong {
+        color: rgba(255, 255, 255, 0.74);
+      }
+    `;
+    document.head.appendChild(customStyle);
+
+    const commissionPanel = document.querySelector(
+      '[data-panel="commission"]'
+    );
+
+    if (commissionPanel?.classList.contains("is-active")) {
+      ensureCardPreview();
+    }
+  }
+
+
   appendClassicScript(CORE_CDN_URL)
     .catch(() => loadCoreFromRawFallback())
     .then(() => {
       installLivePreviewPerformanceFix();
       installCommissionActivityLayout();
+      installMyOwnCodeCommission();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
     })
     .catch((error) => {
