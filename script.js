@@ -11,7 +11,8 @@
  * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE 1–3 และ ACTIVITY: MY TOP 5 MOVIES ทั้งหน้ากิจกรรมและแบบตอบกลับ แบบดูอย่างเดียว
  * - หน้า COMMISSION & SHOWCASE และ ACTIVITY ใช้การ์ด 3 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
  * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
- * - ไม่ต้องแก้ index.html และ style.css
+ * - ปุ่ม BBCode เรียงต่อในแถบเดิม และหน้า editor เปิดมาเป็นฟอร์มว่างทันที โดยพรีวิวหน้าหมวดยังคงสมบูรณ์
+ * - ใช้ร่วมกับ index.html และ style.css ชุดล่าสุดใน ZIP นี้
  */
 
 (() => {
@@ -4438,46 +4439,6 @@ ${stylesheetLinks}
         pointer-events: none;
       }
 
-      .dds-bbcode-tools {
-        flex: 1 1 100%;
-        width: 100%;
-        margin-top: 8px;
-        border-top: 1px solid rgba(255,255,255,.08);
-        padding-top: 8px;
-      }
-
-      .dds-bbcode-tools > summary {
-        width: max-content;
-        list-style: none;
-        cursor: pointer;
-        color: rgba(255,255,255,.7);
-        font: 600 10px/1.2 Arial, sans-serif;
-        letter-spacing: 1.4px;
-        text-transform: uppercase;
-        user-select: none;
-      }
-
-      .dds-bbcode-tools > summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .dds-bbcode-tools > summary::after {
-        content: " +";
-        color: #a90e18;
-      }
-
-      .dds-bbcode-tools[open] > summary::after {
-        content: " −";
-      }
-
-      .dds-bbcode-button-grid {
-        width: 100%;
-        margin-top: 9px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-      }
-
       .dds-rich-toolbar .dds-bbcode-button {
         min-width: 0;
         height: 34px;
@@ -4496,12 +4457,6 @@ ${stylesheetLinks}
         color: #fff;
       }
 
-      .dds-bbcode-help {
-        width: 100%;
-        margin: 8px 0 0;
-        color: rgba(255,255,255,.35);
-        font: 400 10px/1.5 Arial, sans-serif;
-      }
     `;
     document.head.appendChild(style);
 
@@ -4815,7 +4770,7 @@ ${stylesheetLinks}
     document
       .querySelectorAll(".dds-rich-toolbar")
       .forEach((toolbar) => {
-        if (toolbar.querySelector(".dds-bbcode-tools")) {
+        if (toolbar.querySelector("[data-dds-bbcode]")) {
           return;
         }
 
@@ -4834,18 +4789,6 @@ ${stylesheetLinks}
             saveBbcodeSelection(editor);
           });
         });
-
-        const details = document.createElement("details");
-        details.className = "dds-bbcode-tools";
-        details.innerHTML = `
-          <summary>คำสั่ง BBCode</summary>
-          <div class="dds-bbcode-button-grid"></div>
-          <p class="dds-bbcode-help">เลือกข้อความก่อนกดเพื่อครอบคำสั่ง หรือกดได้เลยเพื่อแทรกแม่แบบ</p>
-        `;
-
-        const buttonGrid = details.querySelector(
-          ".dds-bbcode-button-grid"
-        );
 
         bbcodeButtons.forEach(([type, label, title]) => {
           const button = document.createElement("button");
@@ -4871,10 +4814,8 @@ ${stylesheetLinks}
             );
           });
 
-          buttonGrid.appendChild(button);
+          toolbar.appendChild(button);
         });
-
-        toolbar.appendChild(details);
       });
 
     function isProtectedField(field) {
@@ -4976,14 +4917,60 @@ ${stylesheetLinks}
       }
     }
 
+    function getEditorPanelFromButton(button) {
+      if (!button) {
+        return null;
+      }
+
+      const editKey =
+        button.dataset.editCode ||
+        button.dataset.editProfile ||
+        button.dataset.editReview ||
+        "";
+
+      return editKey
+        ? document.querySelector(`[data-panel="editor-${editKey}"]`)
+        : null;
+    }
+
+    function prepareBlankEditor(button) {
+      const panel = getEditorPanelFromButton(button);
+
+      if (!panel) {
+        return;
+      }
+
+      // ล้างตอนที่หน้า editor ยังซ่อนอยู่ เพื่อให้เปิดมาเจอแบบโล่งทันที
+      clearPanelFields(panel, true);
+
+      // กันระบบนำทางหรือ reset ภายใน core เติมค่าตัวอย่างกลับมาในจังหวะถัดไป
+      requestAnimationFrame(() => {
+        clearPanelFields(panel, true);
+      });
+
+      window.setTimeout(() => {
+        clearPanelFields(panel, true);
+      }, 0);
+    }
+
     document
       .querySelectorAll(
         "[data-edit-code], [data-edit-profile], [data-edit-review]"
       )
       .forEach((button) => {
-        button.addEventListener("click", () => {
-          queueMicrotask(clearActiveEditorPanel);
-        });
+        // pointerdown ทำให้ฟอร์มถูกล้างก่อน panel ถูกเปิด จึงไม่เห็นข้อมูลตัวอย่างกระพริบขึ้นมา
+        button.addEventListener(
+          "pointerdown",
+          () => prepareBlankEditor(button),
+          { capture: true }
+        );
+
+        // รองรับการเปิดด้วยคีย์บอร์ด Enter/Space
+        button.addEventListener(
+          "click",
+          () => prepareBlankEditor(button),
+          { capture: true }
+        );
       });
 
     document
