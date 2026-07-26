@@ -5746,3 +5746,16 @@ output {
     max-width: 1040px !important;
   }
 }
+
+
+/* ==================================================
+   COMMISSION 002 — PROFILE WORK
+================================================== */
+
+.dds-commission-card-title {
+  overflow-wrap: anywhere;
+}
+
+.dds-commission-card-preview-frame {
+  background: #242424;
+}

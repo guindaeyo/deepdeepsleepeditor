@@ -37,7 +37,8 @@ const pageNumbers = {
   "editor-profile003": "02",
   "editor-profile004": "02",
   "editor-review001": "03",
-  "editor-commission001": "04"
+  "editor-commission001": "04",
+  "editor-commission002": "04"
 };
 
 const pageTitles = {
@@ -60,7 +61,8 @@ const pageTitles = {
   "editor-profile003": "― www. deep deep sleep code shop .com ―",
   "editor-profile004": "― www. deep deep sleep code shop .com ―",
   "editor-review001": "― www. deep deep sleep code shop .com ―",
-  "editor-commission001": "― www. deep deep sleep code shop .com ―"
+  "editor-commission001": "― www. deep deep sleep code shop .com ―",
+  "editor-commission002": "― www. deep deep sleep code shop .com ―"
 };
 
 function openPage(pageName, updateHash = true) {
@@ -186,6 +188,11 @@ function openPage(pageName, updateHash = true) {
     refreshCommissionPreviewSizing();
   }
 
+  if (validPage === "editor-commission002") {
+    updateCommissionWork002();
+    refreshCommissionPreviewSizing();
+  }
+
   requestAnimationFrame(() => {
     activatePendingPreviews(
       validPage
@@ -289,6 +296,10 @@ commissionViewButtons.forEach((button) => {
 
     if (commissionName === "commission001") {
       openPage("editor-commission001");
+    }
+
+    if (commissionName === "commission002") {
+      openPage("editor-commission002");
     }
   });
 });
@@ -2822,7 +2833,7 @@ function measureCommissionCanvasHeight(iframe) {
 
   const root =
     previewDocument.querySelector(
-      ".fdreview-wrap"
+      ".fdreview-wrap, .ldmac-wrap"
     );
 
   const content =
@@ -3003,13 +3014,16 @@ function resizeCommissionFixedPreview(iframe) {
 
 function refreshCommissionPreviewSizing() {
   const run = () => {
-    resizeCommissionFixedPreview(
-      commissionCardPreview001
-    );
-
-    resizeCommissionFixedPreview(
-      commissionPreview001
-    );
+    [
+      commissionCardPreview001,
+      commissionPreview001,
+      commissionCardPreview002,
+      commissionPreview002
+    ].forEach((iframe) => {
+      resizeCommissionFixedPreview(
+        iframe
+      );
+    });
   };
 
   requestAnimationFrame(() => {
@@ -9044,6 +9058,62 @@ function updateCommissionWork001() {
 }
 
 
+
+/* ==================================================
+   COMMISSION 002 — PROFILE / LANDON A. RUTHERFORD
+================================================== */
+
+const commissionCardPreview002 =
+  document.querySelector(
+    "#commissionCardPreview002"
+  );
+
+const commissionPreview002 =
+  document.querySelector(
+    "#commissionPreview002"
+  );
+
+const commissionStylesheets002 = [
+  "https://guindaeyo.github.io/css/commit-profland.css"
+];
+
+const commissionPreviewCss002 =
+  `<style data-commission-preview-only>html,body{width:1040px!important;min-width:1040px!important;max-width:1040px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important}body{position:relative!important}.dds-preview-shell,.dds-preview-target,.dds-card-preview-shell,.dds-card-preview-target{width:1040px!important;min-width:1040px!important;max-width:1040px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;position:relative!important;overflow:visible!important;transform:none!important}.dds-commission-preview-content{width:1040px!important;min-width:1040px!important;max-width:1040px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;position:relative!important;overflow:visible!important}.dds-commission-preview-content>.ldmac-wrap{width:1040px!important;min-width:1040px!important;max-width:1040px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;position:relative!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;overflow:visible!important}</style>`;
+
+const commissionMarkup002 =
+  `<div class="ldmac-wrap"style="--ldmac-bg:url('https://i.pinimg.com/736x/0b/86/83/0b8683bfc06629594074828c1cd50cdc.jpg');--ldmac-accent:#d69d12;"><div class="ldmac-menubar"><div class="ldmac-menu-left"><span class="ldmac-apple">●</span><strong>Finder</strong><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span></div><div class="ldmac-menu-right"><span>⌁</span><span>◉</span><span>⌕</span><span>Thu 6 Jun</span><span>11:25 a.m.</span></div></div><div class="ldmac-desktop"><div class="ldmac-polaroids"><div class="ldmac-polaroid ldmac-polaroid-one"><div style="--img:url('https://i.pinimg.com/vwebp/1200x/e8/54/85/e85485f1fe119175c5f6018f831cd79d.webp');--x:50%;--y:30%;"></div></div><div class="ldmac-polaroid ldmac-polaroid-two"><div style="--img:url('https://i.pinimg.com/vwebp/736x/ba/4e/c1/ba4ec12261020316284d9d7decd3bfe0.webp');--x:50%;--y:30%;"></div></div></div><section class="ldmac-window ldmac-main-notes"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Notes</div><div class="ldmac-window-actions"><span>⌕</span><span>⌘</span></div></div><div class="ldmac-notes-app"><aside class="ldmac-sidebar"><div class="ldmac-sidebar-heading"><strong>Notes</strong><span>147</span></div><div class="ldmac-sidebar-label">iCloud</div><div class="ldmac-sidebar-active"><span>▣ All iCloud</span><small>143</small></div><div class="ldmac-sidebar-item"><span>Recently Deleted</span><small>1</small></div><div class="ldmac-sidebar-label">Tags</div><div class="ldmac-sidebar-tag"><span>#</span><small>landon</small></div><div class="ldmac-sidebar-preview"><div class="ldmac-sidebar-image" style="--img:url('https://i.pinimg.com/736x/26/c2/6c/26c26c85dff716f17fc87c9f491ac1f3.jpg');--x:50%;--y:30%;"></div><strong>LANDON</strong><span>Musician<br>Songwriter<br>Omega</span></div></aside><article class="ldmac-note"><div class="ldmac-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>♩</span><span>⌕</span></div><div class="ldmac-note-date">6 June 2026 at 11:25</div><h1>♫ — LANDON ARCHIBALD RUTHERFORD</h1><div class="ldmac-note-subtitle">แลนดอน อาร์ชิบอล รัทเทอร์ฟอร์ด</div><h2>Personal Info</h2><div class="ldmac-info-grid"><div><span>ชื่อ</span><strong>Landon Archibald Rutherford</strong><p>แลนดอน อาร์ชิบอล รัทเทอร์ฟอร์ด</p></div><div><span>ชื่อเล่น</span><strong>Landon / Archie</strong></div><div><span>วันเกิด</span><strong>6 June 2001</strong></div><div><span>อายุ</span><strong>25</strong></div><div><span>เผ่าพันธุ์</span><strong>มนุษย์หมาป่า</strong></div><div><span>ชนชั้น</span><strong>โอเมก้า</strong></div><div><span>อาชีพ</span><strong>นักดนตรีและนักแต่งเพลง</strong></div><div><span>Faceclaim</span><strong>Wooyoung — ATEEZ</strong></div></div><h2>Biography</h2><p>อดีตส่วนหนึ่งแห่งฝูงหมาป่าขนาดใหญ่ใกล้ชายป่า แลนดอน เอ. รัทเทอร์ฟอร์ด หากย้อนกลับไปเมื่อไม่กี่ปีที่ผ่านมา เขาเป็นที่รู้จักกันดีในหมู่มนุษย์หมาป่าวัยพึ่งแตกเนื้อหนุ่ม ด้วยที่พักอาศัยของเขาที่กลายมาเป็นแหล่งมั่วสุมชั้นดีให้กับเหล่าวัยรุ่นเมื่อไร้ซึ่งผู้ใหญ่คอยสอดส่องดูแล</p><p>เพราะแลนดอนเติบโตมาโดยไร้การอบรมสั่งสอนที่ถูกต้อง ผู้เป็นมารดาด่วนจากไปตั้งแต่ยังไม่สิบขวบดี ครอบครัวฝั่งพ่อซึ่งเป็นต้นเชื้อสายฝั่งเอเชียก็ไร้วี่แววจะแยแสจนในที่สุดเขาก็กลับกลายเป็นวัยรุ่นที่ยากจะดัดสอน ความสัมพันธ์ระหว่างเขาและฝูงจึงไม่อาจกล่าวได้ว่าอยู่ในระดับที่ดี กลับกัน ดูเหมือนว่าจะถูกเขม่นและตั้งอคติในแง่ลบเป็นพิเศษ</p><p>ถึงอย่างนั้นเจ้าตัวกลับไม่ใคร่จะใส่ใจนักยังคงดำเนินไปอย่างเสเพล จนกระทั่งถึงจุดหนึ่งที่เปลี่ยนแปลงทุกสิ่งไป ในคืนพระจันทร์เต็มดวงคืนหนึ่ง การหยอกล้อเล่นกันในหมู่วัยรุ่นกลับเกินเลยไปไกล ลำพังด้วยความสามารถในการควบคุมอารมณ์ที่ต่ำเตี้ยของแลนดอนก็มากพอแล้วให้เกิดเรื่อง ทว่าสัญชาตญาณประจำเผ่าพันธุ์กลับยิ่งย้ำซ้ำทวีความรุนแรง</p><div class="ldmac-note-quote">จากการเย้าแหย่กลายมาเป็นการวิวาท<br>จากเพียงฟกช้ำกลับกลายเป็นนองเลือด</div><p> พลั้งพลาดเพียงหนึ่งครั้ง ผู้ที่โดนลูกหลงกลับเป็นผู้ใหญ่หนึ่งคนในฝูงที่เขาเปิดใจนับถือ หนึ่งชีวิตจบลง เป็นผลให้อีกหนึ่งชีวิตต้องจรจัด ผู้เป็นจ่าฝูงไล่ตะเพิดเพียงเขาให้ไสหัวไปด้วยอคติที่หนักอึ้ง</p></article></div></section><section class="ldmac-window ldmac-photobooth"><div class="ldmac-windowbar ldmac-photo-bar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Photo Booth</div><div></div></div><div class="ldmac-photo-screen"><div class="ldmac-photo-main" style="--img:url('https://i.pinimg.com/736x/90/ee/d0/90eed05508a846d94df75dd4ff86ef56.jpg');--x:50%;--y:30%;"></div><div class="ldmac-photo-strip"><div class="ldmac-strip-img" style="--img:url('https://i.pinimg.com/736x/6f/54/78/6f5478d2c0ac841a30d7da0521b19db7.jpg');--x:50%;--y:30%;"></div><div class="ldmac-strip-img" style="--img:url('https://i.pinimg.com/736x/78/53/ae/7853aeec402ed13d6146df2add711570.jpg');--x:50%;--y:30%;"></div><div class="ldmac-strip-img" style="--img:url('https://i.pinimg.com/736x/a4/33/dc/a433dc3a0af1998bb1434c72e18b65fe.jpg');--x:50%;--y:30%;"></div></div></div><div class="ldmac-photo-control"><div><span>▦</span><span>▣</span></div><button type="button"></button><span>Effects</span></div></section><section class="ldmac-window ldmac-second-notes"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Biography — Landon</div><div class="ldmac-window-actions"><span>Aa</span><span>⌕</span></div></div><article class="ldmac-document"><div class="ldmac-document-heading"><span>UNTITLED NOTE</span><strong>Life without a pack</strong></div><p>แลนดอนในวัยยี่สิบต้น ๆ จึงจำต้องระหกระเหินจากถิ่นเดิม ไม่ได้รับการศึกษาอีกนับตั้งแต่จบจากไฮสคูลเพียงเอาเวลาไปทิ้งกับการหาเลี้ยงตัวเอง เล่นดนตรีตามร้านยามวิกาล รวมถึงรับจ้างสารพัดสิ่งขอแค่ได้จับเม็ดเงินให้สมค่าเหนื่อยโดยไม่ใส่ใจคำว่าศักดิ์ศรี</p><p>ไร้ที่ซุกหัวนอนเป็นหลักแหล่งอยู่อย่างสันโดษเช่นนั้นเรื่อยมา จนปัจจุบันในวัยเบญจเพสก็ระหกระเหินมาจนถึงเอลิเชียน ตามคำบอกเล่าของผู้ใหญ่ในวัยเด็ก</p><div class="ldmac-audio"><button type="button">▶</button><div class="ldmac-audio-info"><strong>untitled song.mp3</strong><div class="ldmac-audio-line"><span></span></div></div><small>03:17</small></div></article></section><section class="ldmac-window ldmac-traits-window"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div> <div class="ldmac-window-title">Personality &amp; Traits</div><div class="ldmac-window-actions"><span>⌕</span><span>↥</span></div></div><div class="ldmac-traits-layout"><div class="ldmac-traits-picture"><div class="ldmac-traits-img"style="--img:url('https://i.pinimg.com/736x/76/7b/63/767b63c912f52b2286044fdcfec61b50.jpg');--x:50%;--y:30%;"></div><div class="ldmac-picture-caption"><strong>ARCHIE</strong><span>CAMERA ROLL · 003</span></div></div><article class="ldmac-traits-text"><p>เรือนไหมสีน้ำตาลมาจากการโกรกย้อมดูเหมือนว่าสีบลอนด์ทองซึ่งติดตัวมาแต่เกิด จะไม่ใช่สีที่เจ้าตัวโปรดปรานใบหน้าคมคาย ริมฝีปากรูปกระจับ จมูกโด่งเป็นคมสัน รวมทั้งหมดนั้นดึงดูดสายตาผู้มองได้ไม่ยาก</p><p>กอปรรวมกับน้ำเสียงทุ้มหวานยามขับขาน จึงกลายเป็นเครื่องมือหลอกล่อสตรีกระเป๋าหนักชั้นดีอันยากจะลอกเลียนแบบ ทว่าหากสังเกตเห็นถึงดวงตาสีฟ้าซีด เขาก็อาจเสียลูกค้าไปได้สักหนึ่งถึงสองราย</p><p>และถึงแม้เจ้าตัวจะมีอารมณ์รุนแรง แต่ก็ใช่ว่าจะกักเก็บอารมณ์ไม่เป็น กลับกัน เมื่อโตขึ้นเขาก็ดูจะเก็บอารมณ์ได้ค่อนข้างเก่งเลยทีเดียว เห็นได้จากใบหน้าที่ปัจจุบันเกลี้ยงเกลาดี หากเป็นเมื่อก่อนนี้คงพบเห็นร่องรอยฟกช้ำอยู่เสมอ จากการวิวาทกับจ่าฝูงหรือไม่ก็หนุ่มร่วมฝูงคนอื่น ๆ</p><p>พร้อมกันนั้นเขาจึงกลายเป็นสุนัขยิ้มยากไปโดยปริยาย แม้โดยเนื้อแท้แล้วจะเส้นตื้นพอตัวก็ตาม หลายคนกล่าวว่าน่าแปลกใจนักที่เจ้าตัวสามารถใช้ชีวิตมาจนถึงวัยเบญจเพสได้ ด้วยความสามารถครึ่ง ๆ กลาง ๆ และดูจะไม่มีอะไรดีอีกแล้วนอกจากเรื่องดนตรี ดีแค่ไหนที่ยังไม่อดตาย</p></article></div></section><section class="ldmac-window ldmac-last-window"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Observation Log.txt</div><div class="ldmac-window-actions"><span>⌕</span></div></div><article class="ldmac-last-content"><p>อาจด้วยเพราะเหตุผลทางด้านการเอาตัวรอด ปัจจุบันแลนดอนจึงดูจะเป็นมิตรมากขึ้นกว่าเก่า รู้จักใช้คำพูดเพื่อเข้าสังคมและรู้จักการประนีประนอม แต่ถึงอย่างนั้นก็ใช่ว่าจะไว้ใจได้</p><p>อย่างไรเสียสันดานก็เป็นสิ่งที่แก้กันไม่หายจะทำดีหวังผล ลงแรงเพื่อประโยชน์ส่วนตน ไม่ว่ายังไงทุกการกระทำก็ล้วนเป็นไปเพื่อจุดประสงค์นั้นทั้งสิ้น แต่ไม่ต้องเป็นห่วงไป เขาไม่ใช่บุคคลที่ควรเฝ้าระวังอะไรถึงขั้นนั้น</p><div class="ldmac-final-quote">“คิดว่าเขาหลักแหลมถึงขนาดนั้นเลยหรือไงล่ะ?<br>ระแวงเกินไปหน่อยแล้ว”</div><div class="ldmac-tags"><span>#werewolf</span><span>#omega</span><span>#musician</span><span>#elysian</span></div></article></section><div class="ldmac-dock"><span class="ldmac-dock-finder">◉</span><span class="ldmac-dock-browser">⌕</span><span class="ldmac-dock-music">♫</span><span class="ldmac-dock-mail">✉</span><span class="ldmac-dock-notes">▤</span><span class="ldmac-dock-photo">✿</span><span class="ldmac-dock-settings">⚙</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
+
+function updateCommissionWork002() {
+  const markup =
+    commissionPreviewCss002 +
+    `<div class="dds-commission-preview-content">${commissionMarkup002}</div>`;
+
+  if (commissionCardPreview002) {
+    queuePreviewDocument(
+      commissionCardPreview002,
+      buildCardPreviewDocument(
+        commissionStylesheets002,
+        markup
+      ),
+      resizeCommissionFixedPreview
+    );
+  }
+
+  if (commissionPreview002) {
+    queuePreviewDocument(
+      commissionPreview002,
+      buildEditorPreviewDocument(
+        commissionStylesheets002,
+        markup
+      ),
+      resizeCommissionFixedPreview
+    );
+  }
+
+  refreshCommissionPreviewSizing();
+}
+
+
 /* ==================================================
    POLAROID LOVE — PREVIEW ZOOM
 ================================================== */
@@ -11947,6 +12017,16 @@ schedulePreviewResize(
 );
 
 schedulePreviewResize(
+  commissionCardPreview002,
+  resizeCommissionFixedPreview
+);
+
+schedulePreviewResize(
+  commissionPreview002,
+  resizeCommissionFixedPreview
+);
+
+schedulePreviewResize(
   reviewCardPreview001,
   resizeReviewDesktopCardPreview
 );
@@ -12011,5 +12091,6 @@ updateMoodboard();
 updateFortyOne();
 updateNothinBoutMe();
 updateCommissionWork001();
+updateCommissionWork002();
 updateFoodReview();
 openPageFromHash();
