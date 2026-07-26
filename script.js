@@ -2,12 +2,12 @@
 
 /*
  * DEEP DEEP SLEEP CODE SHOP
- * LIVE PREVIEW + COMMISSION, ACTIVITY & MY OWN CODE BUILD
+ * LIVE PREVIEW + COMMISSION & SHOWCASE, ACTIVITY & MY OWN CODE BUILD
  *
  * ไฟล์นี้ใช้แทน script.js เดิมได้ทันที
  * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
- * - เพิ่มหน้า COMMISSION & ACTIVITY พร้อมแท็บ ACTIVITY
+ * - เพิ่มหน้า COMMISSION & SHOWCASE & ACTIVITY พร้อมแท็บ ACTIVITY
  * - เพิ่ม MY OWN CODE เป็นผลงานลำดับที่ 3 แบบดูอย่างเดียว ไม่มีหน้าแก้ไข
  * - ไม่ต้องแก้ index.html และ style.css
  */
@@ -419,7 +419,7 @@
 
     if (homeCommissionButton) {
       homeCommissionButton.textContent =
-        "COMMISSION & ACTIVITY";
+        "COMMISSION & SHOWCASE & ACTIVITY";
     }
 
     const commissionNavText = document.querySelector(
@@ -428,7 +428,7 @@
 
     if (commissionNavText) {
       commissionNavText.innerHTML =
-        "<small>CUSTOM / EVENT</small>COMMISSION &amp; ACTIVITY";
+        "<small>CUSTOM / EVENT</small>COMMISSION &amp; SHOWCASE &amp; ACTIVITY";
     }
 
     const pageEyebrow = commissionPanel.querySelector(
@@ -443,7 +443,7 @@
     }
 
     if (pageHeading) {
-      pageHeading.textContent = "COMMISSION & ACTIVITY";
+      pageHeading.textContent = "COMMISSION & SHOWCASE & ACTIVITY";
     }
 
     const contactBox = commissionPanel.querySelector(
@@ -473,7 +473,7 @@
         data-work-tab="commission"
       >
         <small>01</small>
-        <span>COMMISSION</span>
+        <span>COMMISSION &amp; SHOWCASE</span>
       </button>
       <button
         class="dds-work-tab"
@@ -499,7 +499,7 @@
     commissionSectionHeading.innerHTML = `
       <div>
         <p>CLIENT WORK ARCHIVE</p>
-        <h2>COMMISSION</h2>
+        <h2>COMMISSION &amp; SHOWCASE</h2>
       </div>
     `;
 
@@ -810,7 +810,7 @@
     window.__DDS_MY_OWN_CODE_INSTALLED__ = true;
 
     const stylesheetUrl =
-      "https://guindaeyo.github.io/css/prof-frkl.-css";
+      "https://guindaeyo.github.io/css/prof-frkl.css";
 
     const myOwnCodeMarkup = String.raw`<div class="myyouth-wrap" style="--myyouth-bg: #f7f7f9;--myyouth-red: #d71920;--myyouth-red-dark: #a80d13;--myyouth-main-img: url('https://i.pinimg.com/736x/e8/0d/2c/e80d2c1cd2699b51c4618f7987c41bc5.jpg');--myyouth-main-y: 45%;--myyouth-right-img: url('https://i.pinimg.com/736x/61/4c/a7/614ca7170e3172d3cf153c81e8d88041.jpg');--myyouth-right-y: 50%;--myyouth-left-img: url('https://i.pinimg.com/1200x/48/dd/16/48dd16899cc51c9a3211a91dcd37ddb3.jpg');--myyouth-left-y: 48%;--myyouth-object-img: url('https://iili.io/CNMzVl2.png');--myyouth-object-left: 65%;--myyouth-object-top: 40%;--myyouth-object-width: 100%;--myyouth-object-height: 88%;--myyouth-object-scale: 1.3;--myyouth-object-rotate: -20deg;"><div class="myyouth-page"><div class="myyouth-browser"><div class="myyouth-browser-left"><span class="myyouth-sidebar-icon"></span><span class="myyouth-browser-arrow">‹</span><span class="myyouth-browser-arrow">›</span><span class="myyouth-shield">◐</span></div><div class="myyouth-address"><span class="myyouth-lock">▣</span><span>i can smell that hot blood just under your skin</span><span class="myyouth-refresh">↻</span></div><div class="myyouth-browser-right"><span>◉</span><span>⇧</span><span>＋</span><span>▦</span></div></div><div class="myyouth-heading"><div class="myyouth-pixel-title"><span>Franklin D.</span><span class="myyouth-pixel-title-red"><br>Bloodworth</span></div><div class="myyouth-title-glitch myyouth-title-glitch-one"></div><div class="myyouth-title-glitch myyouth-title-glitch-two"></div><div class="myyouth-title-glitch myyouth-title-glitch-three"></div></div><div class="myyouth-star myyouth-star-top"></div><div class="myyouth-star myyouth-star-left"></div><div class="myyouth-main-photo"></div><div class="myyouth-bubble myyouth-bubble-white">I love you okay?</div><div class="myyouth-bubble myyouth-bubble-red">You’re really lovely too</div><div class="myyouth-window myyouth-window-right"><div class="myyouth-window-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div><div class="myyouth-window-icons"><span>◉</span><span>⌕</span><span>⌂</span><span>□</span></div></div><div class="myyouth-right-photo"></div><div class="myyouth-right-caption"><strong>Sorry, I’m an anti-romantic</strong><br>I want to run away, far away<br>My heart is already chasing you<br>In a small fire</div></div><div class="myyouth-folder-row"><div class="myyouth-folder-item"><div class="myyouth-folder myyouth-folder-gray"><span></span></div><p>fresh.blood_1</p></div><div class="myyouth-folder-item"><div class="myyouth-folder myyouth-folder-red"><span></span></div><p>fresh.blood_2</p></div></div><div class="myyouth-alert"><div class="myyouth-alert-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div></div><div class="myyouth-alert-content"><div class="myyouth-warning-icon"><span>!</span></div><div class="myyouth-alert-text"><strong>“App” is not optimized for your Mac</strong><p>This app needs to be updated by its developer to<br>improve compatibility.</p></div></div><div class="myyouth-alert-actions"><button type="button">Learn More...</button><button type="button" class="myyouth-alert-ok">OK</button></div></div><div class="myyouth-window myyouth-window-left"><div class="myyouth-window-bar"><div class="myyouth-window-buttons"><i></i><i></i><i></i></div><div class="myyouth-window-icons"><span>◉</span><span>⌕</span><span>⌂</span><span>□</span></div></div><div class="myyouth-left-photo"></div></div><div class="myyouth-lyrics">I know<br>Sweet love song<br>The words of the promise<br>When you turn around<br>You end up being someone unfamiliar</div><div class="myyouth-object-area"><div class="myyouth-red-blob"></div><div class="myyouth-object-png"></div><div class="myyouth-bottom-title">franklin</div></div></div></div>`;
 
@@ -930,17 +930,13 @@
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่าง MY OWN CODE — Franklin D. Bloodworth"
+          title="ตัวอย่างโค้ดประเภทโปรไฟล์ — Franklin D. Bloodworth"
         ></iframe>
-        <span class="dds-roleplay-preview-badge">PRIVATE</span>
-      </div>
+              </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
-        <h2 class="dds-commission-card-title">MY OWN CODE</h2>
-        <p class="dds-commission-card-type">โค้ดประเภทประวัติตัวละคร</p>
-        <p class="dds-commission-card-client">
-          สถานะ <strong>PRIVATE</strong>
-        </p>
+        <h2 class="dds-commission-card-title">โค้ดประเภทโปรไฟล์</h2>
+        <p class="dds-commission-card-type">MY OWN CODE</p>
         <button
           class="dds-roleplay-edit"
           data-view-my-own-code="commission003"
@@ -960,10 +956,10 @@
     viewPanel.innerHTML = `
       <div class="dds-commission-view-toolbar">
         <button
-          aria-label="กลับหน้า COMMISSION"
+          aria-label="กลับหน้า COMMISSION & SHOWCASE"
           class="dds-back-button"
           data-my-own-code-back
-          title="กลับหน้า COMMISSION"
+          title="กลับหน้า COMMISSION & SHOWCASE"
           type="button"
         >
           ←
@@ -980,7 +976,7 @@
           data-commission-canvas-width="1040"
           id="commissionPreview003"
           scrolling="no"
-          title="MY OWN CODE — Franklin D. Bloodworth"
+          title="โค้ดประเภทโปรไฟล์ — Franklin D. Bloodworth"
         ></iframe>
       </div>
     `;
