@@ -8,7 +8,8 @@
  * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
  * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
- * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser) และ MY OWN CODE แบบดูอย่างเดียว
+ * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE และ ACTIVITY: MY TOP 5 MOVIES แบบดูอย่างเดียว
+ * - หน้า CODE006 รูปหน้าชื่อเว็บเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ไม่ต้องแก้ index.html และ style.css
  */
 
@@ -788,6 +789,610 @@
     `;
 
     document.head.appendChild(style);
+  }
+
+
+  function installActivityTopMovies() {
+    if (window.__DDS_ACTIVITY_TOP_MOVIES_INSTALLED__) {
+      return;
+    }
+
+    const activityPanel = document.querySelector(
+      '[data-work-panel="activity"]'
+    );
+    const footer = document.querySelector(
+      ".dds-footer"
+    );
+
+    if (!activityPanel || !footer) {
+      return;
+    }
+
+    window.__DDS_ACTIVITY_TOP_MOVIES_INSTALLED__ = true;
+
+    const stylesheetUrls = [
+      "https://guindaeyo.github.io/css/activizz01.css",
+      "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Herr+Von+Muellerhoff&family=Playfair+Display:wght@500;700;900&display=swap"
+    ];
+    const canvasWidth = 734;
+    const rootSelector = ".ativfzr-movies";
+
+    const activityMarkup = String.raw`<div class="ativfzr-movies"><section class="ativfzr-hero"><div class="ativfzr-title">MY TOP</div><div class="ativfzr-sub">xxx movies</div><div class="ativfzr-burst"><span>05</span></div><span class="ativfzr-dot l"></span><span class="ativfzr-dot r"></span><div class="ativfzr-search"><span class="ativfzr-bar"></span></div><div class="ativfzr-tv-bg"><img src="https://i.pinimg.com/originals/b5/7b/7c/b57b7c724a4cb609d5f40a83f7a9e1b3.gif" alt=""></div><div class="ativfzr-tv"><img src="https://s13.gifyu.com/images/b70mu.png" alt=""></div><div class="ativfzr-arrow l">‹</div><div class="ativfzr-arrow r">›</div><div class="ativfzr-name">รายละเอียดกิจกรรม</div></section><section class="ativfzr-list"><section class="ativfzr-info"><p>ถึงเวลาของคอหนังที่จะได้เปิดลิสต์ภาพยนตร์เรื่องโปรดในใจออกมาอวดกันแล้ว! ไม่ว่าจะเป็นหนังสยองขวัญที่ทำให้นอนไม่หลับ หนังรักที่ดูทีไรก็ใจเจ็บ หรือหนังแอคชั่นสุดมันส์ที่ดูวนได้ไม่มีเบื่อ</p><p><strong>— ภาพยนตร์ทุกเรื่องล้วนมีเหตุผลที่ทำให้เราตกหลุมรักมัน</strong></p><p>ร่วมสนุกไปกับกิจกรรม MY TOP 5 MOVIES กิจกรรมจัดอันดับภาพยนตร์ตามหมวดหมู่ประจำวัน ที่จะพาทุกคนมาพูดคุย แชร์รสนิยม บางทีคุณอาจได้เจอคนรสนิยมเหมือนกัน หรือค้นพบหนังเรื่องใหม่จากลิสต์ของคนอื่นก็ได้ &#127871;✨</p><div class="ativfzr-info-tag">กติกา</div><ul><li>ในแต่ละวัน ทีมงานจะประกาศ<strong>หมวดภาพยนตร์</strong>ประจำวัน</li><li>ใช้<strong>โค้ดกิจกรรม</strong>เท่านั้นในการโพสต์</li><li>1 คน สามารถส่งได้เพียง 1 ครั้ง ต่อ 1 โจทย์</li><li>สามารถใส่คำอธิบายหรือเหตุผลเพิ่มเติมได้ตามอิสระ</li><li>ตัวอย่างเช่น: หนังสยองขวัญ / หนังโรแมนติก / หนังแอนิเมชัน</li><li>ผู้เล่นต้องจัดอันดับ<strong>ภาพยนตร์ 5 เรื่องโปรด</strong>ของตัวเองในหมวดนั้น</li><li>เมื่อโพสต์ครบตามกติกา จะได้รับทันที 10 ดอลล่าร์ ต่อ 1 โจทย์</li><li>หากเข้าร่วมครบทั้ง 7 วัน จะได้รับรวมทั้งหมด 70 ดอลล่าร์</li><li>เมื่อเข้าร่วมโจทย์ครบ 5 ครั้งได้รับ 1 คริสตัล</li></ul><div class="ativfzr-info-tag">กรณีโพสต์ย้อนหลัง</div><p>หากไม่สามารถมาร่วมกิจกรรมภายในวันนั้นได้ ยังสามารถโพสต์ย้อนหลังได้ภายหลัง แต่จะได้รับรางวัลลดลงเหลือ</p><ul><li>5 ดอลล่าร์ ต่อ 1 โจทย์ย้อนหลัง</li></ul><h2>ถ้าพร้อมแล้วก็มาเริ่มจัดอันดับกันเล้ยยยย!</h2></section><div class="ativfzr-bottom-wrap"><div class="ativfzr-check"></div></div></section></div>`;
+
+    const previewOnlyCss = `
+      <style data-activity-preview-only>
+        html,
+        body {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+        }
+
+        body {
+          position: relative !important;
+        }
+
+        .dds-preview-shell,
+        .dds-preview-target,
+        .dds-card-preview-shell,
+        .dds-card-preview-target,
+        .dds-activity-preview-content {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+
+        .dds-activity-preview-content > .ativfzr-movies {
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
+        }
+      </style>
+    `;
+
+    const previewMarkup =
+      `${previewOnlyCss}<div class="dds-activity-preview-content">${activityMarkup}</div>`;
+
+    function buildFallbackPreviewDocument(markup) {
+      const stylesheetLinks = stylesheetUrls
+        .map((url) => `<link href="${url}" rel="stylesheet">`)
+        .join("\n");
+
+      return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+${stylesheetLinks}
+<style>
+  html, body { margin: 0; min-height: 100%; background: #242424; }
+  body { padding: 0; overflow: hidden; }
+  .dds-preview-shell,
+  .dds-card-preview-shell {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .dds-preview-target,
+  .dds-card-preview-target {
+    flex: 0 0 auto;
+    transform-origin: top center;
+  }
+</style>
+</head>
+<body>
+  <div class="dds-preview-shell">
+    <div class="dds-preview-target">${markup}</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function buildPreviewDocument(isFullView) {
+      const builder = isFullView
+        ? window.buildEditorPreviewDocument
+        : window.buildCardPreviewDocument;
+
+      if (typeof builder === "function") {
+        return builder(
+          stylesheetUrls,
+          previewMarkup
+        );
+      }
+
+      return buildFallbackPreviewDocument(
+        previewMarkup
+      );
+    }
+
+    activityPanel
+      .querySelector(".dds-activity-empty")
+      ?.remove();
+
+    let activityGrid = activityPanel.querySelector(
+      ".dds-activity-grid"
+    );
+
+    if (!activityGrid) {
+      activityGrid = document.createElement("div");
+      activityGrid.className =
+        "dds-commission-grid dds-activity-grid";
+      activityPanel.appendChild(activityGrid);
+    }
+
+    const card = document.createElement("article");
+    card.className =
+      "dds-roleplay-card dds-commission-card dds-activity-top-movies-card";
+    card.innerHTML = `
+      <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+        <iframe
+          aria-hidden="true"
+          class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="activityTopMoviesCardPreview"
+          loading="lazy"
+          scrolling="no"
+          tabindex="-1"
+          title="ตัวอย่างโค้ดกิจกรรม MY TOP 5 MOVIES"
+        ></iframe>
+        <span class="dds-roleplay-preview-badge">ACTIVITY</span>
+      </div>
+
+      <div class="dds-roleplay-card-body dds-commission-card-body">
+        <h2 class="dds-commission-card-title">MY TOP 5 MOVIES</h2>
+        <p class="dds-commission-card-type">โค้ดกิจกรรม</p>
+        <button
+          class="dds-roleplay-edit"
+          data-view-activity-top-movies
+          type="button"
+        >
+          VIEW WORK <span>↗</span>
+        </button>
+      </div>
+    `;
+    activityGrid.appendChild(card);
+
+    const viewPanel = document.createElement("section");
+    viewPanel.className =
+      "dds-panel dds-commission-view-panel dds-activity-top-movies-view-panel";
+    viewPanel.dataset.panel =
+      "view-activity-top-movies";
+    viewPanel.innerHTML = `
+      <div class="dds-commission-view-toolbar">
+        <button
+          aria-label="กลับหน้า ACTIVITY"
+          class="dds-back-button"
+          data-activity-top-movies-back
+          title="กลับหน้า ACTIVITY"
+          type="button"
+        >
+          ←
+        </button>
+      </div>
+
+      <div
+        class="dds-commission-preview-stage"
+        id="activityTopMoviesPreviewStage"
+      >
+        <iframe
+          class="dds-editor-preview-frame dds-commission-view-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="activityTopMoviesPreview"
+          scrolling="no"
+          title="โค้ดกิจกรรม MY TOP 5 MOVIES"
+        ></iframe>
+      </div>
+    `;
+    footer.before(viewPanel);
+
+    const cardIframe = card.querySelector(
+      "#activityTopMoviesCardPreview"
+    );
+    const fullIframe = viewPanel.querySelector(
+      "#activityTopMoviesPreview"
+    );
+    const viewButton = card.querySelector(
+      "[data-view-activity-top-movies]"
+    );
+    const backButton = viewPanel.querySelector(
+      "[data-activity-top-movies-back]"
+    );
+
+    let cardRendered = false;
+    let fullRendered = false;
+
+    function measureCanvasHeight(iframe) {
+      const previewDocument = iframe?.contentDocument;
+
+      if (!previewDocument) {
+        return 0;
+      }
+
+      const root = previewDocument.querySelector(
+        rootSelector
+      );
+      const content = previewDocument.querySelector(
+        ".dds-activity-preview-content"
+      );
+
+      if (!root || !content) {
+        return 0;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+
+      return Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            rootRect.height,
+            contentRect.height,
+            root.offsetHeight,
+            root.scrollHeight,
+            content.offsetHeight,
+            content.scrollHeight,
+            previewDocument.body.scrollHeight,
+            previewDocument.documentElement.scrollHeight
+          )
+        )
+      );
+    }
+
+    function resizePreview(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      const stage = iframe.closest(
+        ".dds-commission-preview-stage, .dds-roleplay-card-preview"
+      );
+
+      if (!stage) {
+        return;
+      }
+
+      const canvasHeight = measureCanvasHeight(iframe);
+
+      if (!canvasHeight) {
+        return;
+      }
+
+      iframe.style.setProperty(
+        "--dds-commission-canvas-height",
+        `${canvasHeight}px`
+      );
+
+      const isFullView = iframe.classList.contains(
+        "dds-commission-view-frame"
+      );
+
+      if (isFullView) {
+        const scale = Math.max(
+          0.01,
+          Math.min(
+            1,
+            stage.clientWidth / canvasWidth
+          )
+        );
+        const scaledHeight = Math.ceil(
+          canvasHeight * scale
+        );
+
+        iframe.style.setProperty(
+          "--dds-commission-canvas-scale",
+          String(scale)
+        );
+        stage.style.setProperty(
+          "--dds-commission-stage-height",
+          `${scaledHeight}px`
+        );
+        return;
+      }
+
+      if (stage.clientHeight < 20) {
+        return;
+      }
+
+      const padding = 18;
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          (stage.clientWidth - padding) / canvasWidth,
+          (stage.clientHeight - padding) / canvasHeight
+        )
+      );
+
+      iframe.style.setProperty(
+        "--dds-commission-canvas-scale",
+        String(scale)
+      );
+    }
+
+    function scheduleResize(iframe) {
+      const run = () => resizePreview(iframe);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(run);
+      });
+
+      [80, 180, 420, 850, 1500, 2400].forEach(
+        (delay) => {
+          window.setTimeout(run, delay);
+        }
+      );
+    }
+
+    function watchPreview(iframe) {
+      const previewDocument = iframe.contentDocument;
+
+      if (!previewDocument) {
+        return;
+      }
+
+      previewDocument
+        .querySelectorAll("img")
+        .forEach((image) => {
+          if (!image.complete) {
+            image.addEventListener(
+              "load",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+            image.addEventListener(
+              "error",
+              () => scheduleResize(iframe),
+              { once: true }
+            );
+          }
+        });
+
+      if (previewDocument.fonts?.ready) {
+        previewDocument.fonts.ready.then(() => {
+          scheduleResize(iframe);
+        });
+      }
+    }
+
+    function renderPreview(iframe, isFullView) {
+      if (!iframe) {
+        return;
+      }
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          watchPreview(iframe);
+          scheduleResize(iframe);
+        },
+        { once: true }
+      );
+      iframe.srcdoc = buildPreviewDocument(
+        isFullView
+      );
+    }
+
+    function ensureCardPreview() {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+        return;
+      }
+
+      cardRendered = true;
+      renderPreview(cardIframe, false);
+    }
+
+    function ensureFullPreview() {
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+        return;
+      }
+
+      fullRendered = true;
+      renderPreview(fullIframe, true);
+    }
+
+    function activateActivityTab() {
+      const commissionPanel = document.querySelector(
+        '[data-panel="commission"]'
+      );
+
+      if (!commissionPanel) {
+        return;
+      }
+
+      commissionPanel
+        .querySelectorAll("[data-work-tab]")
+        .forEach((tabButton) => {
+          const selected =
+            tabButton.dataset.workTab === "activity";
+
+          tabButton.classList.toggle(
+            "is-active",
+            selected
+          );
+          tabButton.setAttribute(
+            "aria-selected",
+            String(selected)
+          );
+        });
+
+      commissionPanel
+        .querySelectorAll("[data-work-panel]")
+        .forEach((workPanel) => {
+          const selected =
+            workPanel.dataset.workPanel === "activity";
+
+          workPanel.hidden = !selected;
+          workPanel.classList.toggle(
+            "is-active",
+            selected
+          );
+        });
+    }
+
+    function closeCustomViewState() {
+      viewPanel.classList.remove("is-active");
+    }
+
+    function openCustomView() {
+      ensureFullPreview();
+
+      document.body.classList.add(
+        "dds-editor-mode"
+      );
+      document
+        .querySelectorAll("[data-panel]")
+        .forEach((panel) => {
+          panel.classList.toggle(
+            "is-active",
+            panel === viewPanel
+          );
+        });
+
+      document
+        .querySelectorAll("[data-page]")
+        .forEach((button) => {
+          const active =
+            button.dataset.page === "commission";
+
+          button.classList.toggle(
+            "is-active",
+            active
+          );
+          button.setAttribute(
+            "aria-current",
+            active ? "page" : "false"
+          );
+        });
+
+      const pageNumber = document.querySelector(
+        "#currentPageNumber"
+      );
+
+      if (pageNumber) {
+        pageNumber.textContent = "04";
+      }
+
+      document.title =
+        "― www. deep deep sleep code shop .com ―";
+      history.replaceState(
+        null,
+        "",
+        "#commission"
+      );
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      scheduleResize(fullIframe);
+    }
+
+    viewButton.addEventListener(
+      "click",
+      openCustomView
+    );
+
+    backButton.addEventListener("click", () => {
+      closeCustomViewState();
+
+      if (typeof window.openPage === "function") {
+        window.openPage("commission");
+      } else {
+        document.body.classList.remove(
+          "dds-editor-mode"
+        );
+        document
+          .querySelectorAll("[data-panel]")
+          .forEach((panel) => {
+            panel.classList.toggle(
+              "is-active",
+              panel.dataset.panel === "commission"
+            );
+          });
+      }
+
+      activateActivityTab();
+      ensureCardPreview();
+    });
+
+    const activityTab = document.querySelector(
+      '[data-work-tab="activity"]'
+    );
+
+    activityTab?.addEventListener("click", () => {
+      requestAnimationFrame(ensureCardPreview);
+    });
+
+    document
+      .querySelectorAll(
+        '[data-page="commission"], [data-go="commission"]'
+      )
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          closeCustomViewState();
+
+          requestAnimationFrame(() => {
+            if (!activityPanel.hidden) {
+              ensureCardPreview();
+            }
+          });
+        });
+      });
+
+    document
+      .querySelectorAll("[data-page], [data-go]")
+      .forEach((button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            if (!button.matches(
+              '[data-page="commission"], [data-go="commission"]'
+            )) {
+              closeCustomViewState();
+            }
+          },
+          true
+        );
+      });
+
+    window.addEventListener(
+      "hashchange",
+      closeCustomViewState
+    );
+    window.addEventListener("resize", () => {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+      }
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+      }
+    });
+
+    if (
+      document
+        .querySelector('[data-panel="commission"]')
+        ?.classList.contains("is-active") &&
+      !activityPanel.hidden
+    ) {
+      ensureCardPreview();
+    }
   }
 
 
@@ -1930,11 +2535,189 @@
   }
 
 
+  function installNewRulesWebsiteImageFix() {
+    if (window.__DDS_NEW_RULES_WEBSITE_IMAGE_FIX__) {
+      return;
+    }
+
+    window.__DDS_NEW_RULES_WEBSITE_IMAGE_FIX__ = true;
+
+    const panel = document.querySelector(
+      '[data-panel="editor-code006"]'
+    );
+    const generatedCode = document.querySelector(
+      "#generatedNewRulesCode"
+    );
+    const miniAvatarX = document.querySelector(
+      "#nrMiniAvatarX"
+    );
+    const miniAvatarPositionBox =
+      miniAvatarX?.closest(".dds-image-position");
+
+    /*
+     * รูปหน้าชื่อเว็บเป็น PNG ตกแต่งสำเร็จรูป
+     * ให้ผู้ใช้เปลี่ยนเฉพาะ URL เท่านั้น
+     */
+    miniAvatarPositionBox?.remove();
+
+    function stripMiniAvatarInlineStyle(source) {
+      return String(source || "").replace(
+        /(<img\b[^>]*class=["'][^"']*\bbabiezfrn-miniav\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
+        "$1"
+      );
+    }
+
+    /*
+     * กรอง textarea ตั้งแต่ตอนระบบหลักเขียนค่า
+     * ปุ่ม COPY CODE จึงคัดลอกโค้ดสะอาดทันที
+     */
+    if (
+      generatedCode &&
+      !generatedCode.dataset.ddsMiniAvatarSanitized
+    ) {
+      const valueDescriptor =
+        Object.getOwnPropertyDescriptor(
+          HTMLTextAreaElement.prototype,
+          "value"
+        );
+
+      if (valueDescriptor?.get && valueDescriptor?.set) {
+        const currentValue =
+          valueDescriptor.get.call(generatedCode);
+
+        Object.defineProperty(generatedCode, "value", {
+          configurable: true,
+          enumerable: true,
+          get() {
+            return valueDescriptor.get.call(this);
+          },
+          set(nextValue) {
+            valueDescriptor.set.call(
+              this,
+              stripMiniAvatarInlineStyle(nextValue)
+            );
+          }
+        });
+
+        generatedCode.dataset.ddsMiniAvatarSanitized =
+          "true";
+        generatedCode.value = currentValue;
+      }
+    }
+
+    const previewIds = new Set([
+      "newRulesPreview",
+      "roleplayCardPreview006"
+    ]);
+
+    /*
+     * กรอง srcdoc ก่อนเข้าระบบพรีวิว
+     * จึงไม่เหลือ inline object-position / transform
+     * บนรูปหน้าชื่อเว็บทั้งพรีวิวใหญ่และการ์ดหน้า FOR ROLEPLAY
+     */
+    if (
+      typeof window.queuePreviewDocument === "function" &&
+      !window.__DDS_NEW_RULES_QUEUE_WRAPPED__
+    ) {
+      window.__DDS_NEW_RULES_QUEUE_WRAPPED__ = true;
+      const originalQueuePreviewDocument =
+        window.queuePreviewDocument;
+
+      window.queuePreviewDocument = function (
+        iframe,
+        srcdoc,
+        resizeFunction
+      ) {
+        const nextSrcdoc =
+          iframe && previewIds.has(iframe.id)
+            ? stripMiniAvatarInlineStyle(srcdoc)
+            : srcdoc;
+
+        return originalQueuePreviewDocument.call(
+          this,
+          iframe,
+          nextSrcdoc,
+          resizeFunction
+        );
+      };
+    }
+
+    function cleanPreviewIframe(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      if (typeof window.getPreviewState === "function") {
+        const state = window.getPreviewState(iframe);
+
+        if (state?.pendingSrcdoc) {
+          state.pendingSrcdoc =
+            stripMiniAvatarInlineStyle(
+              state.pendingSrcdoc
+            );
+        }
+
+        if (state?.currentSrcdoc) {
+          state.currentSrcdoc =
+            stripMiniAvatarInlineStyle(
+              state.currentSrcdoc
+            );
+        }
+      }
+
+      const miniAvatar =
+        iframe.contentDocument?.querySelector(
+          ".babiezfrn-miniav"
+        );
+
+      miniAvatar?.removeAttribute("style");
+    }
+
+    const previewIframes = Array.from(
+      previewIds,
+      (id) => document.getElementById(id)
+    ).filter(Boolean);
+
+    previewIframes.forEach((iframe) => {
+      iframe.addEventListener("load", () => {
+        cleanPreviewIframe(iframe);
+      });
+
+      cleanPreviewIframe(iframe);
+    });
+
+    function cleanNewRulesOutputAndPreview() {
+      if (generatedCode) {
+        generatedCode.value = generatedCode.value;
+      }
+
+      previewIframes.forEach(cleanPreviewIframe);
+    }
+
+    ["input", "change"].forEach((eventName) => {
+      panel?.addEventListener(
+        eventName,
+        () => {
+          window.setTimeout(
+            cleanNewRulesOutputAndPreview,
+            0
+          );
+        },
+        true
+      );
+    });
+
+    cleanNewRulesOutputAndPreview();
+  }
+
+
   appendClassicScript(CORE_CDN_URL)
     .catch(() => loadCoreFromRawFallback())
     .then(() => {
       installLivePreviewPerformanceFix();
+      installNewRulesWebsiteImageFix();
       installCommissionActivityLayout();
+      installActivityTopMovies();
       installCommissionThreeHouse();
       installMyOwnCodeCommission();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
