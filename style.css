@@ -5547,7 +5547,7 @@ output {
 .dds-commission-card-type,
 .dds-commission-card-client,
 .dds-commission-card-client strong {
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 .dds-commission-card-type {
@@ -5621,5 +5621,128 @@ output {
       ) !important;
 
     min-height: 480px !important;
+  }
+}
+
+
+/* ==================================================
+   COMMISSION — 1000PX / AUTO CONTENT HEIGHT / 13PX
+================================================== */
+
+.dds-commission-card-type,
+.dds-commission-card-client,
+.dds-commission-card-client strong {
+  font-size: 13px !important;
+}
+
+
+/* การ์ดพรีวิว */
+.dds-commission-card-preview-frame {
+  width: 1000px !important;
+  min-width: 1000px !important;
+  max-width: 1000px !important;
+
+  height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+
+  min-height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+
+  max-height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+}
+
+
+/* หน้าโชว์งานขยายตามความสูงจริงของโค้ด */
+.dds-commission-preview-stage {
+  width: min(1000px, 100%) !important;
+  max-width: 1000px !important;
+
+  height:
+    var(
+      --dds-commission-stage-height,
+      800px
+    ) !important;
+
+  min-height: 1px !important;
+
+  margin: 0 auto !important;
+
+  position: relative;
+
+  overflow: hidden !important;
+}
+
+.dds-commission-view-frame {
+  width: 1000px !important;
+  min-width: 1000px !important;
+  max-width: 1000px !important;
+
+  height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+
+  min-height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+
+  max-height:
+    var(
+      --dds-commission-canvas-height,
+      800px
+    ) !important;
+
+  top: 0 !important;
+  left: 50% !important;
+
+  transform:
+    translate3d(-50%, 0, 0)
+    scale(
+      var(
+        --dds-commission-canvas-scale,
+        1
+      )
+    ) !important;
+
+  transform-origin:
+    top center !important;
+}
+
+
+/* การ์ดยังคงจัดชิ้นงานไว้กึ่งกลาง */
+.dds-commission-card-preview-frame {
+  top: 50% !important;
+  left: 50% !important;
+
+  transform:
+    translate3d(-50%, -50%, 0)
+    scale(
+      var(
+        --dds-commission-canvas-scale,
+        0.3
+      )
+    ) !important;
+
+  transform-origin:
+    center center !important;
+}
+
+@media (max-width: 1040px) {
+  .dds-commission-preview-stage {
+    width: 100% !important;
+    max-width: 1000px !important;
   }
 }

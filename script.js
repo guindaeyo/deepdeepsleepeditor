@@ -2812,6 +2812,51 @@ function setNothinZoom(nextZoom) {
 }
 
 
+function measureCommissionCanvasHeight(iframe) {
+  const previewDocument =
+    iframe?.contentDocument;
+
+  if (!previewDocument) {
+    return 0;
+  }
+
+  const root =
+    previewDocument.querySelector(
+      ".fdreview-wrap"
+    );
+
+  const content =
+    previewDocument.querySelector(
+      ".dds-commission-preview-content"
+    );
+
+  if (!root || !content) {
+    return 0;
+  }
+
+  const rootRect =
+    root.getBoundingClientRect();
+
+  const contentRect =
+    content.getBoundingClientRect();
+
+  return Math.max(
+    1,
+    Math.ceil(
+      Math.max(
+        rootRect.height,
+        contentRect.height,
+        root.offsetHeight,
+        root.scrollHeight,
+        content.offsetHeight,
+        content.scrollHeight,
+        previewDocument.body.scrollHeight,
+        previewDocument.documentElement.scrollHeight
+      )
+    )
+  );
+}
+
 function resizeCommissionFixedPreview(iframe) {
   if (!iframe) {
     return;
@@ -2833,13 +2878,10 @@ function resizeCommissionFixedPreview(iframe) {
     stage.clientHeight;
 
   /*
-   * ถ้าหน้ายังซ่อนอยู่ ขนาดจะเป็น 0
-   * ห้ามคำนวณ scale ในจังหวะนี้
+   * หน้าที่ซ่อนอยู่มีขนาดเป็น 0
+   * รอจนแสดงก่อนจึงคำนวณใหม่
    */
-  if (
-    stageWidth < 20 ||
-    stageHeight < 20
-  ) {
+  if (stageWidth < 20) {
     return;
   }
 
@@ -2848,18 +2890,36 @@ function resizeCommissionFixedPreview(iframe) {
       1,
       Number(
         iframe.dataset
-          .commissionCanvasWidth || 1100
-      ) || 734
+          .commissionCanvasWidth || 1000
+      ) || 1000
     );
+
+  /*
+   * เริ่มจากความสูงสำรอง แล้วแทนด้วยความสูงจริง
+   * หลัง CSS และรูปภาพภายในพรีวิวโหลดเสร็จ
+   */
+  const measuredHeight =
+    measureCommissionCanvasHeight(
+      iframe
+    );
+
+  const previousHeight =
+    Number(
+      iframe.dataset
+        .commissionMeasuredHeight || 0
+    ) || 0;
 
   const canvasHeight =
     Math.max(
       1,
-      Number(
-        iframe.dataset
-          .commissionCanvasHeight || 800
-      ) || 800
+      measuredHeight ||
+      previousHeight ||
+      800
     );
+
+  iframe.dataset
+    .commissionMeasuredHeight =
+      String(canvasHeight);
 
   iframe.style.width =
     `${canvasWidth}px`;
@@ -2879,21 +2939,59 @@ function resizeCommissionFixedPreview(iframe) {
   iframe.style.maxHeight =
     `${canvasHeight}px`;
 
+  iframe.style.setProperty(
+    "--dds-commission-canvas-height",
+    `${canvasHeight}px`
+  );
+
   const isFullView =
     iframe.classList.contains(
       "dds-commission-view-frame"
     );
 
-  const padding =
-    isFullView ? 0 : 18;
+  if (isFullView) {
+    const scale =
+      Math.max(
+        0.01,
+        Math.min(
+          1,
+          stageWidth / canvasWidth
+        )
+      );
+
+    const scaledHeight =
+      Math.ceil(
+        canvasHeight * scale
+      );
+
+    iframe.style.setProperty(
+      "--dds-commission-canvas-scale",
+      String(scale)
+    );
+
+    stage.style.setProperty(
+      "--dds-commission-stage-height",
+      `${scaledHeight}px`
+    );
+
+    return;
+  }
+
+  if (stageHeight < 20) {
+    return;
+  }
+
+  const padding = 18;
 
   const scale =
     Math.max(
       0.01,
       Math.min(
         1,
-        (stageWidth - padding) / canvasWidth,
-        (stageHeight - padding) / canvasHeight
+        (stageWidth - padding) /
+          canvasWidth,
+        (stageHeight - padding) /
+          canvasHeight
       )
     );
 
@@ -2904,19 +3002,7 @@ function resizeCommissionFixedPreview(iframe) {
 }
 
 function refreshCommissionPreviewSizing() {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      resizeCommissionFixedPreview(
-        commissionCardPreview001
-      );
-
-      resizeCommissionFixedPreview(
-        commissionPreview001
-      );
-    });
-  });
-
-  window.setTimeout(() => {
+  const run = () => {
     resizeCommissionFixedPreview(
       commissionCardPreview001
     );
@@ -2924,7 +3010,25 @@ function refreshCommissionPreviewSizing() {
     resizeCommissionFixedPreview(
       commissionPreview001
     );
-  }, 160);
+  };
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(run);
+  });
+
+  [
+    80,
+    180,
+    420,
+    850,
+    1500,
+    2400
+  ].forEach((delay) => {
+    window.setTimeout(
+      run,
+      delay
+    );
+  });
 }
 
 
@@ -8904,7 +9008,7 @@ const commissionStylesheets001 = [
 ];
 
 const commissionPreviewCss001 =
-  `<style data-commission-preview-only>html,body{width:1100px!important;min-width:1100px!important;max-width:1100px!important;height:800px!important;min-height:800px!important;max-height:800px!important;margin:0!important;padding:0!important;overflow:hidden!important}body{position:relative!important}.dds-preview-shell,.dds-preview-target,.dds-card-preview-shell,.dds-card-preview-target{width:1100px!important;min-width:1100px!important;max-width:1100px!important;height:800px!important;min-height:800px!important;max-height:800px!important;margin:0!important;padding:0!important;position:relative!important;overflow:hidden!important;transform:none!important}.dds-commission-preview-content{width:1100px!important;min-width:1100px!important;max-width:1100px!important;height:800px!important;min-height:800px!important;max-height:800px!important;margin:0!important;padding:0!important;position:relative!important;overflow:hidden!important}.dds-commission-preview-content>.fdreview-wrap{width:1100px!important;min-width:1100px!important;max-width:1100px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;position:absolute!important;top:50%!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;overflow:hidden!important}</style>`;
+  `<style data-commission-preview-only>html,body{width:1000px!important;min-width:1000px!important;max-width:1000px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important}body{position:relative!important}.dds-preview-shell,.dds-preview-target,.dds-card-preview-shell,.dds-card-preview-target{width:1000px!important;min-width:1000px!important;max-width:1000px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;position:relative!important;overflow:visible!important;transform:none!important}.dds-commission-preview-content{width:1000px!important;min-width:1000px!important;max-width:1000px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;position:relative!important;overflow:visible!important}.dds-commission-preview-content>.fdreview-wrap{width:1000px!important;min-width:1000px!important;max-width:1000px!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;position:relative!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;overflow:visible!important}</style>`;
 
 const commissionMarkup001 =
   `<div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('https://i.postimg.cc/h4mdDXZV/kaisen.jpg');--fdreview-img1-x:50%;--fdreview-img1-y:35%;--fdreview-img2:url('https://i.postimg.cc/RhYsLNfR/dow.jpg');--fdreview-img2-x:50%;--fdreview-img2-y:50%;--fdreview-img3:url('https://i.postimg.cc/jd40rhHr/ate.jpg');--fdreview-img3-x:50%;--fdreview-img3-y:50%;--fdreview-img4:url('https://i.postimg.cc/BQG1XJdb/kaisen2.jpg');--fdreview-img4-x:50%;--fdreview-img4-y:50%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>Sat 00:10</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>Japanese</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>Delivery</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>Don</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>Omakase Don By Teppen</h1><div class="fdreview-location">Bangkok, Thailand · 20 Jun2026</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">10</span><small>/ 10</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="5 stars"><span>★★★★★</span></div><div class="fdreview-rating-text">5 / 5 — อร่อยแบบที่กินแล้วอารมณ์ดีไปอีกสามวัน</div></div><div class="fdreview-quote">วัตถุดิบสดมาก แนะนำมาก ๆ สำหรับคนที่ชอบอีสปลาดิบ</div><div class="fdreview-review-text"><p>เป็นร้านที่ไม่ได้ตั้งใจจะสั่ง ที่สั่งมาไม่รู้จะกินอะไรดีเฉย ๆ ตอนได้มาช็อคนิดหน่อยเพราะมันดูเล็ก กลัวกินไม่อิ่ม แต่ผิดคาด อิ่มพอดี ร้านแพ็คมาดีมาก ใส่ใจจริง ๆ มีน้ำแข็งแนบมาด้วย เลยได้กินแบบที่อาหารยังสดมาก ๆ อยู่ ปกติกินข้าวไม่ค่อยหมด แต่นี่คือกินแซ่บ เพราะข้าวเปล่ายังอร่อย</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿360</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>10 / 10</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>Kaisen Don</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>มากุโระอร่อยเลิศ แสงออกปาก</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>สาขา Dongki Mall | 10:00AM - 9:30PM</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
