@@ -9,7 +9,8 @@
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
  * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
  * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE และ ACTIVITY: MY TOP 5 MOVIES แบบดูอย่างเดียว
- * - หน้า CODE006 รูปหน้าชื่อเว็บเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
+ * - หน้า ACTIVITY ใช้การ์ด 2 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
+ * - หน้า CODE006 รูปหน้าชื่อเว็บและรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ไม่ต้องแก้ index.html และ style.css
  */
 
@@ -814,7 +815,7 @@
       "https://guindaeyo.github.io/css/activizz01.css",
       "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600;700&family=Herr+Von+Muellerhoff&family=Playfair+Display:wght@500;700;900&display=swap"
     ];
-    const canvasWidth = 734;
+    const canvasWidth = 1040;
     const rootSelector = ".ativfzr-movies";
 
     const activityMarkup = String.raw`<div class="ativfzr-movies"><section class="ativfzr-hero"><div class="ativfzr-title">MY TOP</div><div class="ativfzr-sub">xxx movies</div><div class="ativfzr-burst"><span>05</span></div><span class="ativfzr-dot l"></span><span class="ativfzr-dot r"></span><div class="ativfzr-search"><span class="ativfzr-bar"></span></div><div class="ativfzr-tv-bg"><img src="https://i.pinimg.com/originals/b5/7b/7c/b57b7c724a4cb609d5f40a83f7a9e1b3.gif" alt=""></div><div class="ativfzr-tv"><img src="https://s13.gifyu.com/images/b70mu.png" alt=""></div><div class="ativfzr-arrow l">‹</div><div class="ativfzr-arrow r">›</div><div class="ativfzr-name">รายละเอียดกิจกรรม</div></section><section class="ativfzr-list"><section class="ativfzr-info"><p>ถึงเวลาของคอหนังที่จะได้เปิดลิสต์ภาพยนตร์เรื่องโปรดในใจออกมาอวดกันแล้ว! ไม่ว่าจะเป็นหนังสยองขวัญที่ทำให้นอนไม่หลับ หนังรักที่ดูทีไรก็ใจเจ็บ หรือหนังแอคชั่นสุดมันส์ที่ดูวนได้ไม่มีเบื่อ</p><p><strong>— ภาพยนตร์ทุกเรื่องล้วนมีเหตุผลที่ทำให้เราตกหลุมรักมัน</strong></p><p>ร่วมสนุกไปกับกิจกรรม MY TOP 5 MOVIES กิจกรรมจัดอันดับภาพยนตร์ตามหมวดหมู่ประจำวัน ที่จะพาทุกคนมาพูดคุย แชร์รสนิยม บางทีคุณอาจได้เจอคนรสนิยมเหมือนกัน หรือค้นพบหนังเรื่องใหม่จากลิสต์ของคนอื่นก็ได้ &#127871;✨</p><div class="ativfzr-info-tag">กติกา</div><ul><li>ในแต่ละวัน ทีมงานจะประกาศ<strong>หมวดภาพยนตร์</strong>ประจำวัน</li><li>ใช้<strong>โค้ดกิจกรรม</strong>เท่านั้นในการโพสต์</li><li>1 คน สามารถส่งได้เพียง 1 ครั้ง ต่อ 1 โจทย์</li><li>สามารถใส่คำอธิบายหรือเหตุผลเพิ่มเติมได้ตามอิสระ</li><li>ตัวอย่างเช่น: หนังสยองขวัญ / หนังโรแมนติก / หนังแอนิเมชัน</li><li>ผู้เล่นต้องจัดอันดับ<strong>ภาพยนตร์ 5 เรื่องโปรด</strong>ของตัวเองในหมวดนั้น</li><li>เมื่อโพสต์ครบตามกติกา จะได้รับทันที 10 ดอลล่าร์ ต่อ 1 โจทย์</li><li>หากเข้าร่วมครบทั้ง 7 วัน จะได้รับรวมทั้งหมด 70 ดอลล่าร์</li><li>เมื่อเข้าร่วมโจทย์ครบ 5 ครั้งได้รับ 1 คริสตัล</li></ul><div class="ativfzr-info-tag">กรณีโพสต์ย้อนหลัง</div><p>หากไม่สามารถมาร่วมกิจกรรมภายในวันนั้นได้ ยังสามารถโพสต์ย้อนหลังได้ภายหลัง แต่จะได้รับรางวัลลดลงเหลือ</p><ul><li>5 ดอลล่าร์ ต่อ 1 โจทย์ย้อนหลัง</li></ul><h2>ถ้าพร้อมแล้วก็มาเริ่มจัดอันดับกันเล้ยยยย!</h2></section><div class="ativfzr-bottom-wrap"><div class="ativfzr-check"></div></div></section></div>`;
@@ -855,8 +856,20 @@
         }
 
         .dds-activity-preview-content > .ativfzr-movies {
-          margin-top: 0 !important;
-          margin-bottom: 0 !important;
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 auto !important;
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          bottom: auto !important;
+          transform: none !important;
+          overflow: visible !important;
         }
       </style>
     `;
@@ -930,6 +943,51 @@ ${stylesheetLinks}
       activityGrid.className =
         "dds-commission-grid dds-activity-grid";
       activityPanel.appendChild(activityGrid);
+    }
+
+    if (!document.getElementById("ddsActivityShowcaseStyles")) {
+      const activityShowcaseStyle = document.createElement("style");
+      activityShowcaseStyle.id = "ddsActivityShowcaseStyles";
+      activityShowcaseStyle.textContent = `
+        .dds-activity-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          align-items: start;
+          gap: 22px !important;
+        }
+
+        .dds-activity-grid > .dds-commission-card {
+          width: 100%;
+          min-width: 0;
+          margin: 0;
+        }
+
+        .dds-activity-top-movies-view-panel
+          .dds-commission-preview-stage {
+          width: 100%;
+          min-height: 1px;
+          height: var(--dds-commission-stage-height, auto);
+          overflow: hidden;
+        }
+
+        .dds-activity-top-movies-view-panel
+          .dds-commission-view-frame {
+          width: 1040px !important;
+          min-width: 1040px !important;
+          max-width: 1040px !important;
+          height: var(--dds-commission-canvas-height, 1px) !important;
+          transform: scale(var(--dds-commission-canvas-scale, 1));
+          transform-origin: top center;
+        }
+
+        @media (max-width: 760px) {
+          .dds-activity-grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 16px !important;
+          }
+        }
+      `;
+      document.head.appendChild(activityShowcaseStyle);
     }
 
     const card = document.createElement("article");
@@ -2551,20 +2609,31 @@ ${stylesheetLinks}
     const miniAvatarX = document.querySelector(
       "#nrMiniAvatarX"
     );
+    const footerAvatarX = document.querySelector(
+      "#nrFooterAvatarX"
+    );
     const miniAvatarPositionBox =
       miniAvatarX?.closest(".dds-image-position");
+    const footerAvatarPositionBox =
+      footerAvatarX?.closest(".dds-image-position");
 
     /*
-     * รูปหน้าชื่อเว็บเป็น PNG ตกแต่งสำเร็จรูป
-     * ให้ผู้ใช้เปลี่ยนเฉพาะ URL เท่านั้น
+     * รูปหน้าชื่อเว็บและรูปวงกลมเล็กส่วนล่าง
+     * เป็นรูปตกแต่งที่ให้เปลี่ยนเฉพาะ URL เท่านั้น
      */
     miniAvatarPositionBox?.remove();
+    footerAvatarPositionBox?.remove();
 
-    function stripMiniAvatarInlineStyle(source) {
-      return String(source || "").replace(
-        /(<img\b[^>]*class=["'][^"']*\bbabiezfrn-miniav\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
-        "$1"
-      );
+    function stripLockedImageInlineStyles(source) {
+      return String(source || "")
+        .replace(
+          /(<img\b[^>]*class=["'][^"']*\bbabiezfrn-miniav\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
+          "$1"
+        )
+        .replace(
+          /(<img\b[^>]*class=["'][^"']*\bfava\b[^"']*["'][^>]*?)\s+style=["'][^"']*["']/gi,
+          "$1"
+        );
     }
 
     /*
@@ -2594,7 +2663,7 @@ ${stylesheetLinks}
           set(nextValue) {
             valueDescriptor.set.call(
               this,
-              stripMiniAvatarInlineStyle(nextValue)
+              stripLockedImageInlineStyles(nextValue)
             );
           }
         });
@@ -2613,7 +2682,7 @@ ${stylesheetLinks}
     /*
      * กรอง srcdoc ก่อนเข้าระบบพรีวิว
      * จึงไม่เหลือ inline object-position / transform
-     * บนรูปหน้าชื่อเว็บทั้งพรีวิวใหญ่และการ์ดหน้า FOR ROLEPLAY
+     * บนรูปทั้งสองจุดในพรีวิวใหญ่และการ์ดหน้า FOR ROLEPLAY
      */
     if (
       typeof window.queuePreviewDocument === "function" &&
@@ -2630,7 +2699,7 @@ ${stylesheetLinks}
       ) {
         const nextSrcdoc =
           iframe && previewIds.has(iframe.id)
-            ? stripMiniAvatarInlineStyle(srcdoc)
+            ? stripLockedImageInlineStyles(srcdoc)
             : srcdoc;
 
         return originalQueuePreviewDocument.call(
@@ -2652,25 +2721,27 @@ ${stylesheetLinks}
 
         if (state?.pendingSrcdoc) {
           state.pendingSrcdoc =
-            stripMiniAvatarInlineStyle(
+            stripLockedImageInlineStyles(
               state.pendingSrcdoc
             );
         }
 
         if (state?.currentSrcdoc) {
           state.currentSrcdoc =
-            stripMiniAvatarInlineStyle(
+            stripLockedImageInlineStyles(
               state.currentSrcdoc
             );
         }
       }
 
-      const miniAvatar =
-        iframe.contentDocument?.querySelector(
-          ".babiezfrn-miniav"
+      const lockedImages =
+        iframe.contentDocument?.querySelectorAll(
+          ".babiezfrn-miniav, .babiezfrn-foot .fava"
         );
 
-      miniAvatar?.removeAttribute("style");
+      lockedImages?.forEach((image) => {
+        image.removeAttribute("style");
+      });
     }
 
     const previewIframes = Array.from(
