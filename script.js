@@ -5008,17 +5008,25 @@ ${stylesheetLinks}
     window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__ = true;
 
     /*
-     * แก้เฉพาะหน้า FOR ROLEPLAY และ FOR PROFILE
-     * หน้า FOR REVIEW ใช้งานได้ถูกต้องอยู่แล้ว จึงไม่เข้าไปแตะระบบของหน้านั้น
+     * หน้า REVIEW ใช้ฟอร์มเดิมโดยไม่ถูกล้างค่าระหว่างเปลี่ยนช่อง
+     * ส่วน ROLEPLAY / PROFILE เคยมีตัวล้างฟอร์มเพิ่มภายหลัง จึงต้องเก็บ
+     * state ของแต่ละช่องไว้ แล้วคืนค่าหลัง event ของ core ทำงานครบแล้ว
      */
     const editorPanelSelector = [
       '[data-panel^="editor-code"]',
       '[data-panel^="editor-profile"]'
     ].join(',');
 
+    const fieldSelector = [
+      'input',
+      'textarea',
+      'select',
+      '.dds-rich-editor[contenteditable="true"]'
+    ].join(',');
+
     const panelStates = new Map();
-    const resetPanels = new WeakSet();
-    const scheduledFields = new WeakSet();
+    const restoreTokens = new WeakMap();
+    const resettingPanels = new WeakSet();
 
     function isPersistableField(field) {
       if (!(field instanceof Element)) {
@@ -5034,16 +5042,20 @@ ${stylesheetLinks}
       }
 
       return !field.matches(
-        '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"]'
+        '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"], button, output'
       );
     }
 
-    function getPanel(field) {
-      return field?.closest?.(editorPanelSelector) || null;
+    function getPanel(target) {
+      return target?.closest?.(editorPanelSelector) || null;
     }
 
-    function getPanelState(panel, create = true) {
-      const panelName = panel?.dataset?.panel || '';
+    function getPanelName(panel) {
+      return String(panel?.dataset?.panel || '');
+    }
+
+    function getState(panel, create = true) {
+      const panelName = getPanelName(panel);
 
       if (!panelName) {
         return null;
@@ -5056,22 +5068,25 @@ ${stylesheetLinks}
       return panelStates.get(panelName) || null;
     }
 
+    function getFields(panel) {
+      if (!panel) {
+        return [];
+      }
+
+      return Array.from(panel.querySelectorAll(fieldSelector))
+        .filter(isPersistableField);
+    }
+
     function getFieldKey(field) {
       if (field.id) {
         return `id:${field.id}`;
       }
 
       const panel = getPanel(field);
-      const fields = panel
-        ? Array.from(
-            panel.querySelectorAll(
-              'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
-            )
-          ).filter(isPersistableField)
-        : [];
+      const fields = getFields(panel);
       const index = fields.indexOf(field);
-      const name = field.getAttribute('name') || '';
       const type = field.getAttribute('type') || field.tagName.toLowerCase();
+      const name = field.getAttribute('name') || '';
 
       return `field:${type}:${name}:${index}`;
     }
@@ -5105,7 +5120,7 @@ ${stylesheetLinks}
     }
 
     function writeField(field, saved) {
-      if (!saved || resetPanels.has(getPanel(field))) {
+      if (!saved) {
         return;
       }
 
@@ -5142,90 +5157,79 @@ ${stylesheetLinks}
 
       const panel = getPanel(field);
 
-      if (!panel || resetPanels.has(panel)) {
+      if (!panel || resettingPanels.has(panel)) {
         return;
       }
 
-      const state = getPanelState(panel, true);
+      const state = getState(panel, true);
       state.set(getFieldKey(field), readField(field));
-      field.dataset.ddsUserEdited = 'true';
     }
 
-    function restoreField(field) {
-      if (!isPersistableField(field)) {
+    function snapshotPanel(panel) {
+      if (!panel || resettingPanels.has(panel)) {
         return;
       }
 
-      const panel = getPanel(field);
+      const state = getState(panel, true);
 
-      if (!panel || resetPanels.has(panel)) {
-        return;
-      }
-
-      const state = getPanelState(panel, false);
-      const saved = state?.get(getFieldKey(field));
-
-      if (saved) {
-        writeField(field, saved);
-      }
+      getFields(panel).forEach((field) => {
+        state.set(getFieldKey(field), readField(field));
+      });
     }
 
     function restorePanel(panel) {
-      if (!panel || resetPanels.has(panel)) {
+      if (!panel || resettingPanels.has(panel)) {
         return;
       }
 
-      const state = getPanelState(panel, false);
+      const state = getState(panel, false);
 
       if (!state) {
         return;
       }
 
-      panel
-        .querySelectorAll(
-          'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
-        )
-        .forEach((field) => {
-          if (!isPersistableField(field)) {
-            return;
-          }
+      getFields(panel).forEach((field) => {
+        const saved = state.get(getFieldKey(field));
 
-          const saved = state.get(getFieldKey(field));
-
-          if (saved) {
-            writeField(field, saved);
-          }
-        });
-    }
-
-    function scheduleFieldRestore(field) {
-      if (!isPersistableField(field) || scheduledFields.has(field)) {
-        return;
-      }
-
-      scheduledFields.add(field);
-
-      queueMicrotask(() => {
-        restoreField(field);
-
-        requestAnimationFrame(() => {
-          restoreField(field);
-          scheduledFields.delete(field);
-        });
+        if (saved) {
+          writeField(field, saved);
+        }
       });
     }
 
-    document.querySelectorAll(editorPanelSelector).forEach((panel) => {
+    function scheduleRestore(panel) {
+      if (!panel || resettingPanels.has(panel)) {
+        return;
+      }
+
+      const token = (restoreTokens.get(panel) || 0) + 1;
+      restoreTokens.set(panel, token);
+
+      const run = () => {
+        if (
+          restoreTokens.get(panel) === token &&
+          !resettingPanels.has(panel)
+        ) {
+          restorePanel(panel);
+        }
+      };
+
       /*
-       * จำค่า "หลัง" ผู้ใช้พิมพ์แล้วเท่านั้น
-       * ไม่ใช้ beforeinput เพราะเป็นจังหวะก่อนตัวอักษรถูกใส่และอาจดึงค่าเก่ากลับมา
+       * คืนค่าหลัง listener ของ core ทั้งแบบ synchronous และงานที่ถูกคิวไว้
+       * จึงกันได้ทั้งอาการหายตอน input และหายตอนกดไปยังช่องถัดไป
        */
+      queueMicrotask(run);
+      requestAnimationFrame(run);
+      window.setTimeout(run, 0);
+      window.setTimeout(run, 40);
+    }
+
+    document.querySelectorAll(editorPanelSelector).forEach((panel) => {
       panel.addEventListener(
         'input',
         (event) => {
-          const field = event.target;
-          saveField(field);
-          scheduleFieldRestore(field);
+          saveField(event.target);
+          scheduleRestore(panel);
         },
         true
       );
@@ -5233,38 +5237,8 @@ ${stylesheetLinks}
       panel.addEventListener(
         'change',
         (event) => {
-          const field = event.target;
-          saveField(field);
-          scheduleFieldRestore(field);
-        },
-        true
-      );
-
-      /*
-       * Core เดิมผูก update ซ้ำไว้กับ blur ทุกช่อง
-       * input event อัปเดต LIVE PREVIEW อยู่แล้ว จึงหยุด blur ตัวเดิมได้อย่างปลอดภัย
-       * เพื่อไม่ให้ตอนกดไปช่องถัดไปมีโค้ดใดเขียนค่าช่องก่อนหน้าทับ
-       */
-      panel.addEventListener(
-        'blur',
-        (event) => {
-          const field = event.target;
-
-          if (!isPersistableField(field)) {
-            return;
-          }
-
-          saveField(field);
-          event.stopImmediatePropagation();
-          scheduleFieldRestore(field);
-        },
-        true
-      );
-
-      panel.addEventListener(
-        'focusin',
-        (event) => {
-          restoreField(event.target);
+          saveField(event.target);
+          scheduleRestore(panel);
         },
         true
       );
@@ -5280,74 +5254,98 @@ ${stylesheetLinks}
 
           if (activeField && getPanel(activeField) === panel) {
             saveField(activeField);
-            scheduleFieldRestore(activeField);
           }
+
+          snapshotPanel(panel);
+          scheduleRestore(panel);
         },
         true
       );
 
-      panel
-        .querySelectorAll('.dds-reset-button')
-        .forEach((button) => {
-          const beginReset = () => {
-            resetPanels.add(panel);
-            panelStates.delete(panel.dataset.panel || '');
+      /*
+       * Core ผูก updater ซ้ำกับ blur ใน ROLEPLAY / PROFILE ทุกช่อง
+       * input/change อัปเดต LIVE PREVIEW อยู่แล้ว จึงหยุด blur ตัวซ้ำ
+       * เพื่อไม่ให้จังหวะเปลี่ยนช่องเขียนค่ากลับทับสิ่งที่ผู้ใช้เพิ่งกรอก
+       */
+      panel.addEventListener(
+        'blur',
+        (event) => {
+          if (!isPersistableField(event.target)) {
+            return;
+          }
 
-            panel
-              .querySelectorAll('[data-dds-user-edited]')
-              .forEach((field) => {
-                delete field.dataset.ddsUserEdited;
-              });
-          };
+          saveField(event.target);
+          event.stopImmediatePropagation();
+          scheduleRestore(panel);
+        },
+        true
+      );
 
-          button.addEventListener('pointerdown', beginReset, true);
-          button.addEventListener(
-            'click',
-            () => {
-              beginReset();
+      panel.addEventListener(
+        'focusin',
+        () => {
+          restorePanel(panel);
+        },
+        true
+      );
 
-              window.setTimeout(() => {
-                resetPanels.delete(panel);
-              }, 80);
-            },
-            true
-          );
-        });
+      panel.querySelectorAll('.dds-reset-button').forEach((button) => {
+        const beginReset = () => {
+          resettingPanels.add(panel);
+          panelStates.delete(getPanelName(panel));
+          restoreTokens.set(panel, (restoreTokens.get(panel) || 0) + 1);
+        };
+
+        button.addEventListener('pointerdown', beginReset, true);
+        button.addEventListener(
+          'click',
+          () => {
+            beginReset();
+
+            window.setTimeout(() => {
+              resettingPanels.delete(panel);
+              snapshotPanel(panel);
+            }, 30);
+          },
+          true
+        );
+      });
     });
 
-    document.addEventListener(
-      'click',
-      (event) => {
-        const editButton = event.target.closest(
-          '[data-edit-code], [data-edit-profile]'
-        );
+    document
+      .querySelectorAll('[data-edit-code], [data-edit-profile]')
+      .forEach((button) => {
+        const preparePanelState = () => {
+          const editKey =
+            button.dataset.editCode ||
+            button.dataset.editProfile ||
+            '';
+          const panel = editKey
+            ? document.querySelector(`[data-panel="editor-${editKey}"]`)
+            : null;
 
-        if (!editButton) {
-          return;
-        }
+          if (!panel) {
+            return;
+          }
 
-        const editKey =
-          editButton.dataset.editCode ||
-          editButton.dataset.editProfile ||
-          '';
-        const panel = editKey
-          ? document.querySelector(`[data-panel="editor-${editKey}"]`)
-          : null;
+          /*
+           * listener นี้ถูกติดตั้งหลังตัวล้างฟอร์ม จึงได้ค่า "ฟอร์มว่าง"
+           * ในการเปิดครั้งแรก และคืนค่าที่ผู้ใช้กรอกในการเปิดครั้งถัดไป
+           */
+          const existingState = getState(panel, false);
 
-        if (!panel) {
-          return;
-        }
-
-        requestAnimationFrame(() => {
-          restorePanel(panel);
-
-          window.setTimeout(() => {
+          if (existingState) {
             restorePanel(panel);
-          }, 40);
-        });
-      },
-      true
-    );
+          } else {
+            snapshotPanel(panel);
+          }
+
+          scheduleRestore(panel);
+        };
+
+        button.addEventListener('pointerdown', preparePanelState, true);
+        button.addEventListener('click', preparePanelState, true);
+      });
 
     window.addEventListener('hashchange', () => {
       requestAnimationFrame(() => {
@@ -5355,7 +5353,17 @@ ${stylesheetLinks}
           `${editorPanelSelector}.is-active`
         );
 
-        restorePanel(activePanel);
+        if (activePanel) {
+          const existingState = getState(activePanel, false);
+
+          if (existingState) {
+            restorePanel(activePanel);
+          } else {
+            snapshotPanel(activePanel);
+          }
+
+          scheduleRestore(activePanel);
+        }
       });
     });
   }
@@ -5696,6 +5704,7 @@ ${stylesheetLinks}
       normalizeShowcaseCardLabels();
       installThreeColumnShowcaseGrids();
       installBlankEditorFormsAndBbcodeTools();
+      installEditorInputPersistenceFix();
       installStaticCataloguePreviewFix();
       installStaticFoodReviewCataloguePreviewFix();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
