@@ -5787,3 +5787,29 @@ output {
   transform-style:
     preserve-3d;
 }
+
+
+/* ==================================================
+   IMAGE ZOOM CONTROLS — ALL EDITORS
+================================================== */
+
+.dds-zoom-position-row {
+  margin-top: 3px;
+}
+
+.dds-zoom-position-row input[type="range"] {
+  accent-color: var(--dds-red-bright);
+}
+
+.dds-zoom-position-row output {
+  min-width: 42px;
+}
+
+/*
+ * รูปที่ซูมด้วย transform จะยังถูกตัดอยู่ในกรอบเดิม
+ * ไม่ล้นออกไปทับส่วนอื่น
+ */
+.dds-editor-preview-frame img,
+.dds-roleplay-card-preview-frame img {
+  transform-origin: center center;
+}

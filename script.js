@@ -529,13 +529,37 @@ function normalizePosition(value, fallback = 50) {
   );
 }
 
+function normalizeImageZoom(
+  value,
+  fallback = 100
+) {
+  const number =
+    Number(value);
+
+  if (!Number.isFinite(number)) {
+    return fallback;
+  }
+
+  return Math.min(
+    200,
+    Math.max(50, number)
+  );
+}
+
 function buildImagePositionStyle(
   x,
   y,
-  extraStyle = ""
+  extraStyle = "",
+  zoom = 100
 ) {
+  const safeZoom =
+    normalizeImageZoom(
+      zoom,
+      100
+    );
+
   const positionStyle =
-    `object-fit:cover;object-position:${x}% ${y}%`;
+    `object-fit:cover;object-position:${x}% ${y}%;transform:scale(${safeZoom / 100});transform-origin:center center`;
 
   return extraStyle
     ? `${extraStyle};${positionStyle}`
@@ -545,9 +569,35 @@ function buildImagePositionStyle(
 function buildBackgroundImageStyle(
   url,
   x,
-  y
+  y,
+  zoom = 100
 ) {
-  return `background-image:url('${escapeHtml(url)}');background-position:${x}% ${y}%;background-size:cover;background-repeat:no-repeat;`;
+  const safeZoom =
+    normalizeImageZoom(
+      zoom,
+      100
+    );
+
+  const backgroundSize =
+    safeZoom === 100
+      ? "cover"
+      : `${safeZoom}%`;
+
+  return `background-image:url('${escapeHtml(url)}');background-position:${x}% ${y}%;background-size:${backgroundSize};background-repeat:no-repeat;`;
+}
+
+function buildBackgroundZoomStyle(
+  zoom = 100
+) {
+  const safeZoom =
+    normalizeImageZoom(
+      zoom,
+      100
+    );
+
+  return safeZoom === 100
+    ? "background-size:cover"
+    : `background-size:${safeZoom}%`;
 }
 
 function formatEmojiOrSymbol(value) {
@@ -605,7 +655,7 @@ function buildOptionalImageTag({
 function syncImagePositionOutputs() {
   document
     .querySelectorAll(
-      "[data-image-position-range]"
+      "[data-image-position-range], [data-image-zoom-range]"
     )
     .forEach((range) => {
       const output =
@@ -3580,8 +3630,8 @@ function buildPageOfOneMarkup(data) {
 <div class="pageof-title">${escapeHtml(data.displayName)}</div>
 <div class="pageof-subtitle">${escapeHtml(data.subtitle)}</div>
 <div class="pageof-quote">${textWithBreaks(data.quoteText)}</div>
-<div class="pageof-image-grid"><div class="pageof-image-block"><div class="pageof-image-frame"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY)}"></div><div class="pageof-caption">${textWithBreaks(data.captionOne)}</div></div>
-<div class="pageof-image-block"><div class="pageof-image-frame"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY)}"></div><div class="pageof-caption">${textWithBreaks(data.captionTwo)}</div></div></div>
+<div class="pageof-image-grid"><div class="pageof-image-block"><div class="pageof-image-frame"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY, "", data.imageOneZoom)}"></div><div class="pageof-caption">${textWithBreaks(data.captionOne)}</div></div>
+<div class="pageof-image-block"><div class="pageof-image-frame"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY, "", data.imageTwoZoom)}"></div><div class="pageof-caption">${textWithBreaks(data.captionTwo)}</div></div></div>
 <div class="pageof-text-box">${data.roleplay}</div>
 <div class="pageof-remark"><div class="pageof-remark2">${data.remark}</div></div></div>
 ${fdreviewCreditMarkup}`;
@@ -3941,13 +3991,13 @@ function buildWeirdoMarkup(data) {
 <div class="jnsz-weirdo-subtitle">${textWithBreaks(data.subtitle)}</div>
 <div class="jnsz-weirdo-divider"></div>
 <div class="jnsz-weirdo-flex"><div class="column">
-<img src="${escapeHtml(data.imageLeftOne)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageLeftOneX, data.imageLeftOneY, "margin-bottom:-30px")}" alt="">
-<img src="${escapeHtml(data.imageLeftTwo)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageLeftTwoX, data.imageLeftTwoY, "margin-top:-10px")}" alt=""></div>
+<img src="${escapeHtml(data.imageLeftOne)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageLeftOneX, data.imageLeftOneY, "margin-bottom:-30px", data.imageLeftOneZoom)}" alt="">
+<img src="${escapeHtml(data.imageLeftTwo)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageLeftTwoX, data.imageLeftTwoY, "margin-top:-10px", data.imageLeftTwoZoom)}" alt=""></div>
 <div class="column center-column">
-<img src="${escapeHtml(data.imageCenter)}" class="jnsz-weirdo-center-img" style="${buildImagePositionStyle(data.imageCenterX, data.imageCenterY)}" alt=""></div>
+<img src="${escapeHtml(data.imageCenter)}" class="jnsz-weirdo-center-img" style="${buildImagePositionStyle(data.imageCenterX, data.imageCenterY, "", data.imageCenterZoom)}" alt=""></div>
 <div class="column">
-<img src="${escapeHtml(data.imageRightOne)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageRightOneX, data.imageRightOneY, "margin-bottom:-30px")}" alt="">
-<img src="${escapeHtml(data.imageRightTwo)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageRightTwoX, data.imageRightTwoY, "margin-top:-10px")}" alt=""></div></div>
+<img src="${escapeHtml(data.imageRightOne)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageRightOneX, data.imageRightOneY, "margin-bottom:-30px", data.imageRightOneZoom)}" alt="">
+<img src="${escapeHtml(data.imageRightTwo)}" class="jnsz-weirdo-in4img" style="${buildImagePositionStyle(data.imageRightTwoX, data.imageRightTwoY, "margin-top:-10px", data.imageRightTwoZoom)}" alt=""></div></div>
 
 <div class="jnsz-weirdo-footer-bar" style="margin-top: -0px;"></div>
 <div class="jnsz-weirdo-text-box">${data.roleplay}</div>
@@ -4216,7 +4266,7 @@ function buildHihiStyle(data) {
 
 function buildHihiMarkup(data) {
   return `<div class="hihiz-main-box" style="${buildHihiStyle(data)}">
-<div class="hihiz-main-image"><img src="${escapeHtml(data.image)}" alt="" style="${buildImagePositionStyle(data.imageX, data.imageY)}">
+<div class="hihiz-main-image"><img src="${escapeHtml(data.image)}" alt="" style="${buildImagePositionStyle(data.imageX, data.imageY, "", data.imageZoom)}">
 <div class="hihiz-label-top">${escapeHtml(data.species)}</div>
 <div class="hihiz-namez">${escapeHtml(data.nameLineOne)}<br>${escapeHtml(data.nameLineTwo)}</div><div class="hihiz-label2"><h1>${escapeHtml(data.heading)}</h1>
 <p>${textWithBreaks(data.description)}</p>
@@ -4725,12 +4775,12 @@ function buildUuiaaMarkup(data) {
 <div class="uuiiaamymy-gallery-section">
 <div class="uuiiaamymy-image-card left-card">
 <span class="uuiiaamymy-vertical-text">${escapeHtml(data.leftVerticalText)}</span>
-<img src="${escapeHtml(data.leftImage)}" alt="Left Image" style="${buildImagePositionStyle(data.leftImageX, data.leftImageY)}">
+<img src="${escapeHtml(data.leftImage)}" alt="Left Image" style="${buildImagePositionStyle(data.leftImageX, data.leftImageY, "", data.leftImageZoom)}">
 ${leftIcon}</div>
 <div class="uuiiaamymy-image-card polaroid">
-<img src="${escapeHtml(data.centerImage)}" alt="Center Image" style="${buildImagePositionStyle(data.centerImageX, data.centerImageY)}"></div>
+<img src="${escapeHtml(data.centerImage)}" alt="Center Image" style="${buildImagePositionStyle(data.centerImageX, data.centerImageY, "", data.centerImageZoom)}"></div>
 <div class="uuiiaamymy-image-card right-card"><span class="uuiiaamymy-d">${escapeHtml(data.rightShortText)}</span>
-<img src="${escapeHtml(data.rightImage)}" alt="Right Image" style="${buildImagePositionStyle(data.rightImageX, data.rightImageY)}">
+<img src="${escapeHtml(data.rightImage)}" alt="Right Image" style="${buildImagePositionStyle(data.rightImageX, data.rightImageY, "", data.rightImageZoom)}">
 ${rightIcon}
 ${centerIcon}
 <span class="uuiiaamymy-vertical-text02">${escapeHtml(data.rightVerticalText)}</span>
@@ -5072,7 +5122,7 @@ function getCommaData() {
 
 function buildCommaMarkup(data) {
   return `<div class="cy650" style="--bggcolor:${data.backg};--border-color:${data.border};--txtfont:${data.text};--nametxtfont:${data.name};--muted:${data.muted};"><div class="cy650-top"><div class="line"></div><div class="num">${escapeHtml(data.topText)}</div></div>
-<div class="cy650-grid"><div class="cy650-img cy-a"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY)}"></div><div class="cy650-img cy-b"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY)}"></div><div class="cy650-img cy-c"><img src="${escapeHtml(data.imageThree)}" alt="" style="${buildImagePositionStyle(data.imageThreeX, data.imageThreeY)}"></div><div class="cy650-img cy-d"><img src="${escapeHtml(data.imageFour)}" alt="" style="${buildImagePositionStyle(data.imageFourX, data.imageFourY)}"></div></div>
+<div class="cy650-grid"><div class="cy650-img cy-a"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY, "", data.imageOneZoom)}"></div><div class="cy650-img cy-b"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY, "", data.imageTwoZoom)}"></div><div class="cy650-img cy-c"><img src="${escapeHtml(data.imageThree)}" alt="" style="${buildImagePositionStyle(data.imageThreeX, data.imageThreeY, "", data.imageThreeZoom)}"></div><div class="cy650-img cy-d"><img src="${escapeHtml(data.imageFour)}" alt="" style="${buildImagePositionStyle(data.imageFourX, data.imageFourY, "", data.imageFourZoom)}"></div></div>
 <div class="cy650-title"><div class="word"><span>${escapeHtml(data.displayName)}</span><div class="line"></div></div></div>
 <div class="cy650-rp"><div>
 ${data.roleplay}
@@ -5568,11 +5618,11 @@ function getNewRulesData() {
 
 function buildNewRulesMarkup(data) {
   return `<div class="babiezfrn-zi" style="--bg:${data.bg};--card:${data.card};--pill:${data.pill};--pill2:${data.pillTwo};--textro:${data.textRoleplay};--textname:${data.textName};--textun:${data.textUnder};--dot1:${data.dotOne};--dot2:${data.dotTwo};--dot3:${data.dotThree};--dot4:${data.dotFour};"><div class="babiezfrn-left"><div class="babiezfrn-sidepill">${escapeHtml(data.sideInfo)}</div><div class="babiezfrn-sidepill small">${escapeHtml(data.sideProfile)}</div><div class="babiezfrn-dots"><i></i><i></i><i></i><i></i></div></div><div class="babiezfrn-slider"><div class="knob"></div></div><div class="babiezfrn-float">
-<img class="bigav" src="${escapeHtml(data.bigAvatar)}" alt="" style="${buildImagePositionStyle(data.bigAvatarX, data.bigAvatarY)}"><div class="pill">${escapeHtml(data.displayName)}</div></div>
-<div class="babiezfrn-card"><div class="babiezfrn-topstrip"><span class="babiezfrn-dot"></span><div class="babiezfrn-tab"><span>${escapeHtml(data.species)}</span><span style="opacity:.6;">→</span><img class="babiezfrn-miniav" src="${escapeHtml(data.miniAvatar)}" alt="" style="${buildImagePositionStyle(data.miniAvatarX, data.miniAvatarY)}"><b>${escapeHtml(data.websiteText)}</b><span class="x">×</span></div></div><div class="babiezfrn-inner"><div class="babiezfrn-head"><img class="av" src="${escapeHtml(data.accountAvatar)}" alt="" style="${buildImagePositionStyle(data.accountAvatarX, data.accountAvatarY)}"><div class="babiezfrn-title"><b>${escapeHtml(data.accountName)}</b><span>${textWithBreaks(data.accountSubtitle)}</span></div><div class="babiezfrn-menu">⋮</div></div><div class="babiezfrn-conf"><p>
+<img class="bigav" src="${escapeHtml(data.bigAvatar)}" alt="" style="${buildImagePositionStyle(data.bigAvatarX, data.bigAvatarY, "", data.bigAvatarZoom)}"><div class="pill">${escapeHtml(data.displayName)}</div></div>
+<div class="babiezfrn-card"><div class="babiezfrn-topstrip"><span class="babiezfrn-dot"></span><div class="babiezfrn-tab"><span>${escapeHtml(data.species)}</span><span style="opacity:.6;">→</span><img class="babiezfrn-miniav" src="${escapeHtml(data.miniAvatar)}" alt="" style="${buildImagePositionStyle(data.miniAvatarX, data.miniAvatarY, "", data.miniAvatarZoom)}"><b>${escapeHtml(data.websiteText)}</b><span class="x">×</span></div></div><div class="babiezfrn-inner"><div class="babiezfrn-head"><img class="av" src="${escapeHtml(data.accountAvatar)}" alt="" style="${buildImagePositionStyle(data.accountAvatarX, data.accountAvatarY, "", data.accountAvatarZoom)}"><div class="babiezfrn-title"><b>${escapeHtml(data.accountName)}</b><span>${textWithBreaks(data.accountSubtitle)}</span></div><div class="babiezfrn-menu">⋮</div></div><div class="babiezfrn-conf"><p>
 ${data.roleplay}</p></div>
 <div class="babiezfrn-reply">${escapeHtml(data.replyText)}</div><div class="babiezfrn-actions"><div class="babiezfrn-ico">${formatEmojiOrSymbol(data.actionOne)}</div><div class="babiezfrn-ico">${formatEmojiOrSymbol(data.actionTwo)}</div><div class="babiezfrn-ico">${formatEmojiOrSymbol(data.actionThree)}</div><div class="spacer"></div><div class="babiezfrn-btn"><span class="sendico">${formatEmojiOrSymbol(data.sendIcon)}</span>${escapeHtml(data.noteText)}</div></div></div></div>
-<div class="babiezfrn-foot"><img class="fava" src="${escapeHtml(data.footerAvatar)}" alt="" style="${buildImagePositionStyle(data.footerAvatarX, data.footerAvatarY)}"><div>${textWithBreaks(data.footerText)}</div></div></div>
+<div class="babiezfrn-foot"><img class="fava" src="${escapeHtml(data.footerAvatar)}" alt="" style="${buildImagePositionStyle(data.footerAvatarX, data.footerAvatarY, "", data.footerAvatarZoom)}"><div>${textWithBreaks(data.footerText)}</div></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -6028,7 +6078,7 @@ function getLoveSongData() {
 }
 
 function buildLoveSongMarkup(data) {
-  return `<div class="oxoneddsp-container" style="--backgbg:${data.background};--borderox:${data.border};--nameox:${data.name};--subnameox:${data.subname};--linehd:${data.header};--dotox:${data.dot};--unbg:${data.pillBackground};--unbgtext:${data.pillTextColor};--roltext:${data.roleplayColor};"><div class="oxoneddsp-header"><div class="since">${escapeHtml(data.since)}</div><div class="year">${escapeHtml(data.year)}</div></div><div class="oxoneddsp-content"><div class="oxoneddsp-area"><div class="oxoneddsp-dots"><span></span><span></span><span></span></div><h1 class="oxoneddspmain-title">${escapeHtml(data.firstName)}</h1><p class="oxoneddspsub-title">${escapeHtml(data.lastName)}</p></div><div class="oxoneddspgrid-wrapper"><div class="oxoneddspbg-grid"><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridOne, data.gridOneX, data.gridOneY)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridTwo, data.gridTwoX, data.gridTwoY)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridThree, data.gridThreeX, data.gridThreeY)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridFour, data.gridFourX, data.gridFourY)}"></div></div><div class="oxoneddspportrait-frame"><img src="${escapeHtml(data.portrait)}" alt="" style="${buildImagePositionStyle(data.portraitX, data.portraitY)}"></div></div><div class="oxoneddspside-text left"><span class="small">${escapeHtml(data.leftSmall)}</span><p>${escapeHtml(data.leftMain)}</p><div class="oxoneddsppill">${escapeHtml(data.pillText)}</div></div><div class="oxoneddspside-text right"><p>${escapeHtml(data.rightText)}</p></div><div class="oxoneddspname-label">${escapeHtml(data.species)}</div><div class="oxoneddsprp-section"><div class="oxoneddsprp-header">${textWithBreaks(data.quote)}</div><div class="oxoneddsprp-box">
+  return `<div class="oxoneddsp-container" style="--backgbg:${data.background};--borderox:${data.border};--nameox:${data.name};--subnameox:${data.subname};--linehd:${data.header};--dotox:${data.dot};--unbg:${data.pillBackground};--unbgtext:${data.pillTextColor};--roltext:${data.roleplayColor};"><div class="oxoneddsp-header"><div class="since">${escapeHtml(data.since)}</div><div class="year">${escapeHtml(data.year)}</div></div><div class="oxoneddsp-content"><div class="oxoneddsp-area"><div class="oxoneddsp-dots"><span></span><span></span><span></span></div><h1 class="oxoneddspmain-title">${escapeHtml(data.firstName)}</h1><p class="oxoneddspsub-title">${escapeHtml(data.lastName)}</p></div><div class="oxoneddspgrid-wrapper"><div class="oxoneddspbg-grid"><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridOne, data.gridOneX, data.gridOneY, data.gridOneZoom)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridTwo, data.gridTwoX, data.gridTwoY, data.gridTwoZoom)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridThree, data.gridThreeX, data.gridThreeY, data.gridThreeZoom)}"></div><div class="oxoneddspgrid-item" style="${buildBackgroundImageStyle(data.gridFour, data.gridFourX, data.gridFourY, data.gridFourZoom)}"></div></div><div class="oxoneddspportrait-frame"><img src="${escapeHtml(data.portrait)}" alt="" style="${buildImagePositionStyle(data.portraitX, data.portraitY, "", data.portraitZoom)}"></div></div><div class="oxoneddspside-text left"><span class="small">${escapeHtml(data.leftSmall)}</span><p>${escapeHtml(data.leftMain)}</p><div class="oxoneddsppill">${escapeHtml(data.pillText)}</div></div><div class="oxoneddspside-text right"><p>${escapeHtml(data.rightText)}</p></div><div class="oxoneddspname-label">${escapeHtml(data.species)}</div><div class="oxoneddsprp-section"><div class="oxoneddsprp-header">${textWithBreaks(data.quote)}</div><div class="oxoneddsprp-box">
 ${data.roleplay}
 </div></div></div></div>
 ${fdreviewCreditMarkup}`;
@@ -6386,7 +6436,7 @@ function getDumbDumberData() {
 
 function buildDumbDumberMarkup(data) {
   return `<div class="dndddp-wrap" style="--bgg01:${data.background};--colormain:${data.mainColor};--colorrole:${data.roleColor};"><div class="dndddp-title"><div class="dndddp-cloud">${formatEmojiOrSymbol(data.topSymbol)}</div><h1>${escapeHtml(data.displayName)}</h1><span>${escapeHtml(data.species)}</span></div>
-<div class="dndddp-grid"><div class="dndddp-photo p1"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY)}"></div><div class="dndddp-photo p2"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY)}"></div><div class="dndddp-photo p3"><img src="${escapeHtml(data.imageThree)}" alt="" style="${buildImagePositionStyle(data.imageThreeX, data.imageThreeY)}"></div><div class="dndddp-photo p4"><img src="${escapeHtml(data.imageFour)}" alt="" style="${buildImagePositionStyle(data.imageFourX, data.imageFourY)}"></div>
+<div class="dndddp-grid"><div class="dndddp-photo p1"><img src="${escapeHtml(data.imageOne)}" alt="" style="${buildImagePositionStyle(data.imageOneX, data.imageOneY, "", data.imageOneZoom)}"></div><div class="dndddp-photo p2"><img src="${escapeHtml(data.imageTwo)}" alt="" style="${buildImagePositionStyle(data.imageTwoX, data.imageTwoY, "", data.imageTwoZoom)}"></div><div class="dndddp-photo p3"><img src="${escapeHtml(data.imageThree)}" alt="" style="${buildImagePositionStyle(data.imageThreeX, data.imageThreeY, "", data.imageThreeZoom)}"></div><div class="dndddp-photo p4"><img src="${escapeHtml(data.imageFour)}" alt="" style="${buildImagePositionStyle(data.imageFourX, data.imageFourY, "", data.imageFourZoom)}"></div>
 <div class="dndddp-heart">${formatEmojiOrSymbol(data.heartSymbol)}</div><div class="dndddp-tabs-bottom"><span>${escapeHtml(data.tabOne)}</span><span>${escapeHtml(data.tabTwo)}</span><span>${escapeHtml(data.tabThree)}</span></div></div><div class="dndddp-rp">
 ${data.roleplay}
 </div><div class="dndddp-bottom"><span>‹</span><div><a href="#">${escapeHtml(data.bottomOne)}</a><a href="#">${escapeHtml(data.bottomTwo)}</a><a href="#">${escapeHtml(data.bottomThree)}</a></div><span>›</span></div></div>
@@ -6772,9 +6822,9 @@ function getHigherHeavenData() {
 }
 
 function buildHigherHeavenMarkup(data) {
-  return `<div class="ddshigherth-frame" style="--ddshigherth-bg:${data.background};--ddshigherth-mainc:${data.mainColor};--ddshigherth-maincs:${escapeHtml(data.mainSoftColor)};--ddshigherth-fontf:${data.fontColor};--ddshigherth-fontfz:${data.polaroidTextColor};--ddshigherth-dot-color:${data.dotColor};--ddshigherth-main-img:url('${escapeHtml(data.mainImage)}');--ddshigherth-main-pos:${data.mainImageX}% ${data.mainImageY}%;--ddshigherth-mini-img-1:url('${escapeHtml(data.miniTopImage)}');--ddshigherth-mini-img-2:url('${escapeHtml(data.miniBottomImage)}');"><div class="ddshigherth-scale"><div class="ddshigherth-pearl"><div class="ddshigherth-bg-script one">${escapeHtml(data.bgLetterOne)}</div><div class="ddshigherth-bg-script two">${escapeHtml(data.bgLetterTwo)}</div><div class="ddshigherth-top-title">${escapeHtml(data.species)}</div><div class="ddshigherth-side-text">${escapeHtml(data.sideText)}</div><div class="ddshigherth-nav"><span>${escapeHtml(data.navOne)}</span><span>${escapeHtml(data.navTwo)}</span><span>${escapeHtml(data.navThree)}</span></div><div class="ddshigherth-mini-img top" style="background-position:${data.miniTopImageX}% ${data.miniTopImageY}%;"></div><div class="ddshigherth-soft-dot"></div><div class="ddshigherth-brand"><div class="ddshigherth-brand-main">${escapeHtml(data.initial)}<span>${escapeHtml(data.firstName)}</span></div><div class="ddshigherth-brand-sub">${escapeHtml(data.lastName)}</div></div><div class="ddshigherth-photo-wrap"><div class="ddshigherth-photo"></div></div><div class="ddshigherth-tag left">${escapeHtml(data.leftTag)}</div><div class="ddshigherth-tag right">${escapeHtml(data.rightTag)}</div><div class="ddshigherth-roleplay"><div class="ddshigherth-roleplay-text">
+  return `<div class="ddshigherth-frame" style="--ddshigherth-bg:${data.background};--ddshigherth-mainc:${data.mainColor};--ddshigherth-maincs:${escapeHtml(data.mainSoftColor)};--ddshigherth-fontf:${data.fontColor};--ddshigherth-fontfz:${data.polaroidTextColor};--ddshigherth-dot-color:${data.dotColor};--ddshigherth-main-img:url('${escapeHtml(data.mainImage)}');--ddshigherth-main-pos:${data.mainImageX}% ${data.mainImageY}%;--ddshigherth-main-size:${normalizeImageZoom(data.mainImageZoom)}%;--ddshigherth-mini-img-1:url('${escapeHtml(data.miniTopImage)}');--ddshigherth-mini-img-2:url('${escapeHtml(data.miniBottomImage)}');"><div class="ddshigherth-scale"><div class="ddshigherth-pearl"><div class="ddshigherth-bg-script one">${escapeHtml(data.bgLetterOne)}</div><div class="ddshigherth-bg-script two">${escapeHtml(data.bgLetterTwo)}</div><div class="ddshigherth-top-title">${escapeHtml(data.species)}</div><div class="ddshigherth-side-text">${escapeHtml(data.sideText)}</div><div class="ddshigherth-nav"><span>${escapeHtml(data.navOne)}</span><span>${escapeHtml(data.navTwo)}</span><span>${escapeHtml(data.navThree)}</span></div><div class="ddshigherth-mini-img top" style="background-position:${data.miniTopImageX}% ${data.miniTopImageY}%;${buildBackgroundZoomStyle(data.miniTopImageZoom)};"></div><div class="ddshigherth-soft-dot"></div><div class="ddshigherth-brand"><div class="ddshigherth-brand-main">${escapeHtml(data.initial)}<span>${escapeHtml(data.firstName)}</span></div><div class="ddshigherth-brand-sub">${escapeHtml(data.lastName)}</div></div><div class="ddshigherth-photo-wrap"><div class="ddshigherth-photo" style="${buildBackgroundZoomStyle(data.mainImageZoom)};"></div></div><div class="ddshigherth-tag left">${escapeHtml(data.leftTag)}</div><div class="ddshigherth-tag right">${escapeHtml(data.rightTag)}</div><div class="ddshigherth-roleplay"><div class="ddshigherth-roleplay-text">
 ${data.roleplay}
-</div></div><div class="ddshigherth-lower-row"><div class="ddshigherth-mini-img bottom" style="background-position:${data.miniBottomImageX}% ${data.miniBottomImageY}%;"></div><div class="ddshigherth-note-box"><div class="ddshigherth-note-text">${escapeHtml(data.note)}</div></div></div></div></div></div>
+</div></div><div class="ddshigherth-lower-row"><div class="ddshigherth-mini-img bottom" style="background-position:${data.miniBottomImageX}% ${data.miniBottomImageY}%;${buildBackgroundZoomStyle(data.miniBottomImageZoom)};"></div><div class="ddshigherth-note-box"><div class="ddshigherth-note-text">${escapeHtml(data.note)}</div></div></div></div></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -7427,7 +7477,7 @@ function getFoodReviewData() {
 }
 
 function buildFoodReviewMarkup(data) {
-  return `<div class="fdpopup-wrap" style="--fdpopup-bg:url('${escapeHtml(data.backgroundImage)}');--fdpopup-main:${data.mainColor};--fdpopup-dark:${data.darkColor};--fdpopup-star:${data.starColor};--fdpopup-paper:${data.paperColor};--fdpopup-text:${data.textColor};--fdpopup-tagbg:${data.tagColor};background-position:${data.backgroundImageX}% ${data.backgroundImageY}%;"><div class="fdpopup-container"><div class="fdpopup-place">${escapeHtml(data.place)}</div><div class="fdpopup-stage"><div class="fdpopup-info fdpopup-info-left"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">${formatEmojiOrSymbol(data.scoreIcon)}</div><div class="fdpopup-info-title"><span>${escapeHtml(data.scoreLabel)}</span><strong>${escapeHtml(data.scoreTitle)}</strong></div></div><div class="fdpopup-stars">${escapeHtml(data.stars)}</div><div class="fdpopup-score-row"><strong>${escapeHtml(data.overallScore)}</strong><span>${escapeHtml(data.scoreDenominator)}</span></div><div class="fdpopup-score-list"><div><span>${escapeHtml(data.scoreOneLabel)}</span><b>${escapeHtml(data.scoreOneValue)}</b></div><div><span>${escapeHtml(data.scoreTwoLabel)}</span><b>${escapeHtml(data.scoreTwoValue)}</b></div><div><span>${escapeHtml(data.scoreThreeLabel)}</span><b>${escapeHtml(data.scoreThreeValue)}</b></div></div></div><div class="fdpopup-card"><div class="fdpopup-card-head"><div class="fdpopup-brand"><div class="fdpopup-logo" style="background-image:url('${escapeHtml(data.logoImage)}');background-position:${data.logoImageX}% ${data.logoImageY}%;"></div><div class="fdpopup-brand-text"><strong>${escapeHtml(data.accountName)}</strong><span>${escapeHtml(data.accountSubtitle)}</span></div></div><div class="fdpopup-menu">⋮</div></div><div class="fdpopup-gallery"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-1" checked><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-2"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-3"><div class="fdpopup-slides"><div class="fdpopup-photo fdpopup-photo-1" style="--fdpopup-img-1:url('${escapeHtml(data.photoOne)}');--fdpopup-img-1-y:${data.photoOneY}%;background-position:${data.photoOneX}% ${data.photoOneY}%;"></div><div class="fdpopup-photo fdpopup-photo-2" style="--fdpopup-img-2:url('${escapeHtml(data.photoTwo)}');--fdpopup-img-2-y:${data.photoTwoY}%;background-position:${data.photoTwoX}% ${data.photoTwoY}%;"></div><div class="fdpopup-photo fdpopup-photo-3" style="--fdpopup-img-3:url('${escapeHtml(data.photoThree)}');--fdpopup-img-3-y:${data.photoThreeY}%;background-position:${data.photoThreeX}% ${data.photoThreeY}%;"></div></div><div class="fdpopup-gallery-number"><span>${escapeHtml(data.photoCount)}</span></div><div class="fdpopup-dots"><label for="fdpopup-photo-1"></label><label for="fdpopup-photo-2"></label><label for="fdpopup-photo-3"></label></div></div><div class="fdpopup-actions"><div class="fdpopup-actions-left"><span class="fdpopup-heart">${formatEmojiOrSymbol(data.heartIcon)}</span><span class="fdpopup-chat">${formatEmojiOrSymbol(data.chatIcon)}</span><span class="fdpopup-send">${formatEmojiOrSymbol(data.sendIcon)}</span></div><span class="fdpopup-bookmark">${formatEmojiOrSymbol(data.bookmarkIcon)}</span></div><div class="fdpopup-caption"><strong>${escapeHtml(data.captionAccount)}</strong><span>${escapeHtml(data.captionText)}</span></div></div><div class="fdpopup-info fdpopup-info-right"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">${formatEmojiOrSymbol(data.recommendedIcon)}</div><div class="fdpopup-info-title"><span>${escapeHtml(data.recommendedLabel)}</span><strong>${escapeHtml(data.recommendedTitle)}</strong></div></div><h3 class="fdpopup-food-name">${escapeHtml(data.foodName)}</h3><p class="fdpopup-description">${textWithBreaks(data.description)}</p><div class="fdpopup-tags">${buildFoodReviewTags(data.tags)}</div></div></div><div class="fdpopup-contact"><div class="fdpopup-contact-avatar" style="--fdpopup-avatar:url('${escapeHtml(data.contactAvatar)}');--fdpopup-avatar-y:${data.contactAvatarY}%;background-position:${data.contactAvatarX}% ${data.contactAvatarY}%;"></div><div class="fdpopup-contact-text"><span>${escapeHtml(data.contactLabel)}</span><strong>${escapeHtml(data.contactName)}</strong></div><div class="fdpopup-contact-icon">${formatEmojiOrSymbol(data.contactIcon)}</div></div></div></div>
+  return `<div class="fdpopup-wrap" style="--fdpopup-bg:url('${escapeHtml(data.backgroundImage)}');--fdpopup-main:${data.mainColor};--fdpopup-dark:${data.darkColor};--fdpopup-star:${data.starColor};--fdpopup-paper:${data.paperColor};--fdpopup-text:${data.textColor};--fdpopup-tagbg:${data.tagColor};background-position:${data.backgroundImageX}% ${data.backgroundImageY}%;${buildBackgroundZoomStyle(data.backgroundImageZoom)};"><div class="fdpopup-container"><div class="fdpopup-place">${escapeHtml(data.place)}</div><div class="fdpopup-stage"><div class="fdpopup-info fdpopup-info-left"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">${formatEmojiOrSymbol(data.scoreIcon)}</div><div class="fdpopup-info-title"><span>${escapeHtml(data.scoreLabel)}</span><strong>${escapeHtml(data.scoreTitle)}</strong></div></div><div class="fdpopup-stars">${escapeHtml(data.stars)}</div><div class="fdpopup-score-row"><strong>${escapeHtml(data.overallScore)}</strong><span>${escapeHtml(data.scoreDenominator)}</span></div><div class="fdpopup-score-list"><div><span>${escapeHtml(data.scoreOneLabel)}</span><b>${escapeHtml(data.scoreOneValue)}</b></div><div><span>${escapeHtml(data.scoreTwoLabel)}</span><b>${escapeHtml(data.scoreTwoValue)}</b></div><div><span>${escapeHtml(data.scoreThreeLabel)}</span><b>${escapeHtml(data.scoreThreeValue)}</b></div></div></div><div class="fdpopup-card"><div class="fdpopup-card-head"><div class="fdpopup-brand"><div class="fdpopup-logo" style="background-image:url('${escapeHtml(data.logoImage)}');background-position:${data.logoImageX}% ${data.logoImageY}%;${buildBackgroundZoomStyle(data.logoImageZoom)};"></div><div class="fdpopup-brand-text"><strong>${escapeHtml(data.accountName)}</strong><span>${escapeHtml(data.accountSubtitle)}</span></div></div><div class="fdpopup-menu">⋮</div></div><div class="fdpopup-gallery"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-1" checked><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-2"><input type="radio" name="fdpopup-gallery" id="fdpopup-photo-3"><div class="fdpopup-slides"><div class="fdpopup-photo fdpopup-photo-1" style="--fdpopup-img-1:url('${escapeHtml(data.photoOne)}');--fdpopup-img-1-y:${data.photoOneY}%;background-position:${data.photoOneX}% ${data.photoOneY}%;${buildBackgroundZoomStyle(data.photoOneZoom)};"></div><div class="fdpopup-photo fdpopup-photo-2" style="--fdpopup-img-2:url('${escapeHtml(data.photoTwo)}');--fdpopup-img-2-y:${data.photoTwoY}%;background-position:${data.photoTwoX}% ${data.photoTwoY}%;${buildBackgroundZoomStyle(data.photoTwoZoom)};"></div><div class="fdpopup-photo fdpopup-photo-3" style="--fdpopup-img-3:url('${escapeHtml(data.photoThree)}');--fdpopup-img-3-y:${data.photoThreeY}%;background-position:${data.photoThreeX}% ${data.photoThreeY}%;${buildBackgroundZoomStyle(data.photoThreeZoom)};"></div></div><div class="fdpopup-gallery-number"><span>${escapeHtml(data.photoCount)}</span></div><div class="fdpopup-dots"><label for="fdpopup-photo-1"></label><label for="fdpopup-photo-2"></label><label for="fdpopup-photo-3"></label></div></div><div class="fdpopup-actions"><div class="fdpopup-actions-left"><span class="fdpopup-heart">${formatEmojiOrSymbol(data.heartIcon)}</span><span class="fdpopup-chat">${formatEmojiOrSymbol(data.chatIcon)}</span><span class="fdpopup-send">${formatEmojiOrSymbol(data.sendIcon)}</span></div><span class="fdpopup-bookmark">${formatEmojiOrSymbol(data.bookmarkIcon)}</span></div><div class="fdpopup-caption"><strong>${escapeHtml(data.captionAccount)}</strong><span>${escapeHtml(data.captionText)}</span></div></div><div class="fdpopup-info fdpopup-info-right"><div class="fdpopup-info-head"><div class="fdpopup-info-icon">${formatEmojiOrSymbol(data.recommendedIcon)}</div><div class="fdpopup-info-title"><span>${escapeHtml(data.recommendedLabel)}</span><strong>${escapeHtml(data.recommendedTitle)}</strong></div></div><h3 class="fdpopup-food-name">${escapeHtml(data.foodName)}</h3><p class="fdpopup-description">${textWithBreaks(data.description)}</p><div class="fdpopup-tags">${buildFoodReviewTags(data.tags)}</div></div></div><div class="fdpopup-contact"><div class="fdpopup-contact-avatar" style="--fdpopup-avatar:url('${escapeHtml(data.contactAvatar)}');--fdpopup-avatar-y:${data.contactAvatarY}%;background-position:${data.contactAvatarX}% ${data.contactAvatarY}%;${buildBackgroundZoomStyle(data.contactAvatarZoom)};"></div><div class="fdpopup-contact-text"><span>${escapeHtml(data.contactLabel)}</span><strong>${escapeHtml(data.contactName)}</strong></div><div class="fdpopup-contact-icon">${formatEmojiOrSymbol(data.contactIcon)}</div></div></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -7946,7 +7996,7 @@ function getPolaroidLoveData() {
 }
 
 function buildPolaroidLoveMarkup(data) {
-  return `<div class="jnz-polaroidlove-bg" style="background-image:url('${escapeHtml(data.background)}');background-position:${data.backgroundX}% ${data.backgroundY}%;"><div class="jnz-polaroidlove-center-wrapper"><div class="jnz-polaroidlove-jnz-prolar-box" style="--ppylbackg:${data.backgroundColor};--ppylborder:${data.borderColor};--ppyltext:${data.textColor};--ppylsubt:${data.subtitleColor};--ppylquote:${data.quoteColor};--ppylline:${data.lineColor};"><div class="jnz-polaroidlove-vv"><div>${formatEmojiOrSymbol(data.topOne)}</div><div>${formatEmojiOrSymbol(data.topTwo)}</div></div><div class="jnz-polaroidlove-line"></div><div class="jnz-polaroidlove-title">${escapeHtml(data.title)}</div><div class="jnz-polaroidlove-subtitle">${escapeHtml(data.subtitle)}</div><div class="jnz-polaroidlove-quote2d">${textWithBreaks(data.quote)}</div><div class="jnz-polaroidlove-image-wrapper"><div class="jnz-polaroidlove-stacked-images"><img src="${escapeHtml(data.imageOne)}" alt="" style="object-position:${data.imageOneX}% ${data.imageOneY}%;"><div class="jnz-polaroidlove-image-with-polaroid"><img src="${escapeHtml(data.imageTwo)}" alt="" style="object-position:${data.imageTwoX}% ${data.imageTwoY}%;"><img src="${escapeHtml(data.mainPolaroid)}" alt="" class="jnz-polaroidlove-main-polaroid" style="object-position:${data.mainPolaroidX}% ${data.mainPolaroidY}%;"></div><img src="${escapeHtml(data.imageThree)}" alt="" style="margin-top:-15px;object-position:${data.imageThreeX}% ${data.imageThreeY}%;"></div></div><div class="jnz-polaroidlove-quote-boxes"><div class="jnz-polaroidlove-quote">${escapeHtml(data.boxOne)}</div><div class="jnz-polaroidlove-quote">${escapeHtml(data.boxTwo)}</div></div><div class="jnz-polaroidlove-items"><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemOne)}" alt="" style="object-position:${data.itemOneX}% ${data.itemOneY}%;"></div><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemTwo)}" alt="" style="object-position:${data.itemTwoX}% ${data.itemTwoY}%;"></div><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemThree)}" alt="" style="object-position:${data.itemThreeX}% ${data.itemThreeY}%;"></div></div><div class="jnz-polaroidlove-linevvz"></div><div class="jnz-polaroidlove-vvvz"><div>${formatEmojiOrSymbol(data.bottomOne)}</div><div>${formatEmojiOrSymbol(data.bottomTwo)}</div></div></div></div></div>
+  return `<div class="jnz-polaroidlove-bg" style="background-image:url('${escapeHtml(data.background)}');background-position:${data.backgroundX}% ${data.backgroundY}%;${buildBackgroundZoomStyle(data.backgroundZoom)};"><div class="jnz-polaroidlove-center-wrapper"><div class="jnz-polaroidlove-jnz-prolar-box" style="--ppylbackg:${data.backgroundColor};--ppylborder:${data.borderColor};--ppyltext:${data.textColor};--ppylsubt:${data.subtitleColor};--ppylquote:${data.quoteColor};--ppylline:${data.lineColor};"><div class="jnz-polaroidlove-vv"><div>${formatEmojiOrSymbol(data.topOne)}</div><div>${formatEmojiOrSymbol(data.topTwo)}</div></div><div class="jnz-polaroidlove-line"></div><div class="jnz-polaroidlove-title">${escapeHtml(data.title)}</div><div class="jnz-polaroidlove-subtitle">${escapeHtml(data.subtitle)}</div><div class="jnz-polaroidlove-quote2d">${textWithBreaks(data.quote)}</div><div class="jnz-polaroidlove-image-wrapper"><div class="jnz-polaroidlove-stacked-images"><img src="${escapeHtml(data.imageOne)}" alt="" style="object-position:${data.imageOneX}% ${data.imageOneY}%;"><div class="jnz-polaroidlove-image-with-polaroid"><img src="${escapeHtml(data.imageTwo)}" alt="" style="object-position:${data.imageTwoX}% ${data.imageTwoY}%;"><img src="${escapeHtml(data.mainPolaroid)}" alt="" class="jnz-polaroidlove-main-polaroid" style="object-position:${data.mainPolaroidX}% ${data.mainPolaroidY}%;"></div><img src="${escapeHtml(data.imageThree)}" alt="" style="margin-top:-15px;object-position:${data.imageThreeX}% ${data.imageThreeY}%;"></div></div><div class="jnz-polaroidlove-quote-boxes"><div class="jnz-polaroidlove-quote">${escapeHtml(data.boxOne)}</div><div class="jnz-polaroidlove-quote">${escapeHtml(data.boxTwo)}</div></div><div class="jnz-polaroidlove-items"><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemOne)}" alt="" style="object-position:${data.itemOneX}% ${data.itemOneY}%;"></div><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemTwo)}" alt="" style="object-position:${data.itemTwoX}% ${data.itemTwoY}%;"></div><div class="jnz-polaroidlove-item"><img src="${escapeHtml(data.itemThree)}" alt="" style="object-position:${data.itemThreeX}% ${data.itemThreeY}%;"></div></div><div class="jnz-polaroidlove-linevvz"></div><div class="jnz-polaroidlove-vvvz"><div>${formatEmojiOrSymbol(data.bottomOne)}</div><div>${formatEmojiOrSymbol(data.bottomTwo)}</div></div></div></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -8721,7 +8771,7 @@ function getFortyOneData() {
 }
 
 function buildFortyOneMarkup(data) {
-  return `<div class="ddpshop-ywmf" style="--ddpcard-bg:${data.cardBgColor};--ddptxtv:${data.textVColor};--ddptxtname:${data.mainTextColor};--ddpbotxt:${data.mainTextColor};--ddpbot:${data.buttonBgColor};--ddpbotx:${data.buttonTextColor};--ddpnonee:${data.symbolColor};--ddptxtnone:${data.symbolTextColor};--ddpbox1:${data.boxOneColor};--ddpbox2:${data.boxTwoColor};--ddpbox3:${data.boxThreeColor};"><div class="ddpshop-ywmf-bg">${`<img src="${escapeHtml(data.backgroundImage)}" alt="" style="object-fit:cover;object-position:${data.backgroundImageX}% ${data.backgroundImageY}%;">`}</div><div class="ddpshop-ywmf-whisper w">${escapeHtml(data.whisperText)}</div><div class="ddpshop-ywmf-clover c1">${formatEmojiOrSymbol(data.symbolOne)}</div><div class="ddpshop-ywmf-clover c2">${formatEmojiOrSymbol(data.symbolTwo)}</div><div class="ddpshop-ywmf-swatches"><div class="ddpshop-ywmf-swatch s1"></div><div class="ddpshop-ywmf-swatch s2"></div><div class="ddpshop-ywmf-swatch s3"></div></div><div class="ddpshop-ywmf-card"><div class="ddpshop-tag"><span>${escapeHtml(data.species)}</span><span class="ddpshop-ava"><img src="${escapeHtml(data.avatarImage)}" alt="" style="object-fit:cover;object-position:${data.avatarImageX}% ${data.avatarImageY}%;"></span></div><div class="ddpshop-ywmf-title"><span>${escapeHtml(data.firstName)}</span><span>— ${escapeHtml(data.lastName)}</span></div><div class="ddpshop-ywmf-btn" href="${escapeHtml(data.profileUrl)}">${escapeHtml(data.profileButtonText)}</div><div class="ddpshop-ywmf-body">${textWithBreaks(data.bodyText)}</div><div class="ddpshop-ywmf-sep"></div><div class="ddpshop-ywmf-foot"><div class="ddpshop-ywmf-port">${escapeHtml(data.footerTitle)}<br><span style="letter-spacing:.1em;opacity:.8;">${escapeHtml(data.footerSubtitle)}</span></div></div></div></div>
+  return `<div class="ddpshop-ywmf" style="--ddpcard-bg:${data.cardBgColor};--ddptxtv:${data.textVColor};--ddptxtname:${data.mainTextColor};--ddpbotxt:${data.mainTextColor};--ddpbot:${data.buttonBgColor};--ddpbotx:${data.buttonTextColor};--ddpnonee:${data.symbolColor};--ddptxtnone:${data.symbolTextColor};--ddpbox1:${data.boxOneColor};--ddpbox2:${data.boxTwoColor};--ddpbox3:${data.boxThreeColor};"><div class="ddpshop-ywmf-bg">${`<img src="${escapeHtml(data.backgroundImage)}" alt="" style="object-fit:cover;object-position:${data.backgroundImageX}% ${data.backgroundImageY}%;transform:scale(${normalizeImageZoom(data.backgroundImageZoom) / 100});transform-origin:center center;">`}</div><div class="ddpshop-ywmf-whisper w">${escapeHtml(data.whisperText)}</div><div class="ddpshop-ywmf-clover c1">${formatEmojiOrSymbol(data.symbolOne)}</div><div class="ddpshop-ywmf-clover c2">${formatEmojiOrSymbol(data.symbolTwo)}</div><div class="ddpshop-ywmf-swatches"><div class="ddpshop-ywmf-swatch s1"></div><div class="ddpshop-ywmf-swatch s2"></div><div class="ddpshop-ywmf-swatch s3"></div></div><div class="ddpshop-ywmf-card"><div class="ddpshop-tag"><span>${escapeHtml(data.species)}</span><span class="ddpshop-ava"><img src="${escapeHtml(data.avatarImage)}" alt="" style="object-fit:cover;object-position:${data.avatarImageX}% ${data.avatarImageY}%;transform:scale(${normalizeImageZoom(data.avatarImageZoom) / 100});transform-origin:center center;"></span></div><div class="ddpshop-ywmf-title"><span>${escapeHtml(data.firstName)}</span><span>— ${escapeHtml(data.lastName)}</span></div><div class="ddpshop-ywmf-btn" href="${escapeHtml(data.profileUrl)}">${escapeHtml(data.profileButtonText)}</div><div class="ddpshop-ywmf-body">${textWithBreaks(data.bodyText)}</div><div class="ddpshop-ywmf-sep"></div><div class="ddpshop-ywmf-foot"><div class="ddpshop-ywmf-port">${escapeHtml(data.footerTitle)}<br><span style="letter-spacing:.1em;opacity:.8;">${escapeHtml(data.footerSubtitle)}</span></div></div></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -9094,7 +9144,7 @@ function getNothinData() {
 }
 
 function buildNothinMarkup(data) {
-  return `<div class="boutmeddsh" style="--mmainin-img:url('${escapeHtml(data.mainImage)}');--field-img:url('${escapeHtml(data.fieldImage)}');--four-img:url('${escapeHtml(data.fourImage)}');--bgbbg:${data.outerBgColor};--bgbfame:${data.frameBgColor};--bg-dot-color:${data.dotColor};--ccolormainn:${data.mainColor};--ccfontnt:${data.textColor};--linebout:${data.borderColor};"><div class="boutmeddsh-stage"><section class="boutmeddshleft-page"><h1 class="boutmeddshtitle">${escapeHtml(data.species)}</h1><div class="boutmeddshmeta"><span>${escapeHtml(data.displayName)}</span><span>${escapeHtml(data.birthday)}</span></div><div class="boutmeddshphoto-main" style="background-position:${data.mainImageX}% ${data.mainImageY}%;"><span class="boutmeddshtag">${escapeHtml(data.mainTag)}</span></div><div class="boutmeddshdots"><i></i><i></i><i></i></div></section><section class="boutmeddshseason-board"><div class="boutmeddshseason-star"><span>${formatEmojiOrSymbol(data.mainSymbol)}</span></div><div class="boutmeddshseason-head"><div>${escapeHtml(data.seasonTextOne)}</div><div>${escapeHtml(data.seasonTextTwo)}</div></div><div class="boutmeddshseason-grid"><div class="boutmeddshmini-photo" style="background-position:${data.fieldImageX}% ${data.fieldImageY}%;"><span class="boutmeddshproduct-pill">${escapeHtml(data.productText)}</span></div><div class="boutmeddshmini-photo" style="background-position:${data.fieldImageX}% ${data.fieldImageY}%;"></div><div class="boutmeddshmini-photo" style="background-position:${data.fourImageX}% ${data.fourImageY}%;"></div><div class="boutmeddshmini-photo" style="background-position:${data.fourImageX}% ${data.fourImageY}%;"><span class="boutmeddshproduct-pill">${escapeHtml(data.qualityText)}</span></div></div></section><section class="boutmeddshbottom-frame"><span class="boutmeddshhandle h1"></span><span class="boutmeddshhandle h2"></span><span class="boutmeddshhandle h3"></span><span class="boutmeddshhandle h4"></span><span class="boutmeddshhandle h5"></span><span class="boutmeddshhandle h6"></span><div class="boutmeddshframe-grid"><div class="boutmeddshwide-photo"><span class="boutmeddshvideo-pill">${escapeHtml(data.videoText)}</span></div><div class="boutmeddshtall-photo" style="background-position:${data.mainImageX}% ${data.mainImageY}%;"><span class="boutmeddshtall-star">${formatEmojiOrSymbol(data.bottomSymbol)}</span></div></div></section></div></div>
+  return `<div class="boutmeddsh" style="--mmainin-img:url('${escapeHtml(data.mainImage)}');--field-img:url('${escapeHtml(data.fieldImage)}');--four-img:url('${escapeHtml(data.fourImage)}');--bgbbg:${data.outerBgColor};--bgbfame:${data.frameBgColor};--bg-dot-color:${data.dotColor};--ccolormainn:${data.mainColor};--ccfontnt:${data.textColor};--linebout:${data.borderColor};"><div class="boutmeddsh-stage"><section class="boutmeddshleft-page"><h1 class="boutmeddshtitle">${escapeHtml(data.species)}</h1><div class="boutmeddshmeta"><span>${escapeHtml(data.displayName)}</span><span>${escapeHtml(data.birthday)}</span></div><div class="boutmeddshphoto-main" style="background-position:${data.mainImageX}% ${data.mainImageY}%;${buildBackgroundZoomStyle(data.mainImageZoom)};${buildBackgroundZoomStyle(data.mainImageZoom)};"><span class="boutmeddshtag">${escapeHtml(data.mainTag)}</span></div><div class="boutmeddshdots"><i></i><i></i><i></i></div></section><section class="boutmeddshseason-board"><div class="boutmeddshseason-star"><span>${formatEmojiOrSymbol(data.mainSymbol)}</span></div><div class="boutmeddshseason-head"><div>${escapeHtml(data.seasonTextOne)}</div><div>${escapeHtml(data.seasonTextTwo)}</div></div><div class="boutmeddshseason-grid"><div class="boutmeddshmini-photo" style="background-position:${data.fieldImageX}% ${data.fieldImageY}%;${buildBackgroundZoomStyle(data.fieldImageZoom)};${buildBackgroundZoomStyle(data.fieldImageZoom)};"><span class="boutmeddshproduct-pill">${escapeHtml(data.productText)}</span></div><div class="boutmeddshmini-photo" style="background-position:${data.fieldImageX}% ${data.fieldImageY}%;${buildBackgroundZoomStyle(data.fieldImageZoom)};${buildBackgroundZoomStyle(data.fieldImageZoom)};"></div><div class="boutmeddshmini-photo" style="background-position:${data.fourImageX}% ${data.fourImageY}%;${buildBackgroundZoomStyle(data.fourImageZoom)};${buildBackgroundZoomStyle(data.fourImageZoom)};"></div><div class="boutmeddshmini-photo" style="background-position:${data.fourImageX}% ${data.fourImageY}%;${buildBackgroundZoomStyle(data.fourImageZoom)};${buildBackgroundZoomStyle(data.fourImageZoom)};"><span class="boutmeddshproduct-pill">${escapeHtml(data.qualityText)}</span></div></div></section><section class="boutmeddshbottom-frame"><span class="boutmeddshhandle h1"></span><span class="boutmeddshhandle h2"></span><span class="boutmeddshhandle h3"></span><span class="boutmeddshhandle h4"></span><span class="boutmeddshhandle h5"></span><span class="boutmeddshhandle h6"></span><div class="boutmeddshframe-grid"><div class="boutmeddshwide-photo"><span class="boutmeddshvideo-pill">${escapeHtml(data.videoText)}</span></div><div class="boutmeddshtall-photo" style="background-position:${data.mainImageX}% ${data.mainImageY}%;${buildBackgroundZoomStyle(data.mainImageZoom)};${buildBackgroundZoomStyle(data.mainImageZoom)};"><span class="boutmeddshtall-star">${formatEmojiOrSymbol(data.bottomSymbol)}</span></div></div></section></div></div>
 ${fdreviewCreditMarkup}`;
 }
 
@@ -12221,6 +12271,134 @@ window.addEventListener(
 /* ==================================================
    INITIALIZE
 ================================================== */
+
+
+function attachImageZoomValues(
+  data,
+  panelName
+) {
+  const panel =
+    document.querySelector(
+      `[data-panel="${panelName}"]`
+    );
+
+  if (!panel || !data) {
+    return data;
+  }
+
+  Object.keys(data)
+    .filter((key) => key.endsWith("X"))
+    .forEach((xKey) => {
+      const baseKey =
+        xKey.slice(0, -1);
+
+      const yKey =
+        `${baseKey}Y`;
+
+      if (!(yKey in data)) {
+        return;
+      }
+
+      const expectedSuffix =
+        `${baseKey}Zoom`
+          .toLowerCase();
+
+      const zoomInput =
+        Array.from(
+          panel.querySelectorAll(
+            "[data-image-zoom-range]"
+          )
+        ).find((input) => {
+          return String(
+            input.id || ""
+          )
+            .toLowerCase()
+            .endsWith(
+              expectedSuffix
+            );
+        });
+
+      data[`${baseKey}Zoom`] =
+        normalizeImageZoom(
+          zoomInput?.value,
+          100
+        );
+    });
+
+  return data;
+}
+
+function wrapImageZoomDataGetter(
+  getterName,
+  panelName
+) {
+  const originalGetter =
+    window[getterName];
+
+  if (
+    typeof originalGetter !==
+      "function"
+  ) {
+    return;
+  }
+
+  window[getterName] =
+    function wrappedImageZoomGetter() {
+      return attachImageZoomValues(
+        originalGetter(),
+        panelName
+      );
+    };
+}
+
+[
+  ["getPageOfOneData", "editor-code001"],
+  ["getWeirdoData", "editor-code002"],
+  ["getHihiData", "editor-code003"],
+  ["getUuiaaData", "editor-code004"],
+  ["getCommaData", "editor-code005"],
+  ["getNewRulesData", "editor-code006"],
+  ["getLoveSongData", "editor-code007"],
+  ["getDumbDumberData", "editor-code008"],
+  ["getHigherHeavenData", "editor-code009"],
+  ["getPolaroidLoveData", "editor-profile001"],
+  ["getMoodboardData", "editor-profile002"],
+  ["getFortyOneData", "editor-profile003"],
+  ["getNothinData", "editor-profile004"],
+  ["getFoodReviewData", "editor-review001"]
+].forEach(([getterName, panelName]) => {
+  wrapImageZoomDataGetter(
+    getterName,
+    panelName
+  );
+});
+
+document
+  .querySelectorAll(
+    ".dds-reset-button"
+  )
+  .forEach((button) => {
+    button.addEventListener(
+      "click",
+      () => {
+        const panel =
+          button.closest(
+            "[data-panel]"
+          );
+
+        panel
+          ?.querySelectorAll(
+            "[data-image-zoom-range]"
+          )
+          .forEach((input) => {
+            input.value = "100";
+          });
+
+        syncImagePositionOutputs();
+      }
+    );
+  });
+
 
 /*
  * ไม่สร้างพรีวิวทุกหมวดตั้งแต่เปิดหน้าแรก
