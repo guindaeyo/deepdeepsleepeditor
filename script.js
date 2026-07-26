@@ -13,6 +13,7 @@
  * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ปุ่ม BBCode เรียงต่อในแถบเดิม และหน้า editor เปิดมาเป็นฟอร์มว่างทันที โดยพรีวิวหน้าหมวดยังคงสมบูรณ์
  * - พรีวิว PAGE OF ONE ในหน้ารวมใช้ข้อมูลตัวอย่างถาวร ไม่ถูกล้างตามหน้า editor
+ * - ค่าที่พิมพ์ในฟอร์ม editor ค้างอยู่เมื่อเปลี่ยนช่อง จนกว่าจะลบเองหรือกด RESET
  * - ใช้ร่วมกับ index.html และ style.css ชุดล่าสุดใน ZIP นี้
  */
 
@@ -4999,6 +5000,310 @@ ${stylesheetLinks}
   }
 
 
+  function installEditorInputPersistenceFix() {
+    if (window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__) {
+      return;
+    }
+
+    window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__ = true;
+
+    const editorPanelSelector = [
+      '[data-panel^="editor-code"]',
+      '[data-panel^="editor-profile"]',
+      '[data-panel^="editor-review"]'
+    ].join(',');
+
+    const updaterByPanel = {
+      "editor-code001": "updatePageOfOne",
+      "editor-code002": "updateWeirdo",
+      "editor-code003": "updateHihi",
+      "editor-code004": "updateUuiaa",
+      "editor-code005": "updateComma",
+      "editor-code006": "updateNewRules",
+      "editor-code007": "updateLoveSong",
+      "editor-code008": "updateDumbDumber",
+      "editor-code009": "updateHigherHeaven",
+      "editor-profile001": "updatePolaroidLove",
+      "editor-profile002": "updateMoodboard",
+      "editor-profile003": "updateFortyOne",
+      "editor-profile004": "updateNothinBoutMe",
+      "editor-review001": "updateFoodReview"
+    };
+
+    const panelStates = new Map();
+    const pendingPanels = new WeakSet();
+    let restoring = false;
+
+    function isPersistableField(field) {
+      if (!(field instanceof Element)) {
+        return false;
+      }
+
+      if (field.matches('.dds-rich-editor[contenteditable="true"]')) {
+        return true;
+      }
+
+      if (!field.matches('input, textarea, select')) {
+        return false;
+      }
+
+      if (
+        field.matches(
+          '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"]'
+        )
+      ) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function getPersistableFields(panel) {
+      return Array.from(
+        panel.querySelectorAll(
+          'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
+        )
+      ).filter(isPersistableField);
+    }
+
+    function getFieldKey(field, index) {
+      if (field.id) {
+        return `id:${field.id}`;
+      }
+
+      const name = field.getAttribute('name') || '';
+      const type = field.getAttribute('type') || field.tagName.toLowerCase();
+      return `field:${type}:${name}:${index}`;
+    }
+
+    function readField(field) {
+      if (field.matches('.dds-rich-editor[contenteditable="true"]')) {
+        return {
+          kind: 'html',
+          value: field.innerHTML
+        };
+      }
+
+      if (field.matches('input[type="checkbox"], input[type="radio"]')) {
+        return {
+          kind: 'checked',
+          value: Boolean(field.checked)
+        };
+      }
+
+      if (field instanceof HTMLSelectElement && field.multiple) {
+        return {
+          kind: 'multiple',
+          value: Array.from(field.options, (option) => option.selected)
+        };
+      }
+
+      return {
+        kind: 'value',
+        value: field.value
+      };
+    }
+
+    function writeField(field, saved) {
+      if (!saved) {
+        return;
+      }
+
+      if (saved.kind === 'html') {
+        if (field.innerHTML !== saved.value) {
+          field.innerHTML = saved.value;
+        }
+        return;
+      }
+
+      if (saved.kind === 'checked') {
+        if (field.checked !== saved.value) {
+          field.checked = saved.value;
+        }
+        return;
+      }
+
+      if (saved.kind === 'multiple') {
+        Array.from(field.options).forEach((option, index) => {
+          option.selected = Boolean(saved.value[index]);
+        });
+        return;
+      }
+
+      if (field.value !== saved.value) {
+        field.value = saved.value;
+      }
+    }
+
+    function capturePanel(panel) {
+      if (
+        !panel ||
+        restoring ||
+        panel.dataset.ddsPersistResetting === 'true' ||
+        panel.dataset.ddsBlanked !== 'true'
+      ) {
+        return null;
+      }
+
+      const state = new Map();
+
+      getPersistableFields(panel).forEach((field, index) => {
+        state.set(getFieldKey(field, index), readField(field));
+      });
+
+      const panelName = panel.dataset.panel || '';
+      panelStates.set(panelName, state);
+      return state;
+    }
+
+    function restorePanel(panel, runUpdater = true) {
+      if (
+        !panel ||
+        panel.dataset.ddsPersistResetting === 'true'
+      ) {
+        return;
+      }
+
+      const panelName = panel.dataset.panel || '';
+      const state = panelStates.get(panelName);
+
+      if (!state) {
+        return;
+      }
+
+      restoring = true;
+
+      try {
+        getPersistableFields(panel).forEach((field, index) => {
+          writeField(field, state.get(getFieldKey(field, index)));
+        });
+
+        if (runUpdater) {
+          const updater = window[updaterByPanel[panelName]];
+
+          if (typeof updater === 'function') {
+            updater();
+
+            /*
+             * บาง updater ใน core ทำงานต่อเนื่องกับ event blur/change
+             * จึงเขียนค่าฟอร์มกลับอีกรอบหลังอัปเดตพรีวิวเพื่อกันข้อความหาย
+             */
+            getPersistableFields(panel).forEach((field, index) => {
+              writeField(field, state.get(getFieldKey(field, index)));
+            });
+          }
+        }
+      } finally {
+        restoring = false;
+      }
+    }
+
+    function scheduleRestore(panel) {
+      if (!panel || pendingPanels.has(panel)) {
+        return;
+      }
+
+      pendingPanels.add(panel);
+
+      queueMicrotask(() => {
+        pendingPanels.delete(panel);
+        restorePanel(panel, true);
+
+        requestAnimationFrame(() => {
+          restorePanel(panel, false);
+        });
+      });
+    }
+
+    document.querySelectorAll(editorPanelSelector).forEach((panel) => {
+      const captureAndRestore = () => {
+        if (restoring || panel.dataset.ddsPersistResetting === 'true') {
+          return;
+        }
+
+        capturePanel(panel);
+        scheduleRestore(panel);
+      };
+
+      /*
+       * ใช้ capture phase เพื่อจำค่าก่อน listener เดิมของ core จะทำงาน
+       * โดยเฉพาะตอน input เดิม blur เพราะผู้ใช้กดไปกรอกช่องถัดไป
+       */
+      panel.addEventListener('beforeinput', captureAndRestore, true);
+      panel.addEventListener('input', captureAndRestore, true);
+      panel.addEventListener('change', captureAndRestore, true);
+      panel.addEventListener('blur', captureAndRestore, true);
+      panel.addEventListener('focusout', captureAndRestore, true);
+      panel.addEventListener('pointerdown', (event) => {
+        if (event.target.closest('.dds-reset-button')) {
+          return;
+        }
+
+        captureAndRestore();
+      }, true);
+      panel.addEventListener('focusin', () => {
+        scheduleRestore(panel);
+      }, true);
+
+      panel.querySelectorAll('.dds-reset-button').forEach((button) => {
+        const beginReset = () => {
+          const panelName = panel.dataset.panel || '';
+          panel.dataset.ddsPersistResetting = 'true';
+          panelStates.delete(panelName);
+        };
+
+        button.addEventListener('pointerdown', beginReset, true);
+        button.addEventListener('click', () => {
+          beginReset();
+
+          window.setTimeout(() => {
+            panel.dataset.ddsPersistResetting = 'false';
+            capturePanel(panel);
+          }, 40);
+        }, true);
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      const editButton = event.target.closest(
+        '[data-edit-code], [data-edit-profile], [data-edit-review]'
+      );
+
+      if (!editButton) {
+        return;
+      }
+
+      const editKey =
+        editButton.dataset.editCode ||
+        editButton.dataset.editProfile ||
+        editButton.dataset.editReview ||
+        '';
+      const panel = editKey
+        ? document.querySelector(`[data-panel="editor-${editKey}"]`)
+        : null;
+
+      if (!panel) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        /* ครั้งแรกไม่มี state จึงยังคงเปิดมาเป็นฟอร์มว่าง */
+        restorePanel(panel, true);
+      });
+    }, true);
+
+    window.addEventListener('hashchange', () => {
+      requestAnimationFrame(() => {
+        const activePanel = document.querySelector(
+          `${editorPanelSelector}.is-active`
+        );
+
+        restorePanel(activePanel, true);
+      });
+    });
+  }
+
+
   const PAGE_OF_ONE_CATALOGUE_MARKUP = String.raw`<div class="pageof-wrapper" style="--backg:#e0e0e0;--border:#777;--text:#000;--quote:#9e9e9e;">
 <div class="pageof-cr">ordinary vampire<br>(just a girl)</div>
 <div class="pageof-star">✦</div>
@@ -5335,6 +5640,7 @@ ${stylesheetLinks}
       normalizeShowcaseCardLabels();
       installThreeColumnShowcaseGrids();
       installBlankEditorFormsAndBbcodeTools();
+      installEditorInputPersistenceFix();
       installStaticCataloguePreviewFix();
       installStaticFoodReviewCataloguePreviewFix();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
