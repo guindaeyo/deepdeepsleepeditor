@@ -8,7 +8,7 @@
  * - โหลดระบบเว็บไซต์เดิมจาก commit ที่ล็อกเวอร์ชันไว้
  * - จากนั้นติดตั้งตัวแก้ LIVE PREVIEW ให้ซูม/ขยับรูปได้ลื่นขึ้น
  * - หน้าเมนูหลักใช้ COMMISSION & ACTIVITY พร้อมแท็บ COMMISSION & SHOWCASE และ ACTIVITY
- * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE, MY OWN CODE 2 และ ACTIVITY: MY TOP 5 MOVIES ทั้งหน้ากิจกรรมและแบบตอบกลับ แบบดูอย่างเดียว
+ * - เพิ่ม COMMISSION 3 (Mikael F. Kaiser), MY OWN CODE 1–3 และ ACTIVITY: MY TOP 5 MOVIES ทั้งหน้ากิจกรรมและแบบตอบกลับ แบบดูอย่างเดียว
  * - หน้า COMMISSION & SHOWCASE และ ACTIVITY ใช้การ์ด 3 ช่อง และหน้าดูงานใช้แคนวาส 1040px สูงตามเนื้อหา
  * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ไม่ต้องแก้ index.html และ style.css
@@ -2182,7 +2182,7 @@ ${stylesheetLinks}
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
-        <h2 class="dds-commission-card-title">COMMISSION 3</h2>
+        <h2 class="dds-commission-card-title">COMMISSION</h2>
         <p class="dds-commission-card-type">โค้ดประเภทกระทู้บ้าน</p>
         <p class="dds-commission-card-client">
           ผู้จ้าง <strong>MIKAEL F. KAISER</strong>
@@ -3315,12 +3315,12 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่าง MY OWN CODE 2 — โค้ดประเภทประวัติ"
+          title="ตัวอย่าง MY OWN CODE — โค้ดประเภทประวัติ"
         ></iframe>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
-        <h2 class="dds-commission-card-title">MY OWN CODE 2</h2>
+        <h2 class="dds-commission-card-title">MY OWN CODE</h2>
         <p class="dds-commission-card-type">โค้ดประเภทประวัติ</p>
         <button
           class="dds-roleplay-edit"
@@ -3360,7 +3360,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="myOwnCodeHistoryPreview"
           scrolling="no"
-          title="MY OWN CODE 2 — โค้ดประเภทประวัติ"
+          title="MY OWN CODE — โค้ดประเภทประวัติ"
         ></iframe>
       </div>
     `;
@@ -3655,6 +3655,506 @@ ${stylesheetLinks}
   }
 
 
+  function installMyOwnCodeTopicHeader() {
+    if (window.__DDS_MY_OWN_CODE_TOPIC_HEADER_INSTALLED__) {
+      return;
+    }
+
+    const commissionGrid = document.querySelector(
+      '[data-work-panel="commission"] .dds-commission-grid'
+    ) || document.querySelector('.dds-commission-grid');
+    const footer = document.querySelector('.dds-footer');
+
+    if (!commissionGrid || !footer) {
+      return;
+    }
+
+    window.__DDS_MY_OWN_CODE_TOPIC_HEADER_INSTALLED__ = true;
+
+    const stylesheetUrls = [];
+    const canvasWidth = 1040;
+    const rootSelector = '.dds-my-own-code-topic-root';
+
+    const showcaseMarkup = String.raw`<div class="dds-my-own-code-topic-root"><div style="display:flex;align-items:stretch;max-width:850px;margin:40px auto;background-color:#111111;box-shadow:0 15px 40px rgba(0,0,0,0.9);position:relative;font-family:'Georgia','Times New Roman',serif;"><div style="position:absolute;top:-15px;left:40px;background-color:#8b0000;color:#ffffff;padding:25px 12px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);box-shadow:0 5px 15px rgba(139,0,0,0.4);z-index:10;">Vampire</div><div style="width:50%;position:relative;"><img src="https://i.pinimg.com/originals/76/5d/be/765dbe87b96ca7539134ea1de147f21e.gif" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Franklin D. Bloodworth"></div><div style="width:50%;padding:60px 40px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;background-color:#111111;"><div style="text-align:center;color:#666666;font-size:11px;letter-spacing:3px;font-family:'Helvetica Neue',Arial,sans-serif;text-transform:uppercase;margin-bottom:10px;">15 JUNE 2026</div><h2 style="text-align:center;color:#b71c1c;font-size:20px;font-weight:normal;letter-spacing:2px;margin:0 0 25px 0;text-transform:uppercase;border-bottom:1px solid #2b2b2b;padding-bottom:20px;">Obsidian Tower</h2><div style="color:#cccccc;font-size:20px;line-height:1.8;text-align:justify;"><div style="text-align:center;"><i>F</i>ranklin D. Bloodworth</div></div></div></div></div>`;
+
+    const previewOnlyCss = `
+      <style data-my-own-code-topic-preview-only>
+        html,
+        body {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+          background: #242424 !important;
+        }
+
+        body {
+          position: relative !important;
+        }
+
+        .dds-preview-shell,
+        .dds-preview-target,
+        .dds-card-preview-shell,
+        .dds-card-preview-target,
+        .dds-my-own-code-topic-preview-content {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          position: relative !important;
+          overflow: visible !important;
+          transform: none !important;
+        }
+
+        .dds-my-own-code-topic-root {
+          width: ${canvasWidth}px !important;
+          min-width: ${canvasWidth}px !important;
+          max-width: ${canvasWidth}px !important;
+          min-height: 1px !important;
+          box-sizing: border-box !important;
+          overflow: visible !important;
+        }
+      </style>
+    `;
+
+    const previewMarkup =
+      `${previewOnlyCss}<div class="dds-my-own-code-topic-preview-content">${showcaseMarkup}</div>`;
+
+    function buildFallbackPreviewDocument(markup) {
+      return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  html, body { margin: 0; min-height: 100%; background: #242424; }
+  body { padding: 0; overflow: hidden; }
+  .dds-preview-shell,
+  .dds-card-preview-shell {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .dds-preview-target,
+  .dds-card-preview-target {
+    flex: 0 0 auto;
+    transform-origin: top center;
+  }
+</style>
+</head>
+<body>
+  <div class="dds-preview-shell">
+    <div class="dds-preview-target">${markup}</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function buildPreviewDocument(isFullView) {
+      const builder = isFullView
+        ? window.buildEditorPreviewDocument
+        : window.buildCardPreviewDocument;
+
+      if (typeof builder === 'function') {
+        return builder(stylesheetUrls, previewMarkup);
+      }
+
+      return buildFallbackPreviewDocument(previewMarkup);
+    }
+
+    const card = document.createElement('article');
+    card.className =
+      'dds-roleplay-card dds-commission-card dds-my-own-code-topic-card';
+    card.innerHTML = `
+      <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
+        <iframe
+          aria-hidden="true"
+          class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="myOwnCodeTopicCardPreview"
+          loading="lazy"
+          scrolling="no"
+          tabindex="-1"
+          title="ตัวอย่าง MY OWN CODE — โค้ดประเภทหัวกระทู้"
+        ></iframe>
+      </div>
+
+      <div class="dds-roleplay-card-body dds-commission-card-body">
+        <h2 class="dds-commission-card-title">MY OWN CODE</h2>
+        <p class="dds-commission-card-type">โค้ดประเภทหัวกระทู้</p>
+        <button
+          class="dds-roleplay-edit"
+          data-view-my-own-code-topic
+          type="button"
+        >
+          VIEW WORK <span>↗</span>
+        </button>
+      </div>
+    `;
+    commissionGrid.appendChild(card);
+
+    const viewPanel = document.createElement('section');
+    viewPanel.className =
+      'dds-panel dds-commission-view-panel dds-my-own-code-topic-view-panel';
+    viewPanel.dataset.panel = 'view-my-own-code-topic';
+    viewPanel.innerHTML = `
+      <div class="dds-commission-view-toolbar">
+        <button
+          aria-label="กลับหน้า COMMISSION & SHOWCASE"
+          class="dds-back-button"
+          data-my-own-code-topic-back
+          title="กลับหน้า COMMISSION & SHOWCASE"
+          type="button"
+        >
+          ←
+        </button>
+      </div>
+
+      <div
+        class="dds-commission-preview-stage"
+        id="myOwnCodeTopicPreviewStage"
+      >
+        <iframe
+          class="dds-editor-preview-frame dds-commission-view-frame"
+          data-commission-canvas-height="auto"
+          data-commission-canvas-width="${canvasWidth}"
+          id="myOwnCodeTopicPreview"
+          scrolling="no"
+          title="MY OWN CODE — โค้ดประเภทหัวกระทู้"
+        ></iframe>
+      </div>
+    `;
+    footer.before(viewPanel);
+
+    const cardIframe = card.querySelector('#myOwnCodeTopicCardPreview');
+    const fullIframe = viewPanel.querySelector('#myOwnCodeTopicPreview');
+    const viewButton = card.querySelector('[data-view-my-own-code-topic]');
+    const backButton = viewPanel.querySelector('[data-my-own-code-topic-back]');
+
+    let cardRendered = false;
+    let fullRendered = false;
+
+    function measureCanvasHeight(iframe) {
+      const previewDocument = iframe?.contentDocument;
+
+      if (!previewDocument) {
+        return 0;
+      }
+
+      const root = previewDocument.querySelector(rootSelector);
+      const content = previewDocument.querySelector(
+        '.dds-my-own-code-topic-preview-content'
+      );
+
+      if (!root || !content) {
+        return 0;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
+
+      return Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            rootRect.bottom,
+            contentRect.bottom,
+            root.offsetHeight,
+            root.scrollHeight,
+            content.offsetHeight,
+            content.scrollHeight,
+            previewDocument.body.scrollHeight,
+            previewDocument.documentElement.scrollHeight
+          )
+        )
+      );
+    }
+
+    function resizePreview(iframe) {
+      if (!iframe) {
+        return;
+      }
+
+      const stage = iframe.closest(
+        '.dds-commission-preview-stage, .dds-roleplay-card-preview'
+      );
+
+      if (!stage || stage.clientWidth < 20) {
+        return;
+      }
+
+      const measuredHeight = measureCanvasHeight(iframe);
+      const previousHeight = Number(
+        iframe.dataset.commissionMeasuredHeight || 0
+      ) || 0;
+      const canvasHeight = Math.max(
+        1,
+        measuredHeight || previousHeight || 520
+      );
+
+      iframe.dataset.commissionMeasuredHeight = String(canvasHeight);
+      iframe.style.width = `${canvasWidth}px`;
+      iframe.style.minWidth = `${canvasWidth}px`;
+      iframe.style.maxWidth = `${canvasWidth}px`;
+      iframe.style.height = `${canvasHeight}px`;
+      iframe.style.minHeight = `${canvasHeight}px`;
+      iframe.style.maxHeight = `${canvasHeight}px`;
+      iframe.style.setProperty(
+        '--dds-commission-canvas-height',
+        `${canvasHeight}px`
+      );
+
+      const isFullView = iframe.classList.contains(
+        'dds-commission-view-frame'
+      );
+
+      if (isFullView) {
+        const scale = Math.max(
+          0.01,
+          Math.min(1, stage.clientWidth / canvasWidth)
+        );
+        const scaledHeight = Math.ceil(canvasHeight * scale);
+
+        iframe.style.setProperty(
+          '--dds-commission-canvas-scale',
+          String(scale)
+        );
+        stage.style.setProperty(
+          '--dds-commission-stage-height',
+          `${scaledHeight}px`
+        );
+        return;
+      }
+
+      if (stage.clientHeight < 20) {
+        return;
+      }
+
+      const padding = 18;
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          (stage.clientWidth - padding) / canvasWidth,
+          (stage.clientHeight - padding) / canvasHeight
+        )
+      );
+
+      iframe.style.setProperty(
+        '--dds-commission-canvas-scale',
+        String(scale)
+      );
+    }
+
+    function scheduleResize(iframe) {
+      const run = () => resizePreview(iframe);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(run);
+      });
+
+      [80, 180, 420, 850, 1500, 2400].forEach((delay) => {
+        window.setTimeout(run, delay);
+      });
+    }
+
+    function watchAssets(iframe) {
+      const previewDocument = iframe.contentDocument;
+
+      if (!previewDocument) {
+        return;
+      }
+
+      previewDocument.querySelectorAll('img').forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener(
+            'load',
+            () => scheduleResize(iframe),
+            { once: true }
+          );
+          image.addEventListener(
+            'error',
+            () => scheduleResize(iframe),
+            { once: true }
+          );
+        }
+      });
+
+      if (previewDocument.fonts?.ready) {
+        previewDocument.fonts.ready.then(() => {
+          scheduleResize(iframe);
+        });
+      }
+    }
+
+    function renderPreview(iframe, isFullView) {
+      if (!iframe) {
+        return;
+      }
+
+      iframe.addEventListener(
+        'load',
+        () => {
+          watchAssets(iframe);
+          scheduleResize(iframe);
+        },
+        { once: true }
+      );
+      iframe.srcdoc = buildPreviewDocument(isFullView);
+    }
+
+    function ensureCardPreview() {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+        return;
+      }
+
+      cardRendered = true;
+      renderPreview(cardIframe, false);
+    }
+
+    function ensureFullPreview() {
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+        return;
+      }
+
+      fullRendered = true;
+      renderPreview(fullIframe, true);
+    }
+
+    function closeCustomViewState() {
+      viewPanel.classList.remove('is-active');
+    }
+
+    function openCustomView() {
+      ensureFullPreview();
+      document.body.classList.add('dds-editor-mode');
+
+      document.querySelectorAll('[data-panel]').forEach((panel) => {
+        panel.classList.toggle('is-active', panel === viewPanel);
+      });
+
+      document.querySelectorAll('[data-page]').forEach((button) => {
+        const active = button.dataset.page === 'commission';
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
+      });
+
+      const pageNumber = document.querySelector('#currentPageNumber');
+      if (pageNumber) {
+        pageNumber.textContent = '04';
+      }
+
+      document.title = '― www. deep deep sleep code shop .com ―';
+      history.replaceState(null, '', '#commission');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scheduleResize(fullIframe);
+    }
+
+    viewButton?.addEventListener('click', openCustomView);
+
+    backButton?.addEventListener('click', () => {
+      closeCustomViewState();
+
+      if (typeof window.openPage === 'function') {
+        window.openPage('commission');
+      } else {
+        document.body.classList.remove('dds-editor-mode');
+        document.querySelectorAll('[data-panel]').forEach((panel) => {
+          panel.classList.toggle(
+            'is-active',
+            panel.dataset.panel === 'commission'
+          );
+        });
+      }
+
+      ensureCardPreview();
+    });
+
+    document
+      .querySelectorAll('[data-page="commission"], [data-go="commission"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          closeCustomViewState();
+          requestAnimationFrame(ensureCardPreview);
+        });
+      });
+
+    document.querySelectorAll('[data-page], [data-go]').forEach((button) => {
+      button.addEventListener(
+        'click',
+        () => {
+          if (!button.matches(
+            '[data-page="commission"], [data-go="commission"]'
+          )) {
+            closeCustomViewState();
+          }
+        },
+        true
+      );
+    });
+
+    window.addEventListener('hashchange', closeCustomViewState);
+    window.addEventListener('resize', () => {
+      if (cardRendered) {
+        scheduleResize(cardIframe);
+      }
+      if (fullRendered) {
+        scheduleResize(fullIframe);
+      }
+    });
+
+    const commissionPanel = document.querySelector(
+      '[data-panel="commission"]'
+    );
+
+    if (commissionPanel?.classList.contains('is-active')) {
+      ensureCardPreview();
+    }
+  }
+
+
+  function normalizeShowcaseCardLabels() {
+    document
+      .querySelectorAll(".dds-commission-card-title")
+      .forEach((title) => {
+        const label = title.textContent.trim();
+
+        if (/^COMMISSION\s+\d+$/i.test(label)) {
+          title.textContent = "COMMISSION";
+        } else if (/^MY OWN CODE\s+\d+$/i.test(label)) {
+          title.textContent = "MY OWN CODE";
+        }
+      });
+
+    document
+      .querySelectorAll(
+        '.dds-commission-card iframe[title], .dds-commission-view-panel iframe[title]'
+      )
+      .forEach((iframe) => {
+        const currentTitle = iframe.getAttribute("title") || "";
+        const normalizedTitle = currentTitle
+          .replace(/COMMISSION\s+\d+/gi, "COMMISSION")
+          .replace(/MY OWN CODE\s+\d+/gi, "MY OWN CODE");
+
+        if (normalizedTitle !== currentTitle) {
+          iframe.setAttribute("title", normalizedTitle);
+        }
+      });
+  }
+
   function installThreeColumnShowcaseGrids() {
     if (window.__DDS_THREE_COLUMN_SHOWCASE_GRIDS__) {
       return;
@@ -3910,6 +4410,8 @@ ${stylesheetLinks}
       installCommissionThreeHouse();
       installMyOwnCodeCommission();
       installMyOwnCodeHistory();
+      installMyOwnCodeTopicHeader();
+      normalizeShowcaseCardLabels();
       installThreeColumnShowcaseGrids();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
     })
