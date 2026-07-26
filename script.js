@@ -500,7 +500,6 @@
         <p>CLIENT WORK ARCHIVE</p>
         <h2>COMMISSION</h2>
       </div>
-      <span>ผลงานโค้ดที่จัดทำตามคำสั่งจ้าง</span>
     `;
 
     contactBox.before(tabs);
@@ -521,7 +520,6 @@
           <p>EVENT CODE ARCHIVE</p>
           <h2>ACTIVITY</h2>
         </div>
-        <span>ผลงานโค้ดที่สร้างขึ้นจากกิจกรรมต่าง ๆ</span>
       </div>
 
       <div class="dds-activity-empty">
