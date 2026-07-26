@@ -13,7 +13,7 @@
  * - หน้า CODE006 รูปวงกลมใหญ่ รูปหน้าชื่อเว็บ และรูปวงกลมเล็กส่วนล่างเปลี่ยนเฉพาะลิงก์ ไม่มีเครื่องมือขยับ/ซูม
  * - ปุ่ม BBCode เรียงต่อในแถบเดิม และหน้า editor เปิดมาเป็นฟอร์มว่างทันที โดยพรีวิวหน้าหมวดยังคงสมบูรณ์
  * - พรีวิว PAGE OF ONE ในหน้ารวมใช้ข้อมูลตัวอย่างถาวร ไม่ถูกล้างตามหน้า editor
- * - ค่าที่พิมพ์ในฟอร์ม editor ค้างอยู่เมื่อเปลี่ยนช่อง จนกว่าจะลบเองหรือกด RESET
+ * - หน้า editor ของ ROLEPLAY และ PROFILE ใช้การจัดการฟอร์มแบบเดียวกับ REVIEW เพื่อไม่ให้ค่าหายเมื่อเปลี่ยนช่อง
  * - ใช้ร่วมกับ index.html และ style.css ชุดล่าสุดใน ZIP นี้
  */
 
@@ -5696,7 +5696,6 @@ ${stylesheetLinks}
       normalizeShowcaseCardLabels();
       installThreeColumnShowcaseGrids();
       installBlankEditorFormsAndBbcodeTools();
-      installEditorInputPersistenceFix();
       installStaticCataloguePreviewFix();
       installStaticFoodReviewCataloguePreviewFix();
       window.__DDS_PERFORMANCE_BUILD_READY__ = true;
