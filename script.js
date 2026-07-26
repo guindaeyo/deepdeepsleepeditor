@@ -5007,32 +5007,18 @@ ${stylesheetLinks}
 
     window.__DDS_EDITOR_INPUT_PERSISTENCE_FIX__ = true;
 
+    /*
+     * แก้เฉพาะหน้า FOR ROLEPLAY และ FOR PROFILE
+     * หน้า FOR REVIEW ใช้งานได้ถูกต้องอยู่แล้ว จึงไม่เข้าไปแตะระบบของหน้านั้น
+     */
     const editorPanelSelector = [
       '[data-panel^="editor-code"]',
-      '[data-panel^="editor-profile"]',
-      '[data-panel^="editor-review"]'
+      '[data-panel^="editor-profile"]'
     ].join(',');
 
-    const updaterByPanel = {
-      "editor-code001": "updatePageOfOne",
-      "editor-code002": "updateWeirdo",
-      "editor-code003": "updateHihi",
-      "editor-code004": "updateUuiaa",
-      "editor-code005": "updateComma",
-      "editor-code006": "updateNewRules",
-      "editor-code007": "updateLoveSong",
-      "editor-code008": "updateDumbDumber",
-      "editor-code009": "updateHigherHeaven",
-      "editor-profile001": "updatePolaroidLove",
-      "editor-profile002": "updateMoodboard",
-      "editor-profile003": "updateFortyOne",
-      "editor-profile004": "updateNothinBoutMe",
-      "editor-review001": "updateFoodReview"
-    };
-
     const panelStates = new Map();
-    const pendingPanels = new WeakSet();
-    let restoring = false;
+    const resetPanels = new WeakSet();
+    const scheduledFields = new WeakSet();
 
     function isPersistableField(field) {
       if (!(field instanceof Element)) {
@@ -5047,32 +5033,46 @@ ${stylesheetLinks}
         return false;
       }
 
-      if (
-        field.matches(
-          '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"]'
-        )
-      ) {
-        return false;
+      return !field.matches(
+        '.dds-generated-code, [readonly], [disabled], input[type="button"], input[type="submit"], input[type="reset"], input[type="hidden"], input[type="file"]'
+      );
+    }
+
+    function getPanel(field) {
+      return field?.closest?.(editorPanelSelector) || null;
+    }
+
+    function getPanelState(panel, create = true) {
+      const panelName = panel?.dataset?.panel || '';
+
+      if (!panelName) {
+        return null;
       }
 
-      return true;
+      if (!panelStates.has(panelName) && create) {
+        panelStates.set(panelName, new Map());
+      }
+
+      return panelStates.get(panelName) || null;
     }
 
-    function getPersistableFields(panel) {
-      return Array.from(
-        panel.querySelectorAll(
-          'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
-        )
-      ).filter(isPersistableField);
-    }
-
-    function getFieldKey(field, index) {
+    function getFieldKey(field) {
       if (field.id) {
         return `id:${field.id}`;
       }
 
+      const panel = getPanel(field);
+      const fields = panel
+        ? Array.from(
+            panel.querySelectorAll(
+              'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
+            )
+          ).filter(isPersistableField)
+        : [];
+      const index = fields.indexOf(field);
       const name = field.getAttribute('name') || '';
       const type = field.getAttribute('type') || field.tagName.toLowerCase();
+
       return `field:${type}:${name}:${index}`;
     }
 
@@ -5105,7 +5105,7 @@ ${stylesheetLinks}
     }
 
     function writeField(field, saved) {
-      if (!saved) {
+      if (!saved || resetPanels.has(getPanel(field))) {
         return;
       }
 
@@ -5135,162 +5135,219 @@ ${stylesheetLinks}
       }
     }
 
-    function capturePanel(panel) {
-      if (
-        !panel ||
-        restoring ||
-        panel.dataset.ddsPersistResetting === 'true' ||
-        panel.dataset.ddsBlanked !== 'true'
-      ) {
-        return null;
-      }
-
-      const state = new Map();
-
-      getPersistableFields(panel).forEach((field, index) => {
-        state.set(getFieldKey(field, index), readField(field));
-      });
-
-      const panelName = panel.dataset.panel || '';
-      panelStates.set(panelName, state);
-      return state;
-    }
-
-    function restorePanel(panel, runUpdater = true) {
-      if (
-        !panel ||
-        panel.dataset.ddsPersistResetting === 'true'
-      ) {
+    function saveField(field) {
+      if (!isPersistableField(field)) {
         return;
       }
 
-      const panelName = panel.dataset.panel || '';
-      const state = panelStates.get(panelName);
+      const panel = getPanel(field);
+
+      if (!panel || resetPanels.has(panel)) {
+        return;
+      }
+
+      const state = getPanelState(panel, true);
+      state.set(getFieldKey(field), readField(field));
+      field.dataset.ddsUserEdited = 'true';
+    }
+
+    function restoreField(field) {
+      if (!isPersistableField(field)) {
+        return;
+      }
+
+      const panel = getPanel(field);
+
+      if (!panel || resetPanels.has(panel)) {
+        return;
+      }
+
+      const state = getPanelState(panel, false);
+      const saved = state?.get(getFieldKey(field));
+
+      if (saved) {
+        writeField(field, saved);
+      }
+    }
+
+    function restorePanel(panel) {
+      if (!panel || resetPanels.has(panel)) {
+        return;
+      }
+
+      const state = getPanelState(panel, false);
 
       if (!state) {
         return;
       }
 
-      restoring = true;
-
-      try {
-        getPersistableFields(panel).forEach((field, index) => {
-          writeField(field, state.get(getFieldKey(field, index)));
-        });
-
-        if (runUpdater) {
-          const updater = window[updaterByPanel[panelName]];
-
-          if (typeof updater === 'function') {
-            updater();
-
-            /*
-             * บาง updater ใน core ทำงานต่อเนื่องกับ event blur/change
-             * จึงเขียนค่าฟอร์มกลับอีกรอบหลังอัปเดตพรีวิวเพื่อกันข้อความหาย
-             */
-            getPersistableFields(panel).forEach((field, index) => {
-              writeField(field, state.get(getFieldKey(field, index)));
-            });
+      panel
+        .querySelectorAll(
+          'input, textarea, select, .dds-rich-editor[contenteditable="true"]'
+        )
+        .forEach((field) => {
+          if (!isPersistableField(field)) {
+            return;
           }
-        }
-      } finally {
-        restoring = false;
-      }
+
+          const saved = state.get(getFieldKey(field));
+
+          if (saved) {
+            writeField(field, saved);
+          }
+        });
     }
 
-    function scheduleRestore(panel) {
-      if (!panel || pendingPanels.has(panel)) {
+    function scheduleFieldRestore(field) {
+      if (!isPersistableField(field) || scheduledFields.has(field)) {
         return;
       }
 
-      pendingPanels.add(panel);
+      scheduledFields.add(field);
 
       queueMicrotask(() => {
-        pendingPanels.delete(panel);
-        restorePanel(panel, true);
+        restoreField(field);
 
         requestAnimationFrame(() => {
-          restorePanel(panel, false);
+          restoreField(field);
+          scheduledFields.delete(field);
         });
       });
     }
 
     document.querySelectorAll(editorPanelSelector).forEach((panel) => {
-      const captureAndRestore = () => {
-        if (restoring || panel.dataset.ddsPersistResetting === 'true') {
-          return;
-        }
-
-        capturePanel(panel);
-        scheduleRestore(panel);
-      };
-
       /*
-       * ใช้ capture phase เพื่อจำค่าก่อน listener เดิมของ core จะทำงาน
-       * โดยเฉพาะตอน input เดิม blur เพราะผู้ใช้กดไปกรอกช่องถัดไป
+       * จำค่า "หลัง" ผู้ใช้พิมพ์แล้วเท่านั้น
+       * ไม่ใช้ beforeinput เพราะเป็นจังหวะก่อนตัวอักษรถูกใส่และอาจดึงค่าเก่ากลับมา
        */
-      panel.addEventListener('beforeinput', captureAndRestore, true);
-      panel.addEventListener('input', captureAndRestore, true);
-      panel.addEventListener('change', captureAndRestore, true);
-      panel.addEventListener('blur', captureAndRestore, true);
-      panel.addEventListener('focusout', captureAndRestore, true);
-      panel.addEventListener('pointerdown', (event) => {
-        if (event.target.closest('.dds-reset-button')) {
-          return;
-        }
-
-        captureAndRestore();
-      }, true);
-      panel.addEventListener('focusin', () => {
-        scheduleRestore(panel);
-      }, true);
-
-      panel.querySelectorAll('.dds-reset-button').forEach((button) => {
-        const beginReset = () => {
-          const panelName = panel.dataset.panel || '';
-          panel.dataset.ddsPersistResetting = 'true';
-          panelStates.delete(panelName);
-        };
-
-        button.addEventListener('pointerdown', beginReset, true);
-        button.addEventListener('click', () => {
-          beginReset();
-
-          window.setTimeout(() => {
-            panel.dataset.ddsPersistResetting = 'false';
-            capturePanel(panel);
-          }, 40);
-        }, true);
-      });
-    });
-
-    document.addEventListener('click', (event) => {
-      const editButton = event.target.closest(
-        '[data-edit-code], [data-edit-profile], [data-edit-review]'
+      panel.addEventListener(
+        'input',
+        (event) => {
+          const field = event.target;
+          saveField(field);
+          scheduleFieldRestore(field);
+        },
+        true
       );
 
-      if (!editButton) {
-        return;
-      }
+      panel.addEventListener(
+        'change',
+        (event) => {
+          const field = event.target;
+          saveField(field);
+          scheduleFieldRestore(field);
+        },
+        true
+      );
 
-      const editKey =
-        editButton.dataset.editCode ||
-        editButton.dataset.editProfile ||
-        editButton.dataset.editReview ||
-        '';
-      const panel = editKey
-        ? document.querySelector(`[data-panel="editor-${editKey}"]`)
-        : null;
+      /*
+       * Core เดิมผูก update ซ้ำไว้กับ blur ทุกช่อง
+       * input event อัปเดต LIVE PREVIEW อยู่แล้ว จึงหยุด blur ตัวเดิมได้อย่างปลอดภัย
+       * เพื่อไม่ให้ตอนกดไปช่องถัดไปมีโค้ดใดเขียนค่าช่องก่อนหน้าทับ
+       */
+      panel.addEventListener(
+        'blur',
+        (event) => {
+          const field = event.target;
 
-      if (!panel) {
-        return;
-      }
+          if (!isPersistableField(field)) {
+            return;
+          }
 
-      requestAnimationFrame(() => {
-        /* ครั้งแรกไม่มี state จึงยังคงเปิดมาเป็นฟอร์มว่าง */
-        restorePanel(panel, true);
-      });
-    }, true);
+          saveField(field);
+          event.stopImmediatePropagation();
+          scheduleFieldRestore(field);
+        },
+        true
+      );
+
+      panel.addEventListener(
+        'focusin',
+        (event) => {
+          restoreField(event.target);
+        },
+        true
+      );
+
+      panel.addEventListener(
+        'pointerdown',
+        (event) => {
+          if (event.target.closest('.dds-reset-button')) {
+            return;
+          }
+
+          const activeField = document.activeElement;
+
+          if (activeField && getPanel(activeField) === panel) {
+            saveField(activeField);
+            scheduleFieldRestore(activeField);
+          }
+        },
+        true
+      );
+
+      panel
+        .querySelectorAll('.dds-reset-button')
+        .forEach((button) => {
+          const beginReset = () => {
+            resetPanels.add(panel);
+            panelStates.delete(panel.dataset.panel || '');
+
+            panel
+              .querySelectorAll('[data-dds-user-edited]')
+              .forEach((field) => {
+                delete field.dataset.ddsUserEdited;
+              });
+          };
+
+          button.addEventListener('pointerdown', beginReset, true);
+          button.addEventListener(
+            'click',
+            () => {
+              beginReset();
+
+              window.setTimeout(() => {
+                resetPanels.delete(panel);
+              }, 80);
+            },
+            true
+          );
+        });
+    });
+
+    document.addEventListener(
+      'click',
+      (event) => {
+        const editButton = event.target.closest(
+          '[data-edit-code], [data-edit-profile]'
+        );
+
+        if (!editButton) {
+          return;
+        }
+
+        const editKey =
+          editButton.dataset.editCode ||
+          editButton.dataset.editProfile ||
+          '';
+        const panel = editKey
+          ? document.querySelector(`[data-panel="editor-${editKey}"]`)
+          : null;
+
+        if (!panel) {
+          return;
+        }
+
+        requestAnimationFrame(() => {
+          restorePanel(panel);
+
+          window.setTimeout(() => {
+            restorePanel(panel);
+          }, 40);
+        });
+      },
+      true
+    );
 
     window.addEventListener('hashchange', () => {
       requestAnimationFrame(() => {
@@ -5298,11 +5355,10 @@ ${stylesheetLinks}
           `${editorPanelSelector}.is-active`
         );
 
-        restorePanel(activePanel, true);
+        restorePanel(activePanel);
       });
     });
   }
-
 
   const PAGE_OF_ONE_CATALOGUE_MARKUP = String.raw`<div class="pageof-wrapper" style="--backg:#e0e0e0;--border:#777;--text:#000;--quote:#9e9e9e;">
 <div class="pageof-cr">ordinary vampire<br>(just a girl)</div>
