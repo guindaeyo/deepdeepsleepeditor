@@ -5626,7 +5626,7 @@ output {
 
 
 /* ==================================================
-   COMMISSION — 950PX / AUTO CONTENT HEIGHT / 13PX
+   COMMISSION — 980PX / AUTO CONTENT HEIGHT / 13PX
 ================================================== */
 
 .dds-commission-card-type,
@@ -5638,9 +5638,9 @@ output {
 
 /* การ์ดพรีวิว */
 .dds-commission-card-preview-frame {
-  width: 950px !important;
-  min-width: 950px !important;
-  max-width: 950px !important;
+  width: 980px !important;
+  min-width: 980px !important;
+  max-width: 980px !important;
 
   height:
     var(
@@ -5664,8 +5664,8 @@ output {
 
 /* หน้าโชว์งานขยายตามความสูงจริงของโค้ด */
 .dds-commission-preview-stage {
-  width: min(950px, 100%) !important;
-  max-width: 950px !important;
+  width: min(980px, 100%) !important;
+  max-width: 980px !important;
 
   height:
     var(
@@ -5683,9 +5683,9 @@ output {
 }
 
 .dds-commission-view-frame {
-  width: 950px !important;
-  min-width: 950px !important;
-  max-width: 950px !important;
+  width: 980px !important;
+  min-width: 980px !important;
+  max-width: 980px !important;
 
   height:
     var(
@@ -5740,9 +5740,9 @@ output {
     center center !important;
 }
 
-@media (max-width: 990px) {
+@media (max-width: 1020px) {
   .dds-commission-preview-stage {
     width: 100% !important;
-    max-width: 950px !important;
+    max-width: 980px !important;
   }
 }
