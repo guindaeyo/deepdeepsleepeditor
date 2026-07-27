@@ -5813,3 +5813,188 @@ output {
 .dds-roleplay-card-preview-frame img {
   transform-origin: center center;
 }
+
+/* ==================================================
+   LOCAL DRAFT SAVE + BBCODE TOOLBAR
+   ================================================== */
+.dds-draft-manager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(135deg, rgba(143, 14, 22, 0.14), transparent 62%),
+    #0d0c0c;
+}
+
+.dds-draft-manager-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dds-draft-manager-copy strong {
+  color: #f2ece9;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dds-draft-status {
+  color: rgba(255, 255, 255, 0.43);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.dds-draft-status[data-state="saving"] {
+  color: #d7a9ad;
+}
+
+.dds-draft-status[data-state="saved"] {
+  color: #c9d6c1;
+}
+
+.dds-draft-status[data-state="error"] {
+  color: #ff7c86;
+}
+
+.dds-draft-manager-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dds-draft-save-button,
+.dds-draft-delete-button {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dds-draft-save-button {
+  color: #fff;
+  background: linear-gradient(135deg, var(--dds-red), #5a070e);
+}
+
+.dds-draft-delete-button {
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.dds-draft-save-button:hover,
+.dds-draft-delete-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(193, 23, 36, 0.58);
+}
+
+.dds-bbcode-toolbar {
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px;
+  overflow: visible;
+}
+
+.dds-bbcode-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding-right: 6px;
+  margin-right: 1px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dds-bbcode-group:last-of-type {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.dds-bbcode-toolbar button,
+.dds-bbcode-color {
+  min-width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  color: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dds-bbcode-toolbar button:hover,
+.dds-bbcode-color:hover {
+  color: #fff;
+  border-color: var(--dds-red-bright);
+  background: rgba(143, 14, 22, 0.18);
+}
+
+.dds-bbcode-color {
+  position: relative;
+  gap: 5px;
+  padding-right: 5px;
+}
+
+.dds-bbcode-color span {
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+
+.dds-bbcode-color input {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dds-bbcode-toolbar-target {
+  display: none;
+}
+
+.dds-rich-editor + .dds-bbcode-toolbar,
+textarea + .dds-bbcode-toolbar {
+  margin-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .dds-draft-manager {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dds-draft-manager-actions {
+    width: 100%;
+  }
+
+  .dds-draft-save-button,
+  .dds-draft-delete-button {
+    flex: 1 1 0;
+  }
+
+  .dds-bbcode-group {
+    padding-right: 0;
+    margin-right: 0;
+    border-right: 0;
+  }
+}
