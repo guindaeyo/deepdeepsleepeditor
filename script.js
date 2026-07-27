@@ -4329,6 +4329,7 @@ ${stylesheetLinks}
       "editor-code007": "updateLoveSong",
       "editor-code008": "updateDumbDumber",
       "editor-code009": "updateHigherHeaven",
+      "editor-code010": "updateLongWayLongRide",
       "editor-profile001": "updatePolaroidLove",
       "editor-profile002": "updateMoodboard",
       "editor-profile003": "updateFortyOne",
@@ -6445,6 +6446,437 @@ ${stylesheetLinks}
           savePanel(panel, false);
         }
       });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
+})();
+
+/* ============================================================
+   CODE010 — LONG WAY LONG RIDE
+============================================================ */
+(() => {
+  if (window.__DDS_LONG_WAY_LONG_RIDE_INSTALLED__) {
+    return;
+  }
+
+  window.__DDS_LONG_WAY_LONG_RIDE_INSTALLED__ = true;
+
+  const stylesheetUrls = [
+    "https://guindaeyo.github.io/deepdshop/ddsh-lwlrz.css",
+    "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500&family=Italianno&display=swap"
+  ];
+
+  const officialValues = {
+    bg: "#fcfafa",
+    nameColor: "#c9c9c9",
+    textColor: "#b5b5b5",
+    textDarkColor: "#a9a9a9",
+    lineColor: "#d2d2d2",
+    highlightColor: "#c1c1c1",
+    dateText: "cranky vampire",
+    displayName: "Franklin",
+    subtitle: "D. Bloodworth",
+    sideWords: ["it's", "like", "a", "polaroid", "love"],
+    image: "https://pbs.twimg.com/media/HOKMus1XAAAy_6U?format=jpg&name=large",
+    imageX: 50,
+    imageY: 50,
+    imageZoom: 1,
+    noFilter: false,
+    grayscale: 1,
+    contrast: 0.9,
+    brightness: 1.05,
+    quoteSmall: "la luna refleja",
+    quoteBefore: "nuestro",
+    quoteEm: "amor",
+    quoteAfter: " (｡› ᵕ ‹｡)",
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    note: "เจ้าที่แรง - บลูเบอร์รี่ อาร์สยาม"
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function escapeCssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]+/g, "");
+  }
+
+  function formatNumber(value, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) {
+      return String(fallback);
+    }
+    return number.toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
+  }
+
+  function getEditableText(element) {
+    if (!element) {
+      return "";
+    }
+    return String(element.innerText || element.textContent || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n");
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = escapeHtml(value);
+
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%;height:auto;">')
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_match, size, content) => {
+        const sizes = { small: "0.82em", medium: "1em", large: "1.28em" };
+        return `<span style="font-size:${sizes[size]}">${content}</span>`;
+      })
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[(quote|code|hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span class="dds-bbcode-$1">$2</span>')
+      .replace(/\[list(?:=1)?\]/gi, "<div>")
+      .replace(/\[\/list\]/gi, "</div>")
+      .replace(/\[\*\]/g, "<br>• ")
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\n/g, "<br>");
+
+    return text;
+  }
+
+  function buildFilter(values) {
+    if (values.noFilter) {
+      return "none";
+    }
+
+    return `grayscale(${formatNumber(values.grayscale, 1)}) contrast(${formatNumber(values.contrast, 0.9)}) brightness(${formatNumber(values.brightness, 1.05)})`;
+  }
+
+  function buildMarkup(values, previewMode) {
+    const roleplayContent = previewMode
+      ? bbcodeToPreviewHtml(values.roleplay)
+      : escapeHtml(values.roleplay);
+    const noteContent = previewMode
+      ? bbcodeToPreviewHtml(values.note)
+      : escapeHtml(values.note);
+    const sideWords = values.sideWords
+      .map((word) => `<span>${escapeHtml(word)}</span>`)
+      .join("");
+
+    return `<div class="ddsh-lwlrz-wrap" style="--ddsh-lwlrz-bg:${escapeHtml(values.bg)};--ddsh-lwlrz-name:${escapeHtml(values.nameColor)};--ddsh-lwlrz-text:${escapeHtml(values.textColor)};--ddsh-lwlrz-text-dark:${escapeHtml(values.textDarkColor)};--ddsh-lwlrz-line:${escapeHtml(values.lineColor)};--ddsh-lwlrz-highlight:${escapeHtml(values.highlightColor)};"><div class="ddsh-lwlrz-top"><span class="ddsh-lwlrz-top-block"></span><div class="ddsh-lwlrz-date">${escapeHtml(values.dateText)}</div><span class="ddsh-lwlrz-top-block"></span></div><div class="ddsh-lwlrz-top-line"></div><div class="ddsh-lwlrz-title-zone"><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-one">✧</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-two">＋</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-three">·</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-four">＋</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-five">✧</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-six">✧</span><span class="ddsh-lwlrz-spark ddsh-lwlrz-spark-seven">✧</span><div class="ddsh-lwlrz-title">${escapeHtml(values.displayName)}</div><div class="ddsh-lwlrz-subtitle">${escapeHtml(values.subtitle)} <span>✧</span></div></div><div class="ddsh-lwlrz-photo-area"><div class="ddsh-lwlrz-side-word">${sideWords}</div><div class="ddsh-lwlrz-photo-frame"><div class="ddsh-lwlrz-photo"><div class="ddsh-lwlrz-photo-image" style="--ddsh-lwlrz-image:url('${escapeCssUrl(values.image)}');--ddsh-lwlrz-image-x:${values.imageX}%;--ddsh-lwlrz-image-y:${values.imageY}%;--ddsh-lwlrz-image-zoom:${formatNumber(values.imageZoom, 1)};--ddsh-lwlrz-image-filter:${buildFilter(values)};"></div></div><span class="ddsh-lwlrz-photo-block ddsh-lwlrz-photo-block-one"></span><span class="ddsh-lwlrz-photo-block ddsh-lwlrz-photo-block-two"></span></div><div class="ddsh-lwlrz-photo-quote"><span>${escapeHtml(values.quoteSmall)}</span><strong>${escapeHtml(values.quoteBefore)}<em>${escapeHtml(values.quoteEm)}</em>${escapeHtml(values.quoteAfter)}</strong></div></div><div class="ddsh-lwlrz-under-photo"><span>✧</span><span>＋</span><span>·</span><span>＋</span><span>·</span><span>✧</span></div><div class="ddsh-lwlrz-content">${roleplayContent}</div><div class="ddsh-lwlrz-section-label"><strong>หมายเหตุ :</strong>${noteContent}</div></div><div class="fdreview-credit"><span></span></div>`;
+  }
+
+  function buildCopyCode(values) {
+    return `<link href="https://guindaeyo.github.io/deepdshop/ddsh-lwlrz.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500&family=Italianno&display=swap" rel="stylesheet">${buildMarkup(values, false)}`;
+  }
+
+  function buildPreviewDocument(markup) {
+    const links = stylesheetUrls
+      .map((url) => `<link href="${url}" rel="stylesheet">`)
+      .join("");
+
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}<style>html,body{margin:0;min-height:100%;background:#242424}body{padding:18px;overflow:hidden}.dds-lwl-preview-shell{width:100%;display:flex;align-items:flex-start;justify-content:center}.dds-preview-target{flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-lwl-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+  }
+
+  function measureAndResize(iframe, isCard) {
+    const doc = iframe?.contentDocument;
+    const target = doc?.querySelector(".dds-preview-target");
+    const root = doc?.querySelector(".ddsh-lwlrz-wrap") || target;
+    const shell = doc?.querySelector(".dds-lwl-preview-shell");
+
+    if (!iframe || !target || !root || !shell) {
+      return;
+    }
+
+    target.style.transform = "none";
+    shell.style.height = "auto";
+
+    const rootRect = root.getBoundingClientRect();
+    const naturalWidth = Math.max(rootRect.width, root.scrollWidth, root.offsetWidth, 1);
+    const naturalHeight = Math.max(rootRect.height, root.scrollHeight, root.offsetHeight, 1);
+    const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
+    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 28);
+    let scale = Math.min(1, availableWidth / naturalWidth);
+
+    if (isCard) {
+      const availableHeight = Math.max(1, (stage?.clientHeight || 300) - 28);
+      scale = Math.min(scale, availableHeight / naturalHeight);
+    }
+
+    const scaledHeight = Math.ceil(naturalHeight * scale);
+    target.style.transform = `scale(${Math.max(0.01, scale)})`;
+    shell.style.height = `${scaledHeight}px`;
+
+    if (!isCard) {
+      iframe.style.height = `${Math.max(720, scaledHeight + 40)}px`;
+    }
+  }
+
+  function scheduleResize(iframe, isCard) {
+    const run = () => measureAndResize(iframe, isCard);
+    requestAnimationFrame(() => requestAnimationFrame(run));
+    [80, 220, 500, 1000, 1800].forEach((delay) => window.setTimeout(run, delay));
+  }
+
+  function renderPreview(iframe, markup, isCard) {
+    if (!iframe) {
+      return;
+    }
+
+    const srcdoc = buildPreviewDocument(markup);
+    const resize = () => scheduleResize(iframe, isCard);
+
+    if (typeof window.queuePreviewDocument === "function") {
+      window.queuePreviewDocument(iframe, srcdoc, resize);
+      return;
+    }
+
+    iframe.addEventListener("load", resize, { once: true });
+    iframe.srcdoc = srcdoc;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    return Promise.resolve();
+  }
+
+  function initialize() {
+    const panel = document.querySelector('[data-panel="editor-code010"]');
+    const cardIframe = document.querySelector("#roleplayCardPreview010");
+    const editorIframe = document.querySelector("#longWayLongRidePreview");
+    const generatedCode = document.querySelector("#generatedLongWayLongRideCode");
+    const copyButton = document.querySelector("#copyGeneratedLongWayLongRideCode");
+    const editButton = document.querySelector('[data-edit-code="code010"]');
+
+    if (!panel || !cardIframe || !editorIframe || !generatedCode) {
+      return;
+    }
+
+    const ids = {
+      bg: "lwlBgColor",
+      nameColor: "lwlNameColor",
+      textColor: "lwlTextColor",
+      textDarkColor: "lwlTextDarkColor",
+      lineColor: "lwlLineColor",
+      highlightColor: "lwlHighlightColor",
+      dateText: "lwlDateText",
+      displayName: "lwlDisplayName",
+      subtitle: "lwlSubtitle",
+      image: "lwlImage",
+      imageX: "lwlImageX",
+      imageY: "lwlImageY",
+      imageZoom: "lwlImageZoom",
+      noFilter: "lwlNoFilter",
+      grayscale: "lwlGrayscale",
+      contrast: "lwlContrast",
+      brightness: "lwlBrightness",
+      quoteSmall: "lwlPhotoQuoteSmall",
+      quoteBefore: "lwlPhotoQuoteBefore",
+      quoteEm: "lwlPhotoQuoteEm",
+      quoteAfter: "lwlPhotoQuoteAfter",
+      note: "lwlNote"
+    };
+
+    function value(id, fallback = "") {
+      const element = document.getElementById(id);
+      return element ? element.value : fallback;
+    }
+
+    function readValues() {
+      return {
+        bg: value(ids.bg, officialValues.bg),
+        nameColor: value(ids.nameColor, officialValues.nameColor),
+        textColor: value(ids.textColor, officialValues.textColor),
+        textDarkColor: value(ids.textDarkColor, officialValues.textDarkColor),
+        lineColor: value(ids.lineColor, officialValues.lineColor),
+        highlightColor: value(ids.highlightColor, officialValues.highlightColor),
+        dateText: value(ids.dateText),
+        displayName: value(ids.displayName),
+        subtitle: value(ids.subtitle),
+        sideWords: [
+          value("lwlSideWordOne"),
+          value("lwlSideWordTwo"),
+          value("lwlSideWordThree"),
+          value("lwlSideWordFour"),
+          value("lwlSideWordFive")
+        ],
+        image: value(ids.image),
+        imageX: Number(value(ids.imageX, 50)),
+        imageY: Number(value(ids.imageY, 50)),
+        imageZoom: Number(value(ids.imageZoom, 100)) / 100,
+        noFilter: Boolean(document.getElementById(ids.noFilter)?.checked),
+        grayscale: Number(value(ids.grayscale, 1)),
+        contrast: Number(value(ids.contrast, 0.9)),
+        brightness: Number(value(ids.brightness, 1.05)),
+        quoteSmall: value(ids.quoteSmall),
+        quoteBefore: value(ids.quoteBefore),
+        quoteEm: value(ids.quoteEm),
+        quoteAfter: value(ids.quoteAfter),
+        roleplay: getEditableText(document.getElementById("lwlRoleplayEditor")),
+        note: value(ids.note)
+      };
+    }
+
+    function syncOutputs() {
+      const pairs = [
+        ["lwlImageX", "lwlImageX", "%"],
+        ["lwlImageY", "lwlImageY", "%"],
+        ["lwlImageZoom", "lwlImageZoom", "%"]
+      ];
+
+      pairs.forEach(([inputId, outputKey, suffix]) => {
+        const input = document.getElementById(inputId);
+        const output = document.querySelector(`[data-position-output="${outputKey}"]`);
+        if (input && output) {
+          output.textContent = `${input.value}${suffix}`;
+        }
+      });
+
+      ["Grayscale", "Contrast", "Brightness"].forEach((name) => {
+        const input = document.getElementById(`lwl${name}`);
+        const output = document.getElementById(`lwl${name}Output`);
+        if (input && output) {
+          output.textContent = formatNumber(input.value, input.value);
+        }
+      });
+
+      const noFilter = document.getElementById("lwlNoFilter")?.checked;
+      const filterControls = document.getElementById("lwlFilterControls");
+      filterControls?.classList.toggle("is-disabled", Boolean(noFilter));
+      filterControls?.querySelectorAll("input").forEach((input) => {
+        input.disabled = Boolean(noFilter);
+      });
+    }
+
+    function updateLongWayLongRide() {
+      syncOutputs();
+      const values = readValues();
+      generatedCode.value = buildCopyCode(values);
+      renderPreview(editorIframe, buildMarkup(values, true), false);
+    }
+
+    window.updateLongWayLongRide = updateLongWayLongRide;
+
+    const colorPairs = [
+      ["lwlBgColorPicker", "lwlBgColor"],
+      ["lwlNameColorPicker", "lwlNameColor"],
+      ["lwlTextColorPicker", "lwlTextColor"],
+      ["lwlTextDarkColorPicker", "lwlTextDarkColor"],
+      ["lwlLineColorPicker", "lwlLineColor"],
+      ["lwlHighlightColorPicker", "lwlHighlightColor"]
+    ];
+
+    colorPairs.forEach(([pickerId, textId]) => {
+      const picker = document.getElementById(pickerId);
+      const textInput = document.getElementById(textId);
+
+      picker?.addEventListener("input", () => {
+        if (textInput) {
+          textInput.value = picker.value;
+          textInput.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      });
+
+      textInput?.addEventListener("input", () => {
+        if (picker && /^#[0-9a-f]{6}$/i.test(textInput.value.trim())) {
+          picker.value = textInput.value.trim();
+        }
+      });
+    });
+
+    panel.addEventListener("input", updateLongWayLongRide);
+    panel.addEventListener("change", updateLongWayLongRide);
+
+    copyButton?.addEventListener("click", () => {
+      updateLongWayLongRide();
+      copyText(generatedCode.value)
+        .then(() => {
+          if (typeof window.showToast === "function") {
+            window.showToast("คัดลอกโค้ด CODE010 แล้ว");
+          }
+        })
+        .catch(() => {
+          if (typeof window.showToast === "function") {
+            window.showToast("คัดลอกโค้ดไม่สำเร็จ");
+          }
+        });
+    });
+
+    function openCode010Editor() {
+      document.body.classList.add("dds-editor-mode");
+      document.querySelectorAll("[data-panel]").forEach((candidate) => {
+        candidate.classList.toggle("is-active", candidate === panel);
+      });
+      document.querySelectorAll("[data-page]").forEach((button) => {
+        const active = button.dataset.page === "roleplay";
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-current", active ? "page" : "false");
+      });
+      const pageNumber = document.querySelector("#currentPageNumber");
+      if (pageNumber) {
+        pageNumber.textContent = "01";
+      }
+      document.title = "― www. deep deep sleep code shop .com ―";
+      history.replaceState(null, "", "#editor-code010");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(updateLongWayLongRide);
+    }
+
+    editButton?.addEventListener("click", openCode010Editor);
+
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#editor-code010") {
+        openCode010Editor();
+      }
+    });
+
+    if (window.location.hash === "#editor-code010") {
+      queueMicrotask(openCode010Editor);
+    }
+
+    panel.querySelector(".dds-back-button")?.addEventListener("click", () => {
+      requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+    });
+
+    document.querySelectorAll('[data-page="roleplay"], [data-go="roleplay"]').forEach((button) => {
+      button.addEventListener("click", () => {
+        requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+      });
+    });
+
+    renderPreview(cardIframe, buildMarkup(officialValues, true), true);
+    updateLongWayLongRide();
+
+    window.addEventListener("resize", () => {
+      scheduleResize(cardIframe, true);
+      if (panel.classList.contains("is-active")) {
+        scheduleResize(editorIframe, false);
+      }
     });
   }
 

@@ -6051,3 +6051,80 @@ textarea + .dds-bbcode-toolbar {
     text-align: right;
   }
 }
+
+/* CODE010 — LONG WAY LONG RIDE */
+.dds-filter-off-toggle {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 16px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.dds-filter-off-toggle input {
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: var(--dds-red-bright);
+  flex: 0 0 17px;
+}
+
+.dds-filter-off-toggle code {
+  color: var(--dds-red-bright);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+}
+
+.dds-filter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.02);
+  transition: opacity 0.2s ease;
+}
+
+.dds-filter-controls.is-disabled {
+  opacity: 0.38;
+}
+
+.dds-filter-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 10px;
+}
+
+.dds-filter-row input[type="range"] {
+  min-width: 0;
+  width: 100%;
+  accent-color: var(--dds-red-bright);
+}
+
+.dds-filter-row output {
+  min-width: 54px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .dds-filter-row {
+    grid-template-columns: 72px minmax(0, 1fr) 48px;
+    gap: 8px;
+  }
+}
