@@ -5564,7 +5564,8 @@ ${stylesheetLinks}
 
   function shouldKeepBaselineValue(field) {
     return Boolean(
-      isColorValueField(field) ||
+      field.dataset.ddsKeepBaseline === "true" ||
+        isColorValueField(field) ||
         ["range", "checkbox", "radio"].includes(field.type) ||
         field.tagName === "SELECT"
     );
@@ -6764,12 +6765,18 @@ ${stylesheetLinks}
     const sideWordsData = document.getElementById("lwlSideWordsData");
     const sideWordsList = document.getElementById("lwlSideWordsList");
     const addSideWordButton = document.getElementById("lwlAddSideWord");
+    const resetFilterButton = document.getElementById("lwlResetFilter");
     let renderedSideWordsSource = null;
 
     function normalizeSideWords(words) {
-      return Array.isArray(words)
-        ? words.map((word) => String(word ?? ""))
-        : [];
+      if (!Array.isArray(words)) {
+        return [];
+      }
+
+      return words.map((word) => {
+        const text = String(word ?? "");
+        return /^#[0-9a-f]{3,8}$/i.test(text.trim()) ? "" : text;
+      });
     }
 
     function parseSideWords(source) {
@@ -6830,6 +6837,7 @@ ${stylesheetLinks}
             type="text"
             value="${escapeHtml(word)}"
             data-lwl-side-word-input
+            data-dds-no-save
             aria-label="คำด้านข้างรูปที่ ${index + 1}"
           >
         </label>
@@ -6969,7 +6977,7 @@ ${stylesheetLinks}
         return;
       }
 
-      syncSideWordsFromRows(false);
+      syncSideWordsFromRows(true);
     });
 
     sideWordsList?.addEventListener("click", (event) => {
@@ -7006,6 +7014,28 @@ ${stylesheetLinks}
       syncSideWordsFromRows(true);
       updateLongWayLongRide();
       row.querySelector("[data-lwl-side-word-input]")?.focus();
+    });
+
+    resetFilterButton?.addEventListener("click", () => {
+      const noFilter = document.getElementById("lwlNoFilter");
+      const grayscale = document.getElementById("lwlGrayscale");
+      const contrast = document.getElementById("lwlContrast");
+      const brightness = document.getElementById("lwlBrightness");
+
+      if (noFilter) noFilter.checked = false;
+      if (grayscale) grayscale.value = String(officialValues.grayscale);
+      if (contrast) contrast.value = String(officialValues.contrast);
+      if (brightness) brightness.value = String(officialValues.brightness);
+
+      syncOutputs();
+      updateLongWayLongRide();
+
+      // One bubbled input event is enough to trigger the shared draft autosave.
+      grayscale?.dispatchEvent(new Event("input", { bubbles: true }));
+
+      if (typeof window.showToast === "function") {
+        window.showToast("คืนค่าฟิลเตอร์เริ่มต้นแล้ว");
+      }
     });
 
     panel.addEventListener("input", updateLongWayLongRide);

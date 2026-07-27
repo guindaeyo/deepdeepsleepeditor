@@ -6200,3 +6200,24 @@ textarea + .dds-bbcode-toolbar {
     height: 42px;
   }
 }
+
+
+.dds-filter-reset-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dds-filter-reset-button:hover {
+  border-color: var(--dds-red-bright);
+  background: rgba(143, 14, 22, 0.16);
+  color: #ffffff;
+}
