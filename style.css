@@ -6221,3 +6221,100 @@ textarea + .dds-bbcode-toolbar {
   background: rgba(143, 14, 22, 0.16);
   color: #ffffff;
 }
+
+
+/* ==================================================
+   EDITOR TOOLS COLUMN — DRAFT OUTSIDE SCROLL
+   ================================================== */
+.dds-editor-tools-column {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dds-editor-tools-column > .dds-draft-manager {
+  flex: 0 0 auto;
+}
+
+@media (min-width: 1101px) {
+  [data-panel^="editor-code"] .dds-editor-tools-column,
+  [data-panel^="editor-profile"] .dds-editor-tools-column,
+  [data-panel^="editor-review"] .dds-editor-tools-column {
+    width: 100%;
+    min-width: 0;
+    max-width: 610px;
+    height: min(
+      var(--dds-editor-preview-height, calc(100vh - 40px)),
+      calc(100vh - 40px)
+    );
+    min-height: 0;
+    position: sticky;
+    top: 20px;
+    justify-self: end;
+    align-self: start;
+    overflow: hidden;
+  }
+
+  [data-panel^="editor-review"] .dds-editor-tools-column {
+    max-width: 600px;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-tools-column > .dds-editor-controls,
+  [data-panel^="editor-profile"] .dds-editor-tools-column > .dds-editor-controls,
+  [data-panel^="editor-review"] .dds-editor-tools-column > .dds-editor-controls {
+    width: 100%;
+    min-width: 0;
+    max-width: none !important;
+    min-height: 0;
+    height: auto;
+    max-height: none !important;
+    flex: 1 1 auto;
+    position: static !important;
+    top: auto !important;
+    justify-self: stretch;
+    align-self: stretch;
+    padding-right: 9px;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    scrollbar-color:
+      rgba(193, 23, 36, 0.68)
+      rgba(255, 255, 255, 0.045);
+  }
+
+  [data-panel^="editor-code"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar,
+  [data-panel^="editor-profile"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar,
+  [data-panel^="editor-review"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-track,
+  [data-panel^="editor-profile"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-track,
+  [data-panel^="editor-review"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  [data-panel^="editor-code"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-thumb,
+  [data-panel^="editor-profile"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-thumb,
+  [data-panel^="editor-review"] .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-thumb {
+    background: rgba(193, 23, 36, 0.65);
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .dds-editor-tools-column {
+    max-width: none;
+    height: auto;
+    position: static;
+    overflow: visible;
+  }
+
+  .dds-editor-tools-column > .dds-editor-controls {
+    max-height: none !important;
+    padding-right: 0 !important;
+    overflow: visible !important;
+  }
+}

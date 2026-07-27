@@ -3102,17 +3102,23 @@ ${stylesheetLinks}
     const canvasWidth = 1040;
     const rootSelector = '.profco01ddps-stage';
 
-    const showcaseMarkup = String.raw`<section class="profco01ddps-stage"><div class="profco01ddps-board"><aside class="profco01ddps-left"><img src="https://iili.io/CTb913J.png" class="profco01ddps-main-img" alt="Franklin Dominic Bloodworth"></aside><main class="profco01ddps-right"><nav class="profco01ddps-nav"><span class="profco01ddps-navitem">access</span><span class="profco01ddps-navitem">updates</span><span class="profco01ddps-navitem">indications</span><span class="profco01ddps-navitem">recreation</span><span class="profco01ddps-lock">●<small>view</small></span></nav><section class="profco01ddps-card profco01ddps-post"><div class="profco01ddpspost-head"><div class="profco01ddpsprofile"><img src="https://i.pinimg.com/736x/0e/70/0a/0e700a9be59ba8e21e6cd54cb2803e16.jpg" alt="deadbutrich"><span>deadbutrich</span></div><span class="profco01ddpsdots">⋮</span><b>interactive</b></div><p><b>Character name :</b> Franklin Dominic Bloodworth (แฟรงคลิน โดมินิก บลัดเวิร์ธ)
+    const showcaseMarkup = String.raw`<section class="profco01ddps-stage"><div class="profco01ddps-board"><aside class="profco01ddps-left"><img src="https://iili.io/CTb913J.png" class="profco01ddps-main-img"></aside><main class="profco01ddps-right"><nav class="profco01ddps-nav"><span class="profco01ddps-navitem">access</span><span class="profco01ddps-navitem">updates</span><span class="profco01ddps-navitem">indications</span><span class="profco01ddps-navitem">recreation</span><span class="profco01ddps-lock">●<small>view</small></span></nav><section class="profco01ddps-card profco01ddps-post"><div class="profco01ddpspost-head"><div class="profco01ddpsprofile"><img src="https://i.pinimg.com/736x/0e/70/0a/0e700a9be59ba8e21e6cd54cb2803e16.jpg"><span>deadbutrich</span></div><span class="profco01ddpsdots">⋮</span><b>interactive</b></div><p>
+<b>Character name :</b> Franklin Dominic Bloodworth (แฟรงคลิน โดมินิก บลัดเวิร์ธ)
 <b>Date of Birth :</b> 7 May 1995
 <b>Age :</b> 31 ปี (ร่างกายอายุ 25 ปี)
 <b>Race :</b> แวมไพร์
-<b>Personality :</b> แฟรงคลินเป็นชายหนุ่มรูปร่างสูงสง่า หน้าตาดี ทว่ากลับมีแววตาคม และท่าทีที่มักนิ่งเฉย ทำให้ผู้คนรอบตัวรู้สึกว่าเขาเป็นคนหยิ่งยโส ไม่ชอบเข้าหาใครก่อน เขาเป็นคนหัวขบถ มีความเชื่อมั่นในตัวเองสูงจนบางครั้งอาจถูกมองว่าหยิ่งหรือเข้าถึงยาก แต่หากได้รู้จักตัวตนของเขาจริง ๆ จะพบว่าเขามีมุมที่อ่อนโยน และจริงใจอยู่มากกว่าที่ใครหลายคนคิด หรือเปล่า?</p><div class="profco01ddpspost-actions"><button type="button">post</button><span>♡</span></div><div class="profco01ddpspost-tabs"><a href="https://roleplayth.com/member.php?action=profile&amp;uid=600" target="_blank" rel="noopener noreferrer">PROFILE</a><a href="https://discord.com/users/759838371001401364" target="_blank" rel="noopener noreferrer">DISCORD</a><a href="https://roleplayth.com/showthread.php?tid=4932" target="_blank" rel="noopener noreferrer">CODE SHOPS</a></div></section><section class="profco01ddps-card profco01ddps-info"><div class="profco01ddpsabout"><h2>ABOUT ME <span>Biography</span></h2><p>แฟรงคลินเกิดมาในตระกูลแชโบลที่มั่งคั่งของเกาหลี เติบโตท่ามกลางความสะดวกสบาย และการตามใจจากครอบครัว ทำให้เขาเป็นคนค่อนข้างเอาแต่ใจเล็กน้อย เขาย้ายไปศึกษาต่อที่สหรัฐอเมริกา และใช้ชีวิตอยู่ในสังคมชนชั้นสูง ซึ่งทำให้เขาได้พบและมีความสัมพันธ์กับชายหนุ่มคนรักในวงสังคมเดียวกัน
+<b>Personality :</b> แฟรงคลินเป็นชายหนุ่มรูปร่างสูงสง่า หน้าตาดี ทว่ากลับมีแววตาคม และท่าทีที่มักนิ่งเฉย ทำให้ผู้คนรอบตัวรู้สึกว่าเขาเป็นคนหยิ่งยโส ไม่ชอบเข้าหาใครก่อน เขาเป็นคนหัวขบถ มีความเชื่อมั่นในตัวเองสูงจนบางครั้งอาจถูกมองว่าหยิ่งหรือเข้าถึงยาก แต่หากได้รู้จักตัวตนของเขาจริง ๆ จะพบว่าเขามีมุมที่อ่อนโยน และจริงใจอยู่มากกว่าที่ใครหลายคนคิด หรือเปล่า?</p>
+<div class="profco01ddpspost-actions"><button>post</button><span>♡</span></div><div class="profco01ddpspost-tabs"><a href="https://roleplayth.com/member.php?action=profile&uid=600" target="_blank" rel="noopener noreferrer">PROFILE</a><a href="https://discord.com/users/759838371001401364" target="_blank" rel="noopener noreferrer">DISCORD</a><a href="https://roleplayth.com/showthread.php?tid=4932" target="_blank" rel="noopener noreferrer">CODE SHOPS</a>
+</div></section><section class="profco01ddps-card profco01ddps-info"><div class="profco01ddpsabout"><h2>ABOUT ME <span>Biography</span></h2><p>
+แฟรงคลินเกิดมาในตระกูลแชโบลที่มั่งคั่งของเกาหลี เติบโตท่ามกลางความสะดวกสบาย และการตามใจจากครอบครัว ทำให้เขาเป็นคนค่อนข้างเอาแต่ใจเล็กน้อย เขาย้ายไปศึกษาต่อที่สหรัฐอเมริกา และใช้ชีวิตอยู่ในสังคมชนชั้นสูง แต่เขากลับพบรักกับเพื่อนร่วมชั้นสมัยมัธยมปลายที่เกาหลีและพยายามฝ่าฟันอุปสรรคความรักจนได้อาศัยอยู่ด้วยกัน
 
 โชคชะตาของแฟรงคลินเปลี่ยนไปตลอดกาลเมื่อเขาย้ายเข้าไปอยู่ในแมนชั่นหรูแห่งหนึ่ง โดยไม่เคยรู้มาก่อนว่าชายหนุ่มข้างห้องที่สนิทกันคือแวมไพร์ คืนนั้นแฟรงคลินได้ยินเสียงทะเลาะกันอย่างรุนแรงดังมาจากห้องข้าง ๆ จนพื้นสั่นสะเทือน ความหงุดหงิด และรำคาญทำให้เขาตัดสินใจจะเข้าไปห้ามปราม แต่กลับต้องเผชิญกับการโจมตีอย่างไม่ตั้งใจจากสิ่งที่เรียกกันว่านักล่าแวมไพร์
 
 เพื่อนข้างห้องที่เป็นแวมไพร์ รู้สึกผิดอย่างยิ่งที่แฟรงคลินต้องพลอยเดือดร้อน จึงตัดสินใจเปลี่ยนแฟรงคลินให้กลายเป็นแวมไพร์เพื่อรักษาชีวิต และแนะนำให้เขาย้ายไปอาศัยอยู่ที่หมู่บ้านเอลิเชียน ซึ่งเป็นหมู่บ้านที่รวมตัวของสิ่งมีชีวิตเหนือธรรมชาติเพื่อปรับตัวเข้ากับชีวิตอมตะที่ไม่อาจหวนกลับไปเป็นเหมือนเดิมได้อีก และต้องจากคนรักของตนไปตลอดกาล เพราะไม่อยากให้อีกฝ่ายทนอยู่กับตนเองที่ไม่มีวันกลับไปเป็นเช่นเดิมได้อีก
 
-แฟรงคลินตัดสินใจแยกทางกับคนรัก และมายังที่หมู่บ้านเอลิเชียนตามคำแนะนำของทวดที่เจอกันแบบงง ๆ แม้ยังมีความเย่อหยิ่ง ไม่ยอมให้ใครเข้าถึงตัวง่าย ๆ แต่แฟรงคลินก็กำลังเรียนรู้ที่จะใช้ชีวิตใหม่ในฐานะแวมไพร์ ทั้งในด้านพลังพิเศษ ความหิวกระหายอยู่เสมอ</p></div><div class="profco01ddpsgallery"><img src="https://i.pinimg.com/736x/42/ec/16/42ec16a5abf7c4b6522bba528c186f47.jpg" alt="Franklin gallery 1"><img src="https://i.pinimg.com/736x/6b/1a/ba/6b1abaa182ebd3e1d1f014dda7ee18d1.jpg" alt="Franklin gallery 2"></div></section><section class="profco01ddps-bottom lua-music"><div class="profco01ddpsmusic-cover"><img src="https://www.allkpop.com/upload/2025/11/content/091933/1762734818-132734965.jpg" alt="Coma by YEONJUN"></div><div class="profco01ddpsmusic-info"><div class="profco01ddpsmusic-top"><div><h3>Coma</h3><p>YEONJUN</p></div><a class="profco01ddpsmusic-play" href="https://www.youtube.com/watch?v=NgOO0NWe-o8" target="_blank" rel="noopener noreferrer">▶</a></div><div class="profco01ddpsmusic-line"><span>0:42</span><div class="profco01ddpsmusic-progress" style="--progress: 38%;">&nbsp;<div></div></div><span>2:34</span></div></div></section></main></div></section>`;
+แฟรงคลินตัดสินใจแยกทางกับคนรัก และมายังที่หมู่บ้านเอลิเชียนตามคำแนะนำของทวดที่เจอกันแบบงง ๆ แม้ยังมีความเย่อหยิ่ง ไม่ยอมให้ใครเข้าถึงตัวง่าย ๆ แต่แฟรงคลินก็กำลังเรียนรู้ที่จะใช้ชีวิตใหม่ในฐานะแวมไพร์ ทั้งในด้านพลังพิเศษ ความหิวกระหายอยู่เสมอ</p></div>
+<div class="profco01ddpsgallery"><img src="https://i.pinimg.com/736x/42/ec/16/42ec16a5abf7c4b6522bba528c186f47.jpg"><img src="https://i.pinimg.com/736x/6b/1a/ba/6b1abaa182ebd3e1d1f014dda7ee18d1.jpg"></div></section><section class="profco01ddps-bottom lua-music"><div class="profco01ddpsmusic-cover"><img src="https://www.allkpop.com/upload/2025/11/content/091933/1762734818-132734965.jpg"></div><div class="profco01ddpsmusic-info"><div class="profco01ddpsmusic-top"><div><h3>Coma</h3><p>YEONJUN</p></div><a class="profco01ddpsmusic-play" href="https://www.youtube.com/watch?v=NgOO0NWe-o8" target="_blank" rel="noopener noreferrer">▶</a></div><div class="profco01ddpsmusic-line"><span>0:42</span>
+<div class="profco01ddpsmusic-progress" style="--progress: 38%;">  <div></div></div><span>2:34</span></div></div></section></main></div></section>`;
 
     const previewOnlyCss = `
       <style data-my-own-code-history-preview-only>
@@ -5450,7 +5456,10 @@ ${stylesheetLinks}
         initialized: false,
         restoring: false,
         saveTimer: null,
-        statusElement: null
+        statusElement: null,
+        toolsColumn: null,
+        toolsResizeObserver: null,
+        toolsResizeHandler: null
       };
       panelStates.set(panel, state);
     }
@@ -5666,6 +5675,67 @@ ${stylesheetLinks}
     notify("ล้างข้อมูลในหน้าแก้ไขแล้ว");
   }
 
+  function installEditorToolsColumn(panel, controls) {
+    const layout = controls?.closest?.(".dds-editor-layout");
+
+    if (!layout) {
+      return controls;
+    }
+
+    const state = getPanelState(panel);
+    let toolsColumn = Array.from(layout.children).find((child) =>
+      child.classList?.contains("dds-editor-tools-column")
+    );
+
+    if (!toolsColumn) {
+      toolsColumn = document.createElement("div");
+      toolsColumn.className = "dds-editor-tools-column";
+      layout.insertBefore(toolsColumn, controls);
+      toolsColumn.appendChild(controls);
+    } else if (controls.parentElement !== toolsColumn) {
+      toolsColumn.appendChild(controls);
+    }
+
+    state.toolsColumn = toolsColumn;
+
+    const previewColumn = layout.querySelector(".dds-editor-preview-column");
+
+    const syncColumnHeight = () => {
+      if (!previewColumn || !toolsColumn.isConnected) {
+        return;
+      }
+
+      const previewHeight = Math.ceil(
+        previewColumn.getBoundingClientRect().height
+      );
+
+      if (previewHeight > 0) {
+        toolsColumn.style.setProperty(
+          "--dds-editor-preview-height",
+          `${previewHeight}px`
+        );
+      }
+    };
+
+    if (previewColumn && !state.toolsResizeObserver && "ResizeObserver" in window) {
+      state.toolsResizeObserver = new ResizeObserver(syncColumnHeight);
+      state.toolsResizeObserver.observe(previewColumn);
+    }
+
+    if (!state.toolsResizeHandler) {
+      state.toolsResizeHandler = syncColumnHeight;
+      window.addEventListener("resize", state.toolsResizeHandler, {
+        passive: true
+      });
+    }
+
+    requestAnimationFrame(syncColumnHeight);
+    window.setTimeout(syncColumnHeight, 250);
+    window.setTimeout(syncColumnHeight, 1000);
+
+    return toolsColumn;
+  }
+
   function installDraftManager(panel) {
     if (!isEditorPanel(panel) || panel.dataset.ddsDraftManager === "true") {
       return;
@@ -5676,11 +5746,12 @@ ${stylesheetLinks}
     const controls = panel.querySelector(".dds-editor-controls");
 
     if (controls) {
+      const toolsColumn = installEditorToolsColumn(panel, controls);
       const manager = document.createElement("section");
       manager.className = "dds-draft-manager";
       manager.innerHTML = `
         <div class="dds-draft-manager-copy">
-          <strong>บันทึกแบบร่างในเครื่องนี้</strong>
+          <strong>บันทึกแบบร่าง</strong>
           <span class="dds-draft-status" data-state="idle">บันทึกอัตโนมัติเมื่อมีการแก้ไข</span>
         </div>
         <div class="dds-draft-manager-actions">
@@ -5689,7 +5760,7 @@ ${stylesheetLinks}
         </div>
       `;
 
-      controls.insertBefore(manager, controls.firstChild);
+      toolsColumn.insertBefore(manager, controls);
       state.statusElement = manager.querySelector(".dds-draft-status");
 
       manager
