@@ -6128,3 +6128,75 @@ textarea + .dds-bbcode-toolbar {
     gap: 8px;
   }
 }
+
+/* CODE010 — dynamic side words */
+.dds-side-word-description {
+  margin: -6px 0 16px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.dds-side-word-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dds-side-word-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: end;
+  gap: 9px;
+}
+
+.dds-side-word-row .dds-field {
+  min-width: 0;
+}
+
+.dds-side-word-remove,
+.dds-side-word-add {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.68);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.dds-side-word-remove {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.dds-side-word-add {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+  color: #ffffff;
+  border-color: rgba(193, 23, 36, 0.32);
+  background: rgba(143, 14, 22, 0.1);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.dds-side-word-remove:hover,
+.dds-side-word-add:hover {
+  color: #ffffff;
+  border-color: var(--dds-red-bright);
+  background: rgba(143, 14, 22, 0.2);
+}
+
+@media (max-width: 520px) {
+  .dds-side-word-row {
+    grid-template-columns: minmax(0, 1fr) 38px;
+  }
+
+  .dds-side-word-remove {
+    width: 38px;
+    height: 42px;
+  }
+}

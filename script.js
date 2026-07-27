@@ -6632,20 +6632,74 @@ ${stylesheetLinks}
     [80, 220, 500, 1000, 1800].forEach((delay) => window.setTimeout(run, delay));
   }
 
+  const previewRenderStates = new WeakMap();
+
+  function revealLongWayPreview(iframe) {
+    iframe.classList.remove("dds-preview-loading");
+    iframe.classList.add("dds-preview-ready");
+
+    if (typeof window.revealPreview === "function") {
+      window.revealPreview(iframe);
+    }
+  }
+
   function renderPreview(iframe, markup, isCard) {
     if (!iframe) {
       return;
     }
 
     const srcdoc = buildPreviewDocument(markup);
-    const resize = () => scheduleResize(iframe, isCard);
+    const resize = () => {
+      scheduleResize(iframe, isCard);
+      revealLongWayPreview(iframe);
+    };
+    const state = previewRenderStates.get(iframe) || {
+      srcdoc: "",
+      loaded: false,
+      token: 0
+    };
 
-    if (typeof window.queuePreviewDocument === "function") {
-      window.queuePreviewDocument(iframe, srcdoc, resize);
-      return;
+    state.token += 1;
+    const token = state.token;
+    previewRenderStates.set(iframe, state);
+
+    if (
+      state.loaded &&
+      iframe.contentDocument?.readyState !== "loading" &&
+      typeof window.updateLoadedPreviewDocument === "function"
+    ) {
+      try {
+        const updated = window.updateLoadedPreviewDocument(
+          iframe,
+          srcdoc,
+          resize
+        );
+
+        if (updated) {
+          state.srcdoc = srcdoc;
+          revealLongWayPreview(iframe);
+          return;
+        }
+      } catch (error) {
+        console.warn("[DDS CODE010] preview patch failed; reloading srcdoc", error);
+      }
     }
 
-    iframe.addEventListener("load", resize, { once: true });
+    iframe.classList.add("dds-preview-loading");
+    iframe.classList.remove("dds-preview-ready");
+
+    const onLoad = () => {
+      const currentState = previewRenderStates.get(iframe);
+      if (!currentState || currentState.token !== token) {
+        return;
+      }
+
+      currentState.loaded = true;
+      currentState.srcdoc = srcdoc;
+      resize();
+    };
+
+    iframe.addEventListener("load", onLoad, { once: true });
     iframe.srcdoc = srcdoc;
   }
 
@@ -6707,6 +6761,110 @@ ${stylesheetLinks}
       return element ? element.value : fallback;
     }
 
+    const sideWordsData = document.getElementById("lwlSideWordsData");
+    const sideWordsList = document.getElementById("lwlSideWordsList");
+    const addSideWordButton = document.getElementById("lwlAddSideWord");
+    let renderedSideWordsSource = null;
+
+    function normalizeSideWords(words) {
+      return Array.isArray(words)
+        ? words.map((word) => String(word ?? ""))
+        : [];
+    }
+
+    function parseSideWords(source) {
+      const text = String(source ?? "").trim();
+      if (!text) {
+        return [];
+      }
+
+      try {
+        return normalizeSideWords(JSON.parse(text));
+      } catch (_error) {
+        return text
+          .split(/\r?\n/)
+          .map((word) => word.trim())
+          .filter((word) => word.length > 0);
+      }
+    }
+
+    function readSideWordsData() {
+      return parseSideWords(sideWordsData?.value || "");
+    }
+
+    function serializeSideWords(words) {
+      return JSON.stringify(normalizeSideWords(words));
+    }
+
+    function writeSideWordsData(words, dispatch = false) {
+      if (!sideWordsData) {
+        return;
+      }
+
+      const nextValue = serializeSideWords(words);
+      sideWordsData.value = nextValue;
+      renderedSideWordsSource = nextValue;
+
+      if (dispatch) {
+        sideWordsData.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    function getSideWordsFromRows() {
+      if (!sideWordsList) {
+        return readSideWordsData();
+      }
+
+      return Array.from(
+        sideWordsList.querySelectorAll("[data-lwl-side-word-input]")
+      ).map((input) => input.value);
+    }
+
+    function createSideWordRow(word, index) {
+      const row = document.createElement("div");
+      row.className = "dds-side-word-row";
+      row.innerHTML = `
+        <label class="dds-field">
+          <span>คำที่ ${index + 1}</span>
+          <input
+            type="text"
+            value="${escapeHtml(word)}"
+            data-lwl-side-word-input
+            aria-label="คำด้านข้างรูปที่ ${index + 1}"
+          >
+        </label>
+        <button
+          class="dds-side-word-remove"
+          type="button"
+          data-lwl-remove-side-word
+          aria-label="ลบคำที่ ${index + 1}"
+          title="ลบคำนี้"
+        >×</button>
+      `;
+      return row;
+    }
+
+    function renderSideWordRows(force = false) {
+      if (!sideWordsList || !sideWordsData) {
+        return;
+      }
+
+      const source = sideWordsData.value || "";
+      if (!force && renderedSideWordsSource === source) {
+        return;
+      }
+
+      const words = readSideWordsData();
+      sideWordsList.replaceChildren(
+        ...words.map((word, index) => createSideWordRow(word, index))
+      );
+      renderedSideWordsSource = source;
+    }
+
+    function syncSideWordsFromRows(dispatch = false) {
+      writeSideWordsData(getSideWordsFromRows(), dispatch);
+    }
+
     function readValues() {
       return {
         bg: value(ids.bg, officialValues.bg),
@@ -6718,13 +6876,7 @@ ${stylesheetLinks}
         dateText: value(ids.dateText),
         displayName: value(ids.displayName),
         subtitle: value(ids.subtitle),
-        sideWords: [
-          value("lwlSideWordOne"),
-          value("lwlSideWordTwo"),
-          value("lwlSideWordThree"),
-          value("lwlSideWordFour"),
-          value("lwlSideWordFive")
-        ],
+        sideWords: readSideWordsData(),
         image: value(ids.image),
         imageX: Number(value(ids.imageX, 50)),
         imageY: Number(value(ids.imageY, 50)),
@@ -6774,6 +6926,7 @@ ${stylesheetLinks}
     }
 
     function updateLongWayLongRide() {
+      renderSideWordRows();
       syncOutputs();
       const values = readValues();
       generatedCode.value = buildCopyCode(values);
@@ -6807,6 +6960,52 @@ ${stylesheetLinks}
           picker.value = textInput.value.trim();
         }
       });
+    });
+
+    renderSideWordRows(true);
+
+    sideWordsList?.addEventListener("input", (event) => {
+      if (!event.target.closest("[data-lwl-side-word-input]")) {
+        return;
+      }
+
+      syncSideWordsFromRows(false);
+    });
+
+    sideWordsList?.addEventListener("click", (event) => {
+      const removeButton = event.target.closest("[data-lwl-remove-side-word]");
+      if (!removeButton) {
+        return;
+      }
+
+      removeButton.closest(".dds-side-word-row")?.remove();
+      Array.from(sideWordsList.querySelectorAll(".dds-side-word-row")).forEach(
+        (row, index) => {
+          const label = row.querySelector(".dds-field > span");
+          const input = row.querySelector("[data-lwl-side-word-input]");
+          const button = row.querySelector("[data-lwl-remove-side-word]");
+          if (label) label.textContent = `คำที่ ${index + 1}`;
+          if (input) input.setAttribute("aria-label", `คำด้านข้างรูปที่ ${index + 1}`);
+          if (button) {
+            button.setAttribute("aria-label", `ลบคำที่ ${index + 1}`);
+          }
+        }
+      );
+      syncSideWordsFromRows(true);
+      updateLongWayLongRide();
+    });
+
+    addSideWordButton?.addEventListener("click", () => {
+      if (!sideWordsList) {
+        return;
+      }
+
+      const nextIndex = sideWordsList.querySelectorAll(".dds-side-word-row").length;
+      const row = createSideWordRow("", nextIndex);
+      sideWordsList.appendChild(row);
+      syncSideWordsFromRows(true);
+      updateLongWayLongRide();
+      row.querySelector("[data-lwl-side-word-input]")?.focus();
     });
 
     panel.addEventListener("input", updateLongWayLongRide);
@@ -6860,12 +7059,16 @@ ${stylesheetLinks}
     }
 
     panel.querySelector(".dds-back-button")?.addEventListener("click", () => {
-      requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+      requestAnimationFrame(() => {
+        renderPreview(cardIframe, buildMarkup(officialValues, true), true);
+      });
     });
 
     document.querySelectorAll('[data-page="roleplay"], [data-go="roleplay"]').forEach((button) => {
       button.addEventListener("click", () => {
-        requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+        requestAnimationFrame(() => {
+          renderPreview(cardIframe, buildMarkup(officialValues, true), true);
+        });
       });
     });
 

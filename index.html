@@ -20,7 +20,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css" rel="stylesheet"/>
+<link href="./style.css?v=20260727-code010-preview-fix-2" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -266,7 +266,7 @@
 </article>
 <article class="dds-roleplay-card">
 <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
-<iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-preview-fit="width" id="roleplayCardPreview010" loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE010"></iframe>
+<iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-preview-fit="width" id="roleplayCardPreview010" loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE010"></iframe>
 <span class="dds-roleplay-preview-badge">AVAILABLE</span>
 </div>
 <div class="dds-roleplay-card-body">
@@ -2873,13 +2873,10 @@ Just like that, just you and me. I wanna dive in deeper. Into your ocean, I like
 </section>
 <section class="dds-control-section">
 <div class="dds-control-title"><span>03</span><h2>คำด้านข้างรูป</h2></div>
-<div class="dds-form-grid">
-<label class="dds-field"><span>คำที่ 1</span><input id="lwlSideWordOne" type="text" value="it's"></label>
-<label class="dds-field"><span>คำที่ 2</span><input id="lwlSideWordTwo" type="text" value="like"></label>
-<label class="dds-field"><span>คำที่ 3</span><input id="lwlSideWordThree" type="text" value="a"></label>
-<label class="dds-field"><span>คำที่ 4</span><input id="lwlSideWordFour" type="text" value="polaroid"></label>
-<label class="dds-field dds-field-full"><span>คำที่ 5</span><input id="lwlSideWordFive" type="text" value="love"></label>
-</div>
+<p class="dds-side-word-description">เพิ่มหรือลดจำนวนคำได้ตามต้องการ โดยหนึ่งช่องจะแสดงเป็นหนึ่งบรรทัดข้างรูป</p>
+<input id="lwlSideWordsData" type="hidden" value="[&quot;it's&quot;,&quot;like&quot;,&quot;a&quot;,&quot;polaroid&quot;,&quot;love&quot;]">
+<div class="dds-side-word-list" id="lwlSideWordsList"></div>
+<button class="dds-side-word-add" id="lwlAddSideWord" type="button">＋ เพิ่มคำ</button>
 </section>
 <section class="dds-control-section">
 <div class="dds-control-title"><span>04</span><h2>รูปภาพและตำแหน่ง</h2></div>
@@ -2895,7 +2892,7 @@ Just like that, just you and me. I wanna dive in deeper. Into your ocean, I like
 </section>
 <section class="dds-control-section">
 <div class="dds-control-title"><span>05</span><h2>ฟิลเตอร์รูปภาพ</h2></div>
-<label class="dds-filter-off-toggle"><input id="lwlNoFilter" type="checkbox"><span>ไม่ใส่ฟิลเตอร์ — ใช้ <code>--ddsh-lwlrz-image-filter: none</code></span></label>
+<label class="dds-filter-off-toggle"><input id="lwlNoFilter" type="checkbox"><span>ไม่ใส่ฟิลเตอร์</span></label>
 <div class="dds-filter-controls" id="lwlFilterControls">
 <label class="dds-filter-row"><span>Grayscale</span><input id="lwlGrayscale" type="range" min="0" max="1" step="0.05" value="1"><output id="lwlGrayscaleOutput">1</output></label>
 <label class="dds-filter-row"><span>Contrast</span><input id="lwlContrast" type="range" min="0.5" max="2" step="0.05" value="0.9"><output id="lwlContrastOutput">0.9</output></label>
@@ -5182,6 +5179,6 @@ You were mine forever</textarea>
 </div>
 <!-- ระบบหลักเวอร์ชันล็อก + ชุดรวม COMMISSION / ACTIVITY / DRAFT / BBCODE / WORD COUNTER -->
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
-<script src="./script.js?v=20260727-complete-merged"></script>
+<script src="./script.js?v=20260727-code010-preview-fix-2"></script>
 </body>
 </html>
