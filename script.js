@@ -7178,37 +7178,63 @@ ${stylesheetLinks}
 })();
 
 /* ==================================================
-   CLEAN PASTE FOR ROLEPLAY / LONG-TEXT EDITORS
-   Removes Word/web formatting while preserving text,
-   line breaks, and literal BBCode typed by the user.
+   CLEAN PASTE V2 — MICROSOFT WORD / WEB
+   ดัก paste ใน capture phase ก่อนระบบเดิม เพื่อไม่ให้ HTML,
+   inline font-size, สี และพื้นหลังจาก Word เข้าสู่ editor
    ================================================== */
 (() => {
-  if (window.__DDS_CLEAN_PASTE_INSTALLED__) {
+  if (window.__DDS_CLEAN_PASTE_V2_INSTALLED__) {
     return;
   }
 
-  window.__DDS_CLEAN_PASTE_INSTALLED__ = true;
+  window.__DDS_CLEAN_PASTE_V2_INSTALLED__ = true;
 
   const EDITOR_SELECTOR = '.dds-rich-editor[contenteditable="true"]';
 
-  function normalizePastedText(value) {
+  function normalizeText(value) {
     return String(value || "")
       .replace(/\r\n?/g, "\n")
       .replace(/\u00a0/g, " ")
-      .replace(/\u2028|\u2029/g, "\n");
+      .replace(/[\u2028\u2029]/g, "\n");
   }
 
-  function insertPlainText(editor, value) {
-    const text = normalizePastedText(value);
+  function appendPlainText(container, value) {
+    const text = normalizeText(value);
+    const lines = text.split("\n");
+    let lastNode = null;
+
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        const br = document.createElement("br");
+        container.appendChild(br);
+        lastNode = br;
+      }
+
+      if (line) {
+        const textNode = document.createTextNode(line);
+        container.appendChild(textNode);
+        lastNode = textNode;
+      }
+    });
+
+    if (!lastNode) {
+      lastNode = document.createTextNode("");
+      container.appendChild(lastNode);
+    }
+
+    return lastNode;
+  }
+
+  function insertTextAtSelection(editor, value) {
     const selection = window.getSelection();
     let range = null;
 
     editor.focus({ preventScroll: true });
 
     if (selection && selection.rangeCount > 0) {
-      const currentRange = selection.getRangeAt(0);
-      if (editor.contains(currentRange.commonAncestorContainer)) {
-        range = currentRange;
+      const selectedRange = selection.getRangeAt(0);
+      if (editor.contains(selectedRange.commonAncestorContainer)) {
+        range = selectedRange;
       }
     }
 
@@ -7221,30 +7247,10 @@ ${stylesheetLinks}
     range.deleteContents();
 
     const fragment = document.createDocumentFragment();
-    const lines = text.split("\n");
-    let lastInsertedNode = null;
-
-    lines.forEach((line, index) => {
-      if (index > 0) {
-        const breakNode = document.createElement("br");
-        fragment.appendChild(breakNode);
-        lastInsertedNode = breakNode;
-      }
-
-      if (line) {
-        const textNode = document.createTextNode(line);
-        fragment.appendChild(textNode);
-        lastInsertedNode = textNode;
-      }
-    });
-
-    if (!lastInsertedNode) {
-      lastInsertedNode = document.createTextNode("");
-      fragment.appendChild(lastInsertedNode);
-    }
-
+    const lastNode = appendPlainText(fragment, value);
     range.insertNode(fragment);
-    range.setStartAfter(lastInsertedNode);
+
+    range.setStartAfter(lastNode);
     range.collapse(true);
 
     if (selection) {
@@ -7256,38 +7262,84 @@ ${stylesheetLinks}
       ? new InputEvent("input", {
           bubbles: true,
           inputType: "insertFromPaste",
-          data: text
+          data: normalizeText(value)
         })
       : new Event("input", { bubbles: true });
 
     editor.dispatchEvent(inputEvent);
   }
 
-  function installPlainPaste(editor) {
-    if (!editor || editor.dataset.ddsPlainPasteInstalled === "true") {
+  function getPlainEditorText(editor) {
+    return normalizeText(
+      typeof editor.innerText === "string"
+        ? editor.innerText
+        : editor.textContent
+    );
+  }
+
+  function hasImportedFormatting(editor) {
+    return Boolean(
+      editor.querySelector(
+        "font, span, p, div, section, article, h1, h2, h3, h4, h5, h6, " +
+        "table, tbody, thead, tfoot, tr, td, th, ul, ol, li, blockquote, " +
+        "[style], [class^='Mso'], [class*=' Mso']"
+      )
+    );
+  }
+
+  function cleanExistingImportedFormatting(editor) {
+    if (
+      !editor ||
+      document.activeElement === editor ||
+      !hasImportedFormatting(editor)
+    ) {
       return;
     }
 
-    editor.dataset.ddsPlainPasteInstalled = "true";
-    editor.setAttribute("data-clean-paste", "true");
+    const plainText = getPlainEditorText(editor);
+    editor.replaceChildren();
+    appendPlainText(editor, plainText);
+    editor.dispatchEvent(new Event("input", { bubbles: true }));
+  }
 
-    editor.addEventListener("paste", (event) => {
+  // capture=true ทำให้ทำงานก่อน paste listener เดิมของระบบหลัก
+  document.addEventListener(
+    "paste",
+    (event) => {
+      const target = event.target;
+      const editor = target instanceof Element
+        ? target.closest(EDITOR_SELECTOR)
+        : null;
+
+      if (!editor) {
+        return;
+      }
+
       const clipboard = event.clipboardData || window.clipboardData;
       if (!clipboard) {
         return;
       }
 
       event.preventDefault();
-      insertPlainText(editor, clipboard.getData("text/plain"));
+      event.stopImmediatePropagation();
+      insertTextAtSelection(editor, clipboard.getData("text/plain"));
+    },
+    true
+  );
+
+  function initializeEditors() {
+    document.querySelectorAll(EDITOR_SELECTOR).forEach((editor) => {
+      editor.dataset.ddsPlainPasteInstalled = "v2";
     });
-  }
 
-  function installAllPlainPasteEditors(root = document) {
-    root.querySelectorAll(EDITOR_SELECTOR).forEach(installPlainPaste);
-  }
-
-  function start() {
-    installAllPlainPasteEditors();
+    // ล้าง style จากแบบร่างเก่าที่เคยวางจาก Word มาแล้ว
+    [0, 250, 900].forEach((delay) => {
+      window.setTimeout(() => {
+        document.querySelectorAll(EDITOR_SELECTOR).forEach(
+          cleanExistingImportedFormatting
+        );
+      }, delay);
+    });
 
     const observer = new MutationObserver((records) => {
       records.forEach((record) => {
@@ -7297,10 +7349,12 @@ ${stylesheetLinks}
           }
 
           if (node.matches(EDITOR_SELECTOR)) {
-            installPlainPaste(node);
+            node.dataset.ddsPlainPasteInstalled = "v2";
           }
 
-          installAllPlainPasteEditors(node);
+          node.querySelectorAll?.(EDITOR_SELECTOR).forEach((editor) => {
+            editor.dataset.ddsPlainPasteInstalled = "v2";
+          });
         });
       });
     });
@@ -7312,8 +7366,10 @@ ${stylesheetLinks}
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
+    document.addEventListener("DOMContentLoaded", initializeEditors, {
+      once: true
+    });
   } else {
-    start();
+    initializeEditors();
   }
 })();

@@ -6320,19 +6320,34 @@ textarea + .dds-bbcode-toolbar {
 }
 
 /* ==================================================
-   ROLEPLAY TEXT EDITOR — CLEAN PASTE TYPOGRAPHY
-   Keeps pasted Word/web content visually consistent.
+   ROLEPLAY EDITOR — WORD / WEB CLEAN PASTE V2
+   บังคับตัวอักษรในช่องแก้ไขให้คงที่ แม้ข้อมูลเก่าจะมี
+   inline style จาก Microsoft Word หรือเว็บไซต์ติดมา
    ================================================== */
-.dds-rich-editor,
 .dds-rich-editor[contenteditable="true"] {
   font-family: "Bai Jamjuree", sans-serif !important;
   font-size: 15px !important;
   font-weight: 400 !important;
+  font-style: normal !important;
   line-height: 1.85 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
 }
 
-.dds-rich-editor br {
-  line-height: inherit;
+.dds-rich-editor[contenteditable="true"] * {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  font-style: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  text-shadow: none !important;
+}
+
+.dds-rich-editor[contenteditable="true"] br {
+  line-height: inherit !important;
 }
