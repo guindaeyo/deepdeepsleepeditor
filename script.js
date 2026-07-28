@@ -7420,3 +7420,404 @@ ${stylesheetLinks}
     initializeEditors();
   }
 })();
+
+/* ============================================================
+   FAST CATALOGUE PREVIEWS — FOR ROLEPLAY / FOR PROFILE
+   - เร่งการสร้างพรีวิวเฉพาะการ์ดหน้ารวม
+   - สร้างใบที่อยู่ใกล้หน้าจอทันที
+   - ใบด้านล่างเตรียมข้อมูลไว้และค่อยสร้างเมื่อเลื่อนเข้าใกล้
+   - ไม่สร้าง iframe เดิมซ้ำเมื่อกลับเข้าหมวด
+============================================================ */
+(() => {
+  if (window.__DDS_ROLE_PROFILE_FAST_CATALOGUE__) {
+    return;
+  }
+
+  window.__DDS_ROLE_PROFILE_FAST_CATALOGUE__ = true;
+
+  const CARD_ID_PATTERN = /^(?:roleplayCardPreview00[1-9]|profileCardPreview00[1-4])$/;
+  const cardStates = new WeakMap();
+  const preloadLinks = new Set();
+  const preloadImages = new Map();
+
+  const originalQueuePreviewDocument =
+    typeof window.queuePreviewDocument === "function"
+      ? window.queuePreviewDocument
+      : null;
+
+  if (!originalQueuePreviewDocument) {
+    return;
+  }
+
+  function isFastCatalogueCard(iframe) {
+    return Boolean(
+      iframe &&
+      CARD_ID_PATTERN.test(iframe.id || "") &&
+      iframe.classList?.contains("dds-roleplay-card-preview-frame")
+    );
+  }
+
+  function getCardState(iframe) {
+    let state = cardStates.get(iframe);
+
+    if (!state) {
+      state = {
+        pendingSrcdoc: "",
+        currentSrcdoc: "",
+        resizeFunction: null,
+        timer: null,
+        renderToken: 0,
+        status: "idle",
+        observed: false
+      };
+
+      cardStates.set(iframe, state);
+    }
+
+    return state;
+  }
+
+  function isPanelActive(iframe) {
+    return Boolean(
+      iframe.closest("[data-panel]")?.classList.contains("is-active")
+    );
+  }
+
+  function isNearViewport(iframe) {
+    const rect = iframe.getBoundingClientRect();
+    const margin = 780;
+
+    return (
+      rect.bottom >= -margin &&
+      rect.top <= window.innerHeight + margin
+    );
+  }
+
+  function extractAssetUrls(srcdoc) {
+    const stylesheets = [];
+    const images = [];
+    const parsed = new DOMParser().parseFromString(srcdoc, "text/html");
+
+    parsed.querySelectorAll('link[rel="stylesheet"][href]').forEach((link) => {
+      const href = link.getAttribute("href")?.trim();
+      if (href) {
+        stylesheets.push(href);
+      }
+    });
+
+    parsed.querySelectorAll("img[src]").forEach((image) => {
+      const src = image.getAttribute("src")?.trim();
+      if (src) {
+        images.push(src);
+      }
+    });
+
+    parsed.querySelectorAll("[style]").forEach((element) => {
+      const styleText = element.getAttribute("style") || "";
+      const pattern = /url\(\s*(["']?)(.*?)\1\s*\)/gi;
+      let match;
+
+      while ((match = pattern.exec(styleText))) {
+        if (match[2]) {
+          images.push(match[2]);
+        }
+      }
+    });
+
+    return {
+      stylesheets: [...new Set(stylesheets)],
+      images: [...new Set(images)]
+    };
+  }
+
+  function warmAssets(iframe, srcdoc) {
+    const { stylesheets, images } = extractAssetUrls(srcdoc);
+
+    stylesheets.forEach((href) => {
+      if (preloadLinks.has(href)) {
+        return;
+      }
+
+      preloadLinks.add(href);
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "style";
+      link.href = href;
+      link.dataset.ddsCataloguePreload = "style";
+      document.head.appendChild(link);
+    });
+
+    /*
+     * อุ่นเฉพาะรูปของการ์ดที่อยู่ใกล้จอ และจำกัดจำนวน
+     * เพื่อไม่ให้รูปด้านล่างแย่งเน็ตกับการ์ดแถวแรก
+     */
+    if (!isNearViewport(iframe)) {
+      return;
+    }
+
+    images.slice(0, 3).forEach((src) => {
+      if (preloadImages.has(src)) {
+        return;
+      }
+
+      const image = new Image();
+      image.decoding = "async";
+      image.src = src;
+      preloadImages.set(src, image);
+    });
+  }
+
+  function resizeAndReveal(iframe, resizeFunction) {
+    window.requestAnimationFrame(() => {
+      if (typeof resizeFunction === "function") {
+        resizeFunction(iframe);
+      }
+
+      window.requestAnimationFrame(() => {
+        if (typeof resizeFunction === "function") {
+          resizeFunction(iframe);
+        }
+
+        if (typeof window.revealPreview === "function") {
+          window.revealPreview(iframe);
+        } else {
+          iframe.classList.remove("dds-preview-loading");
+          iframe.classList.add("dds-preview-ready");
+        }
+      });
+    });
+  }
+
+  function cancelCoreQueue(iframe) {
+    if (typeof window.getPreviewState !== "function") {
+      return;
+    }
+
+    const state = window.getPreviewState(iframe);
+
+    ["timer", "performanceTimer", "resizeTimer", "assetTimer"].forEach(
+      (key) => {
+        if (state?.[key]) {
+          window.clearTimeout(state[key]);
+          state[key] = null;
+        }
+      }
+    );
+
+    if (state) {
+      state.pendingSrcdoc = "";
+    }
+  }
+
+  function renderCard(iframe) {
+    const state = getCardState(iframe);
+    const srcdoc = state.pendingSrcdoc;
+
+    if (!srcdoc || !isPanelActive(iframe)) {
+      return;
+    }
+
+    if (state.currentSrcdoc === srcdoc) {
+      resizeAndReveal(iframe, state.resizeFunction);
+      return;
+    }
+
+    cancelCoreQueue(iframe);
+    state.currentSrcdoc = srcdoc;
+    state.status = "loading";
+    state.renderToken += 1;
+
+    const token = state.renderToken;
+
+    iframe.setAttribute("loading", "eager");
+    iframe.classList.add("dds-preview-loading");
+    warmAssets(iframe, srcdoc);
+
+    iframe.addEventListener(
+      "load",
+      () => {
+        if (token !== state.renderToken) {
+          return;
+        }
+
+        state.status = "ready";
+        resizeAndReveal(iframe, state.resizeFunction);
+      },
+      { once: true }
+    );
+
+    iframe.srcdoc = srcdoc;
+  }
+
+  const observer =
+    "IntersectionObserver" in window
+      ? new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                renderCard(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "780px 0px 780px 0px",
+            threshold: 0.01
+          }
+        )
+      : null;
+
+  function queueFastCard(iframe, srcdoc, resizeFunction) {
+    const state = getCardState(iframe);
+
+    state.pendingSrcdoc = srcdoc;
+    state.resizeFunction = resizeFunction;
+    iframe.setAttribute("loading", "eager");
+
+    warmAssets(iframe, srcdoc);
+
+    if (!state.observed && observer) {
+      state.observed = true;
+      observer.observe(iframe);
+    }
+
+    window.clearTimeout(state.timer);
+
+    /*
+     * หน่วงสั้นมากเพื่อรวมคำสั่งซ้ำของ PAGE OF ONE
+     * และการเรียก initializer ซ้ำ ให้เขียน srcdoc เพียงรอบเดียว
+     */
+    state.timer = window.setTimeout(
+      () => {
+        state.timer = null;
+
+        if (!observer || isNearViewport(iframe)) {
+          renderCard(iframe);
+        }
+      },
+      iframe.id === "roleplayCardPreview001" ? 24 : 0
+    );
+  }
+
+  window.queuePreviewDocument = function fastCatalogueQueue(
+    iframe,
+    srcdoc,
+    resizeFunction
+  ) {
+    if (!isFastCatalogueCard(iframe)) {
+      return originalQueuePreviewDocument.call(
+        this,
+        iframe,
+        srcdoc,
+        resizeFunction
+      );
+    }
+
+    /* การ์ดหน้ารวมต้องไม่ถูกค่าจากหน้า EDIT เขียนทับ */
+    if (document.body.classList.contains("dds-editor-mode")) {
+      return true;
+    }
+
+    if (!isPanelActive(iframe)) {
+      return originalQueuePreviewDocument.call(
+        this,
+        iframe,
+        srcdoc,
+        resizeFunction
+      );
+    }
+
+    queueFastCard(iframe, srcdoc, resizeFunction);
+    return true;
+  };
+
+  const initializers = {
+    roleplay: [
+      "updatePageOfOne",
+      "updateWeirdo",
+      "updateHihi",
+      "updateUuiaa",
+      "updateComma",
+      "updateNewRules",
+      "updateLoveSong",
+      "updateDumbDumber",
+      "updateHigherHeaven"
+    ],
+    profile: [
+      "updatePolaroidLove",
+      "updateMoodboard",
+      "updateFortyOne",
+      "updateNothinBoutMe"
+    ]
+  };
+
+  function initializeCatalogue(pageName) {
+    const panel = document.querySelector(`[data-panel="${pageName}"]`);
+
+    if (!panel?.classList.contains("is-active")) {
+      return;
+    }
+
+    (initializers[pageName] || []).forEach((functionName) => {
+      const initializer = window[functionName];
+
+      if (typeof initializer === "function") {
+        initializer();
+      }
+    });
+
+    panel
+      .querySelectorAll(".dds-roleplay-card-preview-frame")
+      .forEach((iframe) => {
+        iframe.setAttribute("loading", "eager");
+
+        const state = cardStates.get(iframe);
+        if (state?.pendingSrcdoc && isNearViewport(iframe)) {
+          renderCard(iframe);
+        } else if (iframe.classList.contains("dds-preview-ready")) {
+          resizeAndReveal(iframe, state?.resizeFunction);
+        }
+      });
+  }
+
+  function scheduleCatalogue(pageName) {
+    window.requestAnimationFrame(() => {
+      initializeCatalogue(pageName);
+    });
+  }
+
+  document
+    .querySelectorAll(
+      '[data-panel="roleplay"] .dds-roleplay-card-preview-frame, ' +
+      '[data-panel="profile"] .dds-roleplay-card-preview-frame'
+    )
+    .forEach((iframe) => {
+      iframe.setAttribute("loading", "eager");
+    });
+
+  document.addEventListener("click", (event) => {
+    if (event.target.closest('[data-go="roleplay"], [data-page="roleplay"]')) {
+      scheduleCatalogue("roleplay");
+    }
+
+    if (event.target.closest('[data-go="profile"], [data-page="profile"]')) {
+      scheduleCatalogue("profile");
+    }
+  });
+
+  window.addEventListener("hashchange", () => {
+    if (window.location.hash === "#roleplay") {
+      scheduleCatalogue("roleplay");
+    }
+
+    if (window.location.hash === "#profile") {
+      scheduleCatalogue("profile");
+    }
+  });
+
+  if (window.location.hash === "#roleplay") {
+    scheduleCatalogue("roleplay");
+  } else if (window.location.hash === "#profile") {
+    scheduleCatalogue("profile");
+  }
+})();
