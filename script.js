@@ -5133,8 +5133,8 @@ ${stylesheetLinks}
         : null;
 
     /*
-     * พรีวิวบนหน้าหมวด REVIEW ต้องเป็นตัวอย่างสมบูรณ์ถาวร
-     * ไม่ให้การล้าง/พิมพ์ในหน้า EDIT CODE เขียนทับการ์ดพรีวิวนี้
+     * การ์ดหน้า FOR REVIEW เป็นตัวอย่างถาวร ไม่ให้ค่าจากหน้า EDIT
+     * เขียนทับ และไม่โหลดเอกสาร 3 รอบเหมือนเวอร์ชันก่อน
      */
     if (originalQueuePreviewDocument) {
       window.queuePreviewDocument = function (
@@ -5158,54 +5158,101 @@ ${stylesheetLinks}
       };
     }
 
-    function renderStaticFoodReviewPreview() {
-      const srcdoc = buildStaticFoodReviewCardDocument();
-      const resizeFunction =
-        typeof window.resizeReviewDesktopCardPreview === "function"
-          ? window.resizeReviewDesktopCardPreview
-          : typeof window.resizeCardPreview === "function"
-            ? window.resizeCardPreview
-            : null;
+    const previewAssetUrls = [
+      "https://s13.gifyu.com/images/blgAw.png",
+      "https://i.pinimg.com/vwebp/1200x/cb/76/88/cb76889bbad391355af7c3c819ccb02b.webp",
+      "https://i.pinimg.com/736x/e8/f4/3d/e8f43dae4d9a58d3f7a9bab7f080e0b0.jpg",
+      "https://i.pinimg.com/736x/a2/14/3c/a2143cae7c46e2937acf54914c179652.jpg",
+      "https://i.pinimg.com/736x/88/4a/d3/884ad393abce8919d72b0305646f79bf.jpg",
+      "https://i.pinimg.com/vwebp/1200x/17/2a/f3/172af366be2a5e78b088d5fe0413a17b.webp"
+    ];
 
+    if (!window.__DDS_FOOD_REVIEW_PRELOAD_CACHE__) {
+      window.__DDS_FOOD_REVIEW_PRELOAD_CACHE__ =
+        previewAssetUrls.map((url) => {
+          const image = new Image();
+          image.decoding = "async";
+          image.src = url;
+          return image;
+        });
+    }
+
+    const resizeFunction =
+      typeof window.resizeReviewDesktopCardPreview === "function"
+        ? window.resizeReviewDesktopCardPreview
+        : typeof window.resizeCardPreview === "function"
+          ? window.resizeCardPreview
+          : null;
+
+    function resizeAndReveal() {
+      window.requestAnimationFrame(() => {
+        if (resizeFunction) {
+          resizeFunction(iframe);
+        }
+
+        if (typeof window.revealPreview === "function") {
+          window.revealPreview(iframe);
+        }
+      });
+    }
+
+    function cancelOldQueuedRender() {
+      if (typeof window.getPreviewState !== "function") {
+        return;
+      }
+
+      const state = window.getPreviewState(iframe);
+
+      ["timer", "performanceTimer", "resizeTimer"].forEach(
+        (key) => {
+          if (state?.[key]) {
+            window.clearTimeout(state[key]);
+            state[key] = null;
+          }
+        }
+      );
+
+      if (state) {
+        state.pendingSrcdoc = "";
+      }
+    }
+
+    function renderStaticFoodReviewPreview() {
       iframe.dataset.reviewDesktopWidth = "1300";
       iframe.dataset.reviewDesktopHeight = "920";
       iframe.dataset.previewVisualBounds = "true";
 
-      if (originalQueuePreviewDocument) {
-        window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = true;
-
-        try {
-          originalQueuePreviewDocument.call(
-            window,
-            iframe,
-            srcdoc,
-            resizeFunction
-          );
-        } finally {
-          window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = false;
-        }
-
-        if (typeof window.activatePendingPreviews === "function") {
-          window.activatePendingPreviews("review");
-        }
-      } else {
-        iframe.srcdoc = srcdoc;
-        iframe.addEventListener(
-          "load",
-          () => {
-            if (resizeFunction) {
-              resizeFunction(iframe);
-            }
-          },
-          { once: true }
-        );
+      if (
+        iframe.dataset.ddsFoodReviewPreviewState === "ready" ||
+        iframe.dataset.ddsFoodReviewPreviewState === "loading"
+      ) {
+        resizeAndReveal();
+        return;
       }
-    }
 
-    function scheduleStaticFoodReviewPreview() {
-      [0, 90, 260].forEach((delay) => {
-        window.setTimeout(renderStaticFoodReviewPreview, delay);
-      });
+      cancelOldQueuedRender();
+      iframe.dataset.ddsFoodReviewPreviewState = "loading";
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          iframe.dataset.ddsFoodReviewPreviewState = "ready";
+          resizeAndReveal();
+        },
+        { once: true }
+      );
+
+      /*
+       * เขียน srcdoc โดยตรงเพียงครั้งเดียว ลดคิว/การ parse/การโหลดรูปซ้ำ
+       * ที่เคยเกิดจากรอบ 0, 90 และ 260 ms
+       */
+      window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = true;
+
+      try {
+        iframe.srcdoc = buildStaticFoodReviewCardDocument();
+      } finally {
+        window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = false;
+      }
     }
 
     document.addEventListener("click", (event) => {
@@ -5214,17 +5261,17 @@ ${stylesheetLinks}
           '[data-go="review"], [data-page="review"], [data-edit-review]'
         )
       ) {
-        scheduleStaticFoodReviewPreview();
+        renderStaticFoodReviewPreview();
       }
     });
 
     window.addEventListener("hashchange", () => {
       if (window.location.hash === "#review") {
-        scheduleStaticFoodReviewPreview();
+        renderStaticFoodReviewPreview();
       }
     });
 
-    scheduleStaticFoodReviewPreview();
+    renderStaticFoodReviewPreview();
   }
 
 
@@ -5683,6 +5730,32 @@ ${stylesheetLinks}
     }
 
     state.toolsColumn = toolsColumn;
+
+    /*
+     * ย้ายส่วนคัดลอกโค้ดออกจากพื้นที่สกรอลล์ของเครื่องมือ
+     * เพื่อให้ปุ่ม COPY / RESET มองเห็นอยู่ด้านล่างของคอลัมน์เสมอ
+     */
+    const copySection = Array.from(controls.children).find((child) =>
+      child.classList?.contains("dds-copy-section")
+    );
+
+    if (copySection) {
+      let copyDock = Array.from(toolsColumn.children).find((child) =>
+        child.classList?.contains("dds-editor-copy-dock")
+      );
+
+      if (!copyDock) {
+        copyDock = document.createElement("div");
+        copyDock.className = "dds-editor-copy-dock";
+        toolsColumn.appendChild(copyDock);
+      }
+
+      if (copySection.parentElement !== copyDock) {
+        copyDock.appendChild(copySection);
+      }
+
+      state.copyDock = copyDock;
+    }
 
     const previewColumn = layout.querySelector(".dds-editor-preview-column");
 
@@ -7173,164 +7246,600 @@ ${stylesheetLinks}
   }
 })();
 
-/* ============================================================
-   PLAIN-TEXT PASTE — BAI JAMJUREE 15PX
-   Removes Word/web formatting before content enters roleplay fields.
-============================================================ */
+/* ==================================================
+   CLEAN PASTE V2 — MICROSOFT WORD / WEB
+   ดัก paste ใน capture phase ก่อนระบบเดิม เพื่อไม่ให้ HTML,
+   inline font-size, สี และพื้นหลังจาก Word เข้าสู่ editor
+   ================================================== */
 (() => {
-  if (window.__DDS_PLAIN_TEXT_PASTE_INSTALLED__) {
+  if (window.__DDS_CLEAN_PASTE_V2_INSTALLED__) {
     return;
   }
 
-  window.__DDS_PLAIN_TEXT_PASTE_INSTALLED__ = true;
+  window.__DDS_CLEAN_PASTE_V2_INSTALLED__ = true;
 
-  const EDITOR_SELECTOR = ".dds-rich-editor[contenteditable='true']";
+  const EDITOR_SELECTOR = '.dds-rich-editor[contenteditable="true"]';
 
-  function normalizePlainText(value) {
-    return String(value ?? "")
+  function normalizeText(value) {
+    return String(value || "")
       .replace(/\r\n?/g, "\n")
-      .replace(/\u00a0/g, " ");
+      .replace(/\u00a0/g, " ")
+      .replace(/[\u2028\u2029]/g, "\n");
   }
 
-  function insertPlainText(target, text) {
-    target.focus();
-    const selection = window.getSelection();
-
-    if (!selection || selection.rangeCount === 0) {
-      target.textContent += text;
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    if (!target.contains(range.commonAncestorContainer)) {
-      target.textContent += text;
-      return;
-    }
-
-    range.deleteContents();
-    const fragment = document.createDocumentFragment();
+  function appendPlainText(container, value) {
+    const text = normalizeText(value);
     const lines = text.split("\n");
+    let lastNode = null;
 
     lines.forEach((line, index) => {
       if (index > 0) {
-        fragment.appendChild(document.createElement("br"));
+        const br = document.createElement("br");
+        container.appendChild(br);
+        lastNode = br;
       }
-      fragment.appendChild(document.createTextNode(line));
+
+      if (line) {
+        const textNode = document.createTextNode(line);
+        container.appendChild(textNode);
+        lastNode = textNode;
+      }
     });
 
-    const lastNode = fragment.lastChild;
+    if (!lastNode) {
+      lastNode = document.createTextNode("");
+      container.appendChild(lastNode);
+    }
+
+    return lastNode;
+  }
+
+  function insertTextAtSelection(editor, value) {
+    const selection = window.getSelection();
+    let range = null;
+
+    editor.focus({ preventScroll: true });
+
+    if (selection && selection.rangeCount > 0) {
+      const selectedRange = selection.getRangeAt(0);
+      if (editor.contains(selectedRange.commonAncestorContainer)) {
+        range = selectedRange;
+      }
+    }
+
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+    }
+
+    range.deleteContents();
+
+    const fragment = document.createDocumentFragment();
+    const lastNode = appendPlainText(fragment, value);
     range.insertNode(fragment);
 
-    if (lastNode) {
-      range.setStartAfter(lastNode);
-      range.collapse(true);
+    range.setStartAfter(lastNode);
+    range.collapse(true);
+
+    if (selection) {
       selection.removeAllRanges();
       selection.addRange(range);
     }
+
+    const inputEvent = typeof InputEvent === "function"
+      ? new InputEvent("input", {
+          bubbles: true,
+          inputType: "insertFromPaste",
+          data: normalizeText(value)
+        })
+      : new Event("input", { bubbles: true });
+
+    editor.dispatchEvent(inputEvent);
   }
 
+  function getPlainEditorText(editor) {
+    return normalizeText(
+      typeof editor.innerText === "string"
+        ? editor.innerText
+        : editor.textContent
+    );
+  }
+
+  function hasImportedFormatting(editor) {
+    return Boolean(
+      editor.querySelector(
+        "font, span, p, div, section, article, h1, h2, h3, h4, h5, h6, " +
+        "table, tbody, thead, tfoot, tr, td, th, ul, ol, li, blockquote, " +
+        "[style], [class^='Mso'], [class*=' Mso']"
+      )
+    );
+  }
+
+  function cleanExistingImportedFormatting(editor) {
+    if (
+      !editor ||
+      document.activeElement === editor ||
+      !hasImportedFormatting(editor)
+    ) {
+      return;
+    }
+
+    const plainText = getPlainEditorText(editor);
+    editor.replaceChildren();
+    appendPlainText(editor, plainText);
+    editor.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  // capture=true ทำให้ทำงานก่อน paste listener เดิมของระบบหลัก
   document.addEventListener(
     "paste",
     (event) => {
-      const target = event.target.closest?.(EDITOR_SELECTOR);
-      if (!target) {
+      const target = event.target;
+      const editor = target instanceof Element
+        ? target.closest(EDITOR_SELECTOR)
+        : null;
+
+      if (!editor) {
+        return;
+      }
+
+      const clipboard = event.clipboardData || window.clipboardData;
+      if (!clipboard) {
         return;
       }
 
       event.preventDefault();
       event.stopImmediatePropagation();
-
-      const clipboard = event.clipboardData || window.clipboardData;
-      const plainText = normalizePlainText(
-        clipboard?.getData("text/plain") || ""
-      );
-
-      insertPlainText(target, plainText);
-      target.dispatchEvent(new InputEvent("input", {
-        bubbles: true,
-        inputType: "insertFromPaste",
-        data: plainText
-      }));
+      insertTextAtSelection(editor, clipboard.getData("text/plain"));
     },
     true
   );
 
-  // Old drafts may already contain Word spans/styles. Clean them once when focused.
-  document.addEventListener("focusin", (event) => {
-    const target = event.target.closest?.(EDITOR_SELECTOR);
-    if (!target || !target.querySelector("[style], font")) {
-      return;
-    }
+  function initializeEditors() {
+    document.querySelectorAll(EDITOR_SELECTOR).forEach((editor) => {
+      editor.dataset.ddsPlainPasteInstalled = "v2";
+    });
 
-    const plainText = normalizePlainText(target.innerText);
-    target.textContent = plainText;
-    target.dispatchEvent(new Event("input", { bubbles: true }));
-  });
-})();
+    // ล้าง style จากแบบร่างเก่าที่เคยวางจาก Word มาแล้ว
+    [0, 250, 900].forEach((delay) => {
+      window.setTimeout(() => {
+        document.querySelectorAll(EDITOR_SELECTOR).forEach(
+          cleanExistingImportedFormatting
+        );
+      }, delay);
+    });
 
+    const observer = new MutationObserver((records) => {
+      records.forEach((record) => {
+        record.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) {
+            return;
+          }
 
-/* ============================================================
-   COPY CODE DOCK — OUTSIDE EDITOR SCROLL
-============================================================ */
-(() => {
-  if (window.__DDS_COPY_DOCK_INSTALLED__) {
-    return;
-  }
+          if (node.matches(EDITOR_SELECTOR)) {
+            node.dataset.ddsPlainPasteInstalled = "v2";
+          }
 
-  window.__DDS_COPY_DOCK_INSTALLED__ = true;
+          node.querySelectorAll?.(EDITOR_SELECTOR).forEach((editor) => {
+            editor.dataset.ddsPlainPasteInstalled = "v2";
+          });
+        });
+      });
+    });
 
-  function installCopyDock(panel) {
-    const toolsColumn = panel.querySelector(".dds-editor-tools-column");
-    const controls = toolsColumn?.querySelector(":scope > .dds-editor-controls");
-    const copySection = controls?.querySelector(".dds-copy-section");
-
-    if (!toolsColumn || !controls || !copySection || copySection.dataset.ddsCopyDock === "true") {
-      return;
-    }
-
-    copySection.dataset.ddsCopyDock = "true";
-    copySection.classList.add("dds-copy-dock");
-    toolsColumn.appendChild(copySection);
-  }
-
-  function installAllCopyDocks() {
-    document
-      .querySelectorAll('[data-panel^="editor-code"], [data-panel^="editor-profile"], [data-panel^="editor-review"]')
-      .forEach(installCopyDock);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      requestAnimationFrame(() => requestAnimationFrame(installAllCopyDocks));
-      window.setTimeout(installAllCopyDocks, 300);
-      window.setTimeout(installAllCopyDocks, 1200);
-    }, { once: true });
+    document.addEventListener("DOMContentLoaded", initializeEditors, {
+      once: true
+    });
   } else {
-    requestAnimationFrame(() => requestAnimationFrame(installAllCopyDocks));
-    window.setTimeout(installAllCopyDocks, 300);
+    initializeEditors();
+  }
+})();
+
+/* ============================================================
+   FAST CATALOGUE PREVIEWS — FOR ROLEPLAY / FOR PROFILE
+   - เร่งการสร้างพรีวิวเฉพาะการ์ดหน้ารวม
+   - สร้างใบที่อยู่ใกล้หน้าจอทันที
+   - ใบด้านล่างเตรียมข้อมูลไว้และค่อยสร้างเมื่อเลื่อนเข้าใกล้
+   - ไม่สร้าง iframe เดิมซ้ำเมื่อกลับเข้าหมวด
+============================================================ */
+(() => {
+  if (window.__DDS_ROLE_PROFILE_FAST_CATALOGUE__) {
+    return;
   }
 
-  let scanFrame = 0;
-  const observer = new MutationObserver(() => {
-    if (scanFrame) {
+  window.__DDS_ROLE_PROFILE_FAST_CATALOGUE__ = true;
+
+  const CARD_ID_PATTERN = /^(?:roleplayCardPreview00[1-9]|profileCardPreview00[1-4])$/;
+  const cardStates = new WeakMap();
+  const preloadLinks = new Set();
+  const preloadImages = new Map();
+
+  const originalQueuePreviewDocument =
+    typeof window.queuePreviewDocument === "function"
+      ? window.queuePreviewDocument
+      : null;
+
+  if (!originalQueuePreviewDocument) {
+    return;
+  }
+
+  function isFastCatalogueCard(iframe) {
+    return Boolean(
+      iframe &&
+      CARD_ID_PATTERN.test(iframe.id || "") &&
+      iframe.classList?.contains("dds-roleplay-card-preview-frame")
+    );
+  }
+
+  function getCardState(iframe) {
+    let state = cardStates.get(iframe);
+
+    if (!state) {
+      state = {
+        pendingSrcdoc: "",
+        currentSrcdoc: "",
+        resizeFunction: null,
+        timer: null,
+        renderToken: 0,
+        status: "idle",
+        observed: false
+      };
+
+      cardStates.set(iframe, state);
+    }
+
+    return state;
+  }
+
+  function isPanelActive(iframe) {
+    return Boolean(
+      iframe.closest("[data-panel]")?.classList.contains("is-active")
+    );
+  }
+
+  function isNearViewport(iframe) {
+    const rect = iframe.getBoundingClientRect();
+    const margin = 780;
+
+    return (
+      rect.bottom >= -margin &&
+      rect.top <= window.innerHeight + margin
+    );
+  }
+
+  function extractAssetUrls(srcdoc) {
+    const stylesheets = [];
+    const images = [];
+    const parsed = new DOMParser().parseFromString(srcdoc, "text/html");
+
+    parsed.querySelectorAll('link[rel="stylesheet"][href]').forEach((link) => {
+      const href = link.getAttribute("href")?.trim();
+      if (href) {
+        stylesheets.push(href);
+      }
+    });
+
+    parsed.querySelectorAll("img[src]").forEach((image) => {
+      const src = image.getAttribute("src")?.trim();
+      if (src) {
+        images.push(src);
+      }
+    });
+
+    parsed.querySelectorAll("[style]").forEach((element) => {
+      const styleText = element.getAttribute("style") || "";
+      const pattern = /url\(\s*(["']?)(.*?)\1\s*\)/gi;
+      let match;
+
+      while ((match = pattern.exec(styleText))) {
+        if (match[2]) {
+          images.push(match[2]);
+        }
+      }
+    });
+
+    return {
+      stylesheets: [...new Set(stylesheets)],
+      images: [...new Set(images)]
+    };
+  }
+
+  function warmAssets(iframe, srcdoc) {
+    const { stylesheets, images } = extractAssetUrls(srcdoc);
+
+    stylesheets.forEach((href) => {
+      if (preloadLinks.has(href)) {
+        return;
+      }
+
+      preloadLinks.add(href);
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "style";
+      link.href = href;
+      link.dataset.ddsCataloguePreload = "style";
+      document.head.appendChild(link);
+    });
+
+    /*
+     * อุ่นเฉพาะรูปของการ์ดที่อยู่ใกล้จอ และจำกัดจำนวน
+     * เพื่อไม่ให้รูปด้านล่างแย่งเน็ตกับการ์ดแถวแรก
+     */
+    if (!isNearViewport(iframe)) {
       return;
     }
 
-    scanFrame = requestAnimationFrame(() => {
-      scanFrame = 0;
-      installAllCopyDocks();
+    images.slice(0, 3).forEach((src) => {
+      if (preloadImages.has(src)) {
+        return;
+      }
+
+      const image = new Image();
+      image.decoding = "async";
+      image.src = src;
+      preloadImages.set(src, image);
     });
+  }
+
+  function resizeAndReveal(iframe, resizeFunction) {
+    window.requestAnimationFrame(() => {
+      if (typeof resizeFunction === "function") {
+        resizeFunction(iframe);
+      }
+
+      window.requestAnimationFrame(() => {
+        if (typeof resizeFunction === "function") {
+          resizeFunction(iframe);
+        }
+
+        if (typeof window.revealPreview === "function") {
+          window.revealPreview(iframe);
+        } else {
+          iframe.classList.remove("dds-preview-loading");
+          iframe.classList.add("dds-preview-ready");
+        }
+      });
+    });
+  }
+
+  function cancelCoreQueue(iframe) {
+    if (typeof window.getPreviewState !== "function") {
+      return;
+    }
+
+    const state = window.getPreviewState(iframe);
+
+    ["timer", "performanceTimer", "resizeTimer", "assetTimer"].forEach(
+      (key) => {
+        if (state?.[key]) {
+          window.clearTimeout(state[key]);
+          state[key] = null;
+        }
+      }
+    );
+
+    if (state) {
+      state.pendingSrcdoc = "";
+    }
+  }
+
+  function renderCard(iframe) {
+    const state = getCardState(iframe);
+    const srcdoc = state.pendingSrcdoc;
+
+    if (!srcdoc || !isPanelActive(iframe)) {
+      return;
+    }
+
+    if (state.currentSrcdoc === srcdoc) {
+      resizeAndReveal(iframe, state.resizeFunction);
+      return;
+    }
+
+    cancelCoreQueue(iframe);
+    state.currentSrcdoc = srcdoc;
+    state.status = "loading";
+    state.renderToken += 1;
+
+    const token = state.renderToken;
+
+    iframe.setAttribute("loading", "eager");
+    iframe.classList.add("dds-preview-loading");
+    warmAssets(iframe, srcdoc);
+
+    iframe.addEventListener(
+      "load",
+      () => {
+        if (token !== state.renderToken) {
+          return;
+        }
+
+        state.status = "ready";
+        resizeAndReveal(iframe, state.resizeFunction);
+      },
+      { once: true }
+    );
+
+    iframe.srcdoc = srcdoc;
+  }
+
+  const observer =
+    "IntersectionObserver" in window
+      ? new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                renderCard(entry.target);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "780px 0px 780px 0px",
+            threshold: 0.01
+          }
+        )
+      : null;
+
+  function queueFastCard(iframe, srcdoc, resizeFunction) {
+    const state = getCardState(iframe);
+
+    state.pendingSrcdoc = srcdoc;
+    state.resizeFunction = resizeFunction;
+    iframe.setAttribute("loading", "eager");
+
+    warmAssets(iframe, srcdoc);
+
+    if (!state.observed && observer) {
+      state.observed = true;
+      observer.observe(iframe);
+    }
+
+    window.clearTimeout(state.timer);
+
+    /*
+     * หน่วงสั้นมากเพื่อรวมคำสั่งซ้ำของ PAGE OF ONE
+     * และการเรียก initializer ซ้ำ ให้เขียน srcdoc เพียงรอบเดียว
+     */
+    state.timer = window.setTimeout(
+      () => {
+        state.timer = null;
+
+        if (!observer || isNearViewport(iframe)) {
+          renderCard(iframe);
+        }
+      },
+      iframe.id === "roleplayCardPreview001" ? 24 : 0
+    );
+  }
+
+  window.queuePreviewDocument = function fastCatalogueQueue(
+    iframe,
+    srcdoc,
+    resizeFunction
+  ) {
+    if (!isFastCatalogueCard(iframe)) {
+      return originalQueuePreviewDocument.call(
+        this,
+        iframe,
+        srcdoc,
+        resizeFunction
+      );
+    }
+
+    /* การ์ดหน้ารวมต้องไม่ถูกค่าจากหน้า EDIT เขียนทับ */
+    if (document.body.classList.contains("dds-editor-mode")) {
+      return true;
+    }
+
+    if (!isPanelActive(iframe)) {
+      return originalQueuePreviewDocument.call(
+        this,
+        iframe,
+        srcdoc,
+        resizeFunction
+      );
+    }
+
+    queueFastCard(iframe, srcdoc, resizeFunction);
+    return true;
+  };
+
+  const initializers = {
+    roleplay: [
+      "updatePageOfOne",
+      "updateWeirdo",
+      "updateHihi",
+      "updateUuiaa",
+      "updateComma",
+      "updateNewRules",
+      "updateLoveSong",
+      "updateDumbDumber",
+      "updateHigherHeaven"
+    ],
+    profile: [
+      "updatePolaroidLove",
+      "updateMoodboard",
+      "updateFortyOne",
+      "updateNothinBoutMe"
+    ]
+  };
+
+  function initializeCatalogue(pageName) {
+    const panel = document.querySelector(`[data-panel="${pageName}"]`);
+
+    if (!panel?.classList.contains("is-active")) {
+      return;
+    }
+
+    (initializers[pageName] || []).forEach((functionName) => {
+      const initializer = window[functionName];
+
+      if (typeof initializer === "function") {
+        initializer();
+      }
+    });
+
+    panel
+      .querySelectorAll(".dds-roleplay-card-preview-frame")
+      .forEach((iframe) => {
+        iframe.setAttribute("loading", "eager");
+
+        const state = cardStates.get(iframe);
+        if (state?.pendingSrcdoc && isNearViewport(iframe)) {
+          renderCard(iframe);
+        } else if (iframe.classList.contains("dds-preview-ready")) {
+          resizeAndReveal(iframe, state?.resizeFunction);
+        }
+      });
+  }
+
+  function scheduleCatalogue(pageName) {
+    window.requestAnimationFrame(() => {
+      initializeCatalogue(pageName);
+    });
+  }
+
+  document
+    .querySelectorAll(
+      '[data-panel="roleplay"] .dds-roleplay-card-preview-frame, ' +
+      '[data-panel="profile"] .dds-roleplay-card-preview-frame'
+    )
+    .forEach((iframe) => {
+      iframe.setAttribute("loading", "eager");
+    });
+
+  document.addEventListener("click", (event) => {
+    if (event.target.closest('[data-go="roleplay"], [data-page="roleplay"]')) {
+      scheduleCatalogue("roleplay");
+    }
+
+    if (event.target.closest('[data-go="profile"], [data-page="profile"]')) {
+      scheduleCatalogue("profile");
+    }
   });
 
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true
+  window.addEventListener("hashchange", () => {
+    if (window.location.hash === "#roleplay") {
+      scheduleCatalogue("roleplay");
+    }
+
+    if (window.location.hash === "#profile") {
+      scheduleCatalogue("profile");
+    }
   });
 
-  // All editor panels are static in this build; stop observing after setup.
-  window.setTimeout(() => {
-    installAllCopyDocks();
-    observer.disconnect();
-  }, 2500);
+  if (window.location.hash === "#roleplay") {
+    scheduleCatalogue("roleplay");
+  } else if (window.location.hash === "#profile") {
+    scheduleCatalogue("profile");
+  }
 })();
-
