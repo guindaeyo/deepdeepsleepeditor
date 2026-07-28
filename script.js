@@ -5731,6 +5731,32 @@ ${stylesheetLinks}
 
     state.toolsColumn = toolsColumn;
 
+    /*
+     * ย้ายส่วนคัดลอกโค้ดออกจากพื้นที่สกรอลล์ของเครื่องมือ
+     * เพื่อให้ปุ่ม COPY / RESET มองเห็นอยู่ด้านล่างของคอลัมน์เสมอ
+     */
+    const copySection = Array.from(controls.children).find((child) =>
+      child.classList?.contains("dds-copy-section")
+    );
+
+    if (copySection) {
+      let copyDock = Array.from(toolsColumn.children).find((child) =>
+        child.classList?.contains("dds-editor-copy-dock")
+      );
+
+      if (!copyDock) {
+        copyDock = document.createElement("div");
+        copyDock.className = "dds-editor-copy-dock";
+        toolsColumn.appendChild(copyDock);
+      }
+
+      if (copySection.parentElement !== copyDock) {
+        copyDock.appendChild(copySection);
+      }
+
+      state.copyDock = copyDock;
+    }
+
     const previewColumn = layout.querySelector(".dds-editor-preview-column");
 
     const syncColumnHeight = () => {

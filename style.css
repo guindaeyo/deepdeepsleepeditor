@@ -6369,3 +6369,71 @@ textarea + .dds-bbcode-toolbar {
   will-change: transform;
   backface-visibility: hidden;
 }
+
+/* ==================================================
+   EDITOR COPY DOCK — COPY SECTION OUTSIDE SCROLL
+   ส่วนกรอกข้อมูลเลื่อนด้านบน ส่วนคัดลอกโค้ดอยู่ล่างสุดเสมอ
+   ================================================== */
+.dds-editor-copy-dock {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.dds-editor-copy-dock > .dds-copy-section {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+@media (min-width: 1101px) {
+  [data-panel^="editor-code"] .dds-editor-copy-dock,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock,
+  [data-panel^="editor-review"] .dds-editor-copy-dock {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 3;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock > .dds-copy-section,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock > .dds-copy-section,
+  [data-panel^="editor-review"] .dds-editor-copy-dock > .dds-copy-section {
+    padding: 18px 20px;
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title {
+    margin-bottom: 12px;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title > span,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title > span,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title > span {
+    font-size: 24px;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-description,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-description,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-description {
+    margin: -3px 0 12px;
+    line-height: 1.55;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-reset-button,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-reset-button,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-reset-button {
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .dds-editor-copy-dock {
+    position: static;
+  }
+}
+
