@@ -6320,120 +6320,68 @@ textarea + .dds-bbcode-toolbar {
 }
 
 /* ==================================================
-   ROLEPLAY EDITOR — WORD / WEB CLEAN PASTE V2
-   บังคับตัวอักษรในช่องแก้ไขให้คงที่ แม้ข้อมูลเก่าจะมี
-   inline style จาก Microsoft Word หรือเว็บไซต์ติดมา
+   ROLEPLAY INPUT — FIXED BAI JAMJUREE 15PX
    ================================================== */
 .dds-rich-editor[contenteditable="true"] {
   font-family: "Bai Jamjuree", sans-serif !important;
   font-size: 15px !important;
   font-weight: 400 !important;
-  font-style: normal !important;
-  line-height: 1.85 !important;
-  letter-spacing: normal !important;
-  text-transform: none !important;
+  font-style: normal;
+  line-height: 1.8 !important;
+  letter-spacing: 0 !important;
+  background-color: transparent;
 }
 
-.dds-rich-editor[contenteditable="true"] * {
+.dds-rich-editor[contenteditable="true"] *,
+.dds-rich-editor[contenteditable="true"] *::before,
+.dds-rich-editor[contenteditable="true"] *::after {
   font-family: inherit !important;
   font-size: inherit !important;
-  font-weight: inherit !important;
-  font-style: inherit !important;
   line-height: inherit !important;
   letter-spacing: inherit !important;
-  text-transform: inherit !important;
-  color: inherit !important;
   background: transparent !important;
   background-color: transparent !important;
-  text-shadow: none !important;
-}
-
-.dds-rich-editor[contenteditable="true"] br {
-  line-height: inherit !important;
-}
-
-
-/* ==================================================
-   FOR REVIEW — FAST FIRST PAINT
-   โหลดพรีวิวเพียงครั้งเดียวและให้การ์ดวาดแยกจากหน้าหลัก
-================================================== */
-
-.dds-review-grid .dds-roleplay-card-preview {
-  background:
-    radial-gradient(circle at 50% 42%, rgba(143, 14, 22, 0.18), transparent 42%),
-    #161616;
-  contain: layout paint style;
-}
-
-.dds-review-grid .dds-review-card-preview-frame {
-  will-change: transform;
-  backface-visibility: hidden;
 }
 
 /* ==================================================
-   EDITOR COPY DOCK — COPY SECTION OUTSIDE SCROLL
-   ส่วนกรอกข้อมูลเลื่อนด้านบน ส่วนคัดลอกโค้ดอยู่ล่างสุดเสมอ
+   COPY CODE DOCK — OUTSIDE SCROLL AREA
    ================================================== */
-.dds-editor-copy-dock {
-  width: 100%;
-  min-width: 0;
+.dds-editor-tools-column > .dds-copy-dock {
   flex: 0 0 auto;
-}
-
-.dds-editor-copy-dock > .dds-copy-section {
   width: 100%;
-  min-width: 0;
   margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(135deg, rgba(143, 14, 22, 0.08), transparent 65%),
+    #0d0c0c;
 }
 
 @media (min-width: 1101px) {
-  [data-panel^="editor-code"] .dds-editor-copy-dock,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock,
-  [data-panel^="editor-review"] .dds-editor-copy-dock {
-    flex: 0 0 auto;
-    position: relative;
-    z-index: 3;
+  .dds-editor-tools-column > .dds-copy-dock {
+    max-height: min(255px, 34vh);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(193, 23, 36, 0.68) rgba(255, 255, 255, 0.045);
   }
 
-  [data-panel^="editor-code"] .dds-editor-copy-dock > .dds-copy-section,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock > .dds-copy-section,
-  [data-panel^="editor-review"] .dds-editor-copy-dock > .dds-copy-section {
-    padding: 18px 20px;
-    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.2);
+  .dds-editor-tools-column > .dds-copy-dock::-webkit-scrollbar {
+    width: 7px;
   }
 
-  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title,
-  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title {
-    margin-bottom: 12px;
+  .dds-editor-tools-column > .dds-copy-dock::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
   }
 
-  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title > span,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title > span,
-  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title > span {
-    font-size: 24px;
-  }
-
-  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-description,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-description,
-  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-description {
-    margin: -3px 0 12px;
-    line-height: 1.55;
-  }
-
-  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-button,
-  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-reset-button,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-button,
-  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-reset-button,
-  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-button,
-  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-reset-button {
-    min-height: 46px;
+  .dds-editor-tools-column > .dds-copy-dock::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(193, 23, 36, 0.65);
   }
 }
 
 @media (max-width: 1100px) {
-  .dds-editor-copy-dock {
-    position: static;
+  .dds-editor-tools-column > .dds-copy-dock {
+    max-height: none;
+    overflow: visible;
   }
 }
 
