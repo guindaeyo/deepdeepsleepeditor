@@ -6351,3 +6351,21 @@ textarea + .dds-bbcode-toolbar {
 .dds-rich-editor[contenteditable="true"] br {
   line-height: inherit !important;
 }
+
+
+/* ==================================================
+   FOR REVIEW — FAST FIRST PAINT
+   โหลดพรีวิวเพียงครั้งเดียวและให้การ์ดวาดแยกจากหน้าหลัก
+================================================== */
+
+.dds-review-grid .dds-roleplay-card-preview {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(143, 14, 22, 0.18), transparent 42%),
+    #161616;
+  contain: layout paint style;
+}
+
+.dds-review-grid .dds-review-card-preview-frame {
+  will-change: transform;
+  backface-visibility: hidden;
+}

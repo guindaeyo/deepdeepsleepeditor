@@ -5133,8 +5133,8 @@ ${stylesheetLinks}
         : null;
 
     /*
-     * พรีวิวบนหน้าหมวด REVIEW ต้องเป็นตัวอย่างสมบูรณ์ถาวร
-     * ไม่ให้การล้าง/พิมพ์ในหน้า EDIT CODE เขียนทับการ์ดพรีวิวนี้
+     * การ์ดหน้า FOR REVIEW เป็นตัวอย่างถาวร ไม่ให้ค่าจากหน้า EDIT
+     * เขียนทับ และไม่โหลดเอกสาร 3 รอบเหมือนเวอร์ชันก่อน
      */
     if (originalQueuePreviewDocument) {
       window.queuePreviewDocument = function (
@@ -5158,54 +5158,101 @@ ${stylesheetLinks}
       };
     }
 
-    function renderStaticFoodReviewPreview() {
-      const srcdoc = buildStaticFoodReviewCardDocument();
-      const resizeFunction =
-        typeof window.resizeReviewDesktopCardPreview === "function"
-          ? window.resizeReviewDesktopCardPreview
-          : typeof window.resizeCardPreview === "function"
-            ? window.resizeCardPreview
-            : null;
+    const previewAssetUrls = [
+      "https://s13.gifyu.com/images/blgAw.png",
+      "https://i.pinimg.com/vwebp/1200x/cb/76/88/cb76889bbad391355af7c3c819ccb02b.webp",
+      "https://i.pinimg.com/736x/e8/f4/3d/e8f43dae4d9a58d3f7a9bab7f080e0b0.jpg",
+      "https://i.pinimg.com/736x/a2/14/3c/a2143cae7c46e2937acf54914c179652.jpg",
+      "https://i.pinimg.com/736x/88/4a/d3/884ad393abce8919d72b0305646f79bf.jpg",
+      "https://i.pinimg.com/vwebp/1200x/17/2a/f3/172af366be2a5e78b088d5fe0413a17b.webp"
+    ];
 
+    if (!window.__DDS_FOOD_REVIEW_PRELOAD_CACHE__) {
+      window.__DDS_FOOD_REVIEW_PRELOAD_CACHE__ =
+        previewAssetUrls.map((url) => {
+          const image = new Image();
+          image.decoding = "async";
+          image.src = url;
+          return image;
+        });
+    }
+
+    const resizeFunction =
+      typeof window.resizeReviewDesktopCardPreview === "function"
+        ? window.resizeReviewDesktopCardPreview
+        : typeof window.resizeCardPreview === "function"
+          ? window.resizeCardPreview
+          : null;
+
+    function resizeAndReveal() {
+      window.requestAnimationFrame(() => {
+        if (resizeFunction) {
+          resizeFunction(iframe);
+        }
+
+        if (typeof window.revealPreview === "function") {
+          window.revealPreview(iframe);
+        }
+      });
+    }
+
+    function cancelOldQueuedRender() {
+      if (typeof window.getPreviewState !== "function") {
+        return;
+      }
+
+      const state = window.getPreviewState(iframe);
+
+      ["timer", "performanceTimer", "resizeTimer"].forEach(
+        (key) => {
+          if (state?.[key]) {
+            window.clearTimeout(state[key]);
+            state[key] = null;
+          }
+        }
+      );
+
+      if (state) {
+        state.pendingSrcdoc = "";
+      }
+    }
+
+    function renderStaticFoodReviewPreview() {
       iframe.dataset.reviewDesktopWidth = "1300";
       iframe.dataset.reviewDesktopHeight = "920";
       iframe.dataset.previewVisualBounds = "true";
 
-      if (originalQueuePreviewDocument) {
-        window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = true;
-
-        try {
-          originalQueuePreviewDocument.call(
-            window,
-            iframe,
-            srcdoc,
-            resizeFunction
-          );
-        } finally {
-          window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = false;
-        }
-
-        if (typeof window.activatePendingPreviews === "function") {
-          window.activatePendingPreviews("review");
-        }
-      } else {
-        iframe.srcdoc = srcdoc;
-        iframe.addEventListener(
-          "load",
-          () => {
-            if (resizeFunction) {
-              resizeFunction(iframe);
-            }
-          },
-          { once: true }
-        );
+      if (
+        iframe.dataset.ddsFoodReviewPreviewState === "ready" ||
+        iframe.dataset.ddsFoodReviewPreviewState === "loading"
+      ) {
+        resizeAndReveal();
+        return;
       }
-    }
 
-    function scheduleStaticFoodReviewPreview() {
-      [0, 90, 260].forEach((delay) => {
-        window.setTimeout(renderStaticFoodReviewPreview, delay);
-      });
+      cancelOldQueuedRender();
+      iframe.dataset.ddsFoodReviewPreviewState = "loading";
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          iframe.dataset.ddsFoodReviewPreviewState = "ready";
+          resizeAndReveal();
+        },
+        { once: true }
+      );
+
+      /*
+       * เขียน srcdoc โดยตรงเพียงครั้งเดียว ลดคิว/การ parse/การโหลดรูปซ้ำ
+       * ที่เคยเกิดจากรอบ 0, 90 และ 260 ms
+       */
+      window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = true;
+
+      try {
+        iframe.srcdoc = buildStaticFoodReviewCardDocument();
+      } finally {
+        window.__DDS_RENDER_STATIC_FOOD_REVIEW__ = false;
+      }
     }
 
     document.addEventListener("click", (event) => {
@@ -5214,17 +5261,17 @@ ${stylesheetLinks}
           '[data-go="review"], [data-page="review"], [data-edit-review]'
         )
       ) {
-        scheduleStaticFoodReviewPreview();
+        renderStaticFoodReviewPreview();
       }
     });
 
     window.addEventListener("hashchange", () => {
       if (window.location.hash === "#review") {
-        scheduleStaticFoodReviewPreview();
+        renderStaticFoodReviewPreview();
       }
     });
 
-    scheduleStaticFoodReviewPreview();
+    renderStaticFoodReviewPreview();
   }
 
 
