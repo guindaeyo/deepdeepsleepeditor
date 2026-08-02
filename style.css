@@ -6457,29 +6457,22 @@ textarea + .dds-bbcode-toolbar {
 }
 
 
-/* REVIEW CODE002 — KEEP ORIGINAL CODE SHAPE, CENTER ONLY */
+/* REVIEW CODE002 — SHOW THE WHOLE ORIGINAL CODE, CENTERED */
 .dds-review-grid #reviewCardPreview002 {
   position: absolute !important;
-  inset: auto !important;
-  top: 50% !important;
-  left: 50% !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
 
-  width: 1300px !important;
-  min-width: 1300px !important;
-  max-width: 1300px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
 
-  height: 920px !important;
-  min-height: 920px !important;
-  max-height: 920px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
 
-  transform:
-    translate(-50%, -50%)
-    scale(
-      var(
-        --dds-review-card-scale,
-        0.3
-      )
-    ) !important;
-
+  transform: none !important;
   transform-origin: center center !important;
+  background: #242424 !important;
 }
