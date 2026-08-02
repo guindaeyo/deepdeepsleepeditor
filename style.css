@@ -6436,3 +6436,22 @@ textarea + .dds-bbcode-toolbar {
   }
 }
 
+
+
+/* ==================================================
+   FOR REVIEW — REVIEW CODE002 / LO$ER=LO♡ER
+================================================== */
+#reviewCardPreview002,
+#musicReviewPreview {
+  background: #242424;
+}
+
+#reviewCardPreview002 {
+  width: 100%;
+  height: 100%;
+}
+
+[data-panel="editor-review002"] #musicReviewYoutubeId {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.04em;
+}

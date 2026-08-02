@@ -4326,7 +4326,8 @@ ${stylesheetLinks}
       "editor-profile002": "updateMoodboard",
       "editor-profile003": "updateFortyOne",
       "editor-profile004": "updateNothinBoutMe",
-      "editor-review001": "updateFoodReview"
+      "editor-review001": "updateFoodReview",
+      "editor-review002": "updateMusicReview"
     };
 
     const editorPanelSelector = [
@@ -7841,5 +7842,256 @@ ${stylesheetLinks}
     scheduleCatalogue("roleplay");
   } else if (window.location.hash === "#profile") {
     scheduleCatalogue("profile");
+  }
+})();
+
+
+/* ============================================================
+   FOR REVIEW — REVIEW CODE002 / LO$ER=LO♡ER
+   เพิ่มแบบแยกส่วนบนฐานเดิม ไม่แทนที่ REVIEW CODE001
+============================================================ */
+(() => {
+  const PANEL_NAME = "editor-review002";
+  const CSS_URL = "https://guindaeyo.github.io/deepdshop/ddsh-revmus.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Anton&family=Bai+Jamjuree:wght@300;400;500;600;700&family=Italianno&display=swap";
+
+  const officialValues = {
+    bg: "#ffffff",
+    main: "#b0120a",
+    border: "#000000",
+    text: "#000000",
+    youtubeId: "JzODRUBBXpc",
+    lyricOne: "I'm a loser, I'm a loser",
+    lyricTwo: "Lover with a dollar sign Is a loser",
+    recommender: "Franklin D. Bloodworth",
+    trackTitle: "LO$ER=LO♡ER",
+    artist: "TOMORROW X TOGETHER",
+    reviewTitle: "ต่อให้โลกแต่ก็ช่างมันปะไร",
+    reviewText: "ลองมารีวิวเพลงเก่า ๆ ของทีเร้กแต่ขึ้นหิ่งบ้าง แพ้รักเป็นอีกเพลงที่ดีมาก ๆ สำหรับนี่ รองจากพระมหาอ้อกวันน่ะนะ เป็นเพลงที่ตีหัวนี่ได้เต็ม ๆ โดนตกเข้าด้อมเลยล่ะ แม้ว่าจะไม่ได้ตามตั้งแต่แรกแต่ดีใจมากที่ได้เจอทีเร้ก ชอบเนื้อหาเพลงด้วยที่ต่อให้เราจะเป็นพวกจี้แพ้ในสังคมแต่เพื่อเธออะไรก็ยอมมาก ไปบ้าในโลกนี้กันเถอะ ฟีลพี่เสกโลโซป่ะ 555555555",
+    reviewFooter: "\"Run\" 절대 뒤돌아보지 마 두 손엔 hunnit bands I'm a loser",
+    youtubeLink: "https://www.youtube.com/watch?v=JzODRUBBXpc",
+    spotifyLink: "https://open.spotify.com/track/21aOLk12MksET8AsbU0SI6?si=5e5e47a39f2d4618",
+    appleLink: "https://music.apple.com/us/song/lo%24er-lo-er/1580999419"
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value).replaceAll("`", "&#96;");
+  }
+
+  function htmlLines(value) {
+    return escapeHtml(value).replace(/\r?\n/g, "<br>");
+  }
+
+  function extractYoutubeId(value) {
+    const text = String(value || "").trim();
+    if (!text) return "";
+
+    const patterns = [
+      /[?&]v=([A-Za-z0-9_-]{6,})/,
+      /youtu\.be\/([A-Za-z0-9_-]{6,})/,
+      /youtube\.com\/(?:embed|shorts)\/([A-Za-z0-9_-]{6,})/
+    ];
+
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) return match[1];
+    }
+
+    return text.replace(/[^A-Za-z0-9_-]/g, "");
+  }
+
+  function buildMarkup(values, previewMode = false) {
+    const videoId = extractYoutubeId(values.youtubeId);
+    const videoSrc = videoId
+      ? `https://www.youtube.com/embed/${escapeAttribute(videoId)}?autoplay=${previewMode ? "0" : "1"}&controls=1&loop=1&playlist=${escapeAttribute(videoId)}&playsinline=1&rel=0&modestbranding=1`
+      : "about:blank";
+
+    return `<div class="ddsh-revmus-wrap" style="--ddsh-revmus-bg:${escapeAttribute(values.bg)};--ddsh-revmus-main:${escapeAttribute(values.main)};--ddsh-revmus-border:${escapeAttribute(values.border)};--ddsh-revmus-text:${escapeAttribute(values.text)};"><div class="ddsh-revmus-kicker">A song <span>picked for you</span></div><div class="ddsh-revmus-heading"><div class="ddsh-revmus-title">GIVE</div><div class="ddsh-revmus-script">it a</div><div class="ddsh-revmus-subtitle">listen</div></div><div class="ddsh-revmus-hearts"><svg viewBox="0 0 220 125" aria-hidden="true"><g transform="translate(4 10) rotate(-8 55 55)"><path d="M55 101 C46 92 16 69 10 47 C4 25 18 11 36 13 C47 14 53 21 57 29 C62 18 72 11 84 13 C103 16 111 33 104 51 C96 71 70 92 55 101Z"></path><path class="ddsh-revmus-heart-inner" d="M55 91 C45 81 25 65 21 49 C17 36 25 25 37 26 C47 26 53 33 57 41 C62 32 69 26 80 27 C92 28 98 39 94 51 C89 65 69 82 55 91Z"></path><text x="55" y="60">YOU</text></g><g transform="translate(102 3) rotate(7 55 55)"><path d="M55 101 C46 92 16 69 10 47 C4 25 18 11 36 13 C47 14 53 21 57 29 C62 18 72 11 84 13 C103 16 111 33 104 51 C96 71 70 92 55 101Z"></path><path class="ddsh-revmus-heart-inner" d="M55 91 C45 81 25 65 21 49 C17 36 25 25 37 26 C47 26 53 33 57 41 C62 32 69 26 80 27 C92 28 98 39 94 51 C89 65 69 82 55 91Z"></path><text x="55" y="60">ME</text></g><g transform="translate(-34 6)"><path class="ddsh-revmus-bow" d="M123 15 C113 -1 124 -7 134 8 C142 20 144 31 142 39 M144 31 C153 14 170 4 178 12 C185 20 170 32 151 37 M145 38 C159 39 185 49 187 59 C188 68 169 62 150 44 M142 40 C132 53 119 69 113 63 C106 55 123 44 139 38 M142 39 C142 57 139 70 135 82"></path></g></svg></div><div class="ddsh-revmus-video-frame"><div class="ddsh-revmus-video"><iframe src="${videoSrc}" title="YouTube video" loading="${previewMode ? "lazy" : "eager"}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><span class="ddsh-revmus-star ddsh-revmus-star-right"></span></div><div class="ddsh-revmus-meta"><div class="ddsh-revmus-lyric-area"><div class="ddsh-revmus-lyric">${escapeHtml(values.lyricOne)}<br>${escapeHtml(values.lyricTwo)}</div><div class="ddsh-revmus-recommender"><div class="ddsh-revmus-swatches"><span class="ddsh-revmus-swatch-primary"></span><span class="ddsh-revmus-swatch-secondary"></span></div><div class="ddsh-revmus-recommender-name"><span>RECOMMENDED BY</span>${escapeHtml(values.recommender)}</div></div></div><div class="ddsh-revmus-track"><strong>${escapeHtml(values.trackTitle)}</strong><span>${escapeHtml(values.artist)}</span></div></div><div class="ddsh-revmus-review"><div class="ddsh-revmus-review-title">${escapeHtml(values.reviewTitle)}</div><div class="ddsh-revmus-review-text">${htmlLines(values.reviewText)}</div><div class="ddsh-revmus-review-footer">${htmlLines(values.reviewFooter)}</div></div><div class="ddsh-revmus-links"><a class="ddsh-revmus-link" href="${escapeAttribute(values.youtubeLink)}" target="_blank" rel="noopener noreferrer"><span class="ddsh-revmus-link-icon">▶</span><span class="ddsh-revmus-link-text"><small>WATCH ON</small>YOUTUBE</span></a><a class="ddsh-revmus-link" href="${escapeAttribute(values.spotifyLink)}" target="_blank" rel="noopener noreferrer"><span class="ddsh-revmus-link-icon">◉</span><span class="ddsh-revmus-link-text"><small>LISTEN ON</small>SPOTIFY</span></a><a class="ddsh-revmus-link" href="${escapeAttribute(values.appleLink)}" target="_blank" rel="noopener noreferrer"><span class="ddsh-revmus-link-icon">♪</span><span class="ddsh-revmus-link-text"><small>LISTEN ON</small>APPLE MUSIC</span></a></div><div class="ddsh-revmus-progress"><span></span></div></div><div class="ddsh-revmus-credit"><span></span></div>`;
+  }
+
+  function buildCopyCode(values) {
+    return `<link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet">${buildMarkup(values, false)}`;
+  }
+
+  function buildPreviewDocument(markup, mode) {
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;min-height:100%;background:#242424;overflow:hidden}.dds-music-preview-shell{position:relative;width:100%;min-height:100%;overflow:hidden}.dds-music-preview-target{position:absolute;top:0;left:50%;width:max-content;transform-origin:top center;will-change:transform}.dds-music-preview-target>.ddsh-revmus-wrap{margin:0!important}</style></head><body data-preview-mode="${mode}"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>(()=>{const mode=document.body.dataset.previewMode;const target=document.querySelector('.dds-music-preview-target');const wrap=document.querySelector('.ddsh-revmus-wrap');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!target||!wrap)return;target.style.transform='translateX(-50%) scale(1)';const rect=wrap.getBoundingClientRect();const w=Math.max(rect.width,wrap.scrollWidth,680);const h=Math.max(rect.height,wrap.scrollHeight,760);const vw=Math.max(document.documentElement.clientWidth,320);const vh=Math.max(document.documentElement.clientHeight,260);const scale=mode==='card'?Math.min((vw-18)/w,(vh-18)/h,1):Math.min((vw-28)/w,1);target.style.transform='translateX(-50%) scale('+Math.max(scale,.08)+')';const scaledHeight=Math.ceil(h*Math.max(scale,.08)+28);document.querySelector('.dds-music-preview-shell').style.height=scaledHeight+'px';document.body.style.height=scaledHeight+'px';if(mode!=='card'&&window.frameElement){window.frameElement.style.height=Math.max(720,scaledHeight)+'px';}window.frameElement?.classList.add('dds-preview-ready');window.frameElement?.classList.remove('dds-preview-loading');});}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);new ResizeObserver(fit).observe(wrap);setTimeout(fit,120);setTimeout(fit,500);setTimeout(fit,1200);window.__ddsFitMusic=fit;fit();})();<\/script></body></html>`;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    return Promise.resolve();
+  }
+
+  function initializeMusicReview() {
+    if (window.__DDS_MUSIC_REVIEW_002_INSTALLED__) return;
+
+    const panel = document.querySelector(`[data-panel="${PANEL_NAME}"]`);
+    const cardIframe = document.querySelector("#reviewCardPreview002");
+    const editorIframe = document.querySelector("#musicReviewPreview");
+    const generatedCode = document.querySelector("#generatedMusicReviewCode");
+    const copyButton = document.querySelector("#copyGeneratedMusicReviewCode");
+    const editButton = document.querySelector('[data-edit-review="review002"]');
+
+    if (!panel || !cardIframe || !editorIframe || !generatedCode || !editButton) return;
+    window.__DDS_MUSIC_REVIEW_002_INSTALLED__ = true;
+
+    const ids = {
+      bg: "musicReviewBgColor",
+      main: "musicReviewMainColor",
+      border: "musicReviewBorderColor",
+      text: "musicReviewTextColor",
+      youtubeId: "musicReviewYoutubeId",
+      lyricOne: "musicReviewLyricOne",
+      lyricTwo: "musicReviewLyricTwo",
+      recommender: "musicReviewRecommender",
+      trackTitle: "musicReviewTrackTitle",
+      artist: "musicReviewArtist",
+      reviewTitle: "musicReviewTitle",
+      reviewText: "musicReviewText",
+      reviewFooter: "musicReviewFooter",
+      youtubeLink: "musicReviewYoutubeLink",
+      spotifyLink: "musicReviewSpotifyLink",
+      appleLink: "musicReviewAppleLink"
+    };
+
+    function value(id, fallback = "") {
+      return document.getElementById(id)?.value ?? fallback;
+    }
+
+    function readValues() {
+      return Object.fromEntries(
+        Object.entries(ids).map(([key, id]) => [key, value(id, officialValues[key] || "")])
+      );
+    }
+
+    function renderIframe(iframe, markup, mode) {
+      const srcdoc = buildPreviewDocument(markup, mode);
+      if (iframe.dataset.ddsMusicSrcdoc === srcdoc) return;
+
+      const previewDocument = iframe.contentDocument;
+      if (
+        previewDocument &&
+        previewDocument.readyState !== "loading" &&
+        previewDocument.querySelector(".dds-music-preview-target") &&
+        typeof window.updateLoadedPreviewDocument === "function"
+      ) {
+        try {
+          const patched = window.updateLoadedPreviewDocument(
+            iframe,
+            srcdoc,
+            () => iframe.contentWindow?.__ddsFitMusic?.()
+          );
+
+          if (patched) {
+            iframe.dataset.ddsMusicSrcdoc = srcdoc;
+            iframe.contentWindow?.__ddsFitMusic?.();
+            return;
+          }
+        } catch (error) {
+          console.warn("[DDS REVIEW002] preview patch failed; reloading srcdoc", error);
+        }
+      }
+
+      iframe.dataset.ddsMusicSrcdoc = srcdoc;
+      iframe.classList.add("dds-preview-loading");
+      iframe.classList.remove("dds-preview-ready");
+      iframe.srcdoc = srcdoc;
+    }
+
+    function updateMusicReview() {
+      const values = readValues();
+      generatedCode.value = buildCopyCode(values);
+      renderIframe(editorIframe, buildMarkup(values, true), "editor");
+    }
+
+    window.updateMusicReview = updateMusicReview;
+
+    [
+      ["musicReviewBgColorPicker", "musicReviewBgColor"],
+      ["musicReviewMainColorPicker", "musicReviewMainColor"],
+      ["musicReviewBorderColorPicker", "musicReviewBorderColor"],
+      ["musicReviewTextColorPicker", "musicReviewTextColor"]
+    ].forEach(([pickerId, textId]) => {
+      const picker = document.getElementById(pickerId);
+      const textInput = document.getElementById(textId);
+      picker?.addEventListener("input", () => {
+        if (!textInput) return;
+        textInput.value = picker.value;
+        textInput.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      textInput?.addEventListener("input", () => {
+        const next = textInput.value.trim();
+        if (picker && /^#[0-9a-f]{6}$/i.test(next)) picker.value = next;
+      });
+    });
+
+    panel.addEventListener("input", updateMusicReview);
+    panel.addEventListener("change", updateMusicReview);
+
+    copyButton.addEventListener("click", () => {
+      updateMusicReview();
+      copyText(generatedCode.value)
+        .then(() => window.showToast?.("คัดลอกโค้ด REVIEW CODE002 แล้ว"))
+        .catch(() => window.showToast?.("คัดลอกโค้ดไม่สำเร็จ"));
+    });
+
+    function renderOfficialCard() {
+      renderIframe(cardIframe, buildMarkup(officialValues, true), "card");
+    }
+
+    function openEditor() {
+      document.body.classList.add("dds-editor-mode");
+      document.querySelectorAll("[data-panel]").forEach((candidate) => {
+        candidate.classList.toggle("is-active", candidate === panel);
+      });
+      document.querySelectorAll("[data-page]").forEach((button) => {
+        const active = button.dataset.page === "review";
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-current", active ? "page" : "false");
+      });
+      const pageNumber = document.querySelector("#currentPageNumber");
+      if (pageNumber) pageNumber.textContent = "03";
+      history.replaceState(null, "", "#editor-review002");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(updateMusicReview);
+    }
+
+    editButton.addEventListener("click", openEditor);
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#editor-review002") openEditor();
+      if (window.location.hash === "#review") renderOfficialCard();
+    });
+
+    document.querySelectorAll('[data-page="review"], [data-go="review"]').forEach((button) => {
+      button.addEventListener("click", () => requestAnimationFrame(renderOfficialCard));
+    });
+
+    if (window.location.hash === "#editor-review002") queueMicrotask(openEditor);
+
+    renderOfficialCard();
+    updateMusicReview();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeMusicReview, { once: true });
+  } else {
+    initializeMusicReview();
   }
 })();
