@@ -7115,3 +7115,135 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   border-color: rgba(255, 255, 255, 0.22);
   background: linear-gradient(135deg, #c11724, #870a13);
 }
+
+/* =========================================================
+   MIKAEL COMMISSION 003 — STRUCTURED HOUSE EDITOR
+   ========================================================= */
+.dds-mikael-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.dds-mikael-commission-heading > span:first-child {
+  display: block;
+}
+
+.dds-mikael-commission-heading > span:last-child {
+  display: block;
+  font-family: var(--dds-font-main);
+  font-size: clamp(34px, 4.6vw, 76px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.dds-mikael-preview-stage {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-mikael-preview-stage > iframe {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  width: 1040px;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  transform-origin: top center;
+}
+
+.dds-mikael-house-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-mikael-house-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-mikael-feature-grid,
+.dds-mikael-room-list {
+  display: grid;
+  gap: 12px;
+}
+
+.dds-mikael-feature-group,
+.dds-mikael-room-group {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.dds-mikael-feature-group > strong {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.dds-mikael-room-group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dds-mikael-room-group-title span {
+  color: var(--dds-red-bright);
+  font-family: var(--dds-font-serif);
+  font-size: 22px;
+}
+
+.dds-mikael-room-group-title strong {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.dds-mikael-house-editor [data-mikael-save],
+.dds-mikael-house-editor [data-mikael-copy] {
+  border-color: rgba(193, 23, 36, 0.68);
+  background: linear-gradient(135deg, #a20f1a, #690810);
+}
+
+.dds-mikael-house-copy {
+  flex: 0 0 auto;
+}
+
+.dds-mikael-house-copy .dds-control-title {
+  margin-bottom: 10px;
+}
+
+.dds-mikael-house-copy .dds-protected-commission-copy-actions [data-mikael-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 1100px) {
+  .dds-mikael-preview-stage {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dds-mikael-commission-heading > span:last-child {
+    font-size: 0.68em;
+  }
+
+  .dds-mikael-feature-group,
+  .dds-mikael-room-group {
+    padding: 13px;
+  }
+}

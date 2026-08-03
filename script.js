@@ -10460,3 +10460,673 @@ ${stylesheetLinks}
     install();
   }
 })();
+
+/* =========================================================
+   MIKAEL COMMISSION 003 — PASSWORD-GATED HOUSE EDITOR
+   ใช้รหัสร่วมสำหรับงานของ MIKAEL F. KAISER
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ACCESS_HASH = "eb826ef52686f3139fee3102ae3309a785481071f03a55fb0d8a5f80b5f72789";
+  const ACCESS_SESSION_KEY = "dds:mikael-commission-editor:unlocked";
+  const PANEL_NAME = "protected-commission003-mikael-house";
+  const DRAFT_KEY = "dds:commission-draft:mikael:commission003:structured-v1";
+  const CANVAS_WIDTH = 1040;
+  const CARD_SELECTOR = ".dds-commission-three-card";
+
+  const defaults = Object.freeze({
+    heroImage: "",
+    roomImage1: "",
+    roomImage2: "",
+    roomImage3: "",
+    roomImage4: "",
+    roomImage5: "",
+    roomImage6: "",
+    roomImage7: "",
+    roomImage8: "",
+    residentImage1: "",
+    residentImage2: "",
+    residentImage3: "",
+
+    monogram: "",
+    heroLabel: "",
+    heroSmall: "",
+    houseName: "",
+    heroThai: "",
+
+    introSmall: "",
+    introHeading: "",
+    houseTag1: "",
+    houseTag2: "",
+    houseTag3: "",
+    houseTag4: "",
+    introText1: "",
+    introText2: "",
+
+    featureIcon1: "",
+    featureTitle1: "",
+    featureSubtitle1: "",
+    featureIcon2: "",
+    featureTitle2: "",
+    featureSubtitle2: "",
+    featureIcon3: "",
+    featureTitle3: "",
+    featureSubtitle3: "",
+
+    roomSectionSmall: "",
+    roomSectionTitle: "",
+    roomSectionNote: "",
+
+    roomName1: "",
+    roomSubtitle1: "",
+    roomDescription1: "",
+    roomName2: "",
+    roomSubtitle2: "",
+    roomDescription2: "",
+    roomName3: "",
+    roomSubtitle3: "",
+    roomDescription3: "",
+    roomName4: "",
+    roomSubtitle4: "",
+    roomDescription4: "",
+    roomName5: "",
+    roomSubtitle5: "",
+    roomDescription5: "",
+    roomName6: "",
+    roomSubtitle6: "",
+    roomDescription6: "",
+    roomName7: "",
+    roomSubtitle7: "",
+    roomDescription7: "",
+    roomName8: "",
+    roomSubtitle8: "",
+    roomDescription8: "",
+
+    residentSectionSmall: "",
+    residentSectionTitle: "",
+    residentLabel1: "",
+    residentName1: "",
+    residentLabel2: "",
+    residentName2: "",
+    residentLabel3: "",
+    residentName3: "",
+
+    footerMark: "",
+    footerHeading: "",
+    footerText: ""
+  });
+
+  let panel = null;
+  let modal = null;
+  let previewTimer = 0;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "")
+      .trim()
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]+/g, "");
+  }
+
+  function textWithBreaks(value) {
+    return h(value).replace(/\r\n?|\n/g, "<br>");
+  }
+
+  function textParagraph(value) {
+    return textWithBreaks(value);
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+
+    let toast = document.getElementById("ddsMikaelEditorToast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "ddsMikaelEditorToast";
+      toast.className = "dds-copy-toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    window.clearTimeout(toast._hideTimer);
+    toast._hideTimer = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+    }, 1800);
+  }
+
+  async function sha256(value) {
+    const data = new TextEncoder().encode(value);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  function createField(label, key, options = {}) {
+    const {
+      full = false,
+      textarea = false,
+      rows = 3,
+      placeholder = "กรอกข้อความ",
+      type = "text",
+      help = ""
+    } = options;
+
+    const fieldClass = `dds-field${full ? " dds-field-full" : ""}`;
+    const control = textarea
+      ? `<textarea rows="${rows}" data-mikael-field="${h(key)}" placeholder="${h(placeholder)}"></textarea>`
+      : `<input type="${h(type)}" data-mikael-field="${h(key)}" placeholder="${h(placeholder)}">`;
+
+    return `<label class="${fieldClass}"><span>${h(label)}</span>${control}${help ? `<small class="dds-food-field-help">${h(help)}</small>` : ""}</label>`;
+  }
+
+  function createRoomGroup(index, title) {
+    return `
+      <div class="dds-mikael-room-group">
+        <div class="dds-mikael-room-group-title"><span>${String(index).padStart(2, "0")}</span><strong>${h(title)}</strong></div>
+        <div class="dds-form-grid">
+          ${createField("ชื่อห้อง", `roomName${index}`, { placeholder: "กรอกชื่อห้อง" })}
+          ${createField("ข้อความใต้ชื่อห้อง", `roomSubtitle${index}`, { placeholder: "กรอกข้อความใต้ชื่อ" })}
+          ${createField("รายละเอียดห้อง", `roomDescription${index}`, { full: true, textarea: true, rows: 5, placeholder: "กรอกรายละเอียดห้อง" })}
+        </div>
+      </div>`;
+  }
+
+  function getValues() {
+    const values = { ...defaults };
+    panel?.querySelectorAll("[data-mikael-field]").forEach((field) => {
+      values[field.dataset.mikaelField] = field.value;
+    });
+    return values;
+  }
+
+  function setValues(values = defaults) {
+    const next = { ...defaults, ...(values || {}) };
+    panel?.querySelectorAll("[data-mikael-field]").forEach((field) => {
+      field.value = next[field.dataset.mikaelField] ?? "";
+    });
+  }
+
+  function roomMarkup(values, index) {
+    const number = String(index).padStart(2, "0");
+    const name = values[`roomName${index}`];
+    const subtitle = values[`roomSubtitle${index}`];
+    const description = values[`roomDescription${index}`];
+
+    return `<details class="frdh-room"><summary class="frdh-room-summary"><div class="frdh-room-photo frdh-room-photo-${index}"></div><div class="frdh-room-caption"><span>${number}</span><div><strong>${h(name)}</strong><small>${h(subtitle)}</small></div></div><div class="frdh-open-icon"></div></summary><div class="frdh-room-detail"><div class="frdh-room-detail-title">${h(name)}</div><p>${textParagraph(description)}</p></div></details>`;
+  }
+
+  function buildCode(values = getValues()) {
+    const rooms = Array.from({ length: 8 }, (_, index) => roomMarkup(values, index + 1)).join("");
+
+    return `<link href="https://guindaeyo.github.io/css/code-friedfs.css" rel="stylesheet"><div class="frdh-wrap" style="--frdh-hero:url('${cssUrl(values.heroImage)}');--frdh-hero-pos:center 80%; --frdh-room-1:url('${cssUrl(values.roomImage1)}'); --frdh-room-1-pos:center 50%; --frdh-room-2:url('${cssUrl(values.roomImage2)}'); --frdh-room-2-pos:center 50%; --frdh-room-3:url('${cssUrl(values.roomImage3)}'); --frdh-room-3-pos:center 50%; --frdh-room-4:url('${cssUrl(values.roomImage4)}'); --frdh-room-4-pos:center 50%; --frdh-room-5:url('${cssUrl(values.roomImage5)}'); --frdh-room-5-pos:center 50%; --frdh-room-6:url('${cssUrl(values.roomImage6)}'); --frdh-room-6-pos:center 50%; --frdh-room-7:url('${cssUrl(values.roomImage7)}'); --frdh-room-7-pos:center 50%; --frdh-room-8:url('${cssUrl(values.roomImage8)}'); --frdh-room-8-pos:center 50%; --frdh-person-1:url('${cssUrl(values.residentImage1)}'); --frdh-person-1-pos:center 30%; --frdh-person-2:url('${cssUrl(values.residentImage2)}'); --frdh-person-2-pos:center 30%; --frdh-person-3:url('${cssUrl(values.residentImage3)}');--frdh-person-3-pos:center 30%;"><div class="frdh-hero"><div class="frdh-hero-shade"></div><div class="frdh-hero-top"><div class="frdh-monogram">${h(values.monogram)}</div><div class="frdh-hero-label">${h(values.heroLabel)}</div></div><div class="frdh-hero-title"><div class="frdh-hero-small">${h(values.heroSmall)}</div><div class="frdh-name">${h(values.houseName)}</div><div class="frdh-hero-thai">${textWithBreaks(values.heroThai)}</div></div></div><div class="frdh-intro"><div class="frdh-intro-heading"><div class="frdh-number">01</div><div class="frdh-heading-small">${h(values.introSmall)}</div><div class="frdh-heading-main">${h(values.introHeading)}</div><div class="frdh-heading-line"></div><div class="frdh-house-tags"><span>${h(values.houseTag1)}</span><span>${h(values.houseTag2)}</span><span>${h(values.houseTag3)}</span><span>${h(values.houseTag4)}</span></div></div><div class="frdh-intro-text"><p>${textParagraph(values.introText1)}</p><p>${textParagraph(values.introText2)}</p></div></div><div class="frdh-features"><div class="frdh-feature"><div class="frdh-feature-icon">${h(values.featureIcon1)}</div><div><strong>${h(values.featureTitle1)}</strong><span>${h(values.featureSubtitle1)}</span></div></div><div class="frdh-feature"><div class="frdh-feature-icon">${h(values.featureIcon2)}</div><div><strong>${h(values.featureTitle2)}</strong><span>${h(values.featureSubtitle2)}</span></div></div><div class="frdh-feature"><div class="frdh-feature-icon">${h(values.featureIcon3)}</div><div><strong>${h(values.featureTitle3)}</strong><span>${h(values.featureSubtitle3)}</span></div></div></div><div class="frdh-section"><div class="frdh-section-head"><div><div class="frdh-section-number">02</div><div class="frdh-section-small">${h(values.roomSectionSmall)}</div><div class="frdh-section-title">${h(values.roomSectionTitle)}</div></div><div class="frdh-section-note">${textWithBreaks(values.roomSectionNote)}</div></div><div class="frdh-room-grid">${rooms}</div></div><div class="frdh-resident-section"><div class="frdh-resident-head"><div class="frdh-section-number frdh-section-number-light">03</div><div class="frdh-section-small frdh-section-small-light">${h(values.residentSectionSmall)}</div><div class="frdh-resident-title">${h(values.residentSectionTitle)}</div></div><div class="frdh-resident-grid"><div class="frdh-person-card" style="--frdh-person-bottom:20px;"><div class="frdh-person-photo frdh-person-photo-1"></div><div class="frdh-person-info"><div class="frdh-person-no">${h(values.residentLabel1)}</div><div class="frdh-person-name">${h(values.residentName1)}</div></div></div><div class="frdh-person-card" style="--frdh-person-bottom:20px;"><div class="frdh-person-photo frdh-person-photo-2"></div><div class="frdh-person-info"><div class="frdh-person-no">${h(values.residentLabel2)}</div><div class="frdh-person-name">${h(values.residentName2)}</div></div></div><div class="frdh-person-card" style="--frdh-person-bottom:20px;"><div class="frdh-person-photo frdh-person-photo-3"></div><div class="frdh-person-info"><div class="frdh-person-no">${h(values.residentLabel3)}</div><div class="frdh-person-name">${h(values.residentName3)}</div></div></div></div></div><div class="frdh-footer"><div class="frdh-footer-mark">${h(values.footerMark)}</div><div><strong>${h(values.footerHeading)}</strong><span>${textWithBreaks(values.footerText)}</span></div><div class="frdh-footer-line"></div></div></div>`;
+  }
+
+  function buildPreviewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>
+      html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
+      body{position:relative!important;min-height:1px!important}
+      .dds-mikael-preview-positioner{position:relative!important;display:block!important;width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;transform:none!important}
+      .dds-mikael-preview-positioner>.frdh-wrap,.frdh-wrap{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;transform:none!important}
+    </style></head><body><div class="dds-mikael-preview-positioner" data-mikael-preview-positioner>${code}</div></body></html>`;
+  }
+
+  function fitPreview() {
+    const iframe = panel?.querySelector("[data-mikael-preview]");
+    const stage = panel?.querySelector("[data-mikael-preview-stage]");
+    if (!iframe || !stage) return;
+
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+      const positioner = doc.querySelector("[data-mikael-preview-positioner]");
+      const root = doc.querySelector(".frdh-wrap");
+
+      if (positioner) {
+        positioner.style.width = `${CANVAS_WIDTH}px`;
+        positioner.style.minWidth = `${CANVAS_WIDTH}px`;
+        positioner.style.maxWidth = `${CANVAS_WIDTH}px`;
+        positioner.style.transform = "none";
+      }
+
+      if (root) {
+        root.style.width = `${CANVAS_WIDTH}px`;
+        root.style.minWidth = `${CANVAS_WIDTH}px`;
+        root.style.maxWidth = `${CANVAS_WIDTH}px`;
+        root.style.margin = "0";
+        root.style.transform = "none";
+      }
+
+      const naturalHeight = Math.max(
+        positioner?.scrollHeight || 0,
+        positioner?.offsetHeight || 0,
+        root?.scrollHeight || 0,
+        root?.offsetHeight || 0,
+        doc.body.scrollHeight || 0,
+        doc.documentElement?.scrollHeight || 0,
+        1
+      );
+      const availableWidth = Math.max(1, stage.clientWidth - 24);
+      const scale = Math.min(1, availableWidth / CANVAS_WIDTH);
+      const scaledHeight = Math.ceil(naturalHeight * scale);
+
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.minWidth = `${CANVAS_WIDTH}px`;
+      iframe.style.maxWidth = "none";
+      iframe.style.left = "50%";
+      iframe.style.top = "0";
+      iframe.style.height = `${Math.ceil(naturalHeight)}px`;
+      iframe.style.minHeight = `${Math.ceil(naturalHeight)}px`;
+      iframe.style.transformOrigin = "top center";
+      iframe.style.transform = `translateX(-50%) scale(${scale})`;
+      stage.style.height = `${Math.max(720, scaledHeight)}px`;
+    } catch (error) {
+      console.warn("[DDS] Could not fit Mikael commission preview", error);
+    }
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    const iframe = panel.querySelector("[data-mikael-preview]");
+    if (!iframe) return;
+
+    const next = buildPreviewDocument(buildCode(getValues()));
+    iframe.onload = () => {
+      fitPreview();
+      const doc = iframe.contentDocument;
+      doc?.fonts?.ready?.then(fitPreview).catch(() => {});
+      doc?.querySelectorAll("details").forEach((detailsElement) => {
+        detailsElement.addEventListener("toggle", fitPreview);
+      });
+      Array.from(doc?.images || []).forEach((image) => {
+        if (!image.complete) image.addEventListener("load", fitPreview, { once: true });
+      });
+      [100, 350, 800, 1500].forEach((delay) => window.setTimeout(fitPreview, delay));
+    };
+    iframe.srcdoc = next;
+  }
+
+  function schedulePreview() {
+    window.clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(updatePreview, 80);
+  }
+
+  function formatSavedTime(timestamp) {
+    if (!timestamp) return "ยังไม่มีแบบร่าง";
+    try {
+      return `บันทึกล่าสุด ${new Date(timestamp).toLocaleString("th-TH", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      })}`;
+    } catch {
+      return "มีแบบร่างที่บันทึกไว้";
+    }
+  }
+
+  function setDraftStatus(timestamp = 0) {
+    const status = panel?.querySelector("[data-mikael-draft-status]");
+    if (status) status.textContent = formatSavedTime(timestamp);
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.values ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+    setDraftStatus(savedAt);
+    showToast("บันทึกแบบร่างโค้ดบ้านแล้ว");
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode(getValues());
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("คัดลอกโค้ดกระทู้บ้านแล้ว");
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      showToast("คัดลอกโค้ดกระทู้บ้านแล้ว");
+    }
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-mikael-house-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-protected-commission-back title="กลับหน้า COMMISSION" type="button">←</button>
+        <div>
+          <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
+          <h1 class="dds-mikael-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทกระทู้บ้าน</span></h1>
+          <p>กรอกข้อมูลทางขวา แล้วดูตัวอย่างทั้งหมดทางซ้าย สีและโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
+        </div>
+      </div>
+
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>MIKAEL / COMMISSION 03</strong></div>
+          <div class="dds-protected-commission-preview-stage dds-mikael-preview-stage" data-mikael-preview-stage>
+            <iframe class="dds-protected-commission-preview-frame" data-mikael-preview scrolling="no" title="ตัวอย่างโค้ดกระทู้บ้าน"></iframe>
+          </div>
+        </div>
+
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft">
+            <div><strong>บันทึกแบบร่าง</strong><small data-mikael-draft-status>ยังไม่มีแบบร่าง</small></div>
+            <button type="button" data-mikael-save>SAVE DRAFT</button>
+            <button type="button" data-mikael-delete>DELETE SAVE</button>
+          </div>
+
+          <div class="dds-protected-commission-scroll dds-mikael-house-scroll">
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div>
+              <div class="dds-form-grid">
+                ${createField("รูปหน้าปกบ้าน", "heroImage", { full: true, type: "url", placeholder: "วางลิงก์รูปหน้าปก" })}
+                ${Array.from({ length: 8 }, (_, index) => createField(`รูปห้องที่ ${index + 1}`, `roomImage${index + 1}`, { type: "url", placeholder: "วางลิงก์รูปห้อง" })).join("")}
+                ${createField("รูปผู้อาศัยที่ 1", "residentImage1", { type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปผู้อาศัยที่ 2", "residentImage2", { type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปผู้อาศัยที่ 3", "residentImage3", { type: "url", placeholder: "วางลิงก์รูป" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>02</span><h2>ส่วนหัวและข้อมูลบ้าน</h2></div>
+              <div class="dds-form-grid">
+                ${createField("สัญลักษณ์มุมบน", "monogram", { placeholder: "เช่น F" })}
+                ${createField("ชื่อมุมบน", "heroLabel", { placeholder: "กรอกชื่อ" })}
+                ${createField("ข้อความเหนือชื่อบ้าน", "heroSmall", { placeholder: "เช่น WELCOME TO" })}
+                ${createField("ชื่อบ้าน", "houseName", { placeholder: "กรอกชื่อบ้าน" })}
+                ${createField("ข้อความใต้ชื่อบ้าน", "heroThai", { full: true, textarea: true, rows: 3 })}
+                ${createField("หัวข้อเล็กส่วนแนะนำ", "introSmall", { placeholder: "เช่น ABOUT THE HOUSE" })}
+                ${createField("หัวข้อหลักส่วนแนะนำ", "introHeading", { placeholder: "กรอกหัวข้อ" })}
+                ${createField("แท็กบ้าน 1", "houseTag1", { placeholder: "กรอกแท็ก" })}
+                ${createField("แท็กบ้าน 2", "houseTag2", { placeholder: "กรอกแท็ก" })}
+                ${createField("แท็กบ้าน 3", "houseTag3", { placeholder: "กรอกแท็ก" })}
+                ${createField("แท็กบ้าน 4", "houseTag4", { placeholder: "กรอกแท็ก" })}
+                ${createField("คำอธิบายบ้าน ย่อหน้าที่ 1", "introText1", { full: true, textarea: true, rows: 7 })}
+                ${createField("คำอธิบายบ้าน ย่อหน้าที่ 2", "introText2", { full: true, textarea: true, rows: 7 })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>03</span><h2>จุดเด่นของบ้าน</h2></div>
+              <div class="dds-mikael-feature-grid">
+                ${[1, 2, 3].map((index) => `
+                  <div class="dds-mikael-feature-group">
+                    <strong>จุดเด่นที่ ${index}</strong>
+                    <div class="dds-form-grid">
+                      ${createField("สัญลักษณ์", `featureIcon${index}`, { placeholder: "เช่น ☼" })}
+                      ${createField("หัวข้อ", `featureTitle${index}`, { placeholder: "กรอกหัวข้อ" })}
+                      ${createField("ข้อความใต้หัวข้อ", `featureSubtitle${index}`, { full: true, placeholder: "กรอกข้อความ" })}
+                    </div>
+                  </div>`).join("")}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>04</span><h2>พื้นที่ภายในบ้าน</h2></div>
+              <div class="dds-form-grid">
+                ${createField("หัวข้อเล็ก", "roomSectionSmall", { placeholder: "เช่น ROOM DIRECTORY" })}
+                ${createField("หัวข้อหลัก", "roomSectionTitle", { placeholder: "กรอกหัวข้อ" })}
+                ${createField("ข้อความกำกับ", "roomSectionNote", { full: true, textarea: true, rows: 3 })}
+              </div>
+              <div class="dds-mikael-room-list">
+                ${createRoomGroup(1, "ห้องที่ 1")}
+                ${createRoomGroup(2, "ห้องที่ 2")}
+                ${createRoomGroup(3, "ห้องที่ 3")}
+                ${createRoomGroup(4, "ห้องที่ 4")}
+                ${createRoomGroup(5, "ห้องที่ 5")}
+                ${createRoomGroup(6, "ห้องที่ 6")}
+                ${createRoomGroup(7, "ห้องที่ 7")}
+                ${createRoomGroup(8, "ห้องที่ 8")}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>05</span><h2>ผู้อาศัยและส่วนท้าย</h2></div>
+              <div class="dds-form-grid">
+                ${createField("หัวข้อเล็กส่วนผู้อาศัย", "residentSectionSmall", { placeholder: "เช่น CURRENT RESIDENTS" })}
+                ${createField("หัวข้อหลักส่วนผู้อาศัย", "residentSectionTitle", { placeholder: "กรอกหัวข้อ" })}
+                ${createField("ป้ายผู้อาศัยที่ 1", "residentLabel1", { placeholder: "เช่น RESIDENT 01" })}
+                ${createField("ชื่อผู้อาศัยที่ 1", "residentName1", { placeholder: "กรอกชื่อ" })}
+                ${createField("ป้ายผู้อาศัยที่ 2", "residentLabel2", { placeholder: "เช่น RESIDENT 02" })}
+                ${createField("ชื่อผู้อาศัยที่ 2", "residentName2", { placeholder: "กรอกชื่อ" })}
+                ${createField("ป้ายผู้อาศัยที่ 3", "residentLabel3", { placeholder: "เช่น RESIDENT 03" })}
+                ${createField("ชื่อผู้อาศัยที่ 3", "residentName3", { placeholder: "กรอกชื่อ" })}
+                ${createField("สัญลักษณ์ส่วนท้าย", "footerMark", { placeholder: "เช่น F" })}
+                ${createField("ชื่อส่วนท้าย", "footerHeading", { placeholder: "กรอกชื่อ" })}
+                ${createField("ข้อความส่วนท้าย", "footerText", { full: true, textarea: true, rows: 5 })}
+              </div>
+            </section>
+          </div>
+
+          <section class="dds-protected-commission-copy dds-mikael-house-copy">
+            <div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-protected-commission-copy-actions">
+              <button type="button" data-mikael-copy>COPY CODE <span>↗</span></button>
+              <button type="button" data-mikael-reset>RESET</button>
+            </div>
+          </section>
+        </div>
+      </div>`;
+
+    footer.before(panel);
+
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-mikael-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-mikael-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-mikael-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-mikael-reset]")?.addEventListener("click", resetFields);
+
+    return panel;
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => {
+      item.classList.toggle("is-active", item.dataset.panel === panelName);
+    });
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.page === "commission");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    history.replaceState(null, "", "#commission-mikael-editor");
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function openEditor() {
+    const editorPanel = createPanel();
+    if (!editorPanel) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    updatePreview();
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsMikaelCommissionLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <form class="dds-commission-lock-dialog" data-mikael-lock-form>
+        <small>CLIENT ACCESS / MIKAEL F. KAISER</small>
+        <h2>Protected editor</h2>
+        <p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p>
+        <label class="dds-commission-lock-field">
+          <span>รหัสผ่าน</span>
+          <input type="password" autocomplete="current-password" data-mikael-lock-input placeholder="กรอกรหัสผ่าน">
+        </label>
+        <p class="dds-commission-lock-error" data-mikael-lock-error aria-live="polite"></p>
+        <div class="dds-commission-lock-actions">
+          <button type="submit">UNLOCK EDITOR</button>
+          <button type="button" data-mikael-lock-close>CANCEL</button>
+        </div>
+      </form>`;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector("[data-mikael-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+    modal.querySelector("[data-mikael-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-mikael-lock-input]");
+      const error = modal.querySelector("[data-mikael-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+
+      try {
+        const hash = await sha256(input.value || "");
+        if (hash === ACCESS_HASH) {
+          sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+          error.textContent = "";
+          closeModal();
+          openEditor();
+          return;
+        }
+
+        error.textContent = "รหัสผ่านไม่ถูกต้อง";
+        input.select();
+      } catch (errorObject) {
+        console.warn("[DDS] Could not verify Mikael password", errorObject);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    return modal;
+  }
+
+  function openModal() {
+    const lockModal = createModal();
+    lockModal.hidden = false;
+    document.body.classList.add("dds-modal-open");
+    const input = lockModal.querySelector("[data-mikael-lock-input]");
+    const error = lockModal.querySelector("[data-mikael-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    requestAnimationFrame(() => input?.focus());
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("dds-modal-open");
+  }
+
+  function addEditButton() {
+    const card = document.querySelector(CARD_SELECTOR);
+    if (!card) return false;
+    if (card.querySelector("[data-edit-mikael-commission]")) return true;
+
+    const body = card.querySelector(".dds-commission-card-body");
+    const viewButton = card.querySelector("[data-view-commission-three]");
+    if (!body || !viewButton) return false;
+
+    let actions = body.querySelector(".dds-commission-card-actions");
+    if (!actions) {
+      actions = document.createElement("div");
+      actions.className = "dds-commission-card-actions";
+      viewButton.before(actions);
+      actions.appendChild(viewButton);
+    }
+
+    const editButton = document.createElement("button");
+    editButton.className = "dds-roleplay-edit dds-commission-protected-edit";
+    editButton.type = "button";
+    editButton.dataset.editMikaelCommission = "commission003";
+    editButton.innerHTML = "EDIT CODE <span>↗</span>";
+    actions.appendChild(editButton);
+
+    editButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
+      else openModal();
+    });
+
+    return true;
+  }
+
+  function install() {
+    createModal();
+    window.addEventListener("resize", fitPreview);
+
+    if (addEditButton()) return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      if (addEditButton() || attempts > 40) {
+        window.clearInterval(timer);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();
