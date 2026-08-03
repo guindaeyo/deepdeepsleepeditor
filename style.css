@@ -7247,3 +7247,140 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     padding: 13px;
   }
 }
+
+/* ==================================================
+   ERIC HAWKINS — PROTECTED COMMISSION PROFILE EDITOR
+================================================== */
+.dds-eric-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12em;
+}
+
+.dds-eric-commission-heading > span {
+  display: block;
+}
+
+.dds-eric-commission-heading > span:last-child {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 0.76em;
+  line-height: 0.95;
+}
+
+.dds-eric-preview-stage {
+  min-height: 720px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-eric-preview-holder {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.dds-eric-preview-holder > iframe {
+  position: absolute;
+  inset: 0 auto auto 0;
+  max-width: none !important;
+  border: 0;
+  background: transparent;
+}
+
+.dds-eric-profile-scroll {
+  scrollbar-gutter: stable;
+}
+
+.dds-eric-profile-scroll .dds-control-section {
+  min-width: 0;
+}
+
+.dds-eric-profile-editor [data-eric-save],
+.dds-eric-profile-editor [data-eric-copy] {
+  border-color: rgba(197, 24, 36, 0.9) !important;
+  background: linear-gradient(135deg, #b31520, #7d0811) !important;
+  color: #fff !important;
+}
+
+.dds-eric-profile-copy .dds-protected-commission-copy-actions [data-eric-copy] {
+  flex: 1 1 auto;
+}
+
+.dds-eric-rich-field > .dds-bbcode-toolbar {
+  margin: 7px 0 0;
+  border-bottom: 0;
+}
+
+.dds-eric-rich-field > textarea {
+  min-height: 180px;
+  margin-top: 0;
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.dds-eric-rich-field > .dds-word-counter {
+  margin-top: 0;
+}
+
+.dds-eric-tmi-group {
+  grid-column: 1 / -1;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.dds-eric-tmi-group > strong {
+  display: block;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.dds-eric-card-preview-frame {
+  max-width: none !important;
+  border: 0;
+}
+
+.dds-eric-view-stage {
+  min-height: 600px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: auto;
+  background: #242424;
+}
+
+.dds-eric-view-stage > iframe {
+  flex: 0 0 auto;
+  max-width: none !important;
+  border: 0;
+}
+
+@media (max-width: 1100px) {
+  .dds-eric-preview-stage {
+    min-height: 520px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dds-eric-commission-heading > span:last-child {
+    font-size: 0.68em;
+  }
+
+  .dds-eric-preview-stage {
+    min-height: 390px;
+    padding: 10px;
+  }
+
+  .dds-eric-tmi-group {
+    padding: 14px;
+  }
+}

@@ -11130,3 +11130,487 @@ ${stylesheetLinks}
     install();
   }
 })();
+
+/* =========================================================
+   ERIC HAWKINS COMMISSION — PASSWORD-GATED PROFILE EDITOR
+   รหัสร่วมสำหรับงานของ ERIC HAWKINS
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ACCESS_HASH = "0f12c03d3ca823c878c0ee0eb5dd848796d95d8a99b0c6e34bb955aa422760a4";
+  const ACCESS_SESSION_KEY = "dds:eric-hawkins-commission-editor:unlocked";
+  const PANEL_NAME = "protected-commission-eric-profile";
+  const VIEW_PANEL_NAME = "editor-commission-eric-profile-view";
+  const DRAFT_KEY = "dds:commission-draft:eric-hawkins:profile-v1";
+  const CANVAS_WIDTH = 1040;
+  const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-profer02.css";
+
+  const defaults = Object.freeze({
+    bgImage: "", coverImage: "", avatarImage: "", widgetOneImage: "", widgetTwoImage: "", miniImage: "",
+    coverY: "50", avatarY: "35", widgetOneY: "50", widgetTwoY: "30", widgetOneFade: "80", widgetTwoFade: "80",
+    themeMain: "#789b55", themeMainDark: "#536e3c", themeBackground: "#eff5e6", themePanel: "#fbfcf7",
+    themeCard: "#f8fbf2", themeText: "#22271e", themeTextSoft: "#718064",
+    displayName: "", englishName: "", thaiName: "", messageLabel: "", smallButtonOne: "", smallButtonTwo: "",
+    bubbleSymbol: "", symbolLineOne: "", symbolLineTwo: "",
+    profileHeading: "", profileIcon: "",
+    profileLabel1: "", profileValue1: "", profileLabel2: "", profileValue2: "",
+    profileLabel3: "", profileValue3: "", profileLabel4: "", profileValue4: "",
+    profileLabel5: "", profileValue5: "", profileLabel6: "", profileValue6: "",
+    biographyHeading: "", biographyIcon: "", biographyText: "",
+    educationLabel: "", educationMain: "", educationSub: "",
+    faceclaimLabel: "", faceclaimMain: "", faceclaimSub: "",
+    tabOne: "", tabTwo: "", tabThree: "", widgetsHeading: "", addWidgetLabel: "",
+    widgetOneSymbol: "", widgetOneAbstract: "", musicTitle: "", musicArtist: "",
+    widgetTwoSymbol: "", widgetTwoTitle: "", widgetTwoSubtitle: "",
+    statValue1: "", statLabel1: "", statValue2: "", statLabel2: "", statValue3: "", statLabel3: "",
+    statValue4: "", statLabel4: "", statValue5: "", statLabel5: "", statValue6: "", statLabel6: "",
+    personalityHeading: "", personalityIcon: "", personalityText: "",
+    tmiHeading: "", tmiIcon: "",
+    tmiSymbol1: "", tmiTitle1: "", tmiText1: "", tmiSymbol2: "", tmiTitle2: "", tmiText2: "",
+    tmiSymbol3: "", tmiTitle3: "", tmiText3: "", tmiSymbol4: "", tmiTitle4: "", tmiText4: "",
+    footerSymbolOne: "", footerName: "", footerSymbolTwo: "", footerRace: "", footerSymbolThree: ""
+  });
+
+  const OFFICIAL_CODE = String.raw`<link href="https://guindaeyo.github.io/css/commit-profer02.css" rel="stylesheet"><div class="erw-profile" style="--erw-bg:url('https://i.pinimg.com/736x/24/ee/4c/24ee4c78d1bf27f9b031b92b60772ad9.jpg');--erw-cover:url('https://i.pinimg.com/736x/d6/32/9f/d6329f6a058c75b34f37786694df8fdd.jpg');--erw-avatar:url('https://i.pinimg.com/vwebp/1200x/2a/64/e0/2a64e057a2b06009de0ee4daf538f949.webp');--erw-widget-one:url('https://i.pinimg.com/736x/9d/b9/d2/9db9d24ae8d72e2da6c5b98709e560d4.jpg');--erw-widget-two:url('https://i.pinimg.com/vwebp/1200x/27/31/2f/27312fff33b348dbc152d1e659147eac.webp');--erw-mini:url('https://i.pinimg.com/vwebp/736x/f3/ab/22/f3ab223672e2efb857a05aaab4250c8a.webp');--erw-cover-y:50%;--erw-avatar-y:35%;--erw-widget-one-y:50%;--erw-widget-two-y:30%;--erw-widget-one-fade:80%;--erw-widget-two-fade:80%;--erw-theme-main:#789b55;--erw-theme-main-dark:#536e3c;--erw-theme-background:#eff5e6;--erw-theme-panel:#fbfcf7;--erw-theme-card:#f8fbf2;--erw-theme-text:#22271e;--erw-theme-text-soft:#718064;"><div class="erw-layout"><section class="erw-left"><div class="erw-cover"></div><div class="erw-avatar-area"><div class="erw-avatar-frame"><div class="erw-avatar"></div><div class="erw-moon-status"></div></div><div class="erw-bubble-wrap"><span class="erw-bubble-dot erw-bubble-dot-one"></span><span class="erw-bubble-dot erw-bubble-dot-two"></span><div class="erw-bubble"><span>☘</span></div></div></div><div class="erw-identity"><div class="erw-display-name"></div><h1>Eric Hawkins</h1><div class="erw-thai-name">เอริค ฮอว์กินส์</div><div class="erw-actions"><div class="erw-message-button"><span>&#128172;</span>Message</div><div class="erw-small-button">☻</div><div class="erw-small-button">•••</div></div></div><div class="erw-symbol-art"><div>˙ ◌　&#127811; ᐟᐟ　✿ ˙</div><div>⌣　⌁　☾　˙</div></div><div class="erw-left-block erw-basic-block"><div class="erw-heading"><div><span>01</span><h2>Profile</h2></div><small>☘</small></div><div class="erw-info-grid"><div class="erw-info-item"><small>ชื่อเล่น</small><strong>เอริค, ริค</strong></div><div class="erw-info-item"><small>อายุ</small><strong>20 ปี</strong></div><div class="erw-info-item"><small>วันเกิด</small><strong>21 January 2006</strong></div><div class="erw-info-item"><small>เผ่าพันธุ์</small><strong>มนุษย์หมาป่า</strong></div><div class="erw-info-item"><small>สถานะ</small><strong>โอเมก้า</strong></div><div class="erw-info-item"><small>ภูมิลำเนา</small><strong>Colorado, USA</strong></div></div></div><div class="erw-left-block"><div class="erw-heading"><div><span>02</span><h2>Biography</h2></div><small>✦</small></div><div class="erw-prose"><p class="erw-dropcap">เอริคเติบโตมาในครอบครัวฐานะปานกลางในรัฐโคโลราโด วัยเด็กของเขาแสนจะเรียบง่ายเหมือนเด็กอเมริกันทั่วไปที่รักการเล่นกีฬา เขาเป็นกัปตันทีมฟุตบอลของโรงเรียนไฮสคูลและใช้ชีวิตอยู่กับความฝันที่อยากจะเป็นนักกีฬาอาชีพ จนกระทั่งจุดเปลี่ยนสำคัญมาถึงในช่วงปิดเทอมฤดูร้อนปีสุดท้ายของไฮสคูล<br><br>ในระหว่างการไปตั้งแคมป์กับเพื่อน เขาได้เจอกับหมาป่าขนาดใหญ่ในป่าลึก รูปร่างของมันดูใหญ่เกินกว่าหมาป่าทั่วไปที่เขาเคยเห็น แววตาสีแดงน่ากลัว แม้ว่าเขาจะพยายามป้องกันตัวแต่ก็ได้รับบาดเจ็บสาหัสที่แขนข้างขวา เหตุการณ์ในครั้งนั้นไม่ได้จบลงเพียงแค่การบาดเจ็บทางร่างกาย เพราะในเวลาต่อมาเขาก็เริ่มสังเกตเห็นความเปลี่ยนแปลงในร่างกายของตัวเองที่ไม่สามารถอธิบายได้ ทั้งประสาทสัมผัสที่ดีขึ้น พละกำลังที่มากกว่าปกติ และความเจ็บปวดบางอย่างที่รุนแรงมากขึ้นในช่วงคืนพระจันทร์เต็มดวง<br><br>หลังจากจบไฮสคูลเขาพยายามใช้ชีวิตในมหาวิทยาลัยอย่างปกติ เล่นกีฬา เรียน สังสรรค์ และรักษาความลับนี้ไว้ แต่ด้วยสัญชาตญาณที่เริ่มควบคุมยากขึ้นเรื่อย ๆ ทำให้เขาพยายามออกหาข้อมูลเกี่ยวกับความจริงของสิ่งที่เขากำลังเผชิญอยู่ จนกระทั่งได้พบกับชื่อหมู่บ้านแห่งหนึ่งที่เขาไม่เคยรู้จักมาก่อน ‘หมู่บ้านเอลิเชียน’ และเมื่ออายุครบ 20 ปี เอริคจึงตัดสินใจที่จะย้ายเข้ามาในหมู่บ้านแห่งนี้เพื่อทำความเข้าใจกับตัวเองมากยิ่งขึ้น<br><br>หลังจากย้ายเข้ามาอยู่ที่หมู่บ้านเอลิเชียนหลายเดือน เอริคตัดสินใจเริ่มต้นศึกษาเรียนต่อในคณะมนุษยศาสตร์ฯ สาขาจิตวิทยา</p></div></div><div class="erw-left-bottom"><div class="erw-side-detail"><small>EDUCATION</small><strong>คณะมนุษยศาสตร์ฯ</strong><span>สาขาจิตวิทยา</span></div><div class="erw-side-detail"><small>FACE CLAIM</small><strong>Ohyul</strong><span>Lngshot</span></div><div class="erw-side-detail erw-side-detail-wide"><div class="erw-connection-row"><div></div></div></div></div></section><section class="erw-right"><div class="erw-close">×</div><div class="erw-tabs"><div class="erw-tab erw-tab-active">Board</div><div class="erw-tab">Activity</div><div class="erw-tab">Wishlist</div></div><div class="erw-widget-header"><strong>Your Widgets</strong><div class="erw-add-widget"><span>＋</span>Add Widget</div></div><div class="erw-widget erw-widget-one"><div class="erw-widget-one-photo"></div><div class="erw-widget-one-content"><div class="erw-widget-symbol">☘ ˙⌁ ︵ ☾ ᐟᐟ</div><div class="erw-widget-abstract"><span>⌜</span><div>˙　◌　˙<br>ᐟᐟ　⌁　⌣<br>˙　☾　｡ </div><span>⌟</span></div></div><div class="erw-music-player"><div class="erw-music-cover"></div><div class="erw-music-detail"><div class="erw-progress"><span></span></div><strong>ชื่อเพลง</strong><small>ชื่อนักร้อง</small></div><div class="erw-player-switch">▶</div></div></div><div class="erw-widget erw-widget-two"><div class="erw-widget-two-top"><div class="erw-widget-two-photo"></div><div class="erw-widget-two-content"><div class="erw-widget-symbol">☘ ˙⌁ &#9749; ⌁ ☾ ⌁</div><div class="erw-steam-title">˚₊‧<strong>Omega Wolf</strong>⌣</div><div class="erw-steam-subtitle">woof woof woof!</div></div></div><div class="erw-stat-grid"><div class="erw-stat"><strong>95%</strong><span>Competitive</span></div><div class="erw-stat"><strong>93%</strong><span>Athletic</span></div><div class="erw-stat"><strong>88%</strong><span>Friendly</span></div><div class="erw-stat"><strong>96%</strong><span>Observant</span></div><div class="erw-stat"><strong>91%</strong><span>Caring</span></div><div class="erw-stat"><strong>89%</strong><span>Loyal</span></div></div></div><div class="erw-right-block"><div class="erw-heading"><div><span>03</span><h2>Personality</h2></div><small>✚</small></div><div class="erw-prose">รอยยิ้มที่เป็นเอกลักษณ์ต่างเป็นเสน่ห์เฉพาะตัวของเขาที่ใครต่างก็ต้องทัก บางครั้งยังช่วยทำให้บรรยากาศรอบข้างผ่อนคลายได้ เอริคเป็นคนที่เข้าถึงได้ง่าย และมักจะเป็นจุดสนใจโดยที่ไม่ได้ตั้งใจ<br><br>การที่เป็นนักกีฬาตั้งแต่เด็กหล่อหลอมให้เขาเป็นคนที่ใจสู้และรักในการแข่งขันอยู่เสมอ แม้จะเป็นเรื่องเล็กน้อยอย่างการเล่นเกมหรือการแข่งขันท้าทายสนุก ๆ เขาก็จะงัดเอาความจริงจังออกมาเสมอ แต่เขาก็มีน้ำใจนักกีฬา รู้แพ้รู้ชนะรู้อภัย<br><br>แม้ภายนอกจะดูเป็นวัยรุ่นยุคใหม่ แต่เขาหลงใหลในบีทหนัก ๆ ของสไตล์ฮิปฮอฟแต่ไหนแต่ไร การแต่งตัวและไลฟ์สไตล์ของเขามักจะชอบใส่เสื้อผ้าวินเทจมาประยุกต์ให้ทันสมัย<br><br>และภายใต้ความแข็งแกร่งของร่างกายนักกีฬา เอริคมีความละเอียดอ่อนและช่างสังเกตอย่างน่าประหลาด เขาเป็นคนชอบเอาใจใส่โดยเฉพาะกับคนใกล้ชิด เขามักจะจำรายละเอียดเล็ก ๆ น้อย ๆ ของเพื่อนได้ และพร้อมจะเป็นคนคอยดูแล เทคแคร์เสมอ</div></div><div class="erw-right-block erw-personality-block"><div class="erw-heading"><div><span>04</span><h2>TMI</h2></div><small>♫</small></div><div class="erw-trait-grid"><article class="erw-trait"><div class="erw-trait-icon">☀</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">✦</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">♫</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">☘</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article></div></div><div class="erw-footer"><span>☾</span>ERIC HAWKINS<span>☘</span>WEREWOLF <span>♫</span></div></section></div></div><div class="fdreview-credit"><span></span></div>`;
+
+  let editorPanel = null;
+  let viewPanel = null;
+  let card = null;
+  let modal = null;
+  let previewTimer = 0;
+  let cardRendered = false;
+  let viewRendered = false;
+
+  const h = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+  const cssUrl = (value) => String(value || "").trim().replace(/[\\'\")]/g, "");
+  const pct = (value, fallback) => Math.max(0, Math.min(100, Number(value) || fallback));
+
+  function richToHtml(value) {
+    let text = h(value || "");
+    const replacements = [
+      [/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>"],
+      [/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>"],
+      [/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>"],
+      [/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>"],
+      [/\[center\]([\s\S]*?)\[\/center\]/gi, '<div style="text-align:center">$1</div>'],
+      [/\[right\]([\s\S]*?)\[\/right\]/gi, '<div style="text-align:right">$1</div>'],
+      [/\[left\]([\s\S]*?)\[\/left\]/gi, '<div style="text-align:left">$1</div>'],
+      [/\[quote\]([\s\S]*?)\[\/quote\]/gi, "<blockquote>$1</blockquote>"],
+      [/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>'],
+      [/\[size=([^\]]+)\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:$1">$2</span>'],
+      [/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>']
+    ];
+    replacements.forEach(([pattern, output]) => { text = text.replace(pattern, output); });
+    return text.replace(/\r?\n/g, "<br>");
+  }
+
+  function buildCode(v) {
+    const profileItems = Array.from({length: 6}, (_, i) => `<div class="erw-info-item"><small>${h(v[`profileLabel${i + 1}`])}</small><strong>${h(v[`profileValue${i + 1}`])}</strong></div>`).join("");
+    const stats = Array.from({length: 6}, (_, i) => `<div class="erw-stat"><strong>${h(v[`statValue${i + 1}`])}</strong><span>${h(v[`statLabel${i + 1}`])}</span></div>`).join("");
+    const tmis = Array.from({length: 4}, (_, i) => `<article class="erw-trait"><div class="erw-trait-icon">${h(v[`tmiSymbol${i + 1}`])}</div><div><h3>${h(v[`tmiTitle${i + 1}`])}</h3><p>${richToHtml(v[`tmiText${i + 1}`])}</p></div></article>`).join("");
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><div class="erw-profile" style="--erw-bg:url('${cssUrl(v.bgImage)}');--erw-cover:url('${cssUrl(v.coverImage)}');--erw-avatar:url('${cssUrl(v.avatarImage)}');--erw-widget-one:url('${cssUrl(v.widgetOneImage)}');--erw-widget-two:url('${cssUrl(v.widgetTwoImage)}');--erw-mini:url('${cssUrl(v.miniImage)}');--erw-cover-y:${pct(v.coverY,50)}%;--erw-avatar-y:${pct(v.avatarY,35)}%;--erw-widget-one-y:${pct(v.widgetOneY,50)}%;--erw-widget-two-y:${pct(v.widgetTwoY,30)}%;--erw-widget-one-fade:${pct(v.widgetOneFade,80)}%;--erw-widget-two-fade:${pct(v.widgetTwoFade,80)}%;--erw-theme-main:${h(v.themeMain)};--erw-theme-main-dark:${h(v.themeMainDark)};--erw-theme-background:${h(v.themeBackground)};--erw-theme-panel:${h(v.themePanel)};--erw-theme-card:${h(v.themeCard)};--erw-theme-text:${h(v.themeText)};--erw-theme-text-soft:${h(v.themeTextSoft)};"><div class="erw-layout"><section class="erw-left"><div class="erw-cover"></div><div class="erw-avatar-area"><div class="erw-avatar-frame"><div class="erw-avatar"></div><div class="erw-moon-status"></div></div><div class="erw-bubble-wrap"><span class="erw-bubble-dot erw-bubble-dot-one"></span><span class="erw-bubble-dot erw-bubble-dot-two"></span><div class="erw-bubble"><span>${h(v.bubbleSymbol)}</span></div></div></div><div class="erw-identity"><div class="erw-display-name">${h(v.displayName)}</div><h1>${h(v.englishName)}</h1><div class="erw-thai-name">${h(v.thaiName)}</div><div class="erw-actions"><div class="erw-message-button"><span>&#128172;</span>${h(v.messageLabel)}</div><div class="erw-small-button">${h(v.smallButtonOne)}</div><div class="erw-small-button">${h(v.smallButtonTwo)}</div></div></div><div class="erw-symbol-art"><div>${h(v.symbolLineOne)}</div><div>${h(v.symbolLineTwo)}</div></div><div class="erw-left-block erw-basic-block"><div class="erw-heading"><div><span>01</span><h2>${h(v.profileHeading)}</h2></div><small>${h(v.profileIcon)}</small></div><div class="erw-info-grid">${profileItems}</div></div><div class="erw-left-block"><div class="erw-heading"><div><span>02</span><h2>${h(v.biographyHeading)}</h2></div><small>${h(v.biographyIcon)}</small></div><div class="erw-prose"><p class="erw-dropcap">${richToHtml(v.biographyText)}</p></div></div><div class="erw-left-bottom"><div class="erw-side-detail"><small>${h(v.educationLabel)}</small><strong>${h(v.educationMain)}</strong><span>${h(v.educationSub)}</span></div><div class="erw-side-detail"><small>${h(v.faceclaimLabel)}</small><strong>${h(v.faceclaimMain)}</strong><span>${h(v.faceclaimSub)}</span></div><div class="erw-side-detail erw-side-detail-wide"><div class="erw-connection-row"><div></div></div></div></div></section><section class="erw-right"><div class="erw-close">×</div><div class="erw-tabs"><div class="erw-tab erw-tab-active">${h(v.tabOne)}</div><div class="erw-tab">${h(v.tabTwo)}</div><div class="erw-tab">${h(v.tabThree)}</div></div><div class="erw-widget-header"><strong>${h(v.widgetsHeading)}</strong><div class="erw-add-widget"><span>＋</span>${h(v.addWidgetLabel)}</div></div><div class="erw-widget erw-widget-one"><div class="erw-widget-one-photo"></div><div class="erw-widget-one-content"><div class="erw-widget-symbol">${h(v.widgetOneSymbol)}</div><div class="erw-widget-abstract"><span>⌜</span><div>${richToHtml(v.widgetOneAbstract)}</div><span>⌟</span></div></div><div class="erw-music-player"><div class="erw-music-cover"></div><div class="erw-music-detail"><div class="erw-progress"><span></span></div><strong>${h(v.musicTitle)}</strong><small>${h(v.musicArtist)}</small></div><div class="erw-player-switch">▶</div></div></div><div class="erw-widget erw-widget-two"><div class="erw-widget-two-top"><div class="erw-widget-two-photo"></div><div class="erw-widget-two-content"><div class="erw-widget-symbol">${h(v.widgetTwoSymbol)}</div><div class="erw-steam-title">˚₊‧<strong>${h(v.widgetTwoTitle)}</strong>⌣</div><div class="erw-steam-subtitle">${h(v.widgetTwoSubtitle)}</div></div></div><div class="erw-stat-grid">${stats}</div></div><div class="erw-right-block"><div class="erw-heading"><div><span>03</span><h2>${h(v.personalityHeading)}</h2></div><small>${h(v.personalityIcon)}</small></div><div class="erw-prose">${richToHtml(v.personalityText)}</div></div><div class="erw-right-block erw-personality-block"><div class="erw-heading"><div><span>04</span><h2>${h(v.tmiHeading)}</h2></div><small>${h(v.tmiIcon)}</small></div><div class="erw-trait-grid">${tmis}</div></div><div class="erw-footer"><span>${h(v.footerSymbolOne)}</span>${h(v.footerName)}<span>${h(v.footerSymbolTwo)}</span>${h(v.footerRace)} <span>${h(v.footerSymbolThree)}</span></div></section></div></div><div class="fdreview-credit"><span></span></div>`;
+  }
+
+  function buildDocument(code, marker) {
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${STYLESHEET_URL}" rel="stylesheet"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;background:#242424!important;overflow:hidden!important}.dds-eric-preview-root{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important}.dds-eric-preview-root>.erw-profile,.erw-profile{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;transform:none!important}</style></head><body><div class="dds-eric-preview-root" data-eric-preview-root="${marker}">${code}</div></body></html>`;
+  }
+
+  function fitEditorPreview() {
+    const iframe = editorPanel?.querySelector("[data-eric-preview]");
+    const holder = editorPanel?.querySelector("[data-eric-preview-holder]");
+    const stage = editorPanel?.querySelector("[data-eric-preview-stage]");
+    if (!iframe || !holder || !stage) return;
+    try {
+      const doc = iframe.contentDocument;
+      const root = doc?.querySelector("[data-eric-preview-root]");
+      if (!root) return;
+      const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height));
+      const available = Math.max(320, stage.clientWidth - 32);
+      const scale = Math.min(1, available / CANVAS_WIDTH);
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.height = `${height}px`;
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.transformOrigin = "top left";
+      holder.style.width = `${Math.ceil(CANVAS_WIDTH * scale)}px`;
+      holder.style.height = `${Math.ceil(height * scale)}px`;
+    } catch (error) {
+      console.warn("[DDS] Could not fit Eric editor preview", error);
+    }
+  }
+
+  function fitCardPreview(iframe) {
+    const parent = iframe?.parentElement;
+    if (!iframe || !parent) return;
+    try {
+      const root = iframe.contentDocument?.querySelector("[data-eric-preview-root]");
+      if (!root) return;
+      const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height));
+      const scale = Math.min((parent.clientWidth - 24) / CANVAS_WIDTH, (parent.clientHeight - 24) / height);
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.height = `${height}px`;
+      iframe.style.position = "absolute";
+      iframe.style.left = "50%";
+      iframe.style.top = "50%";
+      iframe.style.transformOrigin = "center center";
+      iframe.style.transform = `translate(-50%, -50%) scale(${Math.max(0.05, scale)})`;
+    } catch (error) {
+      console.warn("[DDS] Could not fit Eric card preview", error);
+    }
+  }
+
+  function writeIframe(iframe, code, marker, afterLoad) {
+    if (!iframe) return;
+    iframe.onload = () => {
+      requestAnimationFrame(() => {
+        afterLoad?.();
+        setTimeout(() => afterLoad?.(), 180);
+        setTimeout(() => afterLoad?.(), 650);
+      });
+    };
+    iframe.srcdoc = buildDocument(code, marker);
+  }
+
+  function field(label, key, options = {}) {
+    const { full = false, textarea = false, rows = 3, type = "text", placeholder = "" } = options;
+    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${h(label)}</span>${textarea ? `<textarea rows="${rows}" data-eric-field="${h(key)}" placeholder="${h(placeholder)}"></textarea>` : `<input type="${h(type)}" data-eric-field="${h(key)}" placeholder="${h(placeholder)}">`}</label>`;
+  }
+
+  function colorField(label, key, value) {
+    return `<label class="dds-color-field"><span>${h(label)}</span><div><input type="color" data-eric-color-picker="${h(key)}" value="${h(value)}"><input type="text" data-eric-field="${h(key)}" value="${h(value)}" spellcheck="false"></div></label>`;
+  }
+
+  function rangeField(label, key, value, suffix = "%") {
+    return `<label class="dds-position-row"><span>${h(label)}</span><small>0</small><input type="range" min="0" max="100" step="1" value="${h(value)}" data-eric-field="${h(key)}"><small>100</small><output data-eric-range-output="${h(key)}">${h(value)}${suffix}</output></label>`;
+  }
+
+  function toolbar(targetKey) {
+    const buttons = [
+      ["B", "[b]", "[/b]"], ["I", "[i]", "[/i]"], ["U", "[u]", "[/u]"], ["S", "[s]", "[/s]"],
+      ["↤", "[left]", "[/left]"], ["≡", "[center]", "[/center]"], ["↦", "[right]", "[/right]"], ["❝", "[quote]", "[/quote]"]
+    ];
+    return `<div class="dds-rich-toolbar dds-bbcode-toolbar dds-eric-bbcode-toolbar" data-eric-toolbar="${h(targetKey)}">${buttons.map(([label, open, close]) => `<button type="button" data-eric-open="${h(open)}" data-eric-close="${h(close)}">${label}</button>`).join("")}<button type="button" data-eric-clear>CLEAR</button></div>`;
+  }
+
+  function richField(label, key, rows = 8) {
+    return `<label class="dds-field dds-field-full dds-eric-rich-field"><span>${h(label)}</span>${toolbar(key)}<textarea rows="${rows}" data-eric-field="${h(key)}" data-eric-rich="${h(key)}" placeholder="กรอกข้อความ"></textarea><div class="dds-word-counter" data-eric-word-counter="${h(key)}" data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label>`;
+  }
+
+  function getValues() {
+    const values = {...defaults};
+    editorPanel?.querySelectorAll("[data-eric-field]").forEach((item) => { values[item.dataset.ericField] = item.value; });
+    return values;
+  }
+
+  function setValues(values = defaults) {
+    const next = {...defaults, ...values};
+    editorPanel?.querySelectorAll("[data-eric-field]").forEach((item) => {
+      item.value = next[item.dataset.ericField] ?? "";
+      if (item.type === "range") editorPanel.querySelector(`[data-eric-range-output="${CSS.escape(item.dataset.ericField)}"]`)?.replaceChildren(document.createTextNode(`${item.value}%`));
+    });
+    editorPanel?.querySelectorAll("[data-eric-color-picker]").forEach((picker) => { picker.value = next[picker.dataset.ericColorPicker] || "#000000"; });
+    updateAllWordCounters();
+  }
+
+  function countWords(value) {
+    const cleaned = String(value || "").replace(/\[[^\]]*\]/g, " ").replace(/https?:\/\/\S+/gi, " ").trim();
+    if (!cleaned) return 0;
+    const thai = cleaned.match(/[\u0E00-\u0E7F]+/g) || [];
+    const latin = cleaned.replace(/[\u0E00-\u0E7F]+/g, " ").match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) || [];
+    return thai.length + latin.length;
+  }
+
+  function updateWordCounter(key) {
+    const editor = editorPanel?.querySelector(`[data-eric-rich="${CSS.escape(key)}"]`);
+    const counter = editorPanel?.querySelector(`[data-eric-word-counter="${CSS.escape(key)}"]`);
+    if (!editor || !counter) return;
+    const count = countWords(editor.value);
+    counter.dataset.empty = String(count === 0);
+    const number = counter.querySelector("strong span");
+    if (number) number.textContent = String(count);
+  }
+
+  function updateAllWordCounters() {
+    editorPanel?.querySelectorAll("[data-eric-rich]").forEach((editor) => updateWordCounter(editor.dataset.ericRich));
+  }
+
+  function installToolbarEvents() {
+    editorPanel?.querySelectorAll("[data-eric-toolbar]").forEach((bar) => {
+      bar.addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+        const key = bar.dataset.ericToolbar;
+        const textarea = editorPanel.querySelector(`[data-eric-rich="${CSS.escape(key)}"]`);
+        if (!textarea) return;
+        if (button.hasAttribute("data-eric-clear")) {
+          textarea.value = textarea.value.replace(/\[[^\]]*\]/g, "");
+        } else {
+          const open = button.dataset.ericOpen || "";
+          const close = button.dataset.ericClose || "";
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const selected = textarea.value.slice(start, end);
+          textarea.setRangeText(`${open}${selected}${close}`, start, end, "end");
+        }
+        textarea.dispatchEvent(new Event("input", {bubbles: true}));
+        textarea.focus();
+      });
+    });
+  }
+
+  function updateEditorPreview() {
+    if (!editorPanel) return;
+    const iframe = editorPanel.querySelector("[data-eric-preview]");
+    writeIframe(iframe, buildCode(getValues()), "editor", fitEditorPreview);
+  }
+
+  function scheduleEditorPreview() {
+    clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(updateEditorPreview, 70);
+  }
+
+  function draftStatus(timestamp = 0) {
+    const el = editorPanel?.querySelector("[data-eric-draft-status]");
+    if (!el) return;
+    el.textContent = timestamp ? `บันทึกล่าสุด ${new Date(timestamp).toLocaleTimeString("th-TH", {hour: "2-digit", minute: "2-digit"})}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function saveDraft() {
+    const payload = {savedAt: Date.now(), values: getValues()};
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+    draftStatus(payload.savedAt);
+    showToast("บันทึกแบบร่างของ Eric Hawkins แล้ว");
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setValues(defaults);
+    draftStatus(0);
+    updateEditorPreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch { return null; }
+  }
+
+  async function copyCode() {
+    const code = buildCode(getValues());
+    try { await navigator.clipboard.writeText(code); }
+    catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    showToast("คัดลอกโค้ดประวัติ Eric Hawkins แล้ว");
+  }
+
+  function showToast(message) {
+    let toast = document.getElementById("ddsEricEditorToast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "ddsEricEditorToast";
+      toast.className = "dds-editor-toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove("is-visible"), 1800);
+  }
+
+  function showOnly(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((panel) => panel.classList.toggle("is-active", panel.dataset.panel === panelName));
+    document.querySelectorAll(".dds-nav-button").forEach((button) => button.classList.toggle("is-active", button.dataset.page === "commission"));
+    const page = document.getElementById("currentPageNumber");
+    if (page) page.textContent = "04";
+    window.scrollTo({top: 0, behavior: "auto"});
+  }
+
+  function backToCommission() {
+    document.body.classList.remove("dds-editor-mode", "dds-commission-editor-mode");
+    if (typeof window.openPage === "function") window.openPage("commission");
+    else showOnly("commission");
+    requestAnimationFrame(() => document.querySelector('[data-work-tab="commission"]')?.click());
+    history.replaceState(null, "", "#commission");
+    window.scrollTo({top: 0, behavior: "auto"});
+  }
+
+  function createEditorPanel() {
+    if (editorPanel?.isConnected) return editorPanel;
+    const footer = document.querySelector(".dds-footer");
+    const main = document.querySelector(".dds-main");
+    if (!main) return null;
+    editorPanel = document.createElement("section");
+    editorPanel.className = "dds-panel dds-protected-commission-editor dds-eric-profile-editor";
+    editorPanel.dataset.panel = PANEL_NAME;
+    editorPanel.innerHTML = `
+      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-eric-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-eric-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทประวัติ</span></h1><p>ผู้จ้าง ERIC HAWKINS — แก้ข้อความ รูป สัญลักษณ์ และสีได้จากเครื่องมือด้านขวา</p></div></div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ERIC HAWKINS / COMMISSION</strong></div><div class="dds-protected-commission-preview-stage dds-eric-preview-stage" data-eric-preview-stage><div class="dds-eric-preview-holder" data-eric-preview-holder><iframe class="dds-protected-commission-preview-frame" data-eric-preview scrolling="no" title="ตัวอย่างโค้ดประวัติ Eric Hawkins"></iframe></div></div></div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-eric-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-eric-save>SAVE DRAFT</button><button type="button" data-eric-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-eric-profile-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีหลัก — --erw-theme-main", "themeMain", defaults.themeMain)}${colorField("สีหลักเข้ม — --erw-theme-main-dark", "themeMainDark", defaults.themeMainDark)}${colorField("สีพื้นหลัง — --erw-theme-background", "themeBackground", defaults.themeBackground)}${colorField("สีพาเนล — --erw-theme-panel", "themePanel", defaults.themePanel)}${colorField("สีการ์ด — --erw-theme-card", "themeCard", defaults.themeCard)}${colorField("สีตัวอักษร — --erw-theme-text", "themeText", defaults.themeText)}${colorField("สีตัวอักษรรอง — --erw-theme-text-soft", "themeTextSoft", defaults.themeTextSoft)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field("รูปพื้นหลัง", "bgImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปปก", "coverImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปโปรไฟล์", "avatarImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 1", "widgetOneImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 2", "widgetTwoImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Mini / Music", "miniImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}</div><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและขอบเฟดรูป</span><small>ปรับค่าเปอร์เซ็นต์</small></div>${rangeField("ตำแหน่งรูปปก", "coverY", 50)}${rangeField("ตำแหน่งรูปโปรไฟล์", "avatarY", 35)}${rangeField("ตำแหน่ง Widget 1", "widgetOneY", 50)}${rangeField("ตำแหน่ง Widget 2", "widgetTwoY", 30)}${rangeField("ขอบเฟด Widget 1", "widgetOneFade", 80)}${rangeField("ขอบเฟด Widget 2", "widgetTwoFade", 80)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อและข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${field("ดิสเพลย์เนม", "displayName")}${field("ชื่อภาษาอังกฤษ", "englishName")}${field("ชื่อภาษาไทย", "thaiName")}${field("ข้อความปุ่ม Message", "messageLabel")}${field("ปุ่มเล็กที่ 1", "smallButtonOne")}${field("ปุ่มเล็กที่ 2", "smallButtonTwo")}${field("สัญลักษณ์ใน Bubble", "bubbleSymbol")}${field("Symbol Art บรรทัด 1", "symbolLineOne", {full:true})}${field("Symbol Art บรรทัด 2", "symbolLineTwo", {full:true})}${field("หัวข้อ Profile", "profileHeading")}${field("สัญลักษณ์หัวข้อ Profile", "profileIcon")}${Array.from({length:6},(_,i)=>field(`หัวข้อข้อมูล ${i+1}`,`profileLabel${i+1}`)+field(`ข้อมูล ${i+1}`,`profileValue${i+1}`)).join("")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Biography และข้อมูลด้านล่าง</h2></div><div class="dds-form-grid">${field("หัวข้อ Biography", "biographyHeading")}${field("สัญลักษณ์ Biography", "biographyIcon")}${richField("เนื้อหา Biography", "biographyText", 12)}${field("หัวข้อ Education", "educationLabel")}${field("Education บรรทัดหลัก", "educationMain")}${field("Education บรรทัดรอง", "educationSub")}${field("หัวข้อ Face Claim", "faceclaimLabel")}${field("Face Claim บรรทัดหลัก", "faceclaimMain")}${field("Face Claim บรรทัดรอง", "faceclaimSub")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Widgets และเพลง</h2></div><div class="dds-form-grid">${field("แท็บที่ 1", "tabOne")}${field("แท็บที่ 2", "tabTwo")}${field("แท็บที่ 3", "tabThree")}${field("หัวข้อ Widgets", "widgetsHeading")}${field("ข้อความ Add Widget", "addWidgetLabel")}${field("สัญลักษณ์ Widget 1", "widgetOneSymbol", {full:true})}${field("Abstract Widget 1", "widgetOneAbstract", {full:true,textarea:true,rows:4})}${field("ชื่อเพลง", "musicTitle")}${field("ชื่อนักร้อง", "musicArtist")}${field("สัญลักษณ์ Widget 2", "widgetTwoSymbol", {full:true})}${field("หัวข้อ Widget 2", "widgetTwoTitle")}${field("ข้อความใต้ Widget 2", "widgetTwoSubtitle")}${Array.from({length:6},(_,i)=>field(`ค่าสถานะ ${i+1}`,`statValue${i+1}`)+field(`ชื่อสถานะ ${i+1}`,`statLabel${i+1}`)).join("")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>Personality และ TMI</h2></div><div class="dds-form-grid">${field("หัวข้อ Personality", "personalityHeading")}${field("สัญลักษณ์ Personality", "personalityIcon")}${richField("เนื้อหา Personality", "personalityText", 12)}${field("หัวข้อ TMI", "tmiHeading")}${field("สัญลักษณ์ TMI", "tmiIcon")}${Array.from({length:4},(_,i)=>`<div class="dds-eric-tmi-group"><strong>TMI ${i+1}</strong><div class="dds-form-grid">${field("สัญลักษณ์",`tmiSymbol${i+1}`)}${field("หัวข้อ",`tmiTitle${i+1}`)}${field("คำอธิบาย",`tmiText${i+1}`,{full:true,textarea:true,rows:4})}</div></div>`).join("")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>ส่วนท้าย</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ที่ 1", "footerSymbolOne")}${field("ชื่อใน Footer", "footerName")}${field("สัญลักษณ์ที่ 2", "footerSymbolTwo")}${field("เผ่าพันธุ์ใน Footer", "footerRace")}${field("สัญลักษณ์ที่ 3", "footerSymbolThree")}</div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-eric-profile-copy"><div class="dds-control-title"><span>08</span><h2>คัดลอกโค้ด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-eric-copy>COPY CODE <span>↗</span></button><button type="button" data-eric-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+    if (footer) main.insertBefore(editorPanel, footer); else main.appendChild(editorPanel);
+    editorPanel.querySelector("[data-eric-back]")?.addEventListener("click", backToCommission);
+    editorPanel.querySelector("[data-eric-save]")?.addEventListener("click", saveDraft);
+    editorPanel.querySelector("[data-eric-delete]")?.addEventListener("click", deleteDraft);
+    editorPanel.querySelector("[data-eric-copy]")?.addEventListener("click", copyCode);
+    editorPanel.querySelector("[data-eric-reset]")?.addEventListener("click", () => { setValues(defaults); draftStatus(0); updateEditorPreview(); });
+    editorPanel.addEventListener("input", (event) => { if (event.target.matches("[data-eric-rich]")) updateWordCounter(event.target.dataset.ericRich); if (event.target.type === "range") { const out = editorPanel.querySelector(`[data-eric-range-output="${CSS.escape(event.target.dataset.ericField)}"]`); if (out) out.textContent = `${event.target.value}%`; } scheduleEditorPreview(); });
+    editorPanel.addEventListener("change", scheduleEditorPreview);
+    editorPanel.querySelectorAll("[data-eric-color-picker]").forEach((picker) => picker.addEventListener("input", () => { const text = editorPanel.querySelector(`[data-eric-field="${CSS.escape(picker.dataset.ericColorPicker)}"]`); if (text) text.value = picker.value; scheduleEditorPreview(); }));
+    editorPanel.querySelectorAll(".dds-color-field input[type=text]").forEach((text) => text.addEventListener("input", () => { const picker = editorPanel.querySelector(`[data-eric-color-picker="${CSS.escape(text.dataset.ericField)}"]`); if (picker && /^#[0-9a-f]{6}$/i.test(text.value)) picker.value = text.value; }));
+    installToolbarEvents();
+    return editorPanel;
+  }
+
+  function openEditor() {
+    const panel = createEditorPanel();
+    if (!panel) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    draftStatus(draft?.savedAt || 0);
+    document.body.classList.add("dds-editor-mode", "dds-commission-editor-mode");
+    showOnly(PANEL_NAME);
+    history.replaceState(null, "", "#commission-eric-editor");
+    updateEditorPreview();
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-eric-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage"><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทประวัติ Eric Hawkins"></iframe></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-eric-view-back]")?.addEventListener("click", backToCommission);
+    return viewPanel;
+  }
+
+  function openView() {
+    const panel = createViewPanel();
+    if (!panel) return;
+    document.body.classList.add("dds-editor-mode");
+    showOnly(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-eric-view");
+    const iframe = panel.querySelector("[data-eric-view-preview]");
+    if (!viewRendered) {
+      writeIframe(iframe, OFFICIAL_CODE, "view", () => {
+        try {
+          const root = iframe.contentDocument?.querySelector("[data-eric-preview-root]");
+          if (!root) return;
+          const height = Math.ceil(root.scrollHeight || root.getBoundingClientRect().height);
+          iframe.style.width = `${CANVAS_WIDTH}px`;
+          iframe.style.height = `${height}px`;
+          iframe.style.maxWidth = "none";
+          panel.querySelector(".dds-eric-view-stage").style.height = `${height}px`;
+        } catch {}
+      });
+      viewRendered = true;
+    }
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsEricCommissionLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-eric-lock-form><small>CLIENT ACCESS / ERIC HAWKINS</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-eric-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-eric-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="button" data-eric-lock-close>CANCEL</button><button type="submit">UNLOCK</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-eric-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.querySelector("[data-eric-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-eric-lock-input]");
+      const error = modal.querySelector("[data-eric-lock-error]");
+      const submit = event.submitter;
+      if (submit) submit.disabled = true;
+      try {
+        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input.value));
+        const hash = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        if (hash !== ACCESS_HASH) { error.textContent = "รหัสผ่านไม่ถูกต้อง"; input.select(); return; }
+        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+        closeModal();
+        openEditor();
+      } catch { error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"; }
+      finally { if (submit) submit.disabled = false; }
+    });
+    return modal;
+  }
+
+  function openModal() {
+    const lock = createModal();
+    lock.hidden = false;
+    document.body.classList.add("dds-modal-open");
+    const input = lock.querySelector("[data-eric-lock-input]");
+    const error = lock.querySelector("[data-eric-lock-error]");
+    input.value = ""; error.textContent = "";
+    requestAnimationFrame(() => input.focus());
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("dds-modal-open");
+  }
+
+  function installCard() {
+    const grid = document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    if (document.querySelector(".dds-eric-commission-card")) return true;
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-eric-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-eric-card-preview-frame" data-eric-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Eric Hawkins"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทประวัติ</p><p class="dds-commission-card-client">ผู้จ้าง <strong>ERIC HAWKINS</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-eric-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-eric-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-eric-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-eric-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    const iframe = card.querySelector("[data-eric-card-preview]");
+    const renderCard = () => {
+      if (cardRendered) return;
+      writeIframe(iframe, OFFICIAL_CODE, "card", () => fitCardPreview(iframe));
+      cardRendered = true;
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { renderCard(); observer.disconnect(); } }, {rootMargin:"300px"});
+      observer.observe(card);
+    } else renderCard();
+    return true;
+  }
+
+  function install() {
+    createModal();
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 60) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      fitEditorPreview();
+      const iframe = card?.querySelector("[data-eric-card-preview]");
+      if (iframe) fitCardPreview(iframe);
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
+  else install();
+})();
