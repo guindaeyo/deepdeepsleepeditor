@@ -9332,9 +9332,37 @@ ${stylesheetLinks}
 
   function buildPreviewDocument(code) {
     return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>
-      html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
-      body{position:relative!important;min-height:1px!important}
-      .dds-food-preview-positioner{position:relative!important;width:max-content!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important;transform:none}
+      html,body{
+        width:${CANVAS_WIDTH}px!important;
+        min-width:${CANVAS_WIDTH}px!important;
+        max-width:${CANVAS_WIDTH}px!important;
+        margin:0!important;
+        padding:0!important;
+        overflow:hidden!important;
+        background:transparent!important;
+      }
+      body{
+        position:relative!important;
+        min-height:1px!important;
+      }
+      .dds-food-preview-positioner{
+        position:relative!important;
+        display:block!important;
+        width:${CANVAS_WIDTH}px!important;
+        min-width:${CANVAS_WIDTH}px!important;
+        max-width:${CANVAS_WIDTH}px!important;
+        margin:0!important;
+        padding:0!important;
+        transform:none!important;
+      }
+      .dds-food-preview-positioner > .fdreview-wrap,
+      .fdreview-wrap{
+        width:${CANVAS_WIDTH}px!important;
+        min-width:${CANVAS_WIDTH}px!important;
+        max-width:${CANVAS_WIDTH}px!important;
+        margin:0!important;
+        transform:none!important;
+      }
       .dds-food-bbcode-quote,.dds-food-bbcode-code,.dds-food-bbcode-hide,.dds-food-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}
     </style></head><body><div class="dds-food-preview-positioner" data-food-preview-positioner>${code}</div></body></html>`;
   }
@@ -9343,32 +9371,50 @@ ${stylesheetLinks}
     const iframe = panel?.querySelector("[data-food-preview]");
     const stage = panel?.querySelector("[data-food-preview-stage]");
     if (!iframe || !stage) return;
+
     try {
       const doc = iframe.contentDocument;
       if (!doc?.body) return;
 
       const positioner = doc.querySelector("[data-food-preview-positioner]");
       const codeRoot = doc.querySelector(".fdreview-wrap");
-      if (positioner && codeRoot) {
+
+      if (positioner) {
+        positioner.style.width = `${CANVAS_WIDTH}px`;
+        positioner.style.minWidth = `${CANVAS_WIDTH}px`;
+        positioner.style.maxWidth = `${CANVAS_WIDTH}px`;
         positioner.style.transform = "none";
-        const rootRect = codeRoot.getBoundingClientRect();
-        const shiftX = (CANVAS_WIDTH - rootRect.width) / 2 - rootRect.left;
-        positioner.style.transform = `translateX(${shiftX}px)`;
       }
 
-      const rootRect = codeRoot?.getBoundingClientRect();
+      if (codeRoot) {
+        codeRoot.style.width = `${CANVAS_WIDTH}px`;
+        codeRoot.style.minWidth = `${CANVAS_WIDTH}px`;
+        codeRoot.style.maxWidth = `${CANVAS_WIDTH}px`;
+        codeRoot.style.margin = "0";
+        codeRoot.style.transform = "none";
+      }
+
       const naturalHeight = Math.max(
-        rootRect ? rootRect.bottom : 0,
-        doc.body.scrollHeight,
+        positioner?.scrollHeight || 0,
+        positioner?.offsetHeight || 0,
+        codeRoot?.scrollHeight || 0,
+        codeRoot?.offsetHeight || 0,
+        doc.body.scrollHeight || 0,
         doc.documentElement?.scrollHeight || 0,
         1
       );
-      const scale = Math.min(1, Math.max(0.01, (stage.clientWidth - 24) / CANVAS_WIDTH));
+
+      const availableWidth = Math.max(1, stage.clientWidth - 24);
+      const scale = Math.min(1, availableWidth / CANVAS_WIDTH);
+
       iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.maxWidth = "none";
       iframe.style.left = "50%";
+      iframe.style.top = "0";
       iframe.style.height = `${Math.ceil(naturalHeight)}px`;
       iframe.style.transformOrigin = "top center";
       iframe.style.transform = `translateX(-50%) scale(${scale})`;
+
       stage.style.height = `${Math.max(680, Math.ceil(naturalHeight * scale))}px`;
     } catch (err) {
       console.warn("Could not fit food commission preview", err);
