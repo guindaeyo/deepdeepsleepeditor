@@ -11280,28 +11280,60 @@ ${stylesheetLinks}
     if (!iframe || !holder || !stage) return;
 
     try {
-      const root = iframe.contentDocument?.querySelector("[data-eric-preview-root]");
+      const doc = iframe.contentDocument;
+      const root = doc?.querySelector("[data-eric-preview-root]");
       if (!root) return;
 
       const height = Math.max(
         1,
-        Math.ceil(root.scrollHeight || root.getBoundingClientRect().height)
+        Math.ceil(root.scrollHeight || 0),
+        Math.ceil(root.offsetHeight || 0),
+        Math.ceil(root.getBoundingClientRect().height || 0),
+        Math.ceil(doc.body?.scrollHeight || 0),
+        Math.ceil(doc.documentElement?.scrollHeight || 0)
       );
-      const horizontalPadding = 48;
+      const horizontalPadding = window.innerWidth <= 700 ? 20 : 48;
       const availableWidth = Math.max(280, stage.clientWidth - horizontalPadding);
       const scale = Math.min(1, availableWidth / CANVAS_WIDTH);
+      const scaledWidth = Math.ceil(CANVAS_WIDTH * scale);
+      const scaledHeight = Math.ceil(height * scale);
+      const verticalPadding = window.innerWidth <= 700 ? 20 : 48;
 
-      iframe.style.width = `${CANVAS_WIDTH}px`;
-      iframe.style.height = `${height}px`;
-      iframe.style.maxWidth = "none";
-      iframe.style.position = "absolute";
-      iframe.style.left = "0";
-      iframe.style.top = "0";
-      iframe.style.transformOrigin = "top left";
-      iframe.style.transform = `scale(${scale})`;
+      /* Override the old generic COMMISSION rules that fixed the iframe at 800px. */
+      iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+      iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+      iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+      iframe.style.setProperty("height", `${height}px`, "important");
+      iframe.style.setProperty("min-height", `${height}px`, "important");
+      iframe.style.setProperty("max-height", `${height}px`, "important");
+      iframe.style.setProperty("position", "absolute", "important");
+      iframe.style.setProperty("inset", "0 auto auto 0", "important");
+      iframe.style.setProperty("top", "0", "important");
+      iframe.style.setProperty("left", "0", "important");
+      iframe.style.setProperty("transform-origin", "top left", "important");
+      iframe.style.setProperty("transform", `scale(${scale})`, "important");
 
-      holder.style.width = `${Math.ceil(CANVAS_WIDTH * scale)}px`;
-      holder.style.height = `${Math.ceil(height * scale)}px`;
+      holder.style.setProperty("width", `${scaledWidth}px`, "important");
+      holder.style.setProperty("height", `${scaledHeight}px`, "important");
+      holder.style.setProperty("margin", "0 auto", "important");
+
+      /* The VIEW WORK page now grows exactly with the scaled code height. */
+      stage.style.setProperty("height", `${scaledHeight + verticalPadding}px`, "important");
+      stage.style.setProperty("min-height", `${scaledHeight + verticalPadding}px`, "important");
+      stage.style.setProperty("overflow", "visible", "important");
+
+      if (!iframe.__ddsEricViewResizeObserver && "ResizeObserver" in window) {
+        const observer = new ResizeObserver(() => {
+          requestAnimationFrame(fitViewPreview);
+        });
+        observer.observe(root);
+        iframe.__ddsEricViewResizeObserver = observer;
+      }
+
+      if (!iframe.__ddsEricFontsReadyBound && doc.fonts?.ready) {
+        iframe.__ddsEricFontsReadyBound = true;
+        doc.fonts.ready.then(() => requestAnimationFrame(fitViewPreview)).catch(() => {});
+      }
     } catch (error) {
       console.warn("[DDS] Could not fit Eric full work preview", error);
     }
