@@ -6787,3 +6787,57 @@ textarea + .dds-bbcode-toolbar {
     padding: 18px;
   }
 }
+
+/* ==================================================
+   LANDON COMMISSION 01 — STRUCTURED FOOD REVIEW EDITOR
+================================================== */
+.dds-food-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-food-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-food-commission-scroll select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  color: var(--dds-white);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 0;
+  background: #111;
+  font-family: var(--dds-font-main);
+  font-size: 12px;
+}
+
+.dds-food-commission-scroll select option {
+  color: #fff;
+  background: #111;
+}
+
+.dds-food-commission-copy .dds-control-title {
+  margin-bottom: 10px;
+}
+
+.dds-food-commission-copy .dds-control-title > span {
+  font-size: 25px;
+}
+
+.dds-food-commission-copy .dds-control-title h2 {
+  font-size: 15px;
+}
+
+.dds-food-commission-editor [data-food-preview-stage] {
+  min-height: 680px;
+}
+
+@media (max-width: 700px) {
+  .dds-food-commission-scroll {
+    padding-right: 0;
+  }
+}

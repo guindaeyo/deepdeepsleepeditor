@@ -8732,3 +8732,460 @@ ${stylesheetLinks}
     install();
   }
 })();
+
+/* =========================================================
+   LANDON COMMISSION 01 — STRUCTURED FOOD REVIEW EDITOR
+   Keeps the existing protected raw editor for other commissions.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ACCESS_HASH = "6d05de9e9a208dc2beb7d5e594b39064b36142353ffc8db10295131098a1bcd6";
+  const ACCESS_SESSION_KEY = "dds:landon-commission-editor:unlocked";
+  const DRAFT_KEY = "dds:commission-draft:landon:commission001:structured";
+  const PANEL_NAME = "protected-commission001-food";
+  const CANVAS_WIDTH = 1040;
+
+  const defaults = Object.freeze({
+    image1: "",
+    image2: "",
+    image3: "",
+    image4: "",
+    dateTime: "",
+    category1: "",
+    category2: "",
+    category3: "",
+    restaurantName: "",
+    location: "",
+    score: "",
+    scoreMax: "",
+    stars: "3",
+    ratingText: "",
+    quote: "",
+    reviewText: "",
+    taste: "",
+    menuAdvice: "",
+    extraAdvice: "",
+    verdict: ""
+  });
+
+  let panel = null;
+  let modal = null;
+  let previewTimer = 0;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]/g, "");
+  }
+
+  function nl2br(value) {
+    return h(value).replace(/\r?\n/g, "<br>");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    window.setTimeout(() => toast.classList.remove("is-visible"), 2100);
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  function setCommissionSidebarActive() {
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.page === "commission");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => {
+      item.classList.toggle("is-active", item.dataset.panel === panelName);
+    });
+    setCommissionSidebarActive();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function backToCommission() {
+    if (typeof window.openPage === "function") window.openPage("commission");
+    else showPanel("commission");
+  }
+
+  function createModal() {
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <form class="dds-commission-lock-dialog" data-food-lock-form>
+        <small>CLIENT ACCESS / LANDON A. RUTHERFORD</small>
+        <h2>Protected editor</h2>
+        <p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p>
+        <label class="dds-commission-lock-field">
+          <span>รหัสผ่าน</span>
+          <input type="password" autocomplete="current-password" data-food-password placeholder="กรอกรหัสผ่าน">
+        </label>
+        <p class="dds-commission-lock-error" data-food-lock-error></p>
+        <div class="dds-commission-lock-actions">
+          <button type="submit">UNLOCK EDITOR</button>
+          <button type="button" data-food-lock-cancel>CANCEL</button>
+        </div>
+      </form>
+    `;
+    document.body.appendChild(modal);
+
+    const close = () => {
+      modal.hidden = true;
+      document.body.style.overflow = "";
+    };
+
+    modal.querySelector("[data-food-lock-cancel]")?.addEventListener("click", close);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) close();
+    });
+    modal.querySelector("[data-food-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-food-password]");
+      const error = modal.querySelector("[data-food-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        const hash = await sha256(input.value);
+        if (hash !== ACCESS_HASH) {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+          return;
+        }
+        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+        close();
+        openEditor();
+      } catch (err) {
+        console.error(err);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function openModal() {
+    const dialog = createModal();
+    const input = dialog.querySelector("[data-food-password]");
+    const error = dialog.querySelector("[data-food-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    window.setTimeout(() => input?.focus(), 30);
+  }
+
+  function createField(label, key, options = {}) {
+    const { full = false, textarea = false, rows = 3, type = "text", placeholder = "กรอกข้อมูล" } = options;
+    const className = `dds-field${full ? " dds-field-full" : ""}`;
+    if (textarea) {
+      return `<label class="${className}"><span>${label}</span><textarea rows="${rows}" data-food-field="${key}" placeholder="${placeholder}"></textarea></label>`;
+    }
+    return `<label class="${className}"><span>${label}</span><input type="${type}" data-food-field="${key}" placeholder="${placeholder}"></label>`;
+  }
+
+  function createPanel() {
+    if (panel) return panel;
+    const main = document.querySelector(".dds-main");
+    const footer = main?.querySelector(".dds-footer");
+    if (!main) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-food-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-food-back title="กลับหน้า COMMISSION" type="button">←</button>
+        <div>
+          <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
+          <h1>COMMISSION — โค้ดประเภทรีวิวอาหาร</h1>
+          <p>กรอกข้อมูลทางขวา แล้วดูผลลัพธ์ทางซ้ายได้ทันที สีและโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
+        </div>
+      </div>
+
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / COMMISSION 01</strong></div>
+          <div class="dds-protected-commission-preview-stage" data-food-preview-stage>
+            <iframe class="dds-protected-commission-preview-frame" data-food-preview scrolling="no" title="ตัวอย่างโค้ดรีวิวอาหาร"></iframe>
+          </div>
+        </div>
+
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft">
+            <div><strong>บันทึกแบบร่าง</strong><small data-food-draft-status>ยังไม่มีแบบร่าง</small></div>
+            <button type="button" data-food-save>SAVE DRAFT</button>
+            <button type="button" data-food-delete>DELETE SAVE</button>
+          </div>
+
+          <div class="dds-protected-commission-scroll dds-food-commission-scroll">
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div>
+              <div class="dds-form-grid">
+                ${createField("รูปขวาใหญ่", "image1", { full: true, type: "url", placeholder: "วางลิงก์รูปขวาใหญ่" })}
+                ${createField("รูปซ้ายฟิล์มด้านบน", "image2", { full: true, type: "url", placeholder: "วางลิงก์รูปซ้ายด้านบน" })}
+                ${createField("รูปซ้ายฟิล์มด้านล่าง", "image3", { full: true, type: "url", placeholder: "วางลิงก์รูปซ้ายด้านล่าง" })}
+                ${createField("รูปโพลารอยด์ล่างสุด", "image4", { full: true, type: "url", placeholder: "วางลิงก์รูปล่างสุด" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>02</span><h2>เมนูและหมวดหมู่</h2></div>
+              <div class="dds-form-grid">
+                ${createField("วันที่และเวลาในแถบเมนู", "dateTime", { full: true, placeholder: "เช่น Thu 09:41" })}
+                ${createField("หมวดหมู่ที่ 1", "category1", { placeholder: "เช่น Café" })}
+                ${createField("หมวดหมู่ที่ 2", "category2", { placeholder: "เช่น Dinner" })}
+                ${createField("หมวดหมู่ที่ 3", "category3", { placeholder: "เช่น Dessert" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>03</span><h2>ข้อมูลร้านและคะแนน</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ชื่อร้าน", "restaurantName", { full: true, placeholder: "กรอกชื่อร้าน" })}
+                ${createField("สถานที่และวันที่", "location", { full: true, placeholder: "เช่น Bangkok, Thailand · 18 July 2026" })}
+                ${createField("คะแนน", "score", { placeholder: "เช่น 9.4" })}
+                ${createField("คะแนนเต็ม", "scoreMax", { placeholder: "เช่น 10" })}
+                <label class="dds-field"><span>จำนวนดาวที่ติดสี</span><select data-food-field="stars">
+                  <option value="0">0 ดาว</option><option value="1">1 ดาว</option><option value="2">2 ดาว</option>
+                  <option value="3">3 ดาว</option><option value="4">4 ดาว</option><option value="5">5 ดาว</option>
+                </select></label>
+                ${createField("ข้อความข้างดาว", "ratingText", { placeholder: "เช่น 4.5 / 5 — ..." })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>04</span><h2>ข้อความรีวิว</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ข้อความโควต", "quote", { full: true, textarea: true, rows: 2, placeholder: "กรอกข้อความโควต" })}
+                ${createField("เนื้อหารีวิว", "reviewText", { full: true, textarea: true, rows: 8, placeholder: "กรอกข้อความรีวิว" })}
+                ${createField("คะแนนรสชาติ", "taste", { full: true, placeholder: "เช่น 9.5 / 10" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>05</span><h2>คำแนะนำ</h2></div>
+              <div class="dds-form-grid">
+                ${createField("เมนูที่แนะนำ", "menuAdvice", { full: true, textarea: true, rows: 3, placeholder: "กรอกเมนูที่แนะนำ" })}
+                ${createField("คำแนะนำเพิ่มเติม", "extraAdvice", { full: true, textarea: true, rows: 3, placeholder: "กรอกคำแนะนำเพิ่มเติม" })}
+                ${createField("FINAL VERDICT", "verdict", { full: true, textarea: true, rows: 3, placeholder: "กรอกบทสรุปหรือคำแนะนำสุดท้าย" })}
+              </div>
+            </section>
+          </div>
+
+          <section class="dds-protected-commission-copy dds-food-commission-copy">
+            <div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-protected-commission-copy-actions">
+              <button type="button" data-food-copy>COPY CODE <span>↗</span></button>
+              <button type="button" data-food-reset>RESET</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+
+    if (footer) main.insertBefore(panel, footer);
+    else main.appendChild(panel);
+
+    panel.querySelector("[data-food-back]")?.addEventListener("click", backToCommission);
+    panel.querySelector("[data-food-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-food-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-food-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-food-reset]")?.addEventListener("click", resetFields);
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    return panel;
+  }
+
+  function getValues() {
+    const result = { ...defaults };
+    panel?.querySelectorAll("[data-food-field]").forEach((field) => {
+      result[field.dataset.foodField] = field.value;
+    });
+    return result;
+  }
+
+  function setValues(values = defaults) {
+    const next = { ...defaults, ...(values || {}) };
+    panel?.querySelectorAll("[data-food-field]").forEach((field) => {
+      const key = field.dataset.foodField;
+      field.value = next[key] ?? defaults[key] ?? "";
+    });
+  }
+
+  function buildCode(values = getValues()) {
+    const filled = Math.max(0, Math.min(5, Number.parseInt(values.stars, 10) || 0));
+    const off = 5 - filled;
+    return `<link href="https://guindaeyo.github.io/css/foodierv-land.css" rel="stylesheet"><div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('${cssUrl(values.image1)}');--fdreview-img1-x:50%;--fdreview-img1-y:35%;--fdreview-img2:url('${cssUrl(values.image2)}');--fdreview-img2-x:50%;--fdreview-img2-y:50%;--fdreview-img3:url('${cssUrl(values.image3)}');--fdreview-img3-x:50%;--fdreview-img3-y:50%;--fdreview-img4:url('${cssUrl(values.image4)}');--fdreview-img4-x:50%;--fdreview-img4-y:50%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>${h(values.dateTime)}</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category1)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category2)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category3)}</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>${h(values.restaurantName)}</h1><div class="fdreview-location">${h(values.location)}</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">${h(values.score)}</span><small>/ ${h(values.scoreMax)}</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="${filled} of 5 stars"><span>${"★".repeat(filled)}</span><span class="fdreview-star-off">${"★".repeat(off)}</span></div><div class="fdreview-rating-text">${h(values.ratingText)}</div></div><div class="fdreview-quote">${nl2br(values.quote)}</div><div class="fdreview-review-text"><p>${nl2br(values.reviewText)}</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿320</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>${h(values.taste)}</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>${nl2br(values.menuAdvice)}</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>${nl2br(values.extraAdvice)}</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>${nl2br(values.verdict)}</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
+  }
+
+  function buildPreviewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}body{display:flex!important;justify-content:center!important;align-items:flex-start!important}</style></head><body>${code}</body></html>`;
+  }
+
+  function fitPreview() {
+    const iframe = panel?.querySelector("[data-food-preview]");
+    const stage = panel?.querySelector("[data-food-preview-stage]");
+    if (!iframe || !stage) return;
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+      const height = Math.max(doc.body.scrollHeight, doc.documentElement?.scrollHeight || 0, 1);
+      const scale = Math.min(1, stage.clientWidth / CANVAS_WIDTH);
+      iframe.style.height = `${height}px`;
+      iframe.style.transform = `translateX(-50%) scale(${scale})`;
+      stage.style.height = `${Math.max(680, Math.ceil(height * scale))}px`;
+    } catch (err) {
+      console.warn("Could not fit food commission preview", err);
+    }
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    const iframe = panel.querySelector("[data-food-preview]");
+    if (!iframe) return;
+    const next = buildPreviewDocument(buildCode());
+    if (iframe.srcdoc === next) {
+      fitPreview();
+      return;
+    }
+    iframe.onload = () => {
+      fitPreview();
+      iframe.contentDocument?.fonts?.ready?.then(fitPreview).catch(() => {});
+      window.setTimeout(fitPreview, 120);
+      window.setTimeout(fitPreview, 500);
+    };
+    iframe.srcdoc = next;
+  }
+
+  function schedulePreview() {
+    window.clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(updatePreview, 90);
+  }
+
+  function formatSavedTime(timestamp) {
+    if (!timestamp) return "ยังไม่มีแบบร่าง";
+    try {
+      return `บันทึกล่าสุด ${new Date(timestamp).toLocaleString("th-TH", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`;
+    } catch {
+      return "มีแบบร่างที่บันทึกไว้";
+    }
+  }
+
+  function setDraftStatus(timestamp = 0) {
+    const status = panel?.querySelector("[data-food-draft-status]");
+    if (status) status.textContent = formatSavedTime(timestamp);
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.values ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+    setDraftStatus(savedAt);
+    showToast("บันทึกแบบร่างงานรีวิวอาหารแล้ว");
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode();
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("คัดลอกโค้ดรีวิวอาหารแล้ว");
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      showToast("คัดลอกโค้ดรีวิวอาหารแล้ว");
+    }
+  }
+
+  function openEditor() {
+    const editorPanel = createPanel();
+    if (!editorPanel) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    updatePreview();
+  }
+
+  function install() {
+    const button = document.querySelector('[data-edit-protected-commission="commission001"]');
+    if (!button) return;
+    button.removeAttribute("data-edit-protected-commission");
+    button.setAttribute("data-edit-food-commission", "commission001");
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
+      else openModal();
+    });
+    window.addEventListener("resize", fitPreview);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();
