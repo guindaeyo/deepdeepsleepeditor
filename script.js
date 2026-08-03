@@ -8277,11 +8277,30 @@ ${stylesheetLinks}
   }
 
   function goBackToCommission() {
+    document.body.classList.remove("dds-commission-editor-mode");
+
     if (typeof window.openPage === "function") {
       window.openPage("commission");
     } else {
       showPanel("commission");
     }
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll("[data-work-tab]").forEach((button) => {
+        const selected = button.dataset.workTab === "commission";
+        button.classList.toggle("is-active", selected);
+        button.setAttribute("aria-selected", String(selected));
+      });
+
+      document.querySelectorAll("[data-work-panel]").forEach((panel) => {
+        const selected = panel.dataset.workPanel === "commission";
+        panel.hidden = !selected;
+        panel.classList.toggle("is-active", selected);
+      });
+
+      document.body.classList.remove("dds-commission-editor-mode");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
   }
 
   function createEditorPanel(commissionId) {
@@ -8793,6 +8812,230 @@ ${stylesheetLinks}
     return h(value).replace(/\r?\n/g, "<br>");
   }
 
+  function createFoodBbcodeToolbarMarkup() {
+    return `
+      <div class="dds-bbcode-group" aria-label="รูปแบบตัวอักษร">
+        <button type="button" data-food-bbcode="b" title="ตัวหนา [b]" aria-label="ตัวหนา"><b>B</b></button>
+        <button type="button" data-food-bbcode="i" title="ตัวเอียง [i]" aria-label="ตัวเอียง"><i>I</i></button>
+        <button type="button" data-food-bbcode="u" title="ขีดเส้นใต้ [u]" aria-label="ขีดเส้นใต้"><u>U</u></button>
+        <button type="button" data-food-bbcode="s" title="ขีดฆ่า [s]" aria-label="ขีดฆ่า"><s>S</s></button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="สีและขนาด">
+        <label class="dds-bbcode-color" title="สีตัวอักษร [color]"><span>A</span><input type="color" data-food-bbcode-color value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label>
+        <button type="button" data-food-bbcode="size-small" title="ตัวอักษรเล็ก [size=small]">A−</button>
+        <button type="button" data-food-bbcode="size-medium" title="ตัวอักษรกลาง [size=medium]">A</button>
+        <button type="button" data-food-bbcode="size-large" title="ตัวอักษรใหญ่ [size=large]">A+</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="จัดตำแหน่ง">
+        <button type="button" data-food-bbcode="align-left" title="ชิดซ้าย [align=left]">⇤</button>
+        <button type="button" data-food-bbcode="align-center" title="กึ่งกลาง [align=center]">↔</button>
+        <button type="button" data-food-bbcode="align-right" title="ชิดขวา [align=right]">⇥</button>
+        <button type="button" data-food-bbcode="align-justify" title="เต็มบรรทัด [align=justify]">☰</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="ลิงก์และสื่อ">
+        <button type="button" data-food-bbcode="url" title="ลิงก์ [url=]">🔗</button>
+        <button type="button" data-food-bbcode="img" title="รูปภาพ [img]">▣</button>
+        <button type="button" data-food-bbcode="video" title="YouTube [video=youtube]">▶</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
+        <button type="button" data-food-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
+        <button type="button" data-food-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-food-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
+        <button type="button" data-food-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="รายการ">
+        <button type="button" data-food-bbcode="list" title="รายการจุด [list]">•≡</button>
+        <button type="button" data-food-bbcode="list-1" title="รายการตัวเลข [list=1]">1≡</button>
+        <button type="button" data-food-bbcode="list-item" title="รายการย่อย [*]">[*]</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="เครื่องมืออื่น">
+        <button type="button" data-food-bbcode="hr" title="เส้นคั่น [hr]">―</button>
+        <button type="button" data-food-bbcode="clear" title="ล้าง BBCode จากข้อความที่เลือก">CLEAR</button>
+      </div>
+    `;
+  }
+
+  function stripFoodBbcode(value) {
+    return String(value || "")
+      .replace(/\[(?:\/?)(?:b|i|u|s|color(?:=[^\]]+)?|size(?:=[^\]]+)?|align(?:=[^\]]+)?|url(?:=[^\]]*)?|img|video(?:=[^\]]+)?|quote|code|hide|spoiler|list(?:=1)?|\*)\]/gi, "")
+      .replace(/\[hr\]/gi, "");
+  }
+
+  function foodBbcodeToPreviewHtml(value) {
+    let text = h(value);
+
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%;height:auto;">')
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_match, size, content) => {
+        const sizes = { small: "0.82em", medium: "1em", large: "1.28em" };
+        return `<span style="font-size:${sizes[size]}">${content}</span>`;
+      })
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[(quote|code|hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span class="dds-food-bbcode-$1">$2</span>')
+      .replace(/\[list(?:=1)?\]/gi, "<div>")
+      .replace(/\[\/list\]/gi, "</div>")
+      .replace(/\[\*\]/g, "<br>• ")
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\r?\n/g, "<br>");
+
+    return text;
+  }
+
+  function removeFoodBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
+      .replace(/\[video(?:=[^\]]*)?\][\s\S]*?\[\/video\]/gi, " ")
+      .replace(/\[url(?:=[^\]]*)?\]([\s\S]*?)\[\/url\]/gi, " $1 ")
+      .replace(/\[(?:\/?[a-z][a-z0-9_-]*(?:=[^\]]*)?|\*|hr)\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countFoodReviewWords(value) {
+    const cleanText = removeFoodBbcodeForWordCount(value);
+    if (!cleanText) return 0;
+
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(cleanText)) {
+        if (segment.isWordLike) count += 1;
+      }
+      return count;
+    }
+
+    const fallbackWords = cleanText.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+    return fallbackWords ? fallbackWords.length : 0;
+  }
+
+  function updateFoodReviewWordCounter() {
+    const target = panel?.querySelector("[data-food-review-editor]");
+    const counter = panel?.querySelector("[data-food-word-counter]");
+    if (!target || !counter) return;
+
+    const count = countFoodReviewWords(target.value);
+    const number = counter.querySelector("[data-food-word-count-number]");
+    if (number) number.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function replaceFoodSelection(target, replacement, emptyCaretOffset = replacement.length) {
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    const hadSelection = end > start;
+    target.value = target.value.slice(0, start) + replacement + target.value.slice(end);
+    const caret = start + (hadSelection ? replacement.length : emptyCaretOffset);
+    target.focus();
+    target.setSelectionRange(caret, caret);
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function getFoodSelectedText(target) {
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    return target.value.slice(start, end);
+  }
+
+  function wrapFoodTag(target, openTag, closeTag) {
+    const selected = getFoodSelectedText(target);
+    const replacement = `${openTag}${selected}${closeTag}`;
+    replaceFoodSelection(target, replacement, selected ? replacement.length : openTag.length);
+  }
+
+  function applyFoodList(target, ordered) {
+    const selected = getFoodSelectedText(target);
+    const lines = selected.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const openTag = ordered ? "[list=1]" : "[list]";
+    const body = lines.length ? lines.map((line) => `[*]${line}`).join("\n") : "[*]";
+    const replacement = `${openTag}\n${body}\n[/list]`;
+    replaceFoodSelection(target, replacement, lines.length ? replacement.length : openTag.length + 4);
+  }
+
+  function applyFoodBbcode(target, action, toolbar) {
+    switch (action) {
+      case "b": case "i": case "u": case "s": case "quote": case "code": case "hide": case "spoiler":
+        wrapFoodTag(target, `[${action}]`, `[/${action}]`);
+        break;
+      case "size-small": wrapFoodTag(target, "[size=small]", "[/size]"); break;
+      case "size-medium": wrapFoodTag(target, "[size=medium]", "[/size]"); break;
+      case "size-large": wrapFoodTag(target, "[size=large]", "[/size]"); break;
+      case "align-left": wrapFoodTag(target, "[align=left]", "[/align]"); break;
+      case "align-center": wrapFoodTag(target, "[align=center]", "[/align]"); break;
+      case "align-right": wrapFoodTag(target, "[align=right]", "[/align]"); break;
+      case "align-justify": wrapFoodTag(target, "[align=justify]", "[/align]"); break;
+      case "url": {
+        const selected = getFoodSelectedText(target);
+        const url = window.prompt("ใส่ลิงก์ URL", /^https?:\/\//i.test(selected) ? selected : "https://");
+        if (url === null) return;
+        replaceFoodSelection(target, `[url=${url}]${selected || url}[/url]`);
+        break;
+      }
+      case "img": {
+        const selected = getFoodSelectedText(target);
+        const url = window.prompt("ใส่ลิงก์รูปภาพ", /^https?:\/\//i.test(selected) ? selected : "https://");
+        if (url === null) return;
+        replaceFoodSelection(target, `[img]${url}[/img]`);
+        break;
+      }
+      case "video": {
+        const selected = getFoodSelectedText(target);
+        const url = window.prompt("ใส่ลิงก์ YouTube", /^https?:\/\//i.test(selected) ? selected : "https://");
+        if (url === null) return;
+        replaceFoodSelection(target, `[video=youtube]${url}[/video]`);
+        break;
+      }
+      case "list": applyFoodList(target, false); break;
+      case "list-1": applyFoodList(target, true); break;
+      case "list-item": replaceFoodSelection(target, `[*]${getFoodSelectedText(target)}`); break;
+      case "hr": replaceFoodSelection(target, "[hr]"); break;
+      case "clear": {
+        const selected = getFoodSelectedText(target);
+        if (!selected) {
+          showToast("คลุมข้อความที่ต้องการล้าง BBCode ก่อน");
+          return;
+        }
+        replaceFoodSelection(target, stripFoodBbcode(selected));
+        break;
+      }
+      case "color": {
+        const color = toolbar.querySelector("[data-food-bbcode-color]")?.value || "#8f0e16";
+        wrapFoodTag(target, `[color=${color}]`, "[/color]");
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  function installFoodReviewBbcode() {
+    const target = panel?.querySelector("[data-food-review-editor]");
+    const toolbar = panel?.querySelector("[data-food-bbcode-toolbar]");
+    if (!target || !toolbar || target.dataset.foodBbcodeReady === "true") return;
+
+    target.dataset.foodBbcodeReady = "true";
+    toolbar.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) event.preventDefault();
+    });
+    toolbar.querySelectorAll("[data-food-bbcode]").forEach((button) => {
+      button.addEventListener("click", () => applyFoodBbcode(target, button.dataset.foodBbcode, toolbar));
+    });
+    toolbar.querySelector("[data-food-bbcode-color]")?.addEventListener("change", () => {
+      applyFoodBbcode(target, "color", toolbar);
+    });
+    target.addEventListener("input", updateFoodReviewWordCounter);
+    target.addEventListener("paste", () => window.setTimeout(updateFoodReviewWordCounter, 0));
+    updateFoodReviewWordCounter();
+  }
+
   function showToast(message) {
     if (typeof window.showToast === "function") {
       window.showToast(message);
@@ -8831,8 +9074,27 @@ ${stylesheetLinks}
   }
 
   function backToCommission() {
+    document.body.classList.remove("dds-commission-editor-mode");
+
     if (typeof window.openPage === "function") window.openPage("commission");
     else showPanel("commission");
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll("[data-work-tab]").forEach((button) => {
+        const selected = button.dataset.workTab === "commission";
+        button.classList.toggle("is-active", selected);
+        button.setAttribute("aria-selected", String(selected));
+      });
+
+      document.querySelectorAll("[data-work-panel]").forEach((panel) => {
+        const selected = panel.dataset.workPanel === "commission";
+        panel.hidden = !selected;
+        panel.classList.toggle("is-active", selected);
+      });
+
+      document.body.classList.remove("dds-commission-editor-mode");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
   }
 
   function createModal() {
@@ -8990,7 +9252,18 @@ ${stylesheetLinks}
               <div class="dds-control-title"><span>04</span><h2>ข้อความรีวิว</h2></div>
               <div class="dds-form-grid">
                 ${createField("ข้อความโควต", "quote", { full: true, textarea: true, rows: 2, placeholder: "กรอกข้อความโควต" })}
-                ${createField("เนื้อหารีวิว", "reviewText", { full: true, textarea: true, rows: 8, placeholder: "กรอกข้อความรีวิว" })}
+                <label class="dds-field dds-field-full dds-food-review-bbcode-field">
+                  <span>เนื้อหารีวิว</span>
+                  <div class="dds-rich-toolbar dds-bbcode-toolbar" data-food-bbcode-toolbar>
+                    ${createFoodBbcodeToolbarMarkup()}
+                  </div>
+                  <textarea rows="8" data-food-field="reviewText" data-food-review-editor placeholder="กรอกข้อความรีวิว"></textarea>
+                  <div class="dds-word-counter" data-food-word-counter data-empty="true">
+                    <span class="dds-word-counter-label">จำนวนคำ</span>
+                    <strong><span data-food-word-count-number>0</span> คำ</strong>
+                    <small>ไม่นับคำสั่ง BBCode</small>
+                  </div>
+                </label>
                 ${createField("คะแนนรสชาติ", "taste", { full: true, placeholder: "เช่น 9.5 / 10" })}
               </div>
             </section>
@@ -9027,6 +9300,7 @@ ${stylesheetLinks}
     panel.querySelector("[data-food-reset]")?.addEventListener("click", resetFields);
     panel.addEventListener("input", schedulePreview);
     panel.addEventListener("change", schedulePreview);
+    installFoodReviewBbcode();
     return panel;
   }
 
@@ -9044,16 +9318,25 @@ ${stylesheetLinks}
       const key = field.dataset.foodField;
       field.value = next[key] ?? defaults[key] ?? "";
     });
+    updateFoodReviewWordCounter();
   }
 
-  function buildCode(values = getValues()) {
+  function buildCode(values = getValues(), previewMode = false) {
     const filled = Math.max(0, Math.min(5, Number.parseInt(values.stars, 10) || 0));
     const off = 5 - filled;
-    return `<link href="https://guindaeyo.github.io/css/foodierv-land.css" rel="stylesheet"><div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('${cssUrl(values.image1)}');--fdreview-img1-x:50%;--fdreview-img1-y:35%;--fdreview-img2:url('${cssUrl(values.image2)}');--fdreview-img2-x:50%;--fdreview-img2-y:50%;--fdreview-img3:url('${cssUrl(values.image3)}');--fdreview-img3-x:50%;--fdreview-img3-y:50%;--fdreview-img4:url('${cssUrl(values.image4)}');--fdreview-img4-x:50%;--fdreview-img4-y:50%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>${h(values.dateTime)}</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category1)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category2)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category3)}</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>${h(values.restaurantName)}</h1><div class="fdreview-location">${h(values.location)}</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">${h(values.score)}</span><small>/ ${h(values.scoreMax)}</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="${filled} of 5 stars"><span>${"★".repeat(filled)}</span><span class="fdreview-star-off">${"★".repeat(off)}</span></div><div class="fdreview-rating-text">${h(values.ratingText)}</div></div><div class="fdreview-quote">${nl2br(values.quote)}</div><div class="fdreview-review-text"><p>${nl2br(values.reviewText)}</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿320</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>${h(values.taste)}</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>${nl2br(values.menuAdvice)}</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>${nl2br(values.extraAdvice)}</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>${nl2br(values.verdict)}</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
+    const reviewContent = previewMode
+      ? foodBbcodeToPreviewHtml(values.reviewText)
+      : nl2br(values.reviewText);
+    return `<link href="https://guindaeyo.github.io/css/foodierv-land.css" rel="stylesheet"><div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('${cssUrl(values.image1)}');--fdreview-img1-x:50%;--fdreview-img1-y:35%;--fdreview-img2:url('${cssUrl(values.image2)}');--fdreview-img2-x:50%;--fdreview-img2-y:50%;--fdreview-img3:url('${cssUrl(values.image3)}');--fdreview-img3-x:50%;--fdreview-img3-y:50%;--fdreview-img4:url('${cssUrl(values.image4)}');--fdreview-img4-x:50%;--fdreview-img4-y:50%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>${h(values.dateTime)}</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category1)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category2)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category3)}</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>${h(values.restaurantName)}</h1><div class="fdreview-location">${h(values.location)}</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">${h(values.score)}</span><small>/ ${h(values.scoreMax)}</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="${filled} of 5 stars"><span>${"★".repeat(filled)}</span><span class="fdreview-star-off">${"★".repeat(off)}</span></div><div class="fdreview-rating-text">${h(values.ratingText)}</div></div><div class="fdreview-quote">${nl2br(values.quote)}</div><div class="fdreview-review-text"><p>${reviewContent}</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿320</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>${h(values.taste)}</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>${nl2br(values.menuAdvice)}</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>${nl2br(values.extraAdvice)}</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>${nl2br(values.verdict)}</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
   }
 
   function buildPreviewDocument(code) {
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}body{display:flex!important;justify-content:center!important;align-items:flex-start!important}</style></head><body>${code}</body></html>`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>
+      html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
+      body{position:relative!important;min-height:1px!important}
+      .dds-food-preview-positioner{position:relative!important;width:max-content!important;min-width:0!important;max-width:none!important;margin:0!important;padding:0!important;transform:none}
+      .dds-food-bbcode-quote,.dds-food-bbcode-code,.dds-food-bbcode-hide,.dds-food-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}
+    </style></head><body><div class="dds-food-preview-positioner" data-food-preview-positioner>${code}</div></body></html>`;
   }
 
   function fitPreview() {
@@ -9063,11 +9346,30 @@ ${stylesheetLinks}
     try {
       const doc = iframe.contentDocument;
       if (!doc?.body) return;
-      const height = Math.max(doc.body.scrollHeight, doc.documentElement?.scrollHeight || 0, 1);
-      const scale = Math.min(1, stage.clientWidth / CANVAS_WIDTH);
-      iframe.style.height = `${height}px`;
+
+      const positioner = doc.querySelector("[data-food-preview-positioner]");
+      const codeRoot = doc.querySelector(".fdreview-wrap");
+      if (positioner && codeRoot) {
+        positioner.style.transform = "none";
+        const rootRect = codeRoot.getBoundingClientRect();
+        const shiftX = (CANVAS_WIDTH - rootRect.width) / 2 - rootRect.left;
+        positioner.style.transform = `translateX(${shiftX}px)`;
+      }
+
+      const rootRect = codeRoot?.getBoundingClientRect();
+      const naturalHeight = Math.max(
+        rootRect ? rootRect.bottom : 0,
+        doc.body.scrollHeight,
+        doc.documentElement?.scrollHeight || 0,
+        1
+      );
+      const scale = Math.min(1, Math.max(0.01, (stage.clientWidth - 24) / CANVAS_WIDTH));
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.left = "50%";
+      iframe.style.height = `${Math.ceil(naturalHeight)}px`;
+      iframe.style.transformOrigin = "top center";
       iframe.style.transform = `translateX(-50%) scale(${scale})`;
-      stage.style.height = `${Math.max(680, Math.ceil(height * scale))}px`;
+      stage.style.height = `${Math.max(680, Math.ceil(naturalHeight * scale))}px`;
     } catch (err) {
       console.warn("Could not fit food commission preview", err);
     }
@@ -9077,7 +9379,7 @@ ${stylesheetLinks}
     if (!panel) return;
     const iframe = panel.querySelector("[data-food-preview]");
     if (!iframe) return;
-    const next = buildPreviewDocument(buildCode());
+    const next = buildPreviewDocument(buildCode(getValues(), true));
     if (iframe.srcdoc === next) {
       fitPreview();
       return;

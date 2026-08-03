@@ -6904,3 +6904,47 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     font-size: 0.68em;
   }
 }
+
+
+/* ==================================================
+   LANDON FOOD REVIEW — BBCODE / WORD COUNT / CENTERED PREVIEW
+================================================== */
+.dds-food-review-bbcode-field {
+  display: block;
+}
+
+.dds-food-review-bbcode-field > .dds-bbcode-toolbar {
+  width: 100%;
+  margin: 8px 0 0;
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.dds-food-review-bbcode-field > textarea {
+  width: 100%;
+  min-height: 220px;
+  margin-top: 8px;
+  resize: vertical;
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.dds-food-review-bbcode-field > .dds-word-counter {
+  width: 100%;
+}
+
+.dds-food-commission-editor [data-food-preview-stage] {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.dds-food-commission-editor [data-food-preview] {
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+  margin: 0 !important;
+  transform-origin: top center !important;
+}
