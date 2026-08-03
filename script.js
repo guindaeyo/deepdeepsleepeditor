@@ -11273,6 +11273,40 @@ ${stylesheetLinks}
     }
   }
 
+  function fitViewPreview() {
+    const iframe = viewPanel?.querySelector("[data-eric-view-preview]");
+    const holder = viewPanel?.querySelector("[data-eric-view-holder]");
+    const stage = viewPanel?.querySelector("[data-eric-view-stage]");
+    if (!iframe || !holder || !stage) return;
+
+    try {
+      const root = iframe.contentDocument?.querySelector("[data-eric-preview-root]");
+      if (!root) return;
+
+      const height = Math.max(
+        1,
+        Math.ceil(root.scrollHeight || root.getBoundingClientRect().height)
+      );
+      const horizontalPadding = 48;
+      const availableWidth = Math.max(280, stage.clientWidth - horizontalPadding);
+      const scale = Math.min(1, availableWidth / CANVAS_WIDTH);
+
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.height = `${height}px`;
+      iframe.style.maxWidth = "none";
+      iframe.style.position = "absolute";
+      iframe.style.left = "0";
+      iframe.style.top = "0";
+      iframe.style.transformOrigin = "top left";
+      iframe.style.transform = `scale(${scale})`;
+
+      holder.style.width = `${Math.ceil(CANVAS_WIDTH * scale)}px`;
+      holder.style.height = `${Math.ceil(height * scale)}px`;
+    } catch (error) {
+      console.warn("[DDS] Could not fit Eric full work preview", error);
+    }
+  }
+
   function writeIframe(iframe, code, marker, afterLoad) {
     if (!iframe) return;
     iframe.onload = () => {
@@ -11463,7 +11497,6 @@ ${stylesheetLinks}
     setValues(defaults);
     draftStatus(0);
     updateEditorPreview();
-    showToast("ลบแบบร่างแล้ว");
   }
 
   function getDraft() {
@@ -11624,7 +11657,7 @@ ${stylesheetLinks}
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-eric-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage"><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทประวัติ Eric Hawkins"></iframe></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage" data-eric-view-stage><div class="dds-eric-view-holder" data-eric-view-holder><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทประวัติ Eric Hawkins"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-eric-view-back]")?.addEventListener("click", backToCommission, true);
     return viewPanel;
@@ -11633,23 +11666,24 @@ ${stylesheetLinks}
   function openView() {
     const panel = createViewPanel();
     if (!panel) return;
+
+    const toast = document.getElementById("ddsEricEditorToast");
+    if (toast) {
+      clearTimeout(toast._timer);
+      toast.classList.remove("is-visible");
+      toast.textContent = "";
+    }
+
     document.body.classList.add("dds-editor-mode");
     showOnly(VIEW_PANEL_NAME);
     history.replaceState(null, "", "#commission-eric-view");
     const iframe = panel.querySelector("[data-eric-view-preview]");
+
     if (!viewRendered) {
-      writeIframe(iframe, OFFICIAL_CODE, "view", () => {
-        try {
-          const root = iframe.contentDocument?.querySelector("[data-eric-preview-root]");
-          if (!root) return;
-          const height = Math.ceil(root.scrollHeight || root.getBoundingClientRect().height);
-          iframe.style.width = `${CANVAS_WIDTH}px`;
-          iframe.style.height = `${height}px`;
-          iframe.style.maxWidth = "none";
-          panel.querySelector(".dds-eric-view-stage").style.height = `${height}px`;
-        } catch {}
-      });
+      writeIframe(iframe, OFFICIAL_CODE, "view", fitViewPreview);
       viewRendered = true;
+    } else {
+      requestAnimationFrame(fitViewPreview);
     }
   }
 
@@ -11730,6 +11764,7 @@ ${stylesheetLinks}
     }, 100);
     window.addEventListener("resize", () => {
       fitEditorPreview();
+      fitViewPreview();
       const iframe = card?.querySelector("[data-eric-card-preview]");
       if (iframe) fitCardPreview(iframe);
     });
