@@ -6841,3 +6841,66 @@ textarea + .dds-bbcode-toolbar {
     padding-right: 0;
   }
 }
+
+
+/* ==================================================
+   COMMISSION EDITOR — FULL WIDTH / NO MAIN SIDEBAR
+================================================== */
+body.dds-commission-editor-mode .dds-app {
+  display: block;
+}
+
+body.dds-commission-editor-mode .dds-sidebar,
+body.dds-commission-editor-mode .dds-topbar,
+body.dds-commission-editor-mode .dds-footer {
+  display: none !important;
+}
+
+body.dds-commission-editor-mode .dds-main {
+  width: 100%;
+  max-width: none;
+  padding: 0 clamp(22px, 4vw, 72px) 60px;
+}
+
+body.dds-commission-editor-mode .dds-protected-commission-editor {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-heading {
+  padding: 22px 0 42px;
+}
+
+.dds-food-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12em;
+}
+
+.dds-food-commission-heading > span {
+  display: block;
+}
+
+.dds-food-commission-heading > span:last-child {
+  font-size: 0.76em;
+  line-height: 0.92;
+}
+
+.dds-food-field-help {
+  display: block;
+  margin-top: 1px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+@media (max-width: 700px) {
+  body.dds-commission-editor-mode .dds-main {
+    padding: 0 16px 40px;
+  }
+
+  .dds-food-commission-heading > span:last-child {
+    font-size: 0.68em;
+  }
+}

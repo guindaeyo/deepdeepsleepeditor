@@ -8907,12 +8907,13 @@ ${stylesheetLinks}
   }
 
   function createField(label, key, options = {}) {
-    const { full = false, textarea = false, rows = 3, type = "text", placeholder = "กรอกข้อมูล" } = options;
+    const { full = false, textarea = false, rows = 3, type = "text", placeholder = "กรอกข้อมูล", help = "" } = options;
     const className = `dds-field${full ? " dds-field-full" : ""}`;
+    const helpText = help ? `<small class="dds-food-field-help">${help}</small>` : "";
     if (textarea) {
-      return `<label class="${className}"><span>${label}</span><textarea rows="${rows}" data-food-field="${key}" placeholder="${placeholder}"></textarea></label>`;
+      return `<label class="${className}"><span>${label}</span><textarea rows="${rows}" data-food-field="${key}" placeholder="${placeholder}"></textarea>${helpText}</label>`;
     }
-    return `<label class="${className}"><span>${label}</span><input type="${type}" data-food-field="${key}" placeholder="${placeholder}"></label>`;
+    return `<label class="${className}"><span>${label}</span><input type="${type}" data-food-field="${key}" placeholder="${placeholder}">${helpText}</label>`;
   }
 
   function createPanel() {
@@ -8929,7 +8930,7 @@ ${stylesheetLinks}
         <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-food-back title="กลับหน้า COMMISSION" type="button">←</button>
         <div>
           <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
-          <h1>COMMISSION — โค้ดประเภทรีวิวอาหาร</h1>
+          <h1 class="dds-food-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทรีวิวอาหาร</span></h1>
           <p>กรอกข้อมูลทางขวา แล้วดูผลลัพธ์ทางซ้ายได้ทันที สีและโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
         </div>
       </div>
@@ -8974,7 +8975,7 @@ ${stylesheetLinks}
               <div class="dds-control-title"><span>03</span><h2>ข้อมูลร้านและคะแนน</h2></div>
               <div class="dds-form-grid">
                 ${createField("ชื่อร้าน", "restaurantName", { full: true, placeholder: "กรอกชื่อร้าน" })}
-                ${createField("สถานที่และวันที่", "location", { full: true, placeholder: "เช่น Bangkok, Thailand · 18 July 2026" })}
+                ${createField("สถานที่และวันที่", "location", { full: true, placeholder: "เช่น Bangkok, Thailand · 18 July 2026", help: "หรือจะใส่ว่า รีวิวโดย LANDON A. RUTHERFORD ก็ได้" })}
                 ${createField("คะแนน", "score", { placeholder: "เช่น 9.4" })}
                 ${createField("คะแนนเต็ม", "scoreMax", { placeholder: "เช่น 10" })}
                 <label class="dds-field"><span>จำนวนดาวที่ติดสี</span><select data-food-field="stars">
@@ -9187,5 +9188,57 @@ ${stylesheetLinks}
     document.addEventListener("DOMContentLoaded", install, { once: true });
   } else {
     install();
+  }
+})();
+
+
+/* =========================================================
+   COMMISSION EDITOR — FULL-WIDTH MODE SYNC
+   ซ่อนเมนูหลักเฉพาะหน้าแก้ไขคอมมิชชั่น
+   ========================================================= */
+(() => {
+  "use strict";
+
+  function syncCommissionEditorMode() {
+    const activeCommissionEditor = document.querySelector(
+      ".dds-panel.is-active.dds-protected-commission-editor"
+    );
+
+    document.body.classList.toggle(
+      "dds-commission-editor-mode",
+      Boolean(activeCommissionEditor)
+    );
+  }
+
+  const observer = new MutationObserver(syncCommissionEditorMode);
+
+  function installCommissionEditorModeSync() {
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    document.addEventListener(
+      "click",
+      () => requestAnimationFrame(syncCommissionEditorMode),
+      true
+    );
+    window.addEventListener(
+      "hashchange",
+      () => requestAnimationFrame(syncCommissionEditorMode)
+    );
+    syncCommissionEditorMode();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      installCommissionEditorModeSync,
+      { once: true }
+    );
+  } else {
+    installCommissionEditorModeSync();
   }
 })();
