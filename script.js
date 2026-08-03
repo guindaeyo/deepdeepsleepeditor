@@ -9590,3 +9590,90 @@ ${stylesheetLinks}
     installCommissionEditorModeSync();
   }
 })();
+
+/* =========================================================
+   COMMISSION EDITOR — FORCE BACK TO SHOWCASE
+   กลับจากหน้าแก้คอมมิชชั่นไปหน้า COMMISSION & ACTIVITY
+   และเปิดแท็บ COMMISSION & SHOWCASE ทุกครั้ง
+   ========================================================= */
+(() => {
+  "use strict";
+
+  function activateCommissionShowcase() {
+    // ปิดโหมด editor เต็มจอก่อน เพื่อคืน sidebar และ layout หลัก
+    document.body.classList.remove("dds-commission-editor-mode");
+    document.documentElement.classList.remove("dds-commission-editor-mode");
+
+    // ให้ระบบหลักอัปเดตหัวข้อ/เลขหน้า หากมีฟังก์ชันนี้
+    if (typeof window.openPage === "function") {
+      try {
+        window.openPage("commission");
+      } catch (error) {
+        console.warn("[DDS] openPage('commission') failed", error);
+      }
+    }
+
+    // บังคับ panel โดยตรง เพื่อไม่ให้ hash หรือ listener ตัวอื่นพาไปหน้าอื่น
+    document.querySelectorAll(".dds-panel").forEach((panel) => {
+      const isCommission = panel.dataset.panel === "commission";
+      panel.classList.toggle("is-active", isCommission);
+    });
+
+    // เปิดแท็บ COMMISSION & SHOWCASE
+    document.querySelectorAll("[data-work-tab]").forEach((button) => {
+      const isCommissionTab = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", isCommissionTab);
+      button.setAttribute("aria-selected", String(isCommissionTab));
+      button.tabIndex = isCommissionTab ? 0 : -1;
+    });
+
+    document.querySelectorAll("[data-work-panel]").forEach((panel) => {
+      const isCommissionPanel = panel.dataset.workPanel === "commission";
+      panel.hidden = !isCommissionPanel;
+      panel.classList.toggle("is-active", isCommissionPanel);
+    });
+
+    // ไฮไลต์เมนู COMMISSION & ACTIVITY ทางขวา
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle(
+        "is-active",
+        button.dataset.page === "commission"
+      );
+    });
+
+    const currentPageNumber = document.getElementById("currentPageNumber");
+    if (currentPageNumber) currentPageNumber.textContent = "04";
+
+    // แก้ URL ให้ตรงกับหน้าที่แสดง โดยไม่เพิ่มประวัติย้อนกลับซ้ำ
+    if (window.location.hash !== "#commission") {
+      history.replaceState(null, "", "#commission");
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
+  function handleCommissionBack(event) {
+    const button = event.target.closest(
+      "[data-food-back], [data-protected-commission-back]"
+    );
+
+    if (!button) return;
+
+    // กัน listener เดิมหรือระบบหลักรับ click ต่อแล้วเปลี่ยนไปหน้าอื่น
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    activateCommissionShowcase();
+
+    // บังคับซ้ำหลัง DOM/MutationObserver ของระบบเดิมทำงานครบ
+    requestAnimationFrame(() => {
+      activateCommissionShowcase();
+      requestAnimationFrame(activateCommissionShowcase);
+    });
+    window.setTimeout(activateCommissionShowcase, 80);
+  }
+
+  // ใช้ capture เพื่อรับเหตุการณ์ก่อน listener เดิมทั้งหมด
+  document.addEventListener("click", handleCommissionBack, true);
+})();
