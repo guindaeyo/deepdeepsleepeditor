@@ -8113,3 +8113,622 @@ ${stylesheetLinks}
     initializeMusicReview();
   }
 })();
+
+
+/* =========================================================
+   LANDON COMMISSION — PASSWORD-GATED EDITOR (TRIAL)
+   This is a client-side access gate for the static site.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ACCESS_HASH = "6d05de9e9a208dc2beb7d5e594b39064b36142353ffc8db10295131098a1bcd6";
+  const ACCESS_SESSION_KEY = "dds:landon-commission-editor:unlocked";
+  const commissions = {
+    commission001: {
+      panel: "protected-commission001",
+      title: "COMMISSION — โค้ดประเภทรีวิวอาหาร",
+      codeLabel: "LANDON / COMMISSION 01",
+      sourceFrames: ["commissionPreview001", "commissionCardPreview001"],
+      draftKey: "dds:commission-draft:landon:commission001"
+    },
+    commission002: {
+      panel: "protected-commission002",
+      title: "COMMISSION 2 — โค้ดประเภทประวัติ",
+      codeLabel: "LANDON / COMMISSION 02",
+      sourceFrames: ["commissionPreview002", "commissionCardPreview002"],
+      draftKey: "dds:commission-draft:landon:commission002"
+    }
+  };
+
+  const states = new Map();
+  let pendingCommissionId = "";
+  let modal = null;
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    window.setTimeout(() => toast.classList.remove("is-visible"), 2100);
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  function createModal() {
+    if (modal) return modal;
+
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <form class="dds-commission-lock-dialog" data-commission-lock-form>
+        <small>CLIENT ACCESS / LANDON A. RUTHERFORD</small>
+        <h2>Protected editor</h2>
+        <p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p>
+        <label class="dds-commission-lock-field">
+          <span>รหัสผ่าน</span>
+          <input
+            type="password"
+            autocomplete="current-password"
+            data-commission-password
+            placeholder="กรอกรหัสผ่าน"
+          >
+        </label>
+        <p class="dds-commission-lock-error" data-commission-lock-error></p>
+        <div class="dds-commission-lock-actions">
+          <button type="submit">UNLOCK EDITOR</button>
+          <button type="button" data-commission-lock-cancel>CANCEL</button>
+        </div>
+      </form>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector("[data-commission-lock-cancel]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+    modal.querySelector("[data-commission-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-commission-password]");
+      const error = modal.querySelector("[data-commission-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+
+      try {
+        const hash = await sha256(input.value);
+        if (hash !== ACCESS_HASH) {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+          return;
+        }
+
+        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+        const target = pendingCommissionId;
+        closeModal();
+        if (target) openEditor(target);
+      } catch (errorObject) {
+        console.error(errorObject);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    return modal;
+  }
+
+  function openModal(commissionId) {
+    pendingCommissionId = commissionId;
+    const dialog = createModal();
+    const input = dialog.querySelector("[data-commission-password]");
+    const error = dialog.querySelector("[data-commission-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    window.setTimeout(() => input?.focus(), 30);
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function setCommissionSidebarActive() {
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.page === "commission");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.dataset.panel === panelName);
+    });
+    setCommissionSidebarActive();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function goBackToCommission() {
+    if (typeof window.openPage === "function") {
+      window.openPage("commission");
+    } else {
+      showPanel("commission");
+    }
+  }
+
+  function createEditorPanel(commissionId) {
+    const info = commissions[commissionId];
+    const main = document.querySelector(".dds-main");
+    const footer = main?.querySelector(".dds-footer");
+    if (!info || !main) return null;
+
+    let panel = document.querySelector(`[data-panel="${info.panel}"]`);
+    if (panel) return panel;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor";
+    panel.dataset.panel = info.panel;
+    panel.dataset.protectedCommission = commissionId;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button
+          aria-label="กลับหน้า COMMISSION"
+          class="dds-back-button"
+          data-protected-commission-back
+          title="กลับหน้า COMMISSION"
+          type="button"
+        >←</button>
+        <div>
+          <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
+          <h1>${escapeHtml(info.title)}</h1>
+          <p>แก้โค้ดทางขวาและดูผลลัพธ์ทางซ้ายได้ทันที</p>
+        </div>
+      </div>
+
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top">
+            <span>LIVE PREVIEW</span>
+            <strong>${escapeHtml(info.codeLabel)}</strong>
+          </div>
+          <div class="dds-protected-commission-preview-stage" data-commission-preview-stage>
+            <iframe
+              class="dds-protected-commission-preview-frame"
+              data-commission-edit-preview
+              scrolling="no"
+              title="ตัวอย่างงานคอมมิชชั่นที่กำลังแก้ไข"
+            ></iframe>
+          </div>
+        </div>
+
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft">
+            <div>
+              <strong>บันทึกแบบร่าง</strong>
+              <small data-commission-draft-status>ยังไม่มีแบบร่าง</small>
+            </div>
+            <button type="button" data-commission-save>SAVE DRAFT</button>
+            <button type="button" data-commission-delete-save>DELETE SAVE</button>
+          </div>
+
+          <div class="dds-protected-commission-scroll">
+            <section class="dds-protected-commission-section">
+              <div class="dds-control-title">
+                <span>01</span>
+                <h2>แก้ไขโค้ด HTML</h2>
+              </div>
+              <p class="dds-protected-commission-help">
+                กล่องนี้เป็นโค้ดงานคอมมิชชั่นจริง สามารถแก้ข้อความ ลิงก์รูป สี และค่า style ได้โดยตรง
+              </p>
+              <textarea
+                class="dds-protected-code-editor"
+                data-commission-code-editor
+                spellcheck="false"
+                wrap="off"
+              ></textarea>
+            </section>
+          </div>
+
+          <section class="dds-protected-commission-copy">
+            <p>คัดลอกโค้ดที่แก้ไขแล้ว หรือรีเซ็ตกลับเป็นงานต้นฉบับ</p>
+            <div class="dds-protected-commission-copy-actions">
+              <button type="button" data-commission-copy>COPY CODE <span>↗</span></button>
+              <button type="button" data-commission-reset>RESET</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+
+    if (footer) main.insertBefore(panel, footer);
+    else main.appendChild(panel);
+
+    panel.querySelector("[data-protected-commission-back]")?.addEventListener("click", goBackToCommission);
+    panel.querySelector("[data-commission-code-editor]")?.addEventListener("input", () => {
+      const state = states.get(commissionId);
+      if (!state) return;
+      clearTimeout(state.previewTimer);
+      state.previewTimer = window.setTimeout(() => updatePreview(commissionId), 120);
+    });
+    panel.querySelector("[data-commission-save]")?.addEventListener("click", () => saveDraft(commissionId));
+    panel.querySelector("[data-commission-delete-save]")?.addEventListener("click", () => deleteDraft(commissionId));
+    panel.querySelector("[data-commission-copy]")?.addEventListener("click", () => copyCode(commissionId));
+    panel.querySelector("[data-commission-reset]")?.addEventListener("click", () => resetCode(commissionId));
+
+    return panel;
+  }
+
+  function isPreviewWrapper(element) {
+    if (!element || element.nodeType !== 1) return false;
+    const classes = Array.from(element.classList);
+    if (!classes.length) return false;
+    return classes.some((name) =>
+      name === "dds-preview-shell" ||
+      name === "dds-preview-target" ||
+      name === "dds-card-preview-shell" ||
+      name === "dds-card-preview-target" ||
+      name === "dds-commission-preview-content" ||
+      name.includes("preview-content") ||
+      name.includes("preview-target") ||
+      name.includes("preview-shell")
+    );
+  }
+
+  function extractMarkupFromDocument(doc) {
+    if (!doc?.body) return "";
+
+    const selectors = [
+      ".dds-commission-preview-content",
+      ".dds-preview-target",
+      ".dds-card-preview-target",
+      ".dds-preview-content",
+      ".dds-card-preview-content"
+    ];
+
+    let container = selectors.map((selector) => doc.querySelector(selector)).find(Boolean) || doc.body;
+
+    while (container) {
+      const children = Array.from(container.children).filter((element) =>
+        !["STYLE", "SCRIPT", "LINK", "META"].includes(element.tagName)
+      );
+      if (children.length === 1 && isPreviewWrapper(children[0])) {
+        container = children[0];
+        continue;
+      }
+      break;
+    }
+
+    let roots = Array.from(container.children).filter((element) =>
+      !["STYLE", "SCRIPT", "LINK", "META"].includes(element.tagName) &&
+      !element.classList.contains("dds-preview-loader")
+    );
+
+    if (!roots.length && container !== doc.body && !isPreviewWrapper(container)) {
+      roots = [container];
+    }
+
+    if (!roots.length) {
+      roots = Array.from(doc.body.children).filter((element) =>
+        !["STYLE", "SCRIPT", "LINK", "META"].includes(element.tagName) &&
+        !isPreviewWrapper(element)
+      );
+    }
+
+    return roots.map((element) => element.outerHTML).join("");
+  }
+
+  function extractStylesheetLinks(doc) {
+    if (!doc?.head) return "";
+    const seen = new Set();
+    return Array.from(doc.head.querySelectorAll('link[rel="stylesheet"]'))
+      .filter((link) => {
+        const href = link.href || link.getAttribute("href") || "";
+        if (!href || seen.has(href)) return false;
+        seen.add(href);
+        return !href.includes("/style.css?v=");
+      })
+      .map((link) => {
+        const clone = link.cloneNode(true);
+        clone.removeAttribute("integrity");
+        return clone.outerHTML;
+      })
+      .join("");
+  }
+
+  function extractCodeFromFrame(frame) {
+    if (!frame) return "";
+
+    try {
+      const doc = frame.contentDocument;
+      if (doc?.body) {
+        const markup = extractMarkupFromDocument(doc);
+        if (markup) return `${extractStylesheetLinks(doc)}${markup}`;
+      }
+    } catch (error) {
+      console.warn("Could not read commission preview frame", error);
+    }
+
+    const source = frame.getAttribute("srcdoc") || frame.srcdoc || "";
+    if (!source.trim()) return "";
+
+    try {
+      const doc = new DOMParser().parseFromString(source, "text/html");
+      const markup = extractMarkupFromDocument(doc);
+      return markup ? `${extractStylesheetLinks(doc)}${markup}` : "";
+    } catch (error) {
+      console.warn("Could not parse commission preview source", error);
+      return "";
+    }
+  }
+
+  async function captureOriginalCode(commissionId) {
+    const info = commissions[commissionId];
+    if (!info) return "";
+
+    for (let attempt = 0; attempt < 70; attempt += 1) {
+      for (const frameId of info.sourceFrames) {
+        const code = extractCodeFromFrame(document.getElementById(frameId));
+        if (code && code.length > 80) return code;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 80));
+    }
+
+    return "";
+  }
+
+  function buildPreviewDocument(code) {
+    return `<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<style>
+  html, body {
+    width: 1040px !important;
+    min-width: 1040px !important;
+    max-width: 1040px !important;
+    min-height: 1px;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+  body {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+</style>
+</head>
+<body>${code}</body>
+</html>`;
+  }
+
+  function fitPreview(commissionId) {
+    const state = states.get(commissionId);
+    if (!state) return;
+    const { panel } = state;
+    const iframe = panel.querySelector("[data-commission-edit-preview]");
+    const stage = panel.querySelector("[data-commission-preview-stage]");
+    if (!iframe || !stage) return;
+
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+      const height = Math.max(
+        doc.body.scrollHeight,
+        doc.documentElement?.scrollHeight || 0,
+        1
+      );
+      const scale = Math.min(1, stage.clientWidth / 1040);
+      iframe.style.height = `${height}px`;
+      iframe.style.transform = `translateX(-50%) scale(${scale})`;
+      stage.style.height = `${Math.max(680, Math.ceil(height * scale))}px`;
+    } catch (error) {
+      console.warn("Could not resize protected commission preview", error);
+    }
+  }
+
+  function updatePreview(commissionId) {
+    const state = states.get(commissionId);
+    if (!state) return;
+    const editor = state.panel.querySelector("[data-commission-code-editor]");
+    const iframe = state.panel.querySelector("[data-commission-edit-preview]");
+    if (!editor || !iframe) return;
+
+    const documentText = buildPreviewDocument(editor.value);
+    if (iframe.srcdoc === documentText) {
+      fitPreview(commissionId);
+      return;
+    }
+
+    iframe.onload = () => {
+      fitPreview(commissionId);
+      const doc = iframe.contentDocument;
+      doc?.fonts?.ready?.then(() => fitPreview(commissionId)).catch(() => {});
+      window.setTimeout(() => fitPreview(commissionId), 120);
+      window.setTimeout(() => fitPreview(commissionId), 500);
+    };
+    iframe.srcdoc = documentText;
+  }
+
+  function formatSavedTime(timestamp) {
+    if (!timestamp) return "ยังไม่มีแบบร่าง";
+    try {
+      return `บันทึกล่าสุด ${new Date(timestamp).toLocaleString("th-TH", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      })}`;
+    } catch {
+      return "มีแบบร่างที่บันทึกไว้";
+    }
+  }
+
+  function getDraft(info) {
+    try {
+      const raw = localStorage.getItem(info.draftKey);
+      if (!raw) return null;
+      const value = JSON.parse(raw);
+      if (!value || typeof value.code !== "string") return null;
+      return value;
+    } catch {
+      return null;
+    }
+  }
+
+  function updateDraftStatus(commissionId, timestamp = 0) {
+    const state = states.get(commissionId);
+    const status = state?.panel.querySelector("[data-commission-draft-status]");
+    if (status) status.textContent = formatSavedTime(timestamp);
+  }
+
+  function saveDraft(commissionId) {
+    const state = states.get(commissionId);
+    const info = commissions[commissionId];
+    const editor = state?.panel.querySelector("[data-commission-code-editor]");
+    if (!state || !info || !editor) return;
+
+    const savedAt = Date.now();
+    localStorage.setItem(info.draftKey, JSON.stringify({ code: editor.value, savedAt }));
+    updateDraftStatus(commissionId, savedAt);
+    showToast("บันทึกแบบร่างงานคอมมิชชั่นแล้ว");
+  }
+
+  function deleteDraft(commissionId) {
+    const info = commissions[commissionId];
+    const state = states.get(commissionId);
+    const editor = state?.panel.querySelector("[data-commission-code-editor]");
+    if (!info || !state || !editor) return;
+
+    localStorage.removeItem(info.draftKey);
+    editor.value = state.originalCode;
+    updateDraftStatus(commissionId, 0);
+    updatePreview(commissionId);
+    showToast("ลบแบบร่างและกลับเป็นงานต้นฉบับแล้ว");
+  }
+
+  function resetCode(commissionId) {
+    const state = states.get(commissionId);
+    const editor = state?.panel.querySelector("[data-commission-code-editor]");
+    if (!state || !editor) return;
+    editor.value = state.originalCode;
+    updatePreview(commissionId);
+    showToast("รีเซ็ตกลับเป็นงานต้นฉบับแล้ว");
+  }
+
+  async function copyCode(commissionId) {
+    const state = states.get(commissionId);
+    const editor = state?.panel.querySelector("[data-commission-code-editor]");
+    if (!editor) return;
+
+    try {
+      await navigator.clipboard.writeText(editor.value);
+      showToast("คัดลอกโค้ดงานคอมมิชชั่นแล้ว");
+    } catch {
+      editor.focus();
+      editor.select();
+      document.execCommand("copy");
+      showToast("คัดลอกโค้ดงานคอมมิชชั่นแล้ว");
+    }
+  }
+
+  async function openEditor(commissionId) {
+    const info = commissions[commissionId];
+    if (!info) return;
+
+    const panel = createEditorPanel(commissionId);
+    if (!panel) return;
+    showPanel(info.panel);
+
+    let state = states.get(commissionId);
+    if (!state) {
+      state = { panel, originalCode: "", previewTimer: 0, loading: false };
+      states.set(commissionId, state);
+    }
+
+    const editor = panel.querySelector("[data-commission-code-editor]");
+    if (!editor || state.loading) return;
+
+    if (!state.originalCode) {
+      state.loading = true;
+      editor.value = "กำลังโหลดโค้ดงานคอมมิชชั่น...";
+      editor.disabled = true;
+      const originalCode = await captureOriginalCode(commissionId);
+      state.loading = false;
+      editor.disabled = false;
+
+      if (!originalCode) {
+        editor.value = "";
+        showToast("ยังโหลดโค้ดต้นฉบับไม่ได้ กรุณากลับไปเปิด VIEW WORK แล้วลองอีกครั้ง");
+        return;
+      }
+
+      state.originalCode = originalCode;
+      const draft = getDraft(info);
+      editor.value = draft?.code || originalCode;
+      updateDraftStatus(commissionId, draft?.savedAt || 0);
+    }
+
+    updatePreview(commissionId);
+  }
+
+  function handleProtectedEditClick(event) {
+    const button = event.target.closest("[data-edit-protected-commission]");
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const commissionId = button.dataset.editProtectedCommission;
+    if (!commissions[commissionId]) return;
+
+    if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
+      openEditor(commissionId);
+    } else {
+      openModal(commissionId);
+    }
+  }
+
+  function install() {
+    createModal();
+    document.addEventListener("click", handleProtectedEditClick, true);
+    window.addEventListener("resize", () => {
+      states.forEach((_, commissionId) => fitPreview(commissionId));
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();

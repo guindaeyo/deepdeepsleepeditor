@@ -6478,3 +6478,312 @@ textarea + .dds-bbcode-toolbar {
   transform-origin: center center !important;
   background: #242424 !important;
 }
+
+
+/* =========================================================
+   LANDON COMMISSION — PASSWORD-GATED EDITOR (TRIAL)
+   ========================================================= */
+.dds-commission-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dds-commission-card-actions .dds-roleplay-edit {
+  width: 100%;
+  min-width: 0;
+  justify-content: space-between;
+}
+
+.dds-commission-protected-edit {
+  border-color: rgba(193, 23, 36, 0.72) !important;
+  background: rgba(116, 8, 18, 0.18) !important;
+}
+
+.dds-commission-lock-modal[hidden] {
+  display: none !important;
+}
+
+.dds-commission-lock-modal {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.dds-commission-lock-dialog {
+  width: min(470px, 100%);
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background:
+    radial-gradient(circle at 100% 0, rgba(143, 14, 22, 0.2), transparent 42%),
+    #0d0b0b;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
+}
+
+.dds-commission-lock-dialog small {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--dds-red-bright);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+}
+
+.dds-commission-lock-dialog h2 {
+  margin: 0;
+  color: #fff;
+  font-family: var(--dds-font-serif);
+  font-size: 38px;
+  font-weight: 500;
+}
+
+.dds-commission-lock-dialog p {
+  margin: 13px 0 22px;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.dds-commission-lock-field {
+  display: block;
+}
+
+.dds-commission-lock-field span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+}
+
+.dds-commission-lock-field input {
+  width: 100%;
+  height: 52px;
+  padding: 0 15px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: #090909;
+  font-family: var(--dds-font-main);
+  font-size: 14px;
+}
+
+.dds-commission-lock-error {
+  min-height: 19px;
+  margin: 9px 0 0 !important;
+  color: #e33b47 !important;
+  font-size: 10px !important;
+}
+
+.dds-commission-lock-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.dds-commission-lock-actions button {
+  min-height: 50px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: transparent;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.dds-commission-lock-actions button:first-child {
+  border-color: rgba(193, 23, 36, 0.7);
+  background: linear-gradient(135deg, #a20f1a, #690810);
+}
+
+.dds-protected-commission-editor .dds-editor-heading {
+  margin-bottom: 30px;
+}
+
+.dds-protected-commission-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 510px);
+  align-items: start;
+  gap: 28px;
+  padding-bottom: 38px;
+}
+
+.dds-protected-commission-preview-column {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #090909;
+}
+
+.dds-protected-commission-preview-stage {
+  position: relative;
+  min-height: 680px;
+  overflow: hidden;
+  background: #222;
+}
+
+.dds-protected-commission-preview-frame {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  width: 1040px;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  transform-origin: top center;
+}
+
+.dds-protected-commission-controls-column {
+  height: 1000px;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+}
+
+.dds-protected-commission-draft,
+.dds-protected-commission-copy {
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(12, 10, 10, 0.93);
+}
+
+.dds-protected-commission-draft {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.dds-protected-commission-draft strong {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+}
+
+.dds-protected-commission-draft small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 9px;
+}
+
+.dds-protected-commission-draft button,
+.dds-protected-commission-copy button {
+  min-height: 48px;
+  padding: 0 17px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.dds-protected-commission-draft [data-commission-save],
+.dds-protected-commission-copy [data-commission-copy] {
+  border-color: rgba(193, 23, 36, 0.68);
+  background: linear-gradient(135deg, #a20f1a, #690810);
+}
+
+.dds-protected-commission-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: var(--dds-red-bright) #090909;
+  scrollbar-width: thin;
+}
+
+.dds-protected-commission-section {
+  min-height: 100%;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(12, 10, 10, 0.93);
+}
+
+.dds-protected-commission-section .dds-control-title {
+  margin-bottom: 22px;
+}
+
+.dds-protected-code-editor {
+  width: 100%;
+  min-height: 650px;
+  resize: vertical;
+  padding: 18px;
+  color: #e8e3df;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #080808;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+
+.dds-protected-commission-help {
+  margin: 0 0 15px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.dds-protected-commission-copy p {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.dds-protected-commission-copy-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.dds-protected-commission-copy-actions [data-commission-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 1250px) {
+  .dds-protected-commission-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dds-protected-commission-controls-column {
+    height: auto;
+  }
+
+  .dds-protected-commission-scroll {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 700px) {
+  .dds-commission-card-actions,
+  .dds-commission-lock-actions,
+  .dds-protected-commission-copy-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .dds-protected-commission-draft {
+    grid-template-columns: 1fr;
+  }
+
+  .dds-protected-commission-preview-stage {
+    min-height: 430px;
+  }
+
+  .dds-protected-commission-section,
+  .dds-protected-commission-draft,
+  .dds-protected-commission-copy {
+    padding: 18px;
+  }
+}
