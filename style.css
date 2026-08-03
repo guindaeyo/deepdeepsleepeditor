@@ -6883,6 +6883,7 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 .dds-food-commission-heading > span:last-child {
+  font-family: "Bai Jamjuree", sans-serif;
   font-size: 0.76em;
   line-height: 0.92;
 }
