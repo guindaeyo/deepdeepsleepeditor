@@ -7100,3 +7100,17 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     font-size: 0.68em;
   }
 }
+
+/* COMMISSION 01 — ปุ่มคัดลอกโค้ดสีแดงเหมือน editor อื่น */
+.dds-food-commission-copy [data-food-copy] {
+  width: 100%;
+  color: #fff;
+  border-color: rgba(193, 23, 36, 0.75);
+  background: linear-gradient(135deg, #b0121d, #720810);
+  text-align: left;
+}
+
+.dds-food-commission-copy [data-food-copy]:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, #c11724, #870a13);
+}
