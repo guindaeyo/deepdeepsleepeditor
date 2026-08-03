@@ -7384,3 +7384,114 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     padding: 14px;
   }
 }
+
+
+/* ERIC HAWKINS EDITOR — LOCKED LABELS / DYNAMIC TMI */
+.dds-eric-locked-note {
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.dds-eric-tmi-toolbar {
+  margin-top: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.dds-eric-tmi-toolbar > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dds-eric-tmi-toolbar strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dds-eric-tmi-toolbar small {
+  color: rgba(255, 255, 255, 0.36);
+  font-size: 10px;
+}
+
+.dds-eric-tmi-toolbar button,
+.dds-eric-tmi-remove {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid rgba(193, 23, 36, 0.64);
+  background: rgba(143, 14, 22, 0.16);
+  color: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.dds-eric-tmi-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.dds-eric-tmi-group {
+  margin: 0;
+}
+
+.dds-eric-tmi-group-head {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dds-eric-tmi-group-head > strong {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.dds-eric-tmi-group-head button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.52);
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.dds-eric-tmi-group-head button:hover {
+  border-color: rgba(193, 23, 36, 0.7);
+  color: #fff;
+}
+
+.dds-eric-tmi-empty {
+  margin: 12px 0 0;
+  padding: 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .dds-eric-tmi-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dds-eric-tmi-toolbar button {
+    width: 100%;
+  }
+}

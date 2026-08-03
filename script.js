@@ -11146,30 +11146,31 @@ ${stylesheetLinks}
   const CANVAS_WIDTH = 1040;
   const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-profer02.css";
 
+  const PROFILE_LABELS = Object.freeze([
+    "ชื่อเล่น",
+    "อายุ",
+    "วันเกิด",
+    "เผ่าพันธุ์",
+    "สถานะ",
+    "ภูมิลำเนา"
+  ]);
+
   const defaults = Object.freeze({
     bgImage: "", coverImage: "", avatarImage: "", widgetOneImage: "", widgetTwoImage: "", miniImage: "",
     coverY: "50", avatarY: "35", widgetOneY: "50", widgetTwoY: "30", widgetOneFade: "80", widgetTwoFade: "80",
     themeMain: "#789b55", themeMainDark: "#536e3c", themeBackground: "#eff5e6", themePanel: "#fbfcf7",
     themeCard: "#f8fbf2", themeText: "#22271e", themeTextSoft: "#718064",
-    displayName: "", englishName: "", thaiName: "", messageLabel: "", smallButtonOne: "", smallButtonTwo: "",
-    bubbleSymbol: "", symbolLineOne: "", symbolLineTwo: "",
-    profileHeading: "", profileIcon: "",
-    profileLabel1: "", profileValue1: "", profileLabel2: "", profileValue2: "",
-    profileLabel3: "", profileValue3: "", profileLabel4: "", profileValue4: "",
-    profileLabel5: "", profileValue5: "", profileLabel6: "", profileValue6: "",
-    biographyHeading: "", biographyIcon: "", biographyText: "",
-    educationLabel: "", educationMain: "", educationSub: "",
-    faceclaimLabel: "", faceclaimMain: "", faceclaimSub: "",
-    tabOne: "", tabTwo: "", tabThree: "", widgetsHeading: "", addWidgetLabel: "",
+    displayName: "", englishName: "", thaiName: "", smallButtonOne: "",
+    bubbleSymbol: "", symbolLineOne: "", symbolLineTwo: "", profileIcon: "",
+    profileValue1: "", profileValue2: "", profileValue3: "", profileValue4: "", profileValue5: "", profileValue6: "",
+    biographyIcon: "", biographyText: "",
+    educationMain: "", educationSub: "", faceclaimMain: "", faceclaimSub: "",
     widgetOneSymbol: "", widgetOneAbstract: "", musicTitle: "", musicArtist: "",
     widgetTwoSymbol: "", widgetTwoTitle: "", widgetTwoSubtitle: "",
     statValue1: "", statLabel1: "", statValue2: "", statLabel2: "", statValue3: "", statLabel3: "",
     statValue4: "", statLabel4: "", statValue5: "", statLabel5: "", statValue6: "", statLabel6: "",
-    personalityHeading: "", personalityIcon: "", personalityText: "",
-    tmiHeading: "", tmiIcon: "",
-    tmiSymbol1: "", tmiTitle1: "", tmiText1: "", tmiSymbol2: "", tmiTitle2: "", tmiText2: "",
-    tmiSymbol3: "", tmiTitle3: "", tmiText3: "", tmiSymbol4: "", tmiTitle4: "", tmiText4: "",
-    footerSymbolOne: "", footerName: "", footerSymbolTwo: "", footerRace: "", footerSymbolThree: ""
+    personalityIcon: "", personalityText: "", tmiIcon: "", tmiCount: "1",
+    footerText: ""
   });
 
   const OFFICIAL_CODE = String.raw`<link href="https://guindaeyo.github.io/css/commit-profer02.css" rel="stylesheet"><div class="erw-profile" style="--erw-bg:url('https://i.pinimg.com/736x/24/ee/4c/24ee4c78d1bf27f9b031b92b60772ad9.jpg');--erw-cover:url('https://i.pinimg.com/736x/d6/32/9f/d6329f6a058c75b34f37786694df8fdd.jpg');--erw-avatar:url('https://i.pinimg.com/vwebp/1200x/2a/64/e0/2a64e057a2b06009de0ee4daf538f949.webp');--erw-widget-one:url('https://i.pinimg.com/736x/9d/b9/d2/9db9d24ae8d72e2da6c5b98709e560d4.jpg');--erw-widget-two:url('https://i.pinimg.com/vwebp/1200x/27/31/2f/27312fff33b348dbc152d1e659147eac.webp');--erw-mini:url('https://i.pinimg.com/vwebp/736x/f3/ab/22/f3ab223672e2efb857a05aaab4250c8a.webp');--erw-cover-y:50%;--erw-avatar-y:35%;--erw-widget-one-y:50%;--erw-widget-two-y:30%;--erw-widget-one-fade:80%;--erw-widget-two-fade:80%;--erw-theme-main:#789b55;--erw-theme-main-dark:#536e3c;--erw-theme-background:#eff5e6;--erw-theme-panel:#fbfcf7;--erw-theme-card:#f8fbf2;--erw-theme-text:#22271e;--erw-theme-text-soft:#718064;"><div class="erw-layout"><section class="erw-left"><div class="erw-cover"></div><div class="erw-avatar-area"><div class="erw-avatar-frame"><div class="erw-avatar"></div><div class="erw-moon-status"></div></div><div class="erw-bubble-wrap"><span class="erw-bubble-dot erw-bubble-dot-one"></span><span class="erw-bubble-dot erw-bubble-dot-two"></span><div class="erw-bubble"><span>☘</span></div></div></div><div class="erw-identity"><div class="erw-display-name"></div><h1>Eric Hawkins</h1><div class="erw-thai-name">เอริค ฮอว์กินส์</div><div class="erw-actions"><div class="erw-message-button"><span>&#128172;</span>Message</div><div class="erw-small-button">☻</div><div class="erw-small-button">•••</div></div></div><div class="erw-symbol-art"><div>˙ ◌　&#127811; ᐟᐟ　✿ ˙</div><div>⌣　⌁　☾　˙</div></div><div class="erw-left-block erw-basic-block"><div class="erw-heading"><div><span>01</span><h2>Profile</h2></div><small>☘</small></div><div class="erw-info-grid"><div class="erw-info-item"><small>ชื่อเล่น</small><strong>เอริค, ริค</strong></div><div class="erw-info-item"><small>อายุ</small><strong>20 ปี</strong></div><div class="erw-info-item"><small>วันเกิด</small><strong>21 January 2006</strong></div><div class="erw-info-item"><small>เผ่าพันธุ์</small><strong>มนุษย์หมาป่า</strong></div><div class="erw-info-item"><small>สถานะ</small><strong>โอเมก้า</strong></div><div class="erw-info-item"><small>ภูมิลำเนา</small><strong>Colorado, USA</strong></div></div></div><div class="erw-left-block"><div class="erw-heading"><div><span>02</span><h2>Biography</h2></div><small>✦</small></div><div class="erw-prose"><p class="erw-dropcap">เอริคเติบโตมาในครอบครัวฐานะปานกลางในรัฐโคโลราโด วัยเด็กของเขาแสนจะเรียบง่ายเหมือนเด็กอเมริกันทั่วไปที่รักการเล่นกีฬา เขาเป็นกัปตันทีมฟุตบอลของโรงเรียนไฮสคูลและใช้ชีวิตอยู่กับความฝันที่อยากจะเป็นนักกีฬาอาชีพ จนกระทั่งจุดเปลี่ยนสำคัญมาถึงในช่วงปิดเทอมฤดูร้อนปีสุดท้ายของไฮสคูล<br><br>ในระหว่างการไปตั้งแคมป์กับเพื่อน เขาได้เจอกับหมาป่าขนาดใหญ่ในป่าลึก รูปร่างของมันดูใหญ่เกินกว่าหมาป่าทั่วไปที่เขาเคยเห็น แววตาสีแดงน่ากลัว แม้ว่าเขาจะพยายามป้องกันตัวแต่ก็ได้รับบาดเจ็บสาหัสที่แขนข้างขวา เหตุการณ์ในครั้งนั้นไม่ได้จบลงเพียงแค่การบาดเจ็บทางร่างกาย เพราะในเวลาต่อมาเขาก็เริ่มสังเกตเห็นความเปลี่ยนแปลงในร่างกายของตัวเองที่ไม่สามารถอธิบายได้ ทั้งประสาทสัมผัสที่ดีขึ้น พละกำลังที่มากกว่าปกติ และความเจ็บปวดบางอย่างที่รุนแรงมากขึ้นในช่วงคืนพระจันทร์เต็มดวง<br><br>หลังจากจบไฮสคูลเขาพยายามใช้ชีวิตในมหาวิทยาลัยอย่างปกติ เล่นกีฬา เรียน สังสรรค์ และรักษาความลับนี้ไว้ แต่ด้วยสัญชาตญาณที่เริ่มควบคุมยากขึ้นเรื่อย ๆ ทำให้เขาพยายามออกหาข้อมูลเกี่ยวกับความจริงของสิ่งที่เขากำลังเผชิญอยู่ จนกระทั่งได้พบกับชื่อหมู่บ้านแห่งหนึ่งที่เขาไม่เคยรู้จักมาก่อน ‘หมู่บ้านเอลิเชียน’ และเมื่ออายุครบ 20 ปี เอริคจึงตัดสินใจที่จะย้ายเข้ามาในหมู่บ้านแห่งนี้เพื่อทำความเข้าใจกับตัวเองมากยิ่งขึ้น<br><br>หลังจากย้ายเข้ามาอยู่ที่หมู่บ้านเอลิเชียนหลายเดือน เอริคตัดสินใจเริ่มต้นศึกษาเรียนต่อในคณะมนุษยศาสตร์ฯ สาขาจิตวิทยา</p></div></div><div class="erw-left-bottom"><div class="erw-side-detail"><small>EDUCATION</small><strong>คณะมนุษยศาสตร์ฯ</strong><span>สาขาจิตวิทยา</span></div><div class="erw-side-detail"><small>FACE CLAIM</small><strong>Ohyul</strong><span>Lngshot</span></div><div class="erw-side-detail erw-side-detail-wide"><div class="erw-connection-row"><div></div></div></div></div></section><section class="erw-right"><div class="erw-close">×</div><div class="erw-tabs"><div class="erw-tab erw-tab-active">Board</div><div class="erw-tab">Activity</div><div class="erw-tab">Wishlist</div></div><div class="erw-widget-header"><strong>Your Widgets</strong><div class="erw-add-widget"><span>＋</span>Add Widget</div></div><div class="erw-widget erw-widget-one"><div class="erw-widget-one-photo"></div><div class="erw-widget-one-content"><div class="erw-widget-symbol">☘ ˙⌁ ︵ ☾ ᐟᐟ</div><div class="erw-widget-abstract"><span>⌜</span><div>˙　◌　˙<br>ᐟᐟ　⌁　⌣<br>˙　☾　｡ </div><span>⌟</span></div></div><div class="erw-music-player"><div class="erw-music-cover"></div><div class="erw-music-detail"><div class="erw-progress"><span></span></div><strong>ชื่อเพลง</strong><small>ชื่อนักร้อง</small></div><div class="erw-player-switch">▶</div></div></div><div class="erw-widget erw-widget-two"><div class="erw-widget-two-top"><div class="erw-widget-two-photo"></div><div class="erw-widget-two-content"><div class="erw-widget-symbol">☘ ˙⌁ &#9749; ⌁ ☾ ⌁</div><div class="erw-steam-title">˚₊‧<strong>Omega Wolf</strong>⌣</div><div class="erw-steam-subtitle">woof woof woof!</div></div></div><div class="erw-stat-grid"><div class="erw-stat"><strong>95%</strong><span>Competitive</span></div><div class="erw-stat"><strong>93%</strong><span>Athletic</span></div><div class="erw-stat"><strong>88%</strong><span>Friendly</span></div><div class="erw-stat"><strong>96%</strong><span>Observant</span></div><div class="erw-stat"><strong>91%</strong><span>Caring</span></div><div class="erw-stat"><strong>89%</strong><span>Loyal</span></div></div></div><div class="erw-right-block"><div class="erw-heading"><div><span>03</span><h2>Personality</h2></div><small>✚</small></div><div class="erw-prose">รอยยิ้มที่เป็นเอกลักษณ์ต่างเป็นเสน่ห์เฉพาะตัวของเขาที่ใครต่างก็ต้องทัก บางครั้งยังช่วยทำให้บรรยากาศรอบข้างผ่อนคลายได้ เอริคเป็นคนที่เข้าถึงได้ง่าย และมักจะเป็นจุดสนใจโดยที่ไม่ได้ตั้งใจ<br><br>การที่เป็นนักกีฬาตั้งแต่เด็กหล่อหลอมให้เขาเป็นคนที่ใจสู้และรักในการแข่งขันอยู่เสมอ แม้จะเป็นเรื่องเล็กน้อยอย่างการเล่นเกมหรือการแข่งขันท้าทายสนุก ๆ เขาก็จะงัดเอาความจริงจังออกมาเสมอ แต่เขาก็มีน้ำใจนักกีฬา รู้แพ้รู้ชนะรู้อภัย<br><br>แม้ภายนอกจะดูเป็นวัยรุ่นยุคใหม่ แต่เขาหลงใหลในบีทหนัก ๆ ของสไตล์ฮิปฮอฟแต่ไหนแต่ไร การแต่งตัวและไลฟ์สไตล์ของเขามักจะชอบใส่เสื้อผ้าวินเทจมาประยุกต์ให้ทันสมัย<br><br>และภายใต้ความแข็งแกร่งของร่างกายนักกีฬา เอริคมีความละเอียดอ่อนและช่างสังเกตอย่างน่าประหลาด เขาเป็นคนชอบเอาใจใส่โดยเฉพาะกับคนใกล้ชิด เขามักจะจำรายละเอียดเล็ก ๆ น้อย ๆ ของเพื่อนได้ และพร้อมจะเป็นคนคอยดูแล เทคแคร์เสมอ</div></div><div class="erw-right-block erw-personality-block"><div class="erw-heading"><div><span>04</span><h2>TMI</h2></div><small>♫</small></div><div class="erw-trait-grid"><article class="erw-trait"><div class="erw-trait-icon">☀</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">✦</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">♫</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article><article class="erw-trait"><div class="erw-trait-icon">☘</div><div><h3>หัวข้อ</h3><p>อธิบายนิดหน่อย</p></div></article></div></div><div class="erw-footer"><span>☾</span>ERIC HAWKINS<span>☘</span>WEREWOLF <span>♫</span></div></section></div></div><div class="fdreview-credit"><span></span></div>`;
@@ -11205,11 +11206,24 @@ ${stylesheetLinks}
     return text.replace(/\r?\n/g, "<br>");
   }
 
+  function normalizeTmiCount(value) {
+    const number = Number.parseInt(value, 10);
+    if (!Number.isFinite(number)) return 1;
+    return Math.max(0, Math.min(20, number));
+  }
+
   function buildCode(v) {
-    const profileItems = Array.from({length: 6}, (_, i) => `<div class="erw-info-item"><small>${h(v[`profileLabel${i + 1}`])}</small><strong>${h(v[`profileValue${i + 1}`])}</strong></div>`).join("");
-    const stats = Array.from({length: 6}, (_, i) => `<div class="erw-stat"><strong>${h(v[`statValue${i + 1}`])}</strong><span>${h(v[`statLabel${i + 1}`])}</span></div>`).join("");
-    const tmis = Array.from({length: 4}, (_, i) => `<article class="erw-trait"><div class="erw-trait-icon">${h(v[`tmiSymbol${i + 1}`])}</div><div><h3>${h(v[`tmiTitle${i + 1}`])}</h3><p>${richToHtml(v[`tmiText${i + 1}`])}</p></div></article>`).join("");
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><div class="erw-profile" style="--erw-bg:url('${cssUrl(v.bgImage)}');--erw-cover:url('${cssUrl(v.coverImage)}');--erw-avatar:url('${cssUrl(v.avatarImage)}');--erw-widget-one:url('${cssUrl(v.widgetOneImage)}');--erw-widget-two:url('${cssUrl(v.widgetTwoImage)}');--erw-mini:url('${cssUrl(v.miniImage)}');--erw-cover-y:${pct(v.coverY,50)}%;--erw-avatar-y:${pct(v.avatarY,35)}%;--erw-widget-one-y:${pct(v.widgetOneY,50)}%;--erw-widget-two-y:${pct(v.widgetTwoY,30)}%;--erw-widget-one-fade:${pct(v.widgetOneFade,80)}%;--erw-widget-two-fade:${pct(v.widgetTwoFade,80)}%;--erw-theme-main:${h(v.themeMain)};--erw-theme-main-dark:${h(v.themeMainDark)};--erw-theme-background:${h(v.themeBackground)};--erw-theme-panel:${h(v.themePanel)};--erw-theme-card:${h(v.themeCard)};--erw-theme-text:${h(v.themeText)};--erw-theme-text-soft:${h(v.themeTextSoft)};"><div class="erw-layout"><section class="erw-left"><div class="erw-cover"></div><div class="erw-avatar-area"><div class="erw-avatar-frame"><div class="erw-avatar"></div><div class="erw-moon-status"></div></div><div class="erw-bubble-wrap"><span class="erw-bubble-dot erw-bubble-dot-one"></span><span class="erw-bubble-dot erw-bubble-dot-two"></span><div class="erw-bubble"><span>${h(v.bubbleSymbol)}</span></div></div></div><div class="erw-identity"><div class="erw-display-name">${h(v.displayName)}</div><h1>${h(v.englishName)}</h1><div class="erw-thai-name">${h(v.thaiName)}</div><div class="erw-actions"><div class="erw-message-button"><span>&#128172;</span>${h(v.messageLabel)}</div><div class="erw-small-button">${h(v.smallButtonOne)}</div><div class="erw-small-button">${h(v.smallButtonTwo)}</div></div></div><div class="erw-symbol-art"><div>${h(v.symbolLineOne)}</div><div>${h(v.symbolLineTwo)}</div></div><div class="erw-left-block erw-basic-block"><div class="erw-heading"><div><span>01</span><h2>${h(v.profileHeading)}</h2></div><small>${h(v.profileIcon)}</small></div><div class="erw-info-grid">${profileItems}</div></div><div class="erw-left-block"><div class="erw-heading"><div><span>02</span><h2>${h(v.biographyHeading)}</h2></div><small>${h(v.biographyIcon)}</small></div><div class="erw-prose"><p class="erw-dropcap">${richToHtml(v.biographyText)}</p></div></div><div class="erw-left-bottom"><div class="erw-side-detail"><small>${h(v.educationLabel)}</small><strong>${h(v.educationMain)}</strong><span>${h(v.educationSub)}</span></div><div class="erw-side-detail"><small>${h(v.faceclaimLabel)}</small><strong>${h(v.faceclaimMain)}</strong><span>${h(v.faceclaimSub)}</span></div><div class="erw-side-detail erw-side-detail-wide"><div class="erw-connection-row"><div></div></div></div></div></section><section class="erw-right"><div class="erw-close">×</div><div class="erw-tabs"><div class="erw-tab erw-tab-active">${h(v.tabOne)}</div><div class="erw-tab">${h(v.tabTwo)}</div><div class="erw-tab">${h(v.tabThree)}</div></div><div class="erw-widget-header"><strong>${h(v.widgetsHeading)}</strong><div class="erw-add-widget"><span>＋</span>${h(v.addWidgetLabel)}</div></div><div class="erw-widget erw-widget-one"><div class="erw-widget-one-photo"></div><div class="erw-widget-one-content"><div class="erw-widget-symbol">${h(v.widgetOneSymbol)}</div><div class="erw-widget-abstract"><span>⌜</span><div>${richToHtml(v.widgetOneAbstract)}</div><span>⌟</span></div></div><div class="erw-music-player"><div class="erw-music-cover"></div><div class="erw-music-detail"><div class="erw-progress"><span></span></div><strong>${h(v.musicTitle)}</strong><small>${h(v.musicArtist)}</small></div><div class="erw-player-switch">▶</div></div></div><div class="erw-widget erw-widget-two"><div class="erw-widget-two-top"><div class="erw-widget-two-photo"></div><div class="erw-widget-two-content"><div class="erw-widget-symbol">${h(v.widgetTwoSymbol)}</div><div class="erw-steam-title">˚₊‧<strong>${h(v.widgetTwoTitle)}</strong>⌣</div><div class="erw-steam-subtitle">${h(v.widgetTwoSubtitle)}</div></div></div><div class="erw-stat-grid">${stats}</div></div><div class="erw-right-block"><div class="erw-heading"><div><span>03</span><h2>${h(v.personalityHeading)}</h2></div><small>${h(v.personalityIcon)}</small></div><div class="erw-prose">${richToHtml(v.personalityText)}</div></div><div class="erw-right-block erw-personality-block"><div class="erw-heading"><div><span>04</span><h2>${h(v.tmiHeading)}</h2></div><small>${h(v.tmiIcon)}</small></div><div class="erw-trait-grid">${tmis}</div></div><div class="erw-footer"><span>${h(v.footerSymbolOne)}</span>${h(v.footerName)}<span>${h(v.footerSymbolTwo)}</span>${h(v.footerRace)} <span>${h(v.footerSymbolThree)}</span></div></section></div></div><div class="fdreview-credit"><span></span></div>`;
+    const profileItems = PROFILE_LABELS.map((label, index) =>
+      `<div class="erw-info-item"><small>${h(label)}</small><strong>${h(v[`profileValue${index + 1}`])}</strong></div>`
+    ).join("");
+    const stats = Array.from({length: 6}, (_, i) =>
+      `<div class="erw-stat"><strong>${h(v[`statValue${i + 1}`])}</strong><span>${h(v[`statLabel${i + 1}`])}</span></div>`
+    ).join("");
+    const tmiCount = normalizeTmiCount(v.tmiCount);
+    const tmis = Array.from({length: tmiCount}, (_, i) =>
+      `<article class="erw-trait"><div class="erw-trait-icon">${h(v[`tmiSymbol${i + 1}`])}</div><div><h3>${h(v[`tmiTitle${i + 1}`])}</h3><p>${richToHtml(v[`tmiText${i + 1}`])}</p></div></article>`
+    ).join("");
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><div class="erw-profile" style="--erw-bg:url('${cssUrl(v.bgImage)}');--erw-cover:url('${cssUrl(v.coverImage)}');--erw-avatar:url('${cssUrl(v.avatarImage)}');--erw-widget-one:url('${cssUrl(v.widgetOneImage)}');--erw-widget-two:url('${cssUrl(v.widgetTwoImage)}');--erw-mini:url('${cssUrl(v.miniImage)}');--erw-cover-y:${pct(v.coverY,50)}%;--erw-avatar-y:${pct(v.avatarY,35)}%;--erw-widget-one-y:${pct(v.widgetOneY,50)}%;--erw-widget-two-y:${pct(v.widgetTwoY,30)}%;--erw-widget-one-fade:${pct(v.widgetOneFade,80)}%;--erw-widget-two-fade:${pct(v.widgetTwoFade,80)}%;--erw-theme-main:${h(v.themeMain)};--erw-theme-main-dark:${h(v.themeMainDark)};--erw-theme-background:${h(v.themeBackground)};--erw-theme-panel:${h(v.themePanel)};--erw-theme-card:${h(v.themeCard)};--erw-theme-text:${h(v.themeText)};--erw-theme-text-soft:${h(v.themeTextSoft)};"><div class="erw-layout"><section class="erw-left"><div class="erw-cover"></div><div class="erw-avatar-area"><div class="erw-avatar-frame"><div class="erw-avatar"></div><div class="erw-moon-status"></div></div><div class="erw-bubble-wrap"><span class="erw-bubble-dot erw-bubble-dot-one"></span><span class="erw-bubble-dot erw-bubble-dot-two"></span><div class="erw-bubble"><span>${h(v.bubbleSymbol)}</span></div></div></div><div class="erw-identity"><div class="erw-display-name">${h(v.displayName)}</div><h1>${h(v.englishName)}</h1><div class="erw-thai-name">${h(v.thaiName)}</div><div class="erw-actions"><div class="erw-message-button"><span>&#128172;</span>Message</div><div class="erw-small-button">${h(v.smallButtonOne)}</div><div class="erw-small-button">•••</div></div></div><div class="erw-symbol-art"><div>${h(v.symbolLineOne)}</div><div>${h(v.symbolLineTwo)}</div></div><div class="erw-left-block erw-basic-block"><div class="erw-heading"><div><span>01</span><h2>Profile</h2></div><small>${h(v.profileIcon)}</small></div><div class="erw-info-grid">${profileItems}</div></div><div class="erw-left-block"><div class="erw-heading"><div><span>02</span><h2>Biography</h2></div><small>${h(v.biographyIcon)}</small></div><div class="erw-prose"><p class="erw-dropcap">${richToHtml(v.biographyText)}</p></div></div><div class="erw-left-bottom"><div class="erw-side-detail"><small>EDUCATION</small><strong>${h(v.educationMain)}</strong><span>${h(v.educationSub)}</span></div><div class="erw-side-detail"><small>FACE CLAIM</small><strong>${h(v.faceclaimMain)}</strong><span>${h(v.faceclaimSub)}</span></div><div class="erw-side-detail erw-side-detail-wide"><div class="erw-connection-row"><div></div></div></div></div></section><section class="erw-right"><div class="erw-close">×</div><div class="erw-tabs"><div class="erw-tab erw-tab-active">Board</div><div class="erw-tab">Activity</div><div class="erw-tab">Wishlist</div></div><div class="erw-widget-header"><strong>Your Widgets</strong><div class="erw-add-widget"><span>＋</span>Add Widget</div></div><div class="erw-widget erw-widget-one"><div class="erw-widget-one-photo"></div><div class="erw-widget-one-content"><div class="erw-widget-symbol">${h(v.widgetOneSymbol)}</div><div class="erw-widget-abstract"><span>⌜</span><div>${richToHtml(v.widgetOneAbstract)}</div><span>⌟</span></div></div><div class="erw-music-player"><div class="erw-music-cover"></div><div class="erw-music-detail"><div class="erw-progress"><span></span></div><strong>${h(v.musicTitle)}</strong><small>${h(v.musicArtist)}</small></div><div class="erw-player-switch">▶</div></div></div><div class="erw-widget erw-widget-two"><div class="erw-widget-two-top"><div class="erw-widget-two-photo"></div><div class="erw-widget-two-content"><div class="erw-widget-symbol">${h(v.widgetTwoSymbol)}</div><div class="erw-steam-title">˚₊‧<strong>${h(v.widgetTwoTitle)}</strong>⌣</div><div class="erw-steam-subtitle">${h(v.widgetTwoSubtitle)}</div></div></div><div class="erw-stat-grid">${stats}</div></div><div class="erw-right-block"><div class="erw-heading"><div><span>03</span><h2>Personality</h2></div><small>${h(v.personalityIcon)}</small></div><div class="erw-prose">${richToHtml(v.personalityText)}</div></div><div class="erw-right-block erw-personality-block"><div class="erw-heading"><div><span>04</span><h2>TMI</h2></div><small>${h(v.tmiIcon)}</small></div><div class="erw-trait-grid">${tmis}</div></div><div class="erw-footer">${h(v.footerText)}</div></section></div></div><div class="fdreview-credit"><span></span></div>`;
   }
 
   function buildDocument(code, marker) {
@@ -11296,14 +11310,76 @@ ${stylesheetLinks}
     return `<label class="dds-field dds-field-full dds-eric-rich-field"><span>${h(label)}</span>${toolbar(key)}<textarea rows="${rows}" data-eric-field="${h(key)}" data-eric-rich="${h(key)}" placeholder="กรอกข้อความ"></textarea><div class="dds-word-counter" data-eric-word-counter="${h(key)}" data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label>`;
   }
 
+  function inferTmiCount(values = {}) {
+    if (Object.prototype.hasOwnProperty.call(values, "tmiCount")) {
+      return normalizeTmiCount(values.tmiCount);
+    }
+    let highest = 0;
+    for (let index = 1; index <= 20; index += 1) {
+      if (["Symbol", "Title", "Text"].some((part) => String(values[`tmi${part}${index}`] || "").trim())) {
+        highest = index;
+      }
+    }
+    return highest || normalizeTmiCount(defaults.tmiCount);
+  }
+
+  function tmiGroupMarkup(index) {
+    return `<div class="dds-eric-tmi-group" data-eric-tmi-group="${index}">
+      <div class="dds-eric-tmi-group-head"><strong>TMI ${index}</strong><button type="button" data-eric-remove-tmi="${index}" aria-label="ลบ TMI ${index}">× ลบ</button></div>
+      <div class="dds-form-grid">
+        ${field("สัญลักษณ์", `tmiSymbol${index}`, {placeholder:"เช่น ☀"})}
+        ${field("หัวข้อ", `tmiTitle${index}`)}
+        ${field("คำอธิบาย", `tmiText${index}`, {full:true,textarea:true,rows:4})}
+      </div>
+    </div>`;
+  }
+
+  function renderTmiGroups(count, values = {}) {
+    const list = editorPanel?.querySelector("[data-eric-tmi-list]");
+    if (!list) return;
+    const safeCount = normalizeTmiCount(count);
+    list.innerHTML = Array.from({length: safeCount}, (_, index) => tmiGroupMarkup(index + 1)).join("");
+    list.querySelectorAll("[data-eric-field]").forEach((item) => {
+      item.value = values[item.dataset.ericField] ?? "";
+    });
+    const empty = editorPanel?.querySelector("[data-eric-tmi-empty]");
+    if (empty) empty.hidden = safeCount !== 0;
+  }
+
+  function collectTmiItems() {
+    return Array.from(editorPanel?.querySelectorAll("[data-eric-tmi-group]") || []).map((group) => ({
+      symbol: group.querySelector('[data-eric-field^="tmiSymbol"]')?.value || "",
+      title: group.querySelector('[data-eric-field^="tmiTitle"]')?.value || "",
+      text: group.querySelector('[data-eric-field^="tmiText"]')?.value || ""
+    }));
+  }
+
+  function renderTmiItems(items) {
+    const values = {};
+    items.forEach((item, index) => {
+      values[`tmiSymbol${index + 1}`] = item.symbol || "";
+      values[`tmiTitle${index + 1}`] = item.title || "";
+      values[`tmiText${index + 1}`] = item.text || "";
+    });
+    renderTmiGroups(items.length, values);
+  }
+
   function getValues() {
     const values = {...defaults};
     editorPanel?.querySelectorAll("[data-eric-field]").forEach((item) => { values[item.dataset.ericField] = item.value; });
+    values.tmiCount = String(editorPanel?.querySelectorAll("[data-eric-tmi-group]").length || 0);
     return values;
   }
 
   function setValues(values = defaults) {
     const next = {...defaults, ...values};
+    if (!String(next.footerText || "").trim()) {
+      const legacyFooter = [values.footerSymbolOne, values.footerName, values.footerSymbolTwo, values.footerRace, values.footerSymbolThree]
+        .filter((part) => String(part || "").trim())
+        .join(" ");
+      if (legacyFooter) next.footerText = legacyFooter;
+    }
+    renderTmiGroups(inferTmiCount(values), next);
     editorPanel?.querySelectorAll("[data-eric-field]").forEach((item) => {
       item.value = next[item.dataset.ericField] ?? "";
       if (item.type === "range") editorPanel.querySelector(`[data-eric-range-output="${CSS.escape(item.dataset.ericField)}"]`)?.replaceChildren(document.createTextNode(`${item.value}%`));
@@ -11432,13 +11508,37 @@ ${stylesheetLinks}
     window.scrollTo({top: 0, behavior: "auto"});
   }
 
-  function backToCommission() {
-    document.body.classList.remove("dds-editor-mode", "dds-commission-editor-mode");
-    if (typeof window.openPage === "function") window.openPage("commission");
-    else showOnly("commission");
-    requestAnimationFrame(() => document.querySelector('[data-work-tab="commission"]')?.click());
+  function backToCommission(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    document.body.classList.remove("dds-editor-mode", "dds-commission-editor-mode", "dds-modal-open");
+    document.querySelectorAll(".dds-panel").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.dataset.panel === "commission");
+    });
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.page === "commission");
+    });
+    document.querySelectorAll("[data-work-tab]").forEach((button) => {
+      const active = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach((panel) => {
+      const active = panel.dataset.workPanel === "commission";
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+    const page = document.getElementById("currentPageNumber");
+    if (page) page.textContent = "04";
     history.replaceState(null, "", "#commission");
     window.scrollTo({top: 0, behavior: "auto"});
+    requestAnimationFrame(() => {
+      const commissionPanel = document.querySelector('[data-panel="commission"]');
+      commissionPanel?.classList.add("is-active");
+      document.querySelector('[data-work-tab="commission"]')?.classList.add("is-active");
+      window.scrollTo({top: 0, behavior: "auto"});
+    });
   }
 
   function createEditorPanel() {
@@ -11458,23 +11558,47 @@ ${stylesheetLinks}
           <div class="dds-protected-commission-scroll dds-eric-profile-scroll">
             <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีหลัก — --erw-theme-main", "themeMain", defaults.themeMain)}${colorField("สีหลักเข้ม — --erw-theme-main-dark", "themeMainDark", defaults.themeMainDark)}${colorField("สีพื้นหลัง — --erw-theme-background", "themeBackground", defaults.themeBackground)}${colorField("สีพาเนล — --erw-theme-panel", "themePanel", defaults.themePanel)}${colorField("สีการ์ด — --erw-theme-card", "themeCard", defaults.themeCard)}${colorField("สีตัวอักษร — --erw-theme-text", "themeText", defaults.themeText)}${colorField("สีตัวอักษรรอง — --erw-theme-text-soft", "themeTextSoft", defaults.themeTextSoft)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field("รูปพื้นหลัง", "bgImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปปก", "coverImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปโปรไฟล์", "avatarImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 1", "widgetOneImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 2", "widgetTwoImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Mini / Music", "miniImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}</div><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและขอบเฟดรูป</span><small>ปรับค่าเปอร์เซ็นต์</small></div>${rangeField("ตำแหน่งรูปปก", "coverY", 50)}${rangeField("ตำแหน่งรูปโปรไฟล์", "avatarY", 35)}${rangeField("ตำแหน่ง Widget 1", "widgetOneY", 50)}${rangeField("ตำแหน่ง Widget 2", "widgetTwoY", 30)}${rangeField("ขอบเฟด Widget 1", "widgetOneFade", 80)}${rangeField("ขอบเฟด Widget 2", "widgetTwoFade", 80)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อและข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${field("ดิสเพลย์เนม", "displayName")}${field("ชื่อภาษาอังกฤษ", "englishName")}${field("ชื่อภาษาไทย", "thaiName")}${field("ข้อความปุ่ม Message", "messageLabel")}${field("ปุ่มเล็กที่ 1", "smallButtonOne")}${field("ปุ่มเล็กที่ 2", "smallButtonTwo")}${field("สัญลักษณ์ใน Bubble", "bubbleSymbol")}${field("Symbol Art บรรทัด 1", "symbolLineOne", {full:true})}${field("Symbol Art บรรทัด 2", "symbolLineTwo", {full:true})}${field("หัวข้อ Profile", "profileHeading")}${field("สัญลักษณ์หัวข้อ Profile", "profileIcon")}${Array.from({length:6},(_,i)=>field(`หัวข้อข้อมูล ${i+1}`,`profileLabel${i+1}`)+field(`ข้อมูล ${i+1}`,`profileValue${i+1}`)).join("")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Biography และข้อมูลด้านล่าง</h2></div><div class="dds-form-grid">${field("หัวข้อ Biography", "biographyHeading")}${field("สัญลักษณ์ Biography", "biographyIcon")}${richField("เนื้อหา Biography", "biographyText", 12)}${field("หัวข้อ Education", "educationLabel")}${field("Education บรรทัดหลัก", "educationMain")}${field("Education บรรทัดรอง", "educationSub")}${field("หัวข้อ Face Claim", "faceclaimLabel")}${field("Face Claim บรรทัดหลัก", "faceclaimMain")}${field("Face Claim บรรทัดรอง", "faceclaimSub")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Widgets และเพลง</h2></div><div class="dds-form-grid">${field("แท็บที่ 1", "tabOne")}${field("แท็บที่ 2", "tabTwo")}${field("แท็บที่ 3", "tabThree")}${field("หัวข้อ Widgets", "widgetsHeading")}${field("ข้อความ Add Widget", "addWidgetLabel")}${field("สัญลักษณ์ Widget 1", "widgetOneSymbol", {full:true})}${field("Abstract Widget 1", "widgetOneAbstract", {full:true,textarea:true,rows:4})}${field("ชื่อเพลง", "musicTitle")}${field("ชื่อนักร้อง", "musicArtist")}${field("สัญลักษณ์ Widget 2", "widgetTwoSymbol", {full:true})}${field("หัวข้อ Widget 2", "widgetTwoTitle")}${field("ข้อความใต้ Widget 2", "widgetTwoSubtitle")}${Array.from({length:6},(_,i)=>field(`ค่าสถานะ ${i+1}`,`statValue${i+1}`)+field(`ชื่อสถานะ ${i+1}`,`statLabel${i+1}`)).join("")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>Personality และ TMI</h2></div><div class="dds-form-grid">${field("หัวข้อ Personality", "personalityHeading")}${field("สัญลักษณ์ Personality", "personalityIcon")}${richField("เนื้อหา Personality", "personalityText", 12)}${field("หัวข้อ TMI", "tmiHeading")}${field("สัญลักษณ์ TMI", "tmiIcon")}${Array.from({length:4},(_,i)=>`<div class="dds-eric-tmi-group"><strong>TMI ${i+1}</strong><div class="dds-form-grid">${field("สัญลักษณ์",`tmiSymbol${i+1}`)}${field("หัวข้อ",`tmiTitle${i+1}`)}${field("คำอธิบาย",`tmiText${i+1}`,{full:true,textarea:true,rows:4})}</div></div>`).join("")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>ส่วนท้าย</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ที่ 1", "footerSymbolOne")}${field("ชื่อใน Footer", "footerName")}${field("สัญลักษณ์ที่ 2", "footerSymbolTwo")}${field("เผ่าพันธุ์ใน Footer", "footerRace")}${field("สัญลักษณ์ที่ 3", "footerSymbolThree")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อและข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${field("ดิสเพลย์เนม", "displayName")}${field("ชื่อภาษาอังกฤษ", "englishName")}${field("ชื่อภาษาไทย", "thaiName")}${field("สัญลักษณ์ปุ่มเล็กกลาง", "smallButtonOne", {placeholder:"เช่น ☻"})}${field("สัญลักษณ์ใน Bubble", "bubbleSymbol")}${field("Symbol Art บรรทัด 1", "symbolLineOne", {full:true})}${field("Symbol Art บรรทัด 2", "symbolLineTwo", {full:true})}${field("สัญลักษณ์หัวข้อ Profile", "profileIcon")}${PROFILE_LABELS.map((label,index)=>field(label,`profileValue${index+1}`,{placeholder:`กรอก${label}`})).join("")}</div><p class="dds-eric-locked-note">ข้อความ “💬 Message”, “•••”, “01 Profile” และชื่อหัวข้อข้อมูลทั้ง 6 ช่องถูกล็อกไว้ตามต้นฉบับ</p></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Biography และข้อมูลด้านล่าง</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ Biography", "biographyIcon")}${richField("เนื้อหา Biography", "biographyText", 12)}${field("Education บรรทัดหลัก", "educationMain")}${field("Education บรรทัดรอง", "educationSub")}${field("Face Claim บรรทัดหลัก", "faceclaimMain")}${field("Face Claim บรรทัดรอง", "faceclaimSub")}</div><p class="dds-eric-locked-note">ข้อความ “02 Biography”, “EDUCATION” และ “FACE CLAIM” ถูกล็อกไว้</p></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Widgets และเพลง</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ Widget 1", "widgetOneSymbol", {full:true})}${field("Abstract Widget 1", "widgetOneAbstract", {full:true,textarea:true,rows:4})}${field("ชื่อเพลง", "musicTitle")}${field("ชื่อนักร้อง", "musicArtist")}${field("สัญลักษณ์ Widget 2", "widgetTwoSymbol", {full:true})}${field("หัวข้อ Widget 2", "widgetTwoTitle")}${field("ข้อความใต้ Widget 2", "widgetTwoSubtitle")}${Array.from({length:6},(_,i)=>field(`ค่าสถานะ ${i+1}`,`statValue${i+1}`,{placeholder:"เช่น 95%"})+field(`ชื่อสถานะ ${i+1}`,`statLabel${i+1}`,{placeholder:"เช่น Competitive"})).join("")}</div><p class="dds-eric-locked-note">ข้อความ “Board”, “Activity”, “Wishlist”, “Your Widgets” และ “＋ Add Widget” ถูกล็อกไว้</p></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>Personality และ TMI</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ Personality", "personalityIcon")}${richField("เนื้อหา Personality", "personalityText", 12)}${field("สัญลักษณ์ TMI", "tmiIcon")}</div><div class="dds-eric-tmi-toolbar"><div><strong>รายการ TMI</strong><small>เพิ่มหรือลดจำนวนได้ตามต้องการ</small></div><button type="button" data-eric-add-tmi>＋ เพิ่ม TMI</button></div><div class="dds-eric-tmi-list" data-eric-tmi-list></div><p class="dds-eric-tmi-empty" data-eric-tmi-empty hidden>ยังไม่มีรายการ TMI — กด “＋ เพิ่ม TMI” เพื่อเพิ่มรายการ</p><p class="dds-eric-locked-note">ข้อความ “03 Personality” และ “04 TMI” ถูกล็อกไว้ แต่สัญลักษณ์ยังแก้ได้</p></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>ส่วนท้าย</h2></div><div class="dds-form-grid">${field("ข้อความส่วนท้าย", "footerText", {full:true,textarea:true,rows:3,placeholder:"เช่น ☾ ERIC HAWKINS ☘ WEREWOLF ♫"})}</div></section>
           </div>
           <section class="dds-protected-commission-copy dds-eric-profile-copy"><div class="dds-control-title"><span>08</span><h2>คัดลอกโค้ด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-eric-copy>COPY CODE <span>↗</span></button><button type="button" data-eric-reset>RESET</button></div></section>
         </div>
       </div>`;
     if (footer) main.insertBefore(editorPanel, footer); else main.appendChild(editorPanel);
-    editorPanel.querySelector("[data-eric-back]")?.addEventListener("click", backToCommission);
+    editorPanel.querySelector("[data-eric-back]")?.addEventListener("click", backToCommission, true);
     editorPanel.querySelector("[data-eric-save]")?.addEventListener("click", saveDraft);
     editorPanel.querySelector("[data-eric-delete]")?.addEventListener("click", deleteDraft);
     editorPanel.querySelector("[data-eric-copy]")?.addEventListener("click", copyCode);
     editorPanel.querySelector("[data-eric-reset]")?.addEventListener("click", () => { setValues(defaults); draftStatus(0); updateEditorPreview(); });
     editorPanel.addEventListener("input", (event) => { if (event.target.matches("[data-eric-rich]")) updateWordCounter(event.target.dataset.ericRich); if (event.target.type === "range") { const out = editorPanel.querySelector(`[data-eric-range-output="${CSS.escape(event.target.dataset.ericField)}"]`); if (out) out.textContent = `${event.target.value}%`; } scheduleEditorPreview(); });
     editorPanel.addEventListener("change", scheduleEditorPreview);
+    editorPanel.addEventListener("click", (event) => {
+      const addButton = event.target.closest("[data-eric-add-tmi]");
+      if (addButton) {
+        event.preventDefault();
+        const items = collectTmiItems();
+        if (items.length >= 20) {
+          showToast("เพิ่ม TMI ได้สูงสุด 20 รายการ");
+          return;
+        }
+        items.push({symbol:"", title:"", text:""});
+        renderTmiItems(items);
+        scheduleEditorPreview();
+        return;
+      }
+      const removeButton = event.target.closest("[data-eric-remove-tmi]");
+      if (removeButton) {
+        event.preventDefault();
+        const index = Number(removeButton.dataset.ericRemoveTmi) - 1;
+        const items = collectTmiItems();
+        if (index >= 0 && index < items.length) items.splice(index, 1);
+        renderTmiItems(items);
+        scheduleEditorPreview();
+      }
+    });
     editorPanel.querySelectorAll("[data-eric-color-picker]").forEach((picker) => picker.addEventListener("input", () => { const text = editorPanel.querySelector(`[data-eric-field="${CSS.escape(picker.dataset.ericColorPicker)}"]`); if (text) text.value = picker.value; scheduleEditorPreview(); }));
     editorPanel.querySelectorAll(".dds-color-field input[type=text]").forEach((text) => text.addEventListener("input", () => { const picker = editorPanel.querySelector(`[data-eric-color-picker="${CSS.escape(text.dataset.ericField)}"]`); if (picker && /^#[0-9a-f]{6}$/i.test(text.value)) picker.value = text.value; }));
     installToolbarEvents();
@@ -11502,7 +11626,7 @@ ${stylesheetLinks}
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
     viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage"><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทประวัติ Eric Hawkins"></iframe></div>`;
     footer.before(viewPanel);
-    viewPanel.querySelector("[data-eric-view-back]")?.addEventListener("click", backToCommission);
+    viewPanel.querySelector("[data-eric-view-back]")?.addEventListener("click", backToCommission, true);
     return viewPanel;
   }
 
@@ -11535,7 +11659,7 @@ ${stylesheetLinks}
     modal.className = "dds-commission-lock-modal";
     modal.id = "ddsEricCommissionLockModal";
     modal.hidden = true;
-    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-eric-lock-form><small>CLIENT ACCESS / ERIC HAWKINS</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-eric-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-eric-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="button" data-eric-lock-close>CANCEL</button><button type="submit">UNLOCK</button></div></form>`;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-eric-lock-form><small>CLIENT ACCESS / ERIC HAWKINS</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-eric-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-eric-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK</button><button type="button" data-eric-lock-close>CANCEL</button></div></form>`;
     document.body.appendChild(modal);
     modal.querySelector("[data-eric-lock-close]")?.addEventListener("click", closeModal);
     modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
