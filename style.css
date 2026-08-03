@@ -6948,3 +6948,155 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   margin: 0 !important;
   transform-origin: top center !important;
 }
+
+/* =========================================================
+   COMMISSION 02 — STRUCTURED HISTORY EDITOR
+   ========================================================= */
+.dds-history-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.dds-history-commission-heading > span:first-child {
+  display: block;
+}
+
+.dds-history-commission-heading > span:last-child {
+  display: block;
+  font-family: var(--dds-font-main);
+  font-size: clamp(34px, 4.6vw, 76px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.dds-history-commission-scroll {
+  min-height: 0;
+}
+
+.dds-history-preview-stage {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-history-preview-stage > iframe {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  border: 0;
+  background: transparent;
+}
+
+.dds-history-bbcode-field > span {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.dds-history-bbcode-toolbar {
+  margin-bottom: 10px;
+}
+
+.dds-history-tags-field > span {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.dds-history-tags-list {
+  display: grid;
+  gap: 8px;
+}
+
+.dds-history-tag-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+
+.dds-history-tag-row input {
+  width: 100%;
+  min-width: 0;
+  padding: 14px 15px;
+  color: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.018);
+  font-family: var(--dds-font-main);
+  font-size: 13px;
+}
+
+.dds-history-tag-row button,
+.dds-history-add-tag {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: var(--dds-font-main);
+  cursor: pointer;
+}
+
+.dds-history-tag-row button:hover,
+.dds-history-add-tag:hover {
+  border-color: rgba(193, 23, 36, 0.7);
+  color: #fff;
+}
+
+.dds-history-add-tag {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 15px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.dds-history-commission-copy {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .dds-history-preview-stage {
+    min-height: 560px;
+  }
+}
+
+.dds-history-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-history-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-history-commission-editor [data-history-save],
+.dds-history-commission-editor [data-history-copy] {
+  border-color: rgba(193, 23, 36, 0.68);
+  background: linear-gradient(135deg, #a20f1a, #690810);
+}
+
+.dds-history-commission-copy .dds-control-title {
+  margin-bottom: 10px;
+}
+
+.dds-history-commission-copy .dds-control-title > span {
+  font-size: 25px;
+}
+
+.dds-history-commission-copy .dds-control-title h2 {
+  font-size: 15px;
+}
+
+@media (max-width: 700px) {
+  .dds-history-commission-scroll {
+    padding-right: 0;
+  }
+
+  .dds-history-commission-heading > span:last-child {
+    font-size: 0.68em;
+  }
+}

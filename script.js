@@ -9677,3 +9677,786 @@ ${stylesheetLinks}
   // ใช้ capture เพื่อรับเหตุการณ์ก่อน listener เดิมทั้งหมด
   document.addEventListener("click", handleCommissionBack, true);
 })();
+
+/* =========================================================
+   LANDON COMMISSION 02 — STRUCTURED PROFILE EDITOR
+   หน้าแก้ไขแบบช่องกรอก แทนกล่อง HTML ดิบ
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ACCESS_HASH = "6d05de9e9a208dc2beb7d5e594b39064b36142353ffc8db10295131098a1bcd6";
+  const ACCESS_SESSION_KEY = "dds:landon-commission-editor:unlocked";
+  const PANEL_NAME = "protected-commission002-structured";
+  const DRAFT_KEY = "dds:commission-draft:landon:commission002:structured-v1";
+  const CANVAS_WIDTH = 1040;
+
+  const defaults = Object.freeze({
+    polaroidOne: "",
+    polaroidTwo: "",
+    sidebarImage: "",
+    photoMain: "",
+    stripOne: "",
+    stripTwo: "",
+    stripThree: "",
+    traitsImage: "",
+    menuDate: "",
+    menuTime: "",
+    noteDate: "",
+    mainTitle: "",
+    thaiSubtitle: "",
+    sidebarTag: "",
+    sidebarName: "",
+    sidebarRoles: "",
+    nameEnglish: "",
+    nameThai: "",
+    nickname: "",
+    birthday: "",
+    age: "",
+    race: "",
+    className: "",
+    occupation: "",
+    faceclaim: "",
+    mainBiography: "",
+    mainQuote: "",
+    afterQuote: "",
+    secondWindowTitle: "",
+    secondLabel: "",
+    secondHeading: "",
+    secondBiography: "",
+    audioTitle: "",
+    audioDuration: "",
+    audioLink: "",
+    traitsWindowTitle: "",
+    traitsCaption: "",
+    traitsCaptionMeta: "",
+    traitsText: "",
+    observationWindowTitle: "",
+    observationText: "",
+    finalQuote: ""
+  });
+
+  let panel = null;
+  let modal = null;
+  let previewTimer = 0;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "").replace(/[\\'\"\n\r]/g, "");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    window.setTimeout(() => toast.classList.remove("is-visible"), 2100);
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  function createModal() {
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <form class="dds-commission-lock-dialog" data-history-lock-form>
+        <small>CLIENT ACCESS / LANDON A. RUTHERFORD</small>
+        <h2>Protected editor</h2>
+        <p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p>
+        <label class="dds-commission-lock-field">
+          <span>รหัสผ่าน</span>
+          <input type="password" autocomplete="current-password" data-history-password placeholder="กรอกรหัสผ่าน">
+        </label>
+        <p class="dds-commission-lock-error" data-history-lock-error></p>
+        <div class="dds-commission-lock-actions">
+          <button type="submit">UNLOCK EDITOR</button>
+          <button type="button" data-history-lock-cancel>CANCEL</button>
+        </div>
+      </form>`;
+    document.body.appendChild(modal);
+
+    const close = () => {
+      modal.hidden = true;
+      document.body.style.overflow = "";
+    };
+
+    modal.querySelector("[data-history-lock-cancel]")?.addEventListener("click", close);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) close();
+    });
+    modal.querySelector("[data-history-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-history-password]");
+      const error = modal.querySelector("[data-history-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        const hash = await sha256(input.value);
+        if (hash !== ACCESS_HASH) {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+          return;
+        }
+        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+        close();
+        openEditor();
+      } catch (err) {
+        console.error(err);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function openModal() {
+    const dialog = createModal();
+    const input = dialog.querySelector("[data-history-password]");
+    const error = dialog.querySelector("[data-history-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    window.setTimeout(() => input?.focus(), 30);
+  }
+
+  function createField(label, key, options = {}) {
+    const full = options.full ? " dds-field-full" : "";
+    const placeholder = h(options.placeholder || "");
+    const help = options.help ? `<small class="dds-field-help">${h(options.help)}</small>` : "";
+    if (options.textarea) {
+      return `<label class="dds-field${full}"><span>${h(label)}</span><textarea rows="${options.rows || 3}" data-history-field="${h(key)}" placeholder="${placeholder}"></textarea>${help}</label>`;
+    }
+    return `<label class="dds-field${full}"><span>${h(label)}</span><input type="${options.type || "text"}" data-history-field="${h(key)}" placeholder="${placeholder}">${help}</label>`;
+  }
+
+  function bbcodeToolbar(target) {
+    return `
+      <div class="dds-rich-toolbar dds-bbcode-toolbar dds-history-bbcode-toolbar" data-history-bbcode-toolbar data-history-target="${h(target)}">
+        <button type="button" data-history-bbcode="b" title="ตัวหนา"><b>B</b></button>
+        <button type="button" data-history-bbcode="i" title="ตัวเอียง"><i>I</i></button>
+        <button type="button" data-history-bbcode="u" title="ขีดเส้นใต้"><u>U</u></button>
+        <button type="button" data-history-bbcode="s" title="ขีดฆ่า"><s>S</s></button>
+        <label class="dds-rich-color" title="สีตัวอักษร"><span>A</span><input type="color" value="#8f0e16" data-history-bbcode-color></label>
+        <button type="button" data-history-bbcode="size-small" title="ตัวอักษรเล็ก">A−</button>
+        <button type="button" data-history-bbcode="size-medium" title="ตัวอักษรปกติ">A</button>
+        <button type="button" data-history-bbcode="size-large" title="ตัวอักษรใหญ่">A+</button>
+        <button type="button" data-history-bbcode="align-left" title="ชิดซ้าย">⇤</button>
+        <button type="button" data-history-bbcode="align-center" title="กึ่งกลาง">↔</button>
+        <button type="button" data-history-bbcode="align-right" title="ชิดขวา">⇥</button>
+        <button type="button" data-history-bbcode="align-justify" title="เต็มบรรทัด">☰</button>
+        <button type="button" data-history-bbcode="url" title="ลิงก์">↗</button>
+        <button type="button" data-history-bbcode="img" title="รูปภาพ">▣</button>
+        <button type="button" data-history-bbcode="video" title="YouTube">▶</button>
+        <button type="button" data-history-bbcode="quote" title="Quote">❝</button>
+        <button type="button" data-history-bbcode="code" title="Code">&lt;/&gt;</button>
+        <button type="button" data-history-bbcode="spoiler" title="Spoiler">◉</button>
+        <button type="button" data-history-bbcode="hide" title="Hide">▤</button>
+        <button type="button" data-history-bbcode="list" title="รายการ">≡</button>
+        <button type="button" data-history-bbcode="list-1" title="รายการตัวเลข">1≡</button>
+        <button type="button" data-history-bbcode="hr" title="เส้นคั่น">—</button>
+        <button type="button" data-history-bbcode="clear">CLEAR</button>
+      </div>`;
+  }
+
+  function createLongTextField(label, key, rows = 8) {
+    return `<label class="dds-field dds-field-full dds-history-bbcode-field"><span>${h(label)}</span>${bbcodeToolbar(key)}<textarea rows="${rows}" data-history-field="${h(key)}" data-history-textarea placeholder="กรอกข้อความ"></textarea><div class="dds-word-counter" data-history-word-counter="${h(key)}" data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-history-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label>`;
+  }
+
+  function createPanel() {
+    if (panel) return panel;
+    const main = document.querySelector(".dds-main");
+    const footer = main?.querySelector(".dds-footer");
+    if (!main) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-history-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-protected-commission-back title="กลับหน้า COMMISSION" type="button">←</button>
+        <div>
+          <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
+          <h1 class="dds-history-commission-heading"><span>COMMISSION 2</span><span>— โค้ดประเภทประวัติ</span></h1>
+          <p>กรอกข้อมูลทางขวา แล้วดูผลลัพธ์ทางซ้ายได้ทันที สี พื้นหลัง และโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
+        </div>
+      </div>
+
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / COMMISSION 02</strong></div>
+          <div class="dds-protected-commission-preview-stage dds-history-preview-stage" data-history-preview-stage>
+            <iframe class="dds-protected-commission-preview-frame" data-history-preview scrolling="no" title="ตัวอย่างโค้ดประวัติ"></iframe>
+          </div>
+        </div>
+
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft">
+            <div><strong>บันทึกแบบร่าง</strong><small data-history-draft-status>ยังไม่มีแบบร่าง</small></div>
+            <button type="button" data-history-save>SAVE DRAFT</button>
+            <button type="button" data-history-delete>DELETE SAVE</button>
+          </div>
+
+          <div class="dds-protected-commission-scroll dds-history-commission-scroll">
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div>
+              <div class="dds-form-grid">
+                ${createField("รูปโพลารอยด์ด้านซ้ายรูปที่ 1", "polaroidOne", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปโพลารอยด์ด้านซ้ายรูปที่ 2", "polaroidTwo", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปโปรไฟล์ในแถบ Notes", "sidebarImage", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปหลักใน Photo Booth", "photoMain", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปแถบ Photo Booth รูปที่ 1", "stripOne", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปแถบ Photo Booth รูปที่ 2", "stripTwo", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูปแถบ Photo Booth รูปที่ 3", "stripThree", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+                ${createField("รูป Personality & Traits", "traitsImage", { full: true, type: "url", placeholder: "วางลิงก์รูป" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>02</span><h2>ข้อมูลส่วนบนและโปรไฟล์ย่อ</h2></div>
+              <div class="dds-form-grid">
+                ${createField("วันที่บนแถบเมนู", "menuDate", { placeholder: "เช่น Thu 6 Jun" })}
+                ${createField("เวลาบนแถบเมนู", "menuTime", { placeholder: "เช่น 11:25 a.m." })}
+                ${createField("วันที่เหนือหัวข้อ Notes", "noteDate", { full: true, placeholder: "เช่น 6 June 2026 at 11:25" })}
+                ${createField("ชื่อหัวข้อหลัก", "mainTitle", { full: true, placeholder: "เช่น ♫ — LANDON ARCHIBALD RUTHERFORD" })}
+                ${createField("ชื่อภาษาไทยใต้หัวข้อ", "thaiSubtitle", { full: true, placeholder: "กรอกชื่อภาษาไทย" })}
+                ${createField("ชื่อแท็กใน Sidebar", "sidebarTag", { placeholder: "เช่น landon" })}
+                ${createField("ชื่อในโปรไฟล์ย่อ", "sidebarName", { placeholder: "เช่น LANDON" })}
+                ${createField("คำอธิบายในโปรไฟล์ย่อ", "sidebarRoles", { full: true, textarea: true, rows: 3, placeholder: "เช่น Musician\nSongwriter\nOmega" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>03</span><h2>Personal Info</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ชื่อภาษาอังกฤษ", "nameEnglish", { full: true, placeholder: "กรอกชื่อภาษาอังกฤษ" })}
+                ${createField("ชื่อภาษาไทย", "nameThai", { full: true, placeholder: "กรอกชื่อภาษาไทย" })}
+                ${createField("ชื่อเล่น", "nickname", { placeholder: "กรอกชื่อเล่น" })}
+                ${createField("วันเกิด", "birthday", { placeholder: "กรอกวันเกิด" })}
+                ${createField("อายุ", "age", { placeholder: "กรอกอายุ" })}
+                ${createField("เผ่าพันธุ์", "race", { placeholder: "กรอกเผ่าพันธุ์" })}
+                ${createField("ชนชั้น", "className", { placeholder: "กรอกชนชั้น" })}
+                ${createField("อาชีพ", "occupation", { full: true, placeholder: "กรอกอาชีพ" })}
+                ${createField("Faceclaim", "faceclaim", { full: true, placeholder: "กรอก Faceclaim" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>04</span><h2>Biography หลัก</h2></div>
+              <div class="dds-form-grid">
+                ${createLongTextField("เนื้อหา Biography ก่อนข้อความคั่น — เว้นบรรทัดว่างเพื่อแบ่งย่อหน้า", "mainBiography", 10)}
+                ${createField("ข้อความคั่นกลาง", "mainQuote", { full: true, textarea: true, rows: 3, placeholder: "กรอกข้อความคั่นกลาง" })}
+                ${createLongTextField("เนื้อหาหลังข้อความคั่น", "afterQuote", 6)}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>05</span><h2>บันทึกที่สองและเพลง</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ชื่อหน้าต่าง", "secondWindowTitle", { full: true, placeholder: "เช่น Biography — Landon" })}
+                ${createField("ข้อความเล็กเหนือหัวข้อ", "secondLabel", { placeholder: "เช่น UNTITLED NOTE" })}
+                ${createField("หัวข้อบันทึก", "secondHeading", { placeholder: "เช่น Life without a pack" })}
+                ${createLongTextField("เนื้อหาบันทึก — เว้นบรรทัดว่างเพื่อแบ่งย่อหน้า", "secondBiography", 9)}
+                ${createField("ชื่อเพลงหรือชื่อไฟล์เสียง", "audioTitle", { placeholder: "เช่น untitled song.mp3" })}
+                ${createField("ระยะเวลาเพลง", "audioDuration", { placeholder: "เช่น 03:17" })}
+                ${createField("ลิงก์เพลง (ไม่บังคับ)", "audioLink", { full: true, type: "url", placeholder: "วางลิงก์เพลง" })}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>06</span><h2>Personality & Traits</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ชื่อหน้าต่าง", "traitsWindowTitle", { full: true, placeholder: "เช่น Personality & Traits" })}
+                ${createField("ชื่อใต้รูป", "traitsCaption", { placeholder: "เช่น ARCHIE" })}
+                ${createField("คำอธิบายใต้รูป", "traitsCaptionMeta", { placeholder: "เช่น CAMERA ROLL · 003" })}
+                ${createLongTextField("เนื้อหา Personality & Traits — เว้นบรรทัดว่างเพื่อแบ่งย่อหน้า", "traitsText", 11)}
+              </div>
+            </section>
+
+            <section class="dds-control-section">
+              <div class="dds-control-title"><span>07</span><h2>Observation และแท็ก</h2></div>
+              <div class="dds-form-grid">
+                ${createField("ชื่อหน้าต่าง", "observationWindowTitle", { full: true, placeholder: "เช่น Observation Log.txt" })}
+                ${createLongTextField("เนื้อหา Observation — เว้นบรรทัดว่างเพื่อแบ่งย่อหน้า", "observationText", 9)}
+                ${createField("ข้อความคำพูดท้ายสุด", "finalQuote", { full: true, textarea: true, rows: 4, placeholder: "กรอกข้อความคำพูดท้ายสุด" })}
+                <div class="dds-field dds-field-full dds-history-tags-field">
+                  <span>แท็ก</span>
+                  <div class="dds-history-tags-list" data-history-tags-list></div>
+                  <button class="dds-history-add-tag" type="button" data-history-add-tag>＋ เพิ่มแท็ก</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="dds-protected-commission-copy dds-history-commission-copy">
+            <div class="dds-control-title"><span>08</span><h2>คัดลอกโค้ด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดประวัติที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-protected-commission-copy-actions">
+              <button type="button" data-history-copy>COPY CODE <span>↗</span></button>
+              <button type="button" data-history-reset>RESET</button>
+            </div>
+          </section>
+        </div>
+      </div>`;
+
+    if (footer) main.insertBefore(panel, footer);
+    else main.appendChild(panel);
+
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-history-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-history-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-history-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-history-reset]")?.addEventListener("click", resetFields);
+    panel.querySelector("[data-history-add-tag]")?.addEventListener("click", () => addTagRow(""));
+
+    installBbcodeEditors();
+    renderTagRows([]);
+    return panel;
+  }
+
+  function stripBbcode(value) {
+    return String(value ?? "")
+      .replace(/\[(?:\/?(?:b|i|u|s|quote|code|hide|spoiler|list|\*)|hr)\]/gi, " ")
+      .replace(/\[(?:color|size|align|url|video)(?:=[^\]]*)?\]/gi, " ")
+      .replace(/\[\/(?:color|size|align|url|video)\]/gi, " ")
+      .replace(/https?:\/\/\S+/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countWords(value) {
+    const clean = stripBbcode(value);
+    if (!clean) return 0;
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(clean)) if (segment.isWordLike) count += 1;
+      return count;
+    }
+    return (clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g) || []).length;
+  }
+
+  function updateWordCounter(key) {
+    const input = panel?.querySelector(`[data-history-field="${CSS.escape(key)}"]`);
+    const counter = panel?.querySelector(`[data-history-word-counter="${CSS.escape(key)}"]`);
+    if (!input || !counter) return;
+    const count = countWords(input.value);
+    const number = counter.querySelector("[data-history-word-count-number]");
+    if (number) number.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function selectedText(target) {
+    return target.value.slice(target.selectionStart ?? 0, target.selectionEnd ?? 0);
+  }
+
+  function replaceSelection(target, replacement, caretOffset = replacement.length) {
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    target.value = target.value.slice(0, start) + replacement + target.value.slice(end);
+    const caret = start + caretOffset;
+    target.focus();
+    target.setSelectionRange(caret, caret);
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function wrapTag(target, open, close) {
+    const selected = selectedText(target);
+    const replacement = `${open}${selected}${close}`;
+    replaceSelection(target, replacement, selected ? replacement.length : open.length);
+  }
+
+  function applyBbcode(target, action, toolbar) {
+    if (["b", "i", "u", "s", "quote", "code", "hide", "spoiler"].includes(action)) {
+      wrapTag(target, `[${action}]`, `[/${action}]`);
+      return;
+    }
+    const map = {
+      "size-small": ["[size=small]", "[/size]"],
+      "size-medium": ["[size=medium]", "[/size]"],
+      "size-large": ["[size=large]", "[/size]"],
+      "align-left": ["[align=left]", "[/align]"],
+      "align-center": ["[align=center]", "[/align]"],
+      "align-right": ["[align=right]", "[/align]"],
+      "align-justify": ["[align=justify]", "[/align]"]
+    };
+    if (map[action]) {
+      wrapTag(target, map[action][0], map[action][1]);
+      return;
+    }
+    if (action === "color") {
+      const color = toolbar.querySelector("[data-history-bbcode-color]")?.value || "#8f0e16";
+      wrapTag(target, `[color=${color}]`, "[/color]");
+      return;
+    }
+    if (action === "url" || action === "img" || action === "video") {
+      const selected = selectedText(target);
+      const promptText = action === "img" ? "ใส่ลิงก์รูปภาพ" : action === "video" ? "ใส่ลิงก์ YouTube" : "ใส่ลิงก์ URL";
+      const url = window.prompt(promptText, /^https?:\/\//i.test(selected) ? selected : "https://");
+      if (url === null) return;
+      if (action === "img") replaceSelection(target, `[img]${url}[/img]`);
+      else if (action === "video") replaceSelection(target, `[video=youtube]${url}[/video]`);
+      else replaceSelection(target, `[url=${url}]${selected || url}[/url]`);
+      return;
+    }
+    if (action === "list" || action === "list-1") {
+      const selected = selectedText(target);
+      const lines = selected.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      const open = action === "list-1" ? "[list=1]" : "[list]";
+      const body = lines.length ? lines.map((line) => `[*]${line}`).join("\n") : "[*]";
+      replaceSelection(target, `${open}\n${body}\n[/list]`);
+      return;
+    }
+    if (action === "hr") {
+      replaceSelection(target, "[hr]");
+      return;
+    }
+    if (action === "clear") {
+      const selected = selectedText(target);
+      if (!selected) {
+        showToast("คลุมข้อความที่ต้องการล้าง BBCode ก่อน");
+        return;
+      }
+      replaceSelection(target, stripBbcode(selected));
+    }
+  }
+
+  function installBbcodeEditors() {
+    panel?.querySelectorAll("[data-history-bbcode-toolbar]").forEach((toolbar) => {
+      if (toolbar.dataset.ready === "true") return;
+      toolbar.dataset.ready = "true";
+      const key = toolbar.dataset.historyTarget;
+      const target = panel.querySelector(`[data-history-field="${CSS.escape(key)}"]`);
+      if (!target) return;
+      toolbar.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) event.preventDefault();
+      });
+      toolbar.querySelectorAll("[data-history-bbcode]").forEach((button) => {
+        button.addEventListener("click", () => applyBbcode(target, button.dataset.historyBbcode, toolbar));
+      });
+      toolbar.querySelector("[data-history-bbcode-color]")?.addEventListener("change", () => applyBbcode(target, "color", toolbar));
+      target.addEventListener("input", () => updateWordCounter(key));
+      updateWordCounter(key);
+    });
+  }
+
+  function renderTagRows(tags) {
+    const list = panel?.querySelector("[data-history-tags-list]");
+    if (!list) return;
+    list.innerHTML = "";
+    const values = Array.isArray(tags) && tags.length ? tags : [""];
+    values.forEach((value) => addTagRow(value));
+  }
+
+  function addTagRow(value = "") {
+    const list = panel?.querySelector("[data-history-tags-list]");
+    if (!list) return;
+    const row = document.createElement("div");
+    row.className = "dds-history-tag-row";
+    row.innerHTML = `<input type="text" data-history-tag placeholder="เช่น #werewolf" value="${h(value)}"><button type="button" aria-label="ลบแท็ก">×</button>`;
+    row.querySelector("button")?.addEventListener("click", () => {
+      row.remove();
+      if (!list.querySelector("[data-history-tag]")) addTagRow("");
+      schedulePreview();
+    });
+    row.querySelector("input")?.addEventListener("input", schedulePreview);
+    list.appendChild(row);
+  }
+
+  function getValues() {
+    const values = { ...defaults };
+    panel?.querySelectorAll("[data-history-field]").forEach((field) => {
+      values[field.dataset.historyField] = field.value;
+    });
+    values.tags = Array.from(panel?.querySelectorAll("[data-history-tag]") || [])
+      .map((input) => input.value.trim())
+      .filter(Boolean);
+    return values;
+  }
+
+  function setValues(values) {
+    const next = { ...defaults, ...(values || {}) };
+    panel?.querySelectorAll("[data-history-field]").forEach((field) => {
+      field.value = next[field.dataset.historyField] ?? "";
+    });
+    renderTagRows(Array.isArray(next.tags) ? next.tags : []);
+    panel?.querySelectorAll("[data-history-word-counter]").forEach((counter) => updateWordCounter(counter.dataset.historyWordCounter));
+  }
+
+  function bbcodeToHtml(value) {
+    let text = h(value).replace(/\r\n?/g, "\n");
+    text = text
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=small\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:12px">$1</span>')
+      .replace(/\[size=medium\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:15px">$1</span>')
+      .replace(/\[size=large\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:20px">$1</span>')
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[img\]([^\[]+)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%">')
+      .replace(/\[video=youtube\]([^\[]+)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">▶ YouTube</a>')
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<span class="dds-history-bbcode-block">$1</span>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code class="dds-history-bbcode-block">$1</code>')
+      .replace(/\[(?:hide|spoiler)\]([\s\S]*?)\[\/(?:hide|spoiler)\]/gi, '<span class="dds-history-bbcode-block">$1</span>')
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\[list(?:=1)?\]([\s\S]*?)\[\/list\]/gi, (_m, inner) => `<ul>${inner.replace(/\[\*\]([^\n]*)/g, "<li>$1</li>")}</ul>`)
+      .replace(/\n/g, "<br>");
+    return text;
+  }
+
+  function renderInline(value, previewMode) {
+    return previewMode ? bbcodeToHtml(value) : h(value).replace(/\r\n?|\n/g, "<br>");
+  }
+
+  function renderParagraphs(value, previewMode) {
+    const parts = String(value ?? "").split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
+    if (!parts.length) return "<p></p>";
+    return parts.map((part) => `<p>${renderInline(part, previewMode)}</p>`).join("");
+  }
+
+  function tagMarkup(tags) {
+    return (tags || []).map((tag) => {
+      const clean = String(tag || "").trim();
+      if (!clean) return "";
+      return `<span>${h(clean.startsWith("#") ? clean : `#${clean}`)}</span>`;
+    }).join("");
+  }
+
+  function audioButton(values) {
+    const button = '<button type="button">▶</button>';
+    if (!String(values.audioLink || "").trim()) return button;
+    return `<a href="${h(values.audioLink)}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">${button}</a>`;
+  }
+
+  function buildCode(values = getValues(), previewMode = false) {
+    return `<link href="https://guindaeyo.github.io/css/commit-profland.-css" rel="stylesheet"><div class="ldmac-wrap" style="--ldmac-bg:url('https://i.pinimg.com/736x/0b/86/83/0b8683bfc06629594074828c1cd50cdc.jpg');--ldmac-accent:#d69d12;"><div class="ldmac-menubar"><div class="ldmac-menu-left"><span class="ldmac-apple">●</span><strong>Finder</strong><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span></div><div class="ldmac-menu-right"><span>⌁</span><span>◉</span><span>⌕</span><span>${h(values.menuDate)}</span><span>${h(values.menuTime)}</span></div></div><div class="ldmac-desktop"><div class="ldmac-polaroids"><div class="ldmac-polaroid ldmac-polaroid-one"><div style="--img:url('${cssUrl(values.polaroidOne)}');--x:50%;--y:30%;"></div></div><div class="ldmac-polaroid ldmac-polaroid-two"><div style="--img:url('${cssUrl(values.polaroidTwo)}');--x:50%;--y:30%;"></div></div></div><section class="ldmac-window ldmac-main-notes"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Notes</div><div class="ldmac-window-actions"><span>⌕</span><span>⌘</span></div></div><div class="ldmac-notes-app"><aside class="ldmac-sidebar"><div class="ldmac-sidebar-heading"><strong>Notes</strong><span>147</span></div><div class="ldmac-sidebar-label">iCloud</div><div class="ldmac-sidebar-active"><span>▣ All iCloud</span><small>143</small></div><div class="ldmac-sidebar-item"><span>Recently Deleted</span><small>1</small></div><div class="ldmac-sidebar-label">Tags</div><div class="ldmac-sidebar-tag"><span>#</span><small>${h(values.sidebarTag)}</small></div><div class="ldmac-sidebar-preview"><div class="ldmac-sidebar-image" style="--img:url('${cssUrl(values.sidebarImage)}');--x:50%;--y:30%;"></div><strong>${h(values.sidebarName)}</strong><span>${h(values.sidebarRoles).replace(/\r\n?|\n/g, "<br>")}</span></div></aside><article class="ldmac-note"><div class="ldmac-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>♩</span><span>⌕</span></div><div class="ldmac-note-date">${h(values.noteDate)}</div><h1>${h(values.mainTitle)}</h1><div class="ldmac-note-subtitle">${h(values.thaiSubtitle)}</div><h2>Personal Info</h2><div class="ldmac-info-grid"><div><span>ชื่อ</span><strong>${h(values.nameEnglish)}</strong><p>${h(values.nameThai)}</p></div><div><span>ชื่อเล่น</span><strong>${h(values.nickname)}</strong></div><div><span>วันเกิด</span><strong>${h(values.birthday)}</strong></div><div><span>อายุ</span><strong>${h(values.age)}</strong></div><div><span>เผ่าพันธุ์</span><strong>${h(values.race)}</strong></div><div><span>ชนชั้น</span><strong>${h(values.className)}</strong></div><div><span>อาชีพ</span><strong>${h(values.occupation)}</strong></div><div><span>Faceclaim</span><strong>${h(values.faceclaim)}</strong></div></div><h2>Biography</h2>${renderParagraphs(values.mainBiography, previewMode)}<div class="ldmac-note-quote">${renderInline(values.mainQuote, previewMode)}</div>${renderParagraphs(values.afterQuote, previewMode)}</article></div></section><section class="ldmac-window ldmac-photobooth"><div class="ldmac-windowbar ldmac-photo-bar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">Photo Booth</div><div></div></div><div class="ldmac-photo-screen"><div class="ldmac-photo-main" style="--img:url('${cssUrl(values.photoMain)}');--x:50%;--y:30%;"></div><div class="ldmac-photo-strip"><div class="ldmac-strip-img" style="--img:url('${cssUrl(values.stripOne)}');--x:50%;--y:30%;"></div><div class="ldmac-strip-img" style="--img:url('${cssUrl(values.stripTwo)}');--x:50%;--y:30%;"></div><div class="ldmac-strip-img" style="--img:url('${cssUrl(values.stripThree)}');--x:50%;--y:30%;"></div></div></div><div class="ldmac-photo-control"><div><span>▦</span><span>▣</span></div><button type="button"></button><span>Effects</span></div></section><section class="ldmac-window ldmac-second-notes"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">${h(values.secondWindowTitle)}</div><div class="ldmac-window-actions"><span>Aa</span><span>⌕</span></div></div><article class="ldmac-document"><div class="ldmac-document-heading"><span>${h(values.secondLabel)}</span><strong>${h(values.secondHeading)}</strong></div>${renderParagraphs(values.secondBiography, previewMode)}<div class="ldmac-audio">${audioButton(values)}<div class="ldmac-audio-info"><strong>${h(values.audioTitle)}</strong><div class="ldmac-audio-line"><span></span></div></div><small>${h(values.audioDuration)}</small></div></article></section><section class="ldmac-window ldmac-traits-window"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">${h(values.traitsWindowTitle)}</div><div class="ldmac-window-actions"><span>⌕</span><span>↥</span></div></div><div class="ldmac-traits-layout"><div class="ldmac-traits-picture"><div class="ldmac-traits-img" style="--img:url('${cssUrl(values.traitsImage)}');--x:50%;--y:30%;"></div><div class="ldmac-picture-caption"><strong>${h(values.traitsCaption)}</strong><span>${h(values.traitsCaptionMeta)}</span></div></div><article class="ldmac-traits-text">${renderParagraphs(values.traitsText, previewMode)}</article></div></section><section class="ldmac-window ldmac-last-window"><div class="ldmac-windowbar"><div class="ldmac-traffic"><i></i><i></i><i></i></div><div class="ldmac-window-title">${h(values.observationWindowTitle)}</div><div class="ldmac-window-actions"><span>⌕</span></div></div><article class="ldmac-last-content">${renderParagraphs(values.observationText, previewMode)}<div class="ldmac-final-quote">${renderInline(values.finalQuote, previewMode)}</div><div class="ldmac-tags">${tagMarkup(values.tags)}</div></article></section><div class="ldmac-dock"><span class="ldmac-dock-finder">◉</span><span class="ldmac-dock-browser">⌕</span><span class="ldmac-dock-music">♫</span><span class="ldmac-dock-mail">✉</span><span class="ldmac-dock-notes">▤</span><span class="ldmac-dock-photo">✿</span><span class="ldmac-dock-settings">⚙</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
+  }
+
+  function buildPreviewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH}"><style>
+      html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
+      body{position:relative!important;min-height:1px!important}
+      .dds-history-preview-positioner{position:relative!important;display:block!important;width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;transform:none!important}
+      .dds-history-preview-positioner>.ldmac-wrap,.ldmac-wrap{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;transform:none!important}
+      .dds-history-bbcode-block{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}
+    </style></head><body><div class="dds-history-preview-positioner" data-history-preview-positioner>${code}</div></body></html>`;
+  }
+
+  function fitPreview() {
+    const iframe = panel?.querySelector("[data-history-preview]");
+    const stage = panel?.querySelector("[data-history-preview-stage]");
+    if (!iframe || !stage) return;
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc?.body) return;
+      const positioner = doc.querySelector("[data-history-preview-positioner]");
+      const root = doc.querySelector(".ldmac-wrap");
+      if (positioner) {
+        positioner.style.width = `${CANVAS_WIDTH}px`;
+        positioner.style.minWidth = `${CANVAS_WIDTH}px`;
+        positioner.style.maxWidth = `${CANVAS_WIDTH}px`;
+        positioner.style.transform = "none";
+      }
+      if (root) {
+        root.style.width = `${CANVAS_WIDTH}px`;
+        root.style.minWidth = `${CANVAS_WIDTH}px`;
+        root.style.maxWidth = `${CANVAS_WIDTH}px`;
+        root.style.margin = "0";
+        root.style.transform = "none";
+      }
+      const naturalHeight = Math.max(
+        positioner?.scrollHeight || 0,
+        positioner?.offsetHeight || 0,
+        root?.scrollHeight || 0,
+        root?.offsetHeight || 0,
+        doc.body.scrollHeight || 0,
+        doc.documentElement?.scrollHeight || 0,
+        1
+      );
+      const availableWidth = Math.max(1, stage.clientWidth - 24);
+      const scale = Math.min(1, availableWidth / CANVAS_WIDTH);
+      iframe.style.width = `${CANVAS_WIDTH}px`;
+      iframe.style.maxWidth = "none";
+      iframe.style.left = "50%";
+      iframe.style.top = "0";
+      iframe.style.height = `${Math.ceil(naturalHeight)}px`;
+      iframe.style.transformOrigin = "top center";
+      iframe.style.transform = `translateX(-50%) scale(${scale})`;
+      stage.style.height = `${Math.max(720, Math.ceil(naturalHeight * scale))}px`;
+    } catch (err) {
+      console.warn("Could not fit history commission preview", err);
+    }
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    const iframe = panel.querySelector("[data-history-preview]");
+    if (!iframe) return;
+    const next = buildPreviewDocument(buildCode(getValues(), true));
+    if (iframe.srcdoc === next) {
+      fitPreview();
+      return;
+    }
+    iframe.onload = () => {
+      fitPreview();
+      iframe.contentDocument?.fonts?.ready?.then(fitPreview).catch(() => {});
+      const images = Array.from(iframe.contentDocument?.images || []);
+      images.forEach((image) => {
+        if (!image.complete) image.addEventListener("load", fitPreview, { once: true });
+      });
+      window.setTimeout(fitPreview, 120);
+      window.setTimeout(fitPreview, 500);
+      window.setTimeout(fitPreview, 1200);
+    };
+    iframe.srcdoc = next;
+  }
+
+  function schedulePreview() {
+    window.clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(updatePreview, 90);
+  }
+
+  function formatSavedTime(timestamp) {
+    if (!timestamp) return "ยังไม่มีแบบร่าง";
+    try {
+      return `บันทึกล่าสุด ${new Date(timestamp).toLocaleString("th-TH", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`;
+    } catch {
+      return "มีแบบร่างที่บันทึกไว้";
+    }
+  }
+
+  function setDraftStatus(timestamp = 0) {
+    const status = panel?.querySelector("[data-history-draft-status]");
+    if (status) status.textContent = formatSavedTime(timestamp);
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.values ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+    setDraftStatus(savedAt);
+    showToast("บันทึกแบบร่างโค้ดประวัติแล้ว");
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode(getValues(), false);
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("คัดลอกโค้ดประวัติแล้ว");
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      showToast("คัดลอกโค้ดประวัติแล้ว");
+    }
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => {
+      item.classList.toggle("is-active", item.dataset.panel === panelName);
+    });
+    document.querySelectorAll(".dds-nav-button").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.page === "commission");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function openEditor() {
+    const editorPanel = createPanel();
+    if (!editorPanel) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    updatePreview();
+  }
+
+  function install() {
+    const original = document.querySelector('[data-edit-protected-commission="commission002"], [data-edit-history-commission="commission002"]');
+    if (!original) return;
+
+    // เปลี่ยนปุ่มทั้งก้อนเพื่อล้าง listener ของ editor HTML ดิบเดิม
+    const button = original.cloneNode(true);
+    button.removeAttribute("data-edit-protected-commission");
+    button.setAttribute("data-edit-history-commission", "commission002");
+    original.replaceWith(button);
+
+    // ลบ panel HTML ดิบเก่าหากเคยถูกสร้างไว้
+    document.querySelector('[data-panel="protected-commission002"]')?.remove();
+
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
+      else openModal();
+    });
+
+    window.addEventListener("resize", fitPreview);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();
