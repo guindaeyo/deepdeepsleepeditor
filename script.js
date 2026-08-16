@@ -12137,42 +12137,37 @@ ${stylesheetLinks}
   }
 
   function renderList(host, panel) {
-    const list = host.querySelector("[data-named-save-list]");
+    const select = host.querySelector("[data-named-save-select]");
     const empty = host.querySelector("[data-named-save-empty]");
-    if (!list || !empty) return;
+    const picker = host.querySelector("[data-named-save-picker]");
+    if (!select || !empty || !picker) return;
 
+    const previousValue = select.value;
     const library = readLibrary(panel);
     const saves = [...library.saves].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-    list.innerHTML = "";
-    empty.hidden = saves.length > 0;
+
+    select.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = saves.length ? "กดเพื่อเลือกไฟล์ที่บันทึก" : "ยังไม่มีไฟล์บันทึก";
+    select.appendChild(placeholder);
 
     saves.forEach((save) => {
-      const row = document.createElement("div");
-      row.className = "dds-named-save-row";
-      row.dataset.namedSaveId = save.id;
-
-      const info = document.createElement("div");
-      info.className = "dds-named-save-info";
-      const name = document.createElement("strong");
-      name.textContent = save.name || "ไม่มีชื่อ";
-      const time = document.createElement("small");
-      time.textContent = formatDate(save.savedAt);
-      info.append(name, time);
-
-      const actions = document.createElement("div");
-      actions.className = "dds-named-save-row-actions";
-      const load = document.createElement("button");
-      load.type = "button";
-      load.dataset.namedSaveLoad = save.id;
-      load.textContent = "LOAD";
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.dataset.namedSaveDelete = save.id;
-      remove.textContent = "DELETE";
-      actions.append(load, remove);
-      row.append(info, actions);
-      list.appendChild(row);
+      const option = document.createElement("option");
+      option.value = save.id;
+      option.textContent = `${save.name || "ไม่มีชื่อ"} · ${formatDate(save.savedAt)}`;
+      select.appendChild(option);
     });
+
+    if (previousValue && saves.some((save) => save.id === previousValue)) {
+      select.value = previousValue;
+    }
+
+    const hasSaves = saves.length > 0;
+    select.disabled = !hasSaves;
+    picker.querySelector("[data-named-save-load-selected]")?.toggleAttribute("disabled", !hasSaves);
+    picker.querySelector("[data-named-save-delete-selected]")?.toggleAttribute("disabled", !hasSaves);
+    empty.hidden = hasSaves;
   }
 
   function saveNamed(host, panel) {
@@ -12247,15 +12242,20 @@ ${stylesheetLinks}
       <div class="dds-named-save-create">
         <label class="dds-named-save-name-field">
           <span>ชื่อการบันทึก</span>
-          <input type="text" maxlength="${MAX_NAME_LENGTH}" data-named-save-name placeholder="เช่น เวอร์ชัน 1 / งานที่แก้เสร็จแล้ว" autocomplete="off">
+          <input type="text" maxlength="${MAX_NAME_LENGTH}" data-named-save-name placeholder="กรอกชื่อการบันทึก" autocomplete="off">
         </label>
         <button type="button" class="dds-named-save-create-button" data-named-save-create>SAVE AS</button>
       </div>
       <div class="dds-named-save-heading">
         <strong>ไฟล์ที่บันทึกไว้ในเครื่องนี้</strong>
-        <small>แต่ละโค้ดมีคลังเซฟแยกกัน · ไม่ส่งขึ้นเซิร์ฟเวอร์</small>
       </div>
-      <div class="dds-named-save-list" data-named-save-list></div>
+      <div class="dds-named-save-picker" data-named-save-picker>
+        <select data-named-save-select aria-label="เลือกไฟล์ที่บันทึก">
+          <option value="">ยังไม่มีไฟล์บันทึก</option>
+        </select>
+        <button type="button" data-named-save-load-selected>LOAD</button>
+        <button type="button" data-named-save-delete-selected>DELETE</button>
+      </div>
       <p class="dds-named-save-empty" data-named-save-empty>ยังไม่มีไฟล์บันทึก</p>
     `;
 
@@ -12273,13 +12273,27 @@ ${stylesheetLinks}
     });
 
     wrap.addEventListener("click", (event) => {
-      const load = event.target.closest("[data-named-save-load]");
-      if (load) {
-        loadNamed(host, panel, load.dataset.namedSaveLoad);
+      const select = wrap.querySelector("[data-named-save-select]");
+      const selectedId = select?.value || "";
+
+      if (event.target.closest("[data-named-save-load-selected]")) {
+        if (!selectedId) {
+          notify("กรุณาเลือกไฟล์ที่ต้องการโหลด");
+          select?.focus();
+          return;
+        }
+        loadNamed(host, panel, selectedId);
         return;
       }
-      const remove = event.target.closest("[data-named-save-delete]");
-      if (remove) deleteNamed(host, panel, remove.dataset.namedSaveDelete);
+
+      if (event.target.closest("[data-named-save-delete-selected]")) {
+        if (!selectedId) {
+          notify("กรุณาเลือกไฟล์ที่ต้องการลบ");
+          select?.focus();
+          return;
+        }
+        deleteNamed(host, panel, selectedId);
+      }
     });
 
     renderList(host, panel);

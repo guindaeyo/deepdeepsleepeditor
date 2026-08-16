@@ -7543,7 +7543,7 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 /* =========================================================
-   NAMED LOCAL SAVE LIBRARY — MULTIPLE SAVES PER EDITOR
+   NAMED LOCAL SAVE LIBRARY — COMPACT SELECTOR
    ========================================================= */
 .dds-original-draft-control {
   display: none !important;
@@ -7556,10 +7556,7 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   align-items: stretch !important;
 }
 
-.dds-draft-manager.dds-named-save-host {
-  padding: 18px 20px;
-}
-
+.dds-draft-manager.dds-named-save-host,
 .dds-protected-commission-draft.dds-named-save-host {
   padding: 18px 20px;
 }
@@ -7603,6 +7600,13 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: #090909;
   outline: none;
+  font-size: 12px !important;
+  line-height: 1.4;
+}
+
+.dds-named-save-name-field input::placeholder {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.30);
 }
 
 .dds-named-save-name-field input:focus {
@@ -7622,10 +7626,6 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 .dds-named-save-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
   padding-top: 11px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
@@ -7636,66 +7636,41 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   font-weight: 600;
 }
 
-.dds-named-save-heading small {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 8px;
-  line-height: 1.45;
-  text-align: right;
-}
-
-.dds-named-save-list {
-  max-height: 190px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--dds-red-bright) #090909;
-}
-
-.dds-named-save-row {
-  min-width: 0;
+.dds-named-save-picker {
+  width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.025);
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: stretch;
+  gap: 6px;
 }
 
-.dds-named-save-info {
+.dds-named-save-picker select {
+  width: 100%;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.dds-named-save-info strong {
-  overflow: hidden;
+  min-height: 38px;
+  padding: 0 34px 0 11px;
   color: #ece6e3;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: #090909;
+  font: inherit;
   font-size: 10px;
-  font-weight: 500;
-  line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  outline: none;
+  cursor: pointer;
 }
 
-.dds-named-save-info small {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 8px;
+.dds-named-save-picker select:focus {
+  border-color: rgba(193, 23, 36, 0.68);
 }
 
-.dds-named-save-row-actions {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.dds-named-save-picker select:disabled {
+  color: rgba(255, 255, 255, 0.28);
+  cursor: default;
 }
 
-.dds-named-save-row-actions button {
-  min-height: 30px !important;
-  padding: 0 9px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+.dds-named-save-picker button {
+  min-height: 38px !important;
+  padding: 0 11px !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
   background: transparent !important;
   font-size: 7px !important;
   font-weight: 600 !important;
@@ -7703,19 +7678,24 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   cursor: pointer;
 }
 
-.dds-named-save-row-actions [data-named-save-load] {
+.dds-named-save-picker [data-named-save-load-selected] {
   color: #fff !important;
-  border-color: rgba(193, 23, 36, 0.5) !important;
+  border-color: rgba(193, 23, 36, 0.50) !important;
   background: rgba(143, 14, 22, 0.16) !important;
 }
 
-.dds-named-save-row-actions [data-named-save-delete] {
+.dds-named-save-picker [data-named-save-delete-selected] {
   color: rgba(255, 255, 255, 0.46) !important;
+}
+
+.dds-named-save-picker button:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .dds-named-save-empty {
   margin: 0;
-  padding: 12px;
+  padding: 10px;
   color: rgba(255, 255, 255, 0.28);
   border: 1px dashed rgba(255, 255, 255, 0.08);
   font-size: 9px;
@@ -7727,8 +7707,7 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 @media (max-width: 700px) {
-  .dds-named-save-create,
-  .dds-named-save-row {
+  .dds-named-save-create {
     grid-template-columns: 1fr;
   }
 
@@ -7736,20 +7715,16 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     width: 100%;
   }
 
-  .dds-named-save-heading {
-    align-items: flex-start;
-    flex-direction: column;
+  .dds-named-save-picker {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .dds-named-save-heading small {
-    text-align: left;
+  .dds-named-save-picker select {
+    grid-column: 1 / -1;
   }
 
-  .dds-named-save-row-actions {
+  .dds-named-save-picker button {
     width: 100%;
   }
-
-  .dds-named-save-row-actions button {
-    flex: 1 1 0;
-  }
 }
+
