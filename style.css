@@ -7541,3 +7541,215 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   border: 0 !important;
   transform-origin: top left !important;
 }
+
+/* =========================================================
+   NAMED LOCAL SAVE LIBRARY — MULTIPLE SAVES PER EDITOR
+   ========================================================= */
+.dds-original-draft-control {
+  display: none !important;
+}
+
+.dds-draft-manager.dds-named-save-host,
+.dds-protected-commission-draft.dds-named-save-host {
+  display: block !important;
+  grid-template-columns: none !important;
+  align-items: stretch !important;
+}
+
+.dds-draft-manager.dds-named-save-host {
+  padding: 18px 20px;
+}
+
+.dds-protected-commission-draft.dds-named-save-host {
+  padding: 18px 20px;
+}
+
+.dds-named-save-library {
+  width: 100%;
+  min-width: 0;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dds-named-save-create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.dds-named-save-name-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dds-named-save-name-field > span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.dds-named-save-name-field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 12px;
+  color: #f3eeee;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #090909;
+  outline: none;
+}
+
+.dds-named-save-name-field input:focus {
+  border-color: rgba(193, 23, 36, 0.75);
+}
+
+.dds-named-save-create-button {
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  color: #fff !important;
+  border: 1px solid rgba(193, 23, 36, 0.72) !important;
+  background: linear-gradient(135deg, #a20f1a, #690810) !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  cursor: pointer;
+}
+
+.dds-named-save-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.dds-named-save-heading strong {
+  color: #f0eae7;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dds-named-save-heading small {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.dds-named-save-list {
+  max-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dds-red-bright) #090909;
+}
+
+.dds-named-save-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.dds-named-save-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dds-named-save-info strong {
+  overflow: hidden;
+  color: #ece6e3;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dds-named-save-info small {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+}
+
+.dds-named-save-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dds-named-save-row-actions button {
+  min-height: 30px !important;
+  padding: 0 9px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: transparent !important;
+  font-size: 7px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  cursor: pointer;
+}
+
+.dds-named-save-row-actions [data-named-save-load] {
+  color: #fff !important;
+  border-color: rgba(193, 23, 36, 0.5) !important;
+  background: rgba(143, 14, 22, 0.16) !important;
+}
+
+.dds-named-save-row-actions [data-named-save-delete] {
+  color: rgba(255, 255, 255, 0.46) !important;
+}
+
+.dds-named-save-empty {
+  margin: 0;
+  padding: 12px;
+  color: rgba(255, 255, 255, 0.28);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  text-align: center;
+}
+
+.dds-named-save-empty[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .dds-named-save-create,
+  .dds-named-save-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dds-named-save-create-button {
+    width: 100%;
+  }
+
+  .dds-named-save-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dds-named-save-heading small {
+    text-align: left;
+  }
+
+  .dds-named-save-row-actions {
+    width: 100%;
+  }
+
+  .dds-named-save-row-actions button {
+    flex: 1 1 0;
+  }
+}

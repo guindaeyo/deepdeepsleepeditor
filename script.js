@@ -11805,3 +11805,514 @@ ${stylesheetLinks}
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();
 })();
+
+/* =========================================================
+   NAMED LOCAL SAVE LIBRARY — MULTIPLE SAVES PER EDITOR
+   - ผู้ใช้ตั้งชื่อเซฟเองได้หลายรายการ
+   - แยกคลังตาม editor / commission
+   - เก็บใน localStorage ของ browser profile เครื่องนั้นเท่านั้น
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_NAMED_LOCAL_SAVES_INSTALLED__) return;
+  window.__DDS_NAMED_LOCAL_SAVES_INSTALLED__ = true;
+
+  const STORAGE_PREFIX = "dds:named-local-saves:v1:";
+  const MAX_NAME_LENGTH = 80;
+  const installedHosts = new WeakSet();
+
+  function notify(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.querySelector("#siteToast");
+    const text = document.querySelector("#siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsNamedSaveTimer);
+    toast.__ddsNamedSaveTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  function safeParse(value, fallback) {
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function safeGet(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  function safeSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function editorKey(panel) {
+    const raw = panel?.dataset?.panel || panel?.id || "unknown-editor";
+    return raw.replace(/[^a-z0-9:_-]+/gi, "-").toLowerCase();
+  }
+
+  function libraryKey(panel) {
+    return `${STORAGE_PREFIX}${editorKey(panel)}`;
+  }
+
+  function readLibrary(panel) {
+    const parsed = safeParse(safeGet(libraryKey(panel)), null);
+    if (!parsed || !Array.isArray(parsed.saves)) {
+      return { version: 1, saves: [] };
+    }
+    return {
+      version: 1,
+      saves: parsed.saves.filter((item) => item && item.id && item.snapshot)
+    };
+  }
+
+  function writeLibrary(panel, library) {
+    return safeSet(libraryKey(panel), JSON.stringify({ version: 1, saves: library.saves || [] }));
+  }
+
+  function fieldIdentity(field, fallbackIndex) {
+    if (field.id) return { type: "id", value: field.id };
+
+    const attrs = [
+      "data-food-field",
+      "data-history-field",
+      "data-mikael-field",
+      "data-eric-field",
+      "data-dds-field-key",
+      "data-review-field",
+      "data-profile-field"
+    ];
+
+    for (const attr of attrs) {
+      const value = field.getAttribute(attr);
+      if (value) return { type: attr, value };
+    }
+
+    if (field.name) return { type: "name", value: field.name };
+    return { type: "index", value: String(fallbackIndex) };
+  }
+
+  function isSavableField(field) {
+    if (!field) return false;
+    if (field.matches("button, [type='button'], [type='submit'], [type='reset'], [type='file']")) return false;
+    if (field.matches(".dds-generated-code, [data-dds-no-save]")) return false;
+    if (field.readOnly || field.disabled) return false;
+    if (field.matches("[data-history-tag], [data-lwl-side-word-input]")) return false;
+    return true;
+  }
+
+  function readField(field) {
+    if (field.matches("[contenteditable='true']")) {
+      return { valueType: "html", value: field.innerHTML };
+    }
+    if (field.type === "checkbox" || field.type === "radio") {
+      return { valueType: "checked", value: Boolean(field.checked) };
+    }
+    return { valueType: "value", value: field.value ?? "" };
+  }
+
+  function captureSpecial(panel) {
+    const special = {};
+
+    const historyTags = panel.querySelectorAll("[data-history-tag]");
+    if (historyTags.length) {
+      special.historyTags = Array.from(historyTags, (input) => input.value || "");
+    }
+
+    const sideWords = panel.querySelectorAll("[data-lwl-side-word-input]");
+    if (sideWords.length || panel.querySelector("[data-lwl-side-words-list]") || panel.querySelector("#lwlSideWordsList")) {
+      special.sideWords = Array.from(sideWords, (input) => input.value || "");
+    }
+
+    const tmiGroups = panel.querySelectorAll("[data-eric-tmi-group]");
+    if (tmiGroups.length || panel.querySelector("[data-eric-tmi-list]")) {
+      special.ericTmi = Array.from(tmiGroups, (group) => ({
+        symbol: group.querySelector('[data-eric-field^="tmiSymbol"]')?.value || "",
+        title: group.querySelector('[data-eric-field^="tmiTitle"]')?.value || "",
+        text: group.querySelector('[data-eric-field^="tmiText"]')?.value || ""
+      }));
+    }
+
+    return special;
+  }
+
+  function captureSnapshot(panel) {
+    const fields = [];
+    const occurrence = new Map();
+    const candidates = Array.from(panel.querySelectorAll("input, textarea, select, [contenteditable='true']"));
+
+    candidates.forEach((field, index) => {
+      if (!isSavableField(field)) return;
+      const identity = fieldIdentity(field, index);
+      const sig = `${identity.type}:${identity.value}`;
+      const count = occurrence.get(sig) || 0;
+      occurrence.set(sig, count + 1);
+      fields.push({ identity, occurrence: count, ...readField(field) });
+    });
+
+    return {
+      version: 1,
+      editor: editorKey(panel),
+      savedAt: Date.now(),
+      fields,
+      special: captureSpecial(panel)
+    };
+  }
+
+  function queryIdentity(panel, identity) {
+    if (!identity) return [];
+    const esc = (value) => CSS.escape(String(value));
+    switch (identity.type) {
+      case "id": {
+        const node = panel.querySelector(`#${esc(identity.value)}`);
+        return node ? [node] : [];
+      }
+      case "name":
+        return Array.from(panel.querySelectorAll(`[name="${esc(identity.value)}"]`));
+      case "data-food-field":
+      case "data-history-field":
+      case "data-mikael-field":
+      case "data-eric-field":
+      case "data-dds-field-key":
+      case "data-review-field":
+      case "data-profile-field":
+        return Array.from(panel.querySelectorAll(`[${identity.type}="${esc(identity.value)}"]`));
+      case "index":
+        return Array.from(panel.querySelectorAll("input, textarea, select, [contenteditable='true']")).filter(isSavableField).slice(Number(identity.value), Number(identity.value) + 1);
+      default:
+        return [];
+    }
+  }
+
+  function setField(field, entry) {
+    if (!field || !entry) return;
+    if (entry.valueType === "html" && field.matches("[contenteditable='true']")) {
+      field.innerHTML = String(entry.value ?? "");
+    } else if (entry.valueType === "checked" && (field.type === "checkbox" || field.type === "radio")) {
+      field.checked = Boolean(entry.value);
+    } else if ("value" in field) {
+      field.value = String(entry.value ?? "");
+    }
+  }
+
+  function clickUntil(panel, getCount, target, addSelector, removeSelector) {
+    let guard = 0;
+    while (getCount() < target && guard < 50) {
+      const button = panel.querySelector(addSelector);
+      if (!button) break;
+      button.click();
+      guard += 1;
+    }
+    guard = 0;
+    while (getCount() > target && guard < 50) {
+      const buttons = panel.querySelectorAll(removeSelector);
+      const button = buttons[buttons.length - 1];
+      if (!button) break;
+      button.click();
+      guard += 1;
+    }
+  }
+
+  function rebuildSpecial(panel, special = {}) {
+    if (Array.isArray(special.historyTags) && panel.querySelector("[data-history-tags-list]")) {
+      const desired = Math.max(1, special.historyTags.length);
+      const count = () => panel.querySelectorAll("[data-history-tag]").length;
+      clickUntil(panel, count, desired, "[data-history-add-tag]", ".dds-history-tag-row button");
+      const inputs = panel.querySelectorAll("[data-history-tag]");
+      inputs.forEach((input, index) => {
+        input.value = special.historyTags[index] ?? "";
+      });
+    }
+
+    if (Array.isArray(special.sideWords)) {
+      const list = panel.querySelector("[data-lwl-side-words-list]") || panel.querySelector("#lwlSideWordsList");
+      if (list) {
+        const desired = special.sideWords.length;
+        const count = () => list.querySelectorAll("[data-lwl-side-word-input]").length;
+        clickUntil(panel, count, desired, "[data-lwl-add-side-word], #lwlAddSideWord", "[data-lwl-remove-side-word]");
+        list.querySelectorAll("[data-lwl-side-word-input]").forEach((input, index) => {
+          input.value = special.sideWords[index] ?? "";
+        });
+      }
+    }
+
+    if (Array.isArray(special.ericTmi) && panel.querySelector("[data-eric-tmi-list]")) {
+      const desired = special.ericTmi.length;
+      const count = () => panel.querySelectorAll("[data-eric-tmi-group]").length;
+      clickUntil(panel, count, desired, "[data-eric-add-tmi]", "[data-eric-remove-tmi]");
+      panel.querySelectorAll("[data-eric-tmi-group]").forEach((group, index) => {
+        const item = special.ericTmi[index] || {};
+        const symbol = group.querySelector('[data-eric-field^="tmiSymbol"]');
+        const title = group.querySelector('[data-eric-field^="tmiTitle"]');
+        const text = group.querySelector('[data-eric-field^="tmiText"]');
+        if (symbol) symbol.value = item.symbol || "";
+        if (title) title.value = item.title || "";
+        if (text) text.value = item.text || "";
+      });
+    }
+  }
+
+  function dispatchRefresh(panel) {
+    const fields = Array.from(panel.querySelectorAll("input, textarea, select, [contenteditable='true']")).filter(isSavableField);
+    fields.forEach((field) => {
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      if (field.matches("select, input[type='checkbox'], input[type='radio'], input[type='color'], input[type='range']")) {
+        field.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+    if (typeof window.syncImagePositionOutputs === "function") window.syncImagePositionOutputs();
+    if (typeof window.updateLongWayLongRide === "function" && panel.dataset.panel === "editor-code010") {
+      window.updateLongWayLongRide();
+    }
+  }
+
+  function restoreSnapshot(panel, snapshot) {
+    if (!snapshot || !Array.isArray(snapshot.fields)) return false;
+    rebuildSpecial(panel, snapshot.special || {});
+
+    snapshot.fields.forEach((entry) => {
+      const matches = queryIdentity(panel, entry.identity);
+      const field = matches[entry.occurrence || 0];
+      if (field) setField(field, entry);
+    });
+
+    dispatchRefresh(panel);
+    return true;
+  }
+
+  function formatDate(timestamp) {
+    try {
+      return new Date(timestamp).toLocaleString("th-TH", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch {
+      return "";
+    }
+  }
+
+  function originalSaveButton(host) {
+    return host.querySelector([
+      ".dds-draft-save-button",
+      "[data-commission-save]",
+      "[data-food-save]",
+      "[data-history-save]",
+      "[data-mikael-save]",
+      "[data-eric-save]"
+    ].join(","));
+  }
+
+  function originalDeleteButton(host) {
+    return host.querySelector([
+      ".dds-draft-delete-button",
+      "[data-commission-delete-save]",
+      "[data-food-delete]",
+      "[data-history-delete]",
+      "[data-mikael-delete]",
+      "[data-eric-delete]"
+    ].join(","));
+  }
+
+  function syncCurrentDraft(host) {
+    const button = originalSaveButton(host);
+    if (button) button.click();
+  }
+
+  function renderList(host, panel) {
+    const list = host.querySelector("[data-named-save-list]");
+    const empty = host.querySelector("[data-named-save-empty]");
+    if (!list || !empty) return;
+
+    const library = readLibrary(panel);
+    const saves = [...library.saves].sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+    list.innerHTML = "";
+    empty.hidden = saves.length > 0;
+
+    saves.forEach((save) => {
+      const row = document.createElement("div");
+      row.className = "dds-named-save-row";
+      row.dataset.namedSaveId = save.id;
+
+      const info = document.createElement("div");
+      info.className = "dds-named-save-info";
+      const name = document.createElement("strong");
+      name.textContent = save.name || "ไม่มีชื่อ";
+      const time = document.createElement("small");
+      time.textContent = formatDate(save.savedAt);
+      info.append(name, time);
+
+      const actions = document.createElement("div");
+      actions.className = "dds-named-save-row-actions";
+      const load = document.createElement("button");
+      load.type = "button";
+      load.dataset.namedSaveLoad = save.id;
+      load.textContent = "LOAD";
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.dataset.namedSaveDelete = save.id;
+      remove.textContent = "DELETE";
+      actions.append(load, remove);
+      row.append(info, actions);
+      list.appendChild(row);
+    });
+  }
+
+  function saveNamed(host, panel) {
+    const input = host.querySelector("[data-named-save-name]");
+    const name = String(input?.value || "").trim().slice(0, MAX_NAME_LENGTH);
+    if (!name) {
+      notify("กรุณาตั้งชื่อการบันทึกก่อน");
+      input?.focus();
+      return;
+    }
+
+    const library = readLibrary(panel);
+    const duplicate = library.saves.find((item) => item.name.trim().toLocaleLowerCase() === name.toLocaleLowerCase());
+    const snapshot = captureSnapshot(panel);
+
+    if (duplicate) {
+      if (!window.confirm(`มีเซฟชื่อ “${name}” อยู่แล้ว ต้องการเขียนทับหรือไม่?`)) return;
+      duplicate.snapshot = snapshot;
+      duplicate.savedAt = snapshot.savedAt;
+      duplicate.name = name;
+    } else {
+      library.saves.push({
+        id: `save-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name,
+        savedAt: snapshot.savedAt,
+        snapshot
+      });
+    }
+
+    if (!writeLibrary(panel, library)) {
+      notify("บันทึกไม่สำเร็จ พื้นที่จัดเก็บของเบราว์เซอร์อาจเต็ม");
+      return;
+    }
+
+    syncCurrentDraft(host);
+    if (input) input.value = "";
+    renderList(host, panel);
+    notify(`บันทึก “${name}” ลงในเครื่องนี้แล้ว`);
+  }
+
+  function loadNamed(host, panel, id) {
+    const library = readLibrary(panel);
+    const save = library.saves.find((item) => item.id === id);
+    if (!save) {
+      notify("ไม่พบไฟล์บันทึกนี้");
+      renderList(host, panel);
+      return;
+    }
+    if (!restoreSnapshot(panel, save.snapshot)) {
+      notify("โหลดไฟล์บันทึกไม่สำเร็จ");
+      return;
+    }
+    window.setTimeout(() => syncCurrentDraft(host), 30);
+    notify(`โหลด “${save.name}” แล้ว`);
+  }
+
+  function deleteNamed(host, panel, id) {
+    const library = readLibrary(panel);
+    const save = library.saves.find((item) => item.id === id);
+    if (!save) return;
+    if (!window.confirm(`ลบเซฟ “${save.name}” ออกจากเครื่องนี้หรือไม่?`)) return;
+    library.saves = library.saves.filter((item) => item.id !== id);
+    writeLibrary(panel, library);
+    renderList(host, panel);
+    notify(`ลบเซฟ “${save.name}” แล้ว`);
+  }
+
+  function buildNamedUi(host, panel) {
+    const wrap = document.createElement("div");
+    wrap.className = "dds-named-save-library";
+    wrap.innerHTML = `
+      <div class="dds-named-save-create">
+        <label class="dds-named-save-name-field">
+          <span>ชื่อการบันทึก</span>
+          <input type="text" maxlength="${MAX_NAME_LENGTH}" data-named-save-name placeholder="เช่น เวอร์ชัน 1 / งานที่แก้เสร็จแล้ว" autocomplete="off">
+        </label>
+        <button type="button" class="dds-named-save-create-button" data-named-save-create>SAVE AS</button>
+      </div>
+      <div class="dds-named-save-heading">
+        <strong>ไฟล์ที่บันทึกไว้ในเครื่องนี้</strong>
+        <small>แต่ละโค้ดมีคลังเซฟแยกกัน · ไม่ส่งขึ้นเซิร์ฟเวอร์</small>
+      </div>
+      <div class="dds-named-save-list" data-named-save-list></div>
+      <p class="dds-named-save-empty" data-named-save-empty>ยังไม่มีไฟล์บันทึก</p>
+    `;
+
+    host.appendChild(wrap);
+    host.querySelectorAll(".dds-draft-manager-actions, [data-commission-save], [data-commission-delete-save], [data-food-save], [data-food-delete], [data-history-save], [data-history-delete], [data-mikael-save], [data-mikael-delete], [data-eric-save], [data-eric-delete]").forEach((node) => {
+      node.classList.add("dds-original-draft-control");
+    });
+
+    wrap.querySelector("[data-named-save-create]")?.addEventListener("click", () => saveNamed(host, panel));
+    wrap.querySelector("[data-named-save-name]")?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        saveNamed(host, panel);
+      }
+    });
+
+    wrap.addEventListener("click", (event) => {
+      const load = event.target.closest("[data-named-save-load]");
+      if (load) {
+        loadNamed(host, panel, load.dataset.namedSaveLoad);
+        return;
+      }
+      const remove = event.target.closest("[data-named-save-delete]");
+      if (remove) deleteNamed(host, panel, remove.dataset.namedSaveDelete);
+    });
+
+    renderList(host, panel);
+  }
+
+  function upgradeHost(host) {
+    if (!host || installedHosts.has(host)) return;
+    const panel = host.closest(".dds-panel");
+    if (!panel || !panel.dataset.panel) return;
+    installedHosts.add(host);
+    host.classList.add("dds-named-save-host");
+    buildNamedUi(host, panel);
+  }
+
+  function scan(root = document) {
+    root.querySelectorAll?.(".dds-draft-manager, .dds-protected-commission-draft").forEach(upgradeHost);
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node.matches(".dds-draft-manager, .dds-protected-commission-draft")) upgradeHost(node);
+        scan(node);
+      });
+    });
+  });
+
+  function install() {
+    scan();
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();
