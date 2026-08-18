@@ -12548,6 +12548,39 @@ ${stylesheetLinks}
     iframe.srcdoc = previewDocument(code);
   }
 
+  /*
+   * หน้า COMMISSION ใช้พรีวิวแบบเบาเพื่อไม่ให้ YouTube player จริง
+   * และ Google Fonts ถูกโหลดซ้ำตั้งแต่ยังไม่ได้เปิด VIEW WORK.
+   * VIEW WORK / EDIT CODE ยังคงใช้ OFFICIAL_CODE เต็มเหมือนเดิม.
+   */
+  function buildLightCardPreviewCode(code) {
+    let output = String(code || "");
+
+    output = output
+      .replace(/<link\b[^>]*rel=["']preconnect["'][^>]*>/gi, "")
+      .replace(/<link\b[^>]*href=["']https:\/\/fonts\.googleapis\.com\/[^"']*["'][^>]*>/gi, "")
+      .replace(/<link\b[^>]*href=["']https:\/\/fonts\.gstatic\.com\/[^"']*["'][^>]*>/gi, "");
+
+    const poster = [
+      '<!doctype html><html><head><meta charset="utf-8">',
+      '<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080808}',
+      'body{display:grid;place-items:center;color:rgba(255,255,255,.72);font:600 28px/1 Arial,sans-serif}',
+      '.p{width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(255,255,255,.06)}</style>',
+      '</head><body><div class="p">▶</div></body></html>'
+    ].join("")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+    output = output.replace(
+      /\ssrc=["']https:\/\/www\.youtube\.com\/embed\/[^"']+["']/i,
+      ` srcdoc="${poster}" loading="lazy"`
+    );
+
+    return output;
+  }
+
   function contentHeight(iframe) {
     try {
       const doc = iframe.contentDocument;
@@ -12912,7 +12945,26 @@ ${stylesheetLinks}
     grid.appendChild(card);
     card.querySelector("[data-vmac-view]")?.addEventListener("click", openView);
     card.querySelector("[data-vmac-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
-    writeIframe(card.querySelector("[data-vmac-card-preview]"), OFFICIAL_CODE, fitCardPreview);
+
+    const cardPreview = card.querySelector("[data-vmac-card-preview]");
+    let cardPreviewRendered = false;
+    const renderCardPreview = () => {
+      if (cardPreviewRendered || !cardPreview) return;
+      cardPreviewRendered = true;
+      writeIframe(cardPreview, buildLightCardPreviewCode(OFFICIAL_CODE), fitCardPreview);
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        renderCardPreview();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else {
+      renderCardPreview();
+    }
+
     return true;
   }
 
