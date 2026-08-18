@@ -11895,6 +11895,7 @@ ${stylesheetLinks}
       "data-history-field",
       "data-mikael-field",
       "data-eric-field",
+      "data-vmac-field",
       "data-dds-field-key",
       "data-review-field",
       "data-profile-field"
@@ -11990,6 +11991,7 @@ ${stylesheetLinks}
       case "data-history-field":
       case "data-mikael-field":
       case "data-eric-field":
+      case "data-vmac-field":
       case "data-dds-field-key":
       case "data-review-field":
       case "data-profile-field":
@@ -12118,7 +12120,8 @@ ${stylesheetLinks}
       "[data-food-save]",
       "[data-history-save]",
       "[data-mikael-save]",
-      "[data-eric-save]"
+      "[data-eric-save]",
+      "[data-vmac-save]"
     ].join(","));
   }
 
@@ -12129,7 +12132,8 @@ ${stylesheetLinks}
       "[data-food-delete]",
       "[data-history-delete]",
       "[data-mikael-delete]",
-      "[data-eric-delete]"
+      "[data-eric-delete]",
+      "[data-vmac-delete]"
     ].join(","));
   }
 
@@ -12262,7 +12266,7 @@ ${stylesheetLinks}
     `;
 
     host.appendChild(wrap);
-    host.querySelectorAll(".dds-draft-manager-actions, [data-commission-save], [data-commission-delete-save], [data-food-save], [data-food-delete], [data-history-save], [data-history-delete], [data-mikael-save], [data-mikael-delete], [data-eric-save], [data-eric-delete]").forEach((node) => {
+    host.querySelectorAll(".dds-draft-manager-actions, [data-commission-save], [data-commission-delete-save], [data-food-save], [data-food-delete], [data-history-save], [data-history-delete], [data-mikael-save], [data-mikael-delete], [data-eric-save], [data-eric-delete], [data-vmac-save], [data-vmac-delete]").forEach((node) => {
       node.classList.add("dds-original-draft-control");
     });
 
@@ -12330,5 +12334,553 @@ ${stylesheetLinks}
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();
+
+/* =========================================================
+   MIKAEL F. KAISER — COVER SONG COMMISSION EDITOR
+   รหัสร่วมกับงาน MIKAEL อื่น: thesecretk (เก็บเป็น SHA-256)
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_MIKAEL_COVER_EDITOR_INSTALLED__) return;
+  window.__DDS_MIKAEL_COVER_EDITOR_INSTALLED__ = true;
+
+  const ACCESS_HASH = "eb826ef52686f3139fee3102ae3309a785481071f03a55fb0d8a5f80b5f72789";
+  const ACCESS_SESSION_KEY = "dds:mikael-commission-editor:unlocked";
+  const PANEL_NAME = "protected-commission-mikael-cover-song";
+  const VIEW_PANEL_NAME = "editor-commission-mikael-cover-song";
+  const DRAFT_KEY = "dds:commission-draft:mikael:cover-song:structured-v1";
+  const CANVAS_WIDTH = 900;
+
+  const LINK_PREFIX = String.raw`<link href="https://guindaeyo.github.io/css/commit-mklsinsong.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">`;
+
+  const OFFICIAL_CODE = String.raw`<link href="https://guindaeyo.github.io/css/commit-mklsinsong.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><div class="ddsh-vmac-fullbg" style="--ddsh-vmac-bg:url('https://i.pinimg.com/1200x/23/10/8b/23108b4dbecdb3dbce78de778b701828.jpg');--ddsh-vmac-inner-bg:url('https://i.pinimg.com/1200x/a1/f9/43/a1f943fa7e48fd29ae372ec4505c2be9.jpg');"><div class="ddsh-vmac"><div class="ddsh-vmac-menubar"><div class="ddsh-vmac-menu-left"><span class="ddsh-vmac-apple">●</span><strong>Finder</strong><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span></div><div class="ddsh-vmac-menu-right"><span>◖◗</span><span>⌁</span><span>100%</span><span>&#128267;</span><span>Sun 23:25</span></div></div><div class="ddsh-vmac-desktop"><div class="ddsh-vmac-emoji ddsh-vmac-emoji-one">&#127911;</div><div class="ddsh-vmac-emoji ddsh-vmac-emoji-two">&#11088;</div><div class="ddsh-vmac-emoji ddsh-vmac-emoji-three">&#128191;</div><div class="ddsh-vmac-emoji ddsh-vmac-emoji-four">&#127872;</div><div class="ddsh-vmac-finder"><div class="ddsh-vmac-finder-top"><span></span><span></span><span></span></div><div class="ddsh-vmac-finder-title">Favorites</div><div class="ddsh-vmac-finder-item"><b>◉</b><span>AirDrop</span></div><div class="ddsh-vmac-finder-item"><b>◷</b><span>Recents</span></div><div class="ddsh-vmac-finder-item"><b>□</b><span>Documents</span></div><div class="ddsh-vmac-finder-item"><b>☁</b><span>iCloud</span></div><div class="ddsh-vmac-finder-title ddsh-vmac-finder-title2">iCloud</div><div class="ddsh-vmac-finder-item"><b>↓</b><span>Downloads</span></div><div class="ddsh-vmac-finder-item"><b>♫</b><span>Music</span></div></div><div class="ddsh-vmac-photo ddsh-vmac-photo-one"><div class="ddsh-vmac-photo-bar"><div class="ddsh-vmac-dots"><i></i><i></i><i></i></div><span>Preview</span></div><img src="https://i.pinimg.com/736x/a4/1a/f2/a41af2da9102c60a827281f67da9e827.jpg"><div class="ddsh-vmac-photo-info"><span>IMG_0624</span><b>•••</b></div></div><div class="ddsh-vmac-video-stage"><div class="ddsh-vmac-song-head"><div class="ddsh-vmac-song-small">NOW PLAYING</div><div class="ddsh-vmac-song-name">ชื่อเพลง</div><div class="ddsh-vmac-song-artist">Original Artist — ชื่อศิลปิน</div></div><div class="ddsh-vmac-video-window"><div class="ddsh-vmac-window-head"><div class="ddsh-vmac-window-dots"><i></i><i></i><i></i></div><span>Video Booth</span></div><div class="ddsh-vmac-video-area"><iframe src="https://www.youtube.com/embed/Jq19C6hi5mU?rel=0&playsinline=1" title="Video" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="ddsh-vmac-video-bottom"><div class="ddsh-vmac-bottom-left"><span>▦</span><span class="active">▣</span><span>▤</span></div><div class="ddsh-vmac-record"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="11" height="10" rx="2"></rect><path d="M15 10l5-3v10l-5-3z"></path></svg></div><div class="ddsh-vmac-effect">Effects</div></div></div></div><div class="ddsh-vmac-photo ddsh-vmac-photo-two"><div class="ddsh-vmac-photo-bar"><div class="ddsh-vmac-dots"><i></i><i></i><i></i></div><span>Photos</span></div><img src="https://i.pinimg.com/1200x/96/e7/cf/96e7cf2edc621eda58b0bc38d11014e8.jpg"><div class="ddsh-vmac-photo-actions"><span>♡</span><span>Today</span><span>↥</span></div></div><div class="ddsh-vmac-description"><div class="ddsh-vmac-description-head"><div><div class="ddsh-vmac-description-label">VOICE MEMO</div><div class="ddsh-vmac-description-title">about this cover</div></div><div class="ddsh-vmac-description-more">•••</div></div><div class="ddsh-vmac-cover"><div class="ddsh-vmac-cover-info"><span>COVERED BY</span><strong>ชื่อคนร้อง Cover</strong></div><div class="ddsh-vmac-cover-status">REC</div></div><div class="ddsh-vmac-description-text">สุขใดเล่าจะเท่า มีคุณแม่เป็นทรงซ้อ มีคุณพ่อเป็นทรงเอ
+แม่หนูเป็นทรงซ้อ ทรงซ้อ ทรงซ้อ ทรงซ้อ
+พ่อหนูเป็นทรงเอ ทรงเอ ทรงเอ ทรงเอ
+แม่หนูเป็นทรงซ้อ พ่อหนูเป็นทรงเอ
+เขาเรียกแม่หนูทรงซ้อ เขาเรียกพ่อหนูทรงเอ
+บ้านหนูมันโคตรเท่
+พ่อแม่โอเค เปย์หนูทั้งใจ
+...อ้างอิง https://www.siamzone.com/music/thailyric/38553</div><div class="ddsh-vmac-description-bottom"><span>recorded with video booth</span><span>♡ 01</span></div></div><div class="ddsh-vmac-notify"><span class="ddsh-vmac-notify-icon">✓</span><div><strong>Video Saved</strong><small>just now</small></div></div><div class="ddsh-vmac-dock"><div class="ddsh-vmac-dock-icon"><span>◒</span></div><div class="ddsh-vmac-dock-icon"><span>▦</span></div><div class="ddsh-vmac-dock-icon"><span>A</span></div><div class="ddsh-vmac-dock-icon"><span>◎</span></div><div class="ddsh-vmac-dock-icon"><span>▰</span></div><div class="ddsh-vmac-dock-icon"><span>◉</span></div><div class="ddsh-vmac-dock-icon"><span>✦</span></div><div class="ddsh-vmac-dock-icon"><span>●</span></div><div class="ddsh-vmac-dock-icon"><span>□</span></div><div class="ddsh-vmac-dock-icon"><span>⌁</span></div><div class="ddsh-vmac-dock-separator"></div><div class="ddsh-vmac-dock-icon"><span>⌫</span></div></div></div></div></div>`;
+
+  const defaults = Object.freeze({
+    bgImage: "https://i.pinimg.com/1200x/23/10/8b/23108b4dbecdb3dbce78de778b701828.jpg",
+    innerBgImage: "https://i.pinimg.com/1200x/a1/f9/43/a1f943fa7e48fd29ae372ec4505c2be9.jpg",
+    photoOne: "https://i.pinimg.com/736x/a4/1a/f2/a41af2da9102c60a827281f67da9e827.jpg",
+    photoTwo: "https://i.pinimg.com/1200x/96/e7/cf/96e7cf2edc621eda58b0bc38d11014e8.jpg",
+    youtubeId: "Jq19C6hi5mU",
+    emojiOne: "127911",
+    emojiTwo: "11088",
+    emojiThree: "128191",
+    emojiFour: "127872",
+    menuDate: "Sun 23:25",
+    photoOneName: "IMG_0624",
+    songName: "ชื่อเพลง",
+    originalArtist: "ชื่อศิลปิน",
+    coverName: "ชื่อคนร้อง Cover",
+    descriptionLabel: "VOICE MEMO",
+    descriptionTitle: "about this cover",
+    descriptionText: "สุขใดเล่าจะเท่า มีคุณแม่เป็นทรงซ้อ มีคุณพ่อเป็นทรงเอ\nแม่หนูเป็นทรงซ้อ ทรงซ้อ ทรงซ้อ ทรงซ้อ\nพ่อหนูเป็นทรงเอ ทรงเอ ทรงเอ ทรงเอ\nแม่หนูเป็นทรงซ้อ พ่อหนูเป็นทรงเอ\nเขาเรียกแม่หนูทรงซ้อ เขาเรียกพ่อหนูทรงเอ\nบ้านหนูมันโคตรเท่\nพ่อแม่โอเค เปย์หนูทั้งใจ\n...อ้างอิง https://www.siamzone.com/music/thailyric/38553",
+    recordedText: "recorded with video booth",
+    likeText: "♡ 01",
+    notifyTitle: "Video Saved",
+    notifyTime: "just now",
+    dock1: "◒", dock2: "▦", dock3: "A", dock4: "◎", dock5: "▰", dock6: "◉",
+    dock7: "✦", dock8: "●", dock9: "□", dock10: "⌁", dock11: "⌫"
+  });
+
+  let panel = null;
+  let viewPanel = null;
+  let card = null;
+  let modal = null;
+  let previewTimer = 0;
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") return window.showToast(message);
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsVmacTimer);
+    toast.__ddsVmacTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  async function sha256(value) {
+    const data = new TextEncoder().encode(String(value || ""));
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function cssUrl(value) {
+    return String(value || "").replace(/[\\'\r\n]/g, (char) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[char] ?? ""));
+  }
+
+  function decimal(value, fallback) {
+    const match = String(value || "").match(/\d+/);
+    return match ? match[0] : String(fallback || "");
+  }
+
+  function youtubeId(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    if (/^[A-Za-z0-9_-]{6,20}$/.test(raw)) return raw;
+    const patterns = [/[?&]v=([A-Za-z0-9_-]{6,20})/, /youtu\.be\/([A-Za-z0-9_-]{6,20})/, /embed\/([A-Za-z0-9_-]{6,20})/, /shorts\/([A-Za-z0-9_-]{6,20})/];
+    for (const pattern of patterns) {
+      const match = raw.match(pattern);
+      if (match) return match[1];
+    }
+    return raw.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 20);
+  }
+
+  function field(label, key, options = {}) {
+    const { full = false, textarea = false, rows = 3, type = "text", placeholder = "" } = options;
+    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${h(label)}</span>${textarea
+      ? `<textarea rows="${rows}" data-vmac-field="${h(key)}" placeholder="${h(placeholder)}"></textarea>`
+      : `<input type="${h(type)}" data-vmac-field="${h(key)}" placeholder="${h(placeholder)}" spellcheck="false">`}</label>`;
+  }
+
+  function getValues() {
+    const result = {};
+    panel?.querySelectorAll("[data-vmac-field]").forEach((input) => {
+      result[input.dataset.vmacField] = input.value;
+    });
+    return result;
+  }
+
+  function setValues(values = defaults) {
+    panel?.querySelectorAll("[data-vmac-field]").forEach((input) => {
+      const key = input.dataset.vmacField;
+      input.value = values?.[key] ?? defaults[key] ?? "";
+    });
+  }
+
+  function parseOfficial() {
+    return new DOMParser().parseFromString(`<!doctype html><html><body>${OFFICIAL_CODE}</body></html>`, "text/html");
+  }
+
+  function setText(doc, selector, value) {
+    const node = doc.querySelector(selector);
+    if (node) node.textContent = String(value ?? "");
+  }
+
+  function buildCode(values = getValues()) {
+    const doc = parseOfficial();
+    const root = doc.querySelector(".ddsh-vmac-fullbg");
+    if (root) {
+      root.style.setProperty("--ddsh-vmac-bg", `url('${cssUrl(values.bgImage)}')`);
+      root.style.setProperty("--ddsh-vmac-inner-bg", `url('${cssUrl(values.innerBgImage)}')`);
+    }
+
+    const images = doc.querySelectorAll(".ddsh-vmac-photo img");
+    if (images[0]) images[0].setAttribute("src", values.photoOne || "");
+    if (images[1]) images[1].setAttribute("src", values.photoTwo || "");
+
+    const video = doc.querySelector(".ddsh-vmac-video-area iframe");
+    if (video) video.setAttribute("src", `https://www.youtube.com/embed/${youtubeId(values.youtubeId)}?rel=0&playsinline=1`);
+
+    const emojiSelectors = [".ddsh-vmac-emoji-one", ".ddsh-vmac-emoji-two", ".ddsh-vmac-emoji-three", ".ddsh-vmac-emoji-four"];
+    const emojiValues = [values.emojiOne, values.emojiTwo, values.emojiThree, values.emojiFour];
+    emojiSelectors.forEach((selector, index) => {
+      const node = doc.querySelector(selector);
+      if (node) node.textContent = `__DDS_VMAC_EMOJI_${index + 1}__`;
+    });
+
+    const menuRight = doc.querySelectorAll(".ddsh-vmac-menu-right > span");
+    if (menuRight.length) menuRight[menuRight.length - 1].textContent = values.menuDate || "";
+    setText(doc, ".ddsh-vmac-photo-one .ddsh-vmac-photo-info > span", values.photoOneName);
+    setText(doc, ".ddsh-vmac-song-name", values.songName);
+    setText(doc, ".ddsh-vmac-song-artist", `Original Artist — ${values.originalArtist || ""}`);
+    setText(doc, ".ddsh-vmac-cover-info > strong", values.coverName);
+    setText(doc, ".ddsh-vmac-description-label", values.descriptionLabel);
+    setText(doc, ".ddsh-vmac-description-title", values.descriptionTitle);
+    setText(doc, ".ddsh-vmac-description-text", values.descriptionText);
+    const bottom = doc.querySelectorAll(".ddsh-vmac-description-bottom > span");
+    if (bottom[0]) bottom[0].textContent = values.recordedText || "";
+    if (bottom[1]) bottom[1].textContent = values.likeText || "";
+    setText(doc, ".ddsh-vmac-notify strong", values.notifyTitle);
+    setText(doc, ".ddsh-vmac-notify small", values.notifyTime);
+
+    const dock = doc.querySelectorAll(".ddsh-vmac-dock-icon > span");
+    dock.forEach((node, index) => {
+      node.textContent = values[`dock${index + 1}`] ?? "";
+    });
+
+    let output = doc.body.innerHTML.replace(/<link\b[^>]*>/gi, "");
+    output = LINK_PREFIX + output;
+    emojiValues.forEach((value, index) => {
+      output = output.replace(`__DDS_VMAC_EMOJI_${index + 1}__`, `&#${decimal(value, [127911,11088,128191,127872][index])};`);
+    });
+    return output;
+  }
+
+  function previewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:100%;background:#242424}body{overflow:hidden}.dds-vmac-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}</style></head><body><div class="dds-vmac-preview-shell">${code}</div></body></html>`;
+  }
+
+  function writeIframe(iframe, code, afterLoad) {
+    if (!iframe) return;
+    iframe.onload = () => {
+      window.setTimeout(() => afterLoad?.(), 40);
+      window.setTimeout(() => afterLoad?.(), 250);
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => afterLoad?.());
+      } catch {}
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function contentHeight(iframe) {
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc) return 900;
+      const root = doc.querySelector(".ddsh-vmac-fullbg") || doc.querySelector(".ddsh-vmac") || doc.body;
+      return Math.max(1, Math.ceil(Math.max(
+        root?.scrollHeight || 0,
+        root?.getBoundingClientRect?.().height || 0,
+        doc.body?.scrollHeight || 0,
+        doc.documentElement?.scrollHeight || 0
+      )));
+    } catch {
+      return 900;
+    }
+  }
+
+  function fitHolder(stage, holder, iframe) {
+    if (!stage || !holder || !iframe) return;
+    const height = contentHeight(iframe);
+    const available = Math.max(280, stage.clientWidth - 48);
+    const scale = Math.min(1, available / CANVAS_WIDTH);
+    holder.style.width = `${Math.ceil(CANVAS_WIDTH * scale)}px`;
+    holder.style.height = `${Math.ceil(height * scale)}px`;
+    iframe.style.width = `${CANVAS_WIDTH}px`;
+    iframe.style.height = `${height}px`;
+    iframe.style.transform = `scale(${scale})`;
+    iframe.style.transformOrigin = "top left";
+  }
+
+  function fitEditorPreview() {
+    if (!panel) return;
+    fitHolder(panel.querySelector("[data-vmac-preview-stage]"), panel.querySelector("[data-vmac-preview-holder]"), panel.querySelector("[data-vmac-preview]"));
+  }
+
+  function fitViewPreview() {
+    if (!viewPanel) return;
+    fitHolder(viewPanel.querySelector("[data-vmac-view-stage]"), viewPanel.querySelector("[data-vmac-view-holder]"), viewPanel.querySelector("[data-vmac-view-preview]"));
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-vmac-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const height = contentHeight(iframe);
+    const widthScale = stage.clientWidth / CANVAS_WIDTH;
+    const heightScale = stage.clientHeight / Math.max(1, height);
+    const scale = Math.min(widthScale, heightScale, 0.42);
+    iframe.style.width = `${CANVAS_WIDTH}px`;
+    iframe.style.height = `${height}px`;
+    iframe.style.left = "50%";
+    iframe.style.top = "50%";
+    iframe.style.transformOrigin = "center center";
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${scale})`, "important");
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    const iframe = panel.querySelector("[data-vmac-preview]");
+    writeIframe(iframe, buildCode(), fitEditorPreview);
+  }
+
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 70);
+  }
+
+  function setDraftStatus(savedAt) {
+    const status = panel?.querySelector("[data-vmac-draft-status]");
+    if (!status) return;
+    status.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH", { hour: "2-digit", minute: "2-digit" })}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+      showToast("บันทึกแบบร่างโค้ด Cover แล้ว");
+    } catch {
+      showToast("บันทึกแบบร่างไม่สำเร็จ");
+    }
+  }
+
+  function deleteDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode();
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("คัดลอกโค้ด Cover แล้ว");
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      showToast("คัดลอกโค้ด Cover แล้ว");
+    }
+  }
+
+  function setCommissionTab() {
+    document.querySelectorAll("[data-work-tab]").forEach((button) => {
+      const selected = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", String(selected));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach((workPanel) => {
+      const selected = workPanel.dataset.workPanel === "commission";
+      workPanel.hidden = !selected;
+      workPanel.classList.toggle("is-active", selected);
+    });
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => item.classList.toggle("is-active", item.dataset.panel === panelName));
+    document.querySelectorAll(".dds-nav-button").forEach((button) => button.classList.toggle("is-active", button.dataset.page === "commission"));
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-commission-editor-mode");
+    if (typeof window.openPage === "function") window.openPage("commission");
+    else showPanel("commission");
+    requestAnimationFrame(() => {
+      setCommissionTab();
+      history.replaceState(null, "", "#commission");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-vmac-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-vmac-back type="button">←</button>
+        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-vmac-commission-heading"><span>COMMISSION</span><span>— โค้ดสำหรับการลงโคฟเวอร์เพลง</span></h1><p>ผู้จ้าง MIKAEL F. KAISER — แก้รูป วิดีโอ Emoji ข้อความ และ Dock ได้จากเครื่องมือด้านขวา</p></div>
+      </div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>MIKAEL / COVER SONG</strong></div>
+          <div class="dds-protected-commission-preview-stage dds-vmac-preview-stage" data-vmac-preview-stage><div class="dds-vmac-preview-holder" data-vmac-preview-holder><iframe class="dds-protected-commission-preview-frame" data-vmac-preview scrolling="no" title="ตัวอย่างโค้ด Cover Song"></iframe></div></div>
+        </div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-vmac-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-vmac-save>SAVE DRAFT</button><button type="button" data-vmac-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-vmac-commission-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">
+              ${field("รูปพื้นหลังด้านนอก — --ddsh-vmac-bg", "bgImage", {full:true,type:"url",placeholder:defaults.bgImage})}
+              ${field("รูปพื้นหลังด้านใน — --ddsh-vmac-inner-bg", "innerBgImage", {full:true,type:"url",placeholder:defaults.innerBgImage})}
+              ${field("รูป Preview ด้านซ้าย", "photoOne", {full:true,type:"url",placeholder:defaults.photoOne})}
+              ${field("รูป Photos ด้านขวา", "photoTwo", {full:true,type:"url",placeholder:defaults.photoTwo})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>เพลงและ YouTube</h2></div><div class="dds-form-grid">
+              ${field("YouTube Video ID", "youtubeId", {full:true,placeholder:"เช่น Jq19C6hi5mU"})}
+              ${field("ชื่อเพลง", "songName", {placeholder:"ชื่อเพลง"})}
+              ${field("ชื่อศิลปิน", "originalArtist", {placeholder:"ชื่อศิลปิน"})}
+              ${field("ชื่อคนร้อง Cover", "coverName", {full:true,placeholder:"ชื่อคนร้อง Cover"})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>Emoji บน Desktop</h2></div><p class="dds-vmac-emoji-help">กรอกเฉพาะเลขจากช่อง <strong>Decimal Value</strong> ระบบจะสร้างเป็น HTML Emoji Code ให้อัตโนมัติ · <a href="https://www.dremendo.com/html-tutorial/html-emoji-codes" target="_blank" rel="noopener noreferrer">เปิดตาราง Emoji Codes ↗</a></p><div class="dds-form-grid">
+              ${field("Emoji 01 — หูฟัง", "emojiOne", {placeholder:"127911"})}
+              ${field("Emoji 02 — ดาว", "emojiTwo", {placeholder:"11088"})}
+              ${field("Emoji 03 — ซีดี", "emojiThree", {placeholder:"128191"})}
+              ${field("Emoji 04 — โบว์", "emojiFour", {placeholder:"127872"})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>ข้อความในโค้ด</h2></div><div class="dds-form-grid">
+              ${field("วัน / เวลาแถบเมนู", "menuDate", {placeholder:"Sun 23:25"})}
+              ${field("ชื่อไฟล์รูป Preview", "photoOneName", {placeholder:"IMG_0624"})}
+              ${field("ป้ายคำอธิบาย", "descriptionLabel", {placeholder:"VOICE MEMO"})}
+              ${field("หัวข้อคำอธิบาย", "descriptionTitle", {placeholder:"about this cover"})}
+              ${field("ข้อความ .ddsh-vmac-description-text", "descriptionText", {full:true,textarea:true,rows:9,placeholder:"กรอกรายละเอียด Cover"})}
+              ${field("ข้อความล่างซ้าย", "recordedText", {placeholder:"recorded with video booth"})}
+              ${field("ข้อความล่างขวา", "likeText", {placeholder:"♡ 01"})}
+              ${field("ข้อความแจ้งเตือน", "notifyTitle", {placeholder:"Video Saved"})}
+              ${field("เวลาการแจ้งเตือน", "notifyTime", {placeholder:"just now"})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Dock Symbols</h2></div><p class="dds-vmac-emoji-help">แก้สัญลักษณ์ใน <code>.ddsh-vmac-dock-icon</code> ได้ทุกช่อง จะพิมพ์ตัวอักษรหรือสัญลักษณ์โดยตรงก็ได้</p><div class="dds-form-grid dds-vmac-dock-editor-grid">
+              ${field("Dock 01", "dock1", {placeholder:"◒"})}${field("Dock 02", "dock2", {placeholder:"▦"})}${field("Dock 03", "dock3", {placeholder:"A"})}${field("Dock 04", "dock4", {placeholder:"◎"})}${field("Dock 05", "dock5", {placeholder:"▰"})}${field("Dock 06", "dock6", {placeholder:"◉"})}${field("Dock 07", "dock7", {placeholder:"✦"})}${field("Dock 08", "dock8", {placeholder:"●"})}${field("Dock 09", "dock9", {placeholder:"□"})}${field("Dock 10", "dock10", {placeholder:"⌁"})}${field("Dock 11 — หลังเส้นคั่น", "dock11", {placeholder:"⌫"})}
+            </div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-vmac-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ด Cover ที่แก้เสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-vmac-copy>COPY CODE <span>↗</span></button><button type="button" data-vmac-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+
+    footer.before(panel);
+    panel.querySelector("[data-vmac-back]")?.addEventListener("click", goBack);
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-vmac-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-vmac-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-vmac-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-vmac-reset]")?.addEventListener("click", resetFields);
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-vmac-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-vmac-view-back type="button">←</button></div><div class="dds-vmac-view-stage" data-vmac-view-stage><div class="dds-vmac-view-holder" data-vmac-view-holder><iframe class="dds-editor-preview-frame dds-vmac-view-frame" data-vmac-view-preview scrolling="no" title="งานคอมมิชชั่น Cover Song ของ Mikael F. Kaiser"></iframe></div></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-vmac-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function openView() {
+    const target = createViewPanel();
+    if (!target) return;
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-mikael-cover-view");
+    writeIframe(target.querySelector("[data-vmac-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+  }
+
+  function openEditor() {
+    const editor = createPanel();
+    if (!editor) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#commission-mikael-cover-editor");
+    updatePreview();
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("dds-modal-open");
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsMikaelCoverLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-vmac-lock-form><small>CLIENT ACCESS / MIKAEL F. KAISER</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-vmac-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-vmac-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-vmac-lock-close>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-vmac-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.querySelector("[data-vmac-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-vmac-lock-input]");
+      const error = modal.querySelector("[data-vmac-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        if (await sha256(input.value || "") === ACCESS_HASH) {
+          sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+          error.textContent = "";
+          closeModal();
+          openEditor();
+        } else {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+        }
+      } catch {
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function openModal() {
+    const lock = createModal();
+    lock.hidden = false;
+    document.body.classList.add("dds-modal-open");
+    const input = lock.querySelector("[data-vmac-lock-input]");
+    const error = lock.querySelector("[data-vmac-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    requestAnimationFrame(() => input?.focus());
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    if (grid.querySelector(".dds-vmac-commission-card")) return true;
+
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-vmac-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-vmac-card-preview-frame" data-vmac-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Cover Song"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดสำหรับการลงโคฟเวอร์เพลง</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-vmac-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-vmac-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-vmac-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-vmac-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    writeIframe(card.querySelector("[data-vmac-card-preview]"), OFFICIAL_CODE, fitCardPreview);
+    return true;
+  }
+
+  function install() {
+    createModal();
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 80) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      fitCardPreview();
+      fitEditorPreview();
+      fitViewPreview();
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();
 })();

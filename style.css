@@ -7728,3 +7728,128 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   }
 }
 
+
+/* ==================================================
+   MIKAEL — COVER SONG COMMISSION EDITOR
+   ================================================== */
+.dds-vmac-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.08em;
+}
+
+.dds-vmac-commission-heading > span {
+  display: block;
+}
+
+.dds-vmac-commission-heading > span:last-child {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 0.62em;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.dds-vmac-preview-stage,
+.dds-vmac-view-stage {
+  width: 100%;
+  min-height: 520px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-vmac-preview-holder,
+.dds-vmac-view-holder {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.dds-vmac-preview-holder > iframe,
+.dds-vmac-view-holder > iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent;
+}
+
+.dds-vmac-view-stage {
+  min-height: 0;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dds-vmac-card-preview-frame {
+  position: absolute !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: #242424;
+}
+
+.dds-vmac-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-vmac-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-vmac-commission-editor [data-vmac-save],
+.dds-vmac-commission-editor [data-vmac-copy] {
+  color: #fff;
+  border-color: rgba(193, 23, 36, 0.72);
+  background: linear-gradient(135deg, #b0121d, #720810);
+}
+
+.dds-vmac-commission-copy .dds-protected-commission-copy-actions [data-vmac-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+.dds-vmac-emoji-help {
+  margin: 0 0 15px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  line-height: 1.75;
+}
+
+.dds-vmac-emoji-help strong,
+.dds-vmac-emoji-help code {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.dds-vmac-emoji-help a {
+  color: #e44b55;
+  border-bottom: 1px solid rgba(228, 75, 85, 0.35);
+}
+
+.dds-vmac-dock-editor-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .dds-vmac-commission-heading > span:last-child {
+    font-size: 0.58em;
+  }
+
+  .dds-vmac-preview-stage,
+  .dds-vmac-view-stage {
+    padding: 14px;
+  }
+
+  .dds-vmac-dock-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}
