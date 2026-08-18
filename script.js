@@ -9603,8 +9603,16 @@ ${stylesheetLinks}
 
   function activateCommissionShowcase() {
     // ปิดโหมด editor เต็มจอก่อน เพื่อคืน sidebar และ layout หลัก
-    document.body.classList.remove("dds-commission-editor-mode");
-    document.documentElement.classList.remove("dds-commission-editor-mode");
+    document.body.classList.remove(
+      "dds-editor-mode",
+      "dds-commission-editor-mode",
+      "dds-modal-open"
+    );
+    document.documentElement.classList.remove(
+      "dds-editor-mode",
+      "dds-commission-editor-mode",
+      "dds-modal-open"
+    );
 
     // ให้ระบบหลักอัปเดตหัวข้อ/เลขหน้า หากมีฟังก์ชันนี้
     if (typeof window.openPage === "function") {
@@ -9656,7 +9664,7 @@ ${stylesheetLinks}
 
   function handleCommissionBack(event) {
     const button = event.target.closest(
-      "[data-food-back], [data-protected-commission-back]"
+      "[data-food-back], [data-protected-commission-back], [data-vmac-back], [data-vmac-view-back]"
     );
 
     if (!button) return;
@@ -12685,15 +12693,43 @@ ${stylesheetLinks}
     window.scrollTo({ top: 0, behavior: "auto" });
   }
 
-  function goBack() {
-    document.body.classList.remove("dds-commission-editor-mode");
-    if (typeof window.openPage === "function") window.openPage("commission");
-    else showPanel("commission");
-    requestAnimationFrame(() => {
+  function goBack(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+
+    const restoreCommissionPage = () => {
+      document.body.classList.remove(
+        "dds-editor-mode",
+        "dds-commission-editor-mode",
+        "dds-modal-open"
+      );
+      document.documentElement.classList.remove(
+        "dds-editor-mode",
+        "dds-commission-editor-mode",
+        "dds-modal-open"
+      );
+
+      document.querySelectorAll(".dds-panel").forEach((item) => {
+        item.classList.toggle("is-active", item.dataset.panel === "commission");
+      });
+      document.querySelectorAll(".dds-nav-button").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.page === "commission");
+      });
       setCommissionTab();
+
+      const pageNumber = document.getElementById("currentPageNumber");
+      if (pageNumber) pageNumber.textContent = "04";
       history.replaceState(null, "", "#commission");
-      window.scrollTo({ top: 0, behavior: "auto" });
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    };
+
+    restoreCommissionPage();
+    requestAnimationFrame(() => {
+      restoreCommissionPage();
+      requestAnimationFrame(restoreCommissionPage);
     });
+    window.setTimeout(restoreCommissionPage, 80);
   }
 
   function createPanel() {
@@ -12781,9 +12817,22 @@ ${stylesheetLinks}
   function openView() {
     const target = createViewPanel();
     if (!target) return;
+
+    // VIEW WORK ใช้โหมดเต็มหน้าเหมือนคอมมิชชั่นอื่น
+    // ซ่อน sidebar / topbar / footer และแสดงเฉพาะชิ้นงาน
+    document.body.classList.add("dds-editor-mode");
+    document.documentElement.classList.add("dds-editor-mode");
+
     showPanel(VIEW_PANEL_NAME);
     history.replaceState(null, "", "#commission-mikael-cover-view");
     writeIframe(target.querySelector("[data-vmac-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+
+    // กันระบบ layout อื่นคืน sidebar หลังสลับ panel
+    requestAnimationFrame(() => {
+      document.body.classList.add("dds-editor-mode");
+      document.documentElement.classList.add("dds-editor-mode");
+      fitViewPreview();
+    });
   }
 
   function openEditor() {
