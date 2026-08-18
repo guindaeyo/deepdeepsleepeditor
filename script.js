@@ -12360,7 +12360,7 @@ ${stylesheetLinks}
   const PANEL_NAME = "protected-commission-mikael-cover-song";
   const VIEW_PANEL_NAME = "editor-commission-mikael-cover-song";
   const DRAFT_KEY = "dds:commission-draft:mikael:cover-song:structured-v1";
-  const CANVAS_WIDTH = 900;
+  const CANVAS_WIDTH = 1040;
 
   const LINK_PREFIX = String.raw`<link href="https://guindaeyo.github.io/css/commit-mklsinsong.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">`;
 
@@ -12533,7 +12533,12 @@ ${stylesheetLinks}
   }
 
   function previewDocument(code) {
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:100%;background:#242424}body{overflow:hidden}.dds-vmac-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}</style></head><body><div class="dds-vmac-preview-shell">${code}</div></body></html>`;
+    /*
+     * บังคับ viewport ของงาน Cover Song เป็น desktop canvas จริง 1040px
+     * ก่อนค่อย scale iframe ทั้งชิ้นจากด้านนอก เพื่อไม่ให้ CSS ภายใน
+     * เข้า breakpoint แคบแล้วบีบ/จัด layout ใหม่จนพรีวิวเบี้ยว
+     */
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH},initial-scale=1"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;min-height:100%;background:#242424;overflow:hidden!important}.dds-vmac-preview-shell{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;display:flex;justify-content:center;align-items:flex-start}</style></head><body><div class="dds-vmac-preview-shell">${code}</div></body></html>`;
   }
 
   function writeIframe(iframe, code, afterLoad) {
@@ -12604,7 +12609,9 @@ ${stylesheetLinks}
     const scale = Math.min(1, available / CANVAS_WIDTH);
     holder.style.width = `${Math.ceil(CANVAS_WIDTH * scale)}px`;
     holder.style.height = `${Math.ceil(height * scale)}px`;
-    iframe.style.width = `${CANVAS_WIDTH}px`;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.height = `${height}px`;
     iframe.style.transform = `scale(${scale})`;
     iframe.style.transformOrigin = "top left";
@@ -12628,7 +12635,9 @@ ${stylesheetLinks}
     const widthScale = stage.clientWidth / CANVAS_WIDTH;
     const heightScale = stage.clientHeight / Math.max(1, height);
     const scale = Math.min(widthScale, heightScale, 0.42);
-    iframe.style.width = `${CANVAS_WIDTH}px`;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.height = `${height}px`;
     iframe.style.left = "50%";
     iframe.style.top = "50%";
