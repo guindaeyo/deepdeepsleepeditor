@@ -12360,7 +12360,7 @@ ${stylesheetLinks}
   const PANEL_NAME = "protected-commission-mikael-cover-song";
   const VIEW_PANEL_NAME = "editor-commission-mikael-cover-song";
   const DRAFT_KEY = "dds:commission-draft:mikael:cover-song:structured-v1";
-  const CANVAS_WIDTH = 1040;
+  const CANVAS_WIDTH = 900;
 
   const LINK_PREFIX = String.raw`<link href="https://guindaeyo.github.io/css/commit-mklsinsong.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">`;
 
@@ -12534,11 +12534,15 @@ ${stylesheetLinks}
 
   function previewDocument(code) {
     /*
-     * บังคับ viewport ของงาน Cover Song เป็น desktop canvas จริง 1040px
-     * ก่อนค่อย scale iframe ทั้งชิ้นจากด้านนอก เพื่อไม่ให้ CSS ภายใน
-     * เข้า breakpoint แคบแล้วบีบ/จัด layout ใหม่จนพรีวิวเบี้ยว
+     * ใช้ viewport desktop ตามความกว้างจริงของงาน Cover Song (900px)
+     * แล้วค่อย scale iframe ทั้งชิ้นจากด้านนอก เพื่อไม่ให้ CSS ภายใน
+     * เข้า breakpoint แคบจน layout เบี้ยว
+     *
+     * สำคัญ: OFFICIAL_CODE มี fdreview-credit เป็น sibling ของชิ้นงานหลัก
+     * จึงต้องเรียง preview shell เป็นแนวตั้ง ไม่เช่นนั้น flex แถวเดียวจะบีบ
+     * .ddsh-vmac-fullbg ให้แคบและดันชิ้นงานออกจากกึ่งกลาง
      */
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH},initial-scale=1"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;min-height:100%;background:#242424;overflow:hidden!important}.dds-vmac-preview-shell{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;display:flex;justify-content:center;align-items:flex-start}</style></head><body><div class="dds-vmac-preview-shell">${code}</div></body></html>`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=${CANVAS_WIDTH},initial-scale=1"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;min-height:100%;background:#242424;overflow:hidden!important}.dds-vmac-preview-shell{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:center!important}.dds-vmac-preview-shell>.ddsh-vmac-fullbg,.dds-vmac-preview-shell>.fdreview-credit{flex:0 0 auto!important;max-width:none}</style></head><body><div class="dds-vmac-preview-shell">${code}</div></body></html>`;
   }
 
   function writeIframe(iframe, code, afterLoad) {
