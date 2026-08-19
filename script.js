@@ -12998,3 +12998,551 @@ ${stylesheetLinks}
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();
 })();
+
+
+/* =========================================================
+   LANDON A. RUTHERFORD — PROFILE COMMISSION EDITOR
+   รหัสร่วมกับงาน LANDON อื่น: tomhuakaigetout (เก็บเป็น SHA-256)
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_LANDON_DESKTOP_PROFILE_EDITOR_INSTALLED__) return;
+  window.__DDS_LANDON_DESKTOP_PROFILE_EDITOR_INSTALLED__ = true;
+
+  const ACCESS_HASH = "6d05de9e9a208dc2beb7d5e594b39064b36142353ffc8db10295131098a1bcd6";
+  const ACCESS_SESSION_KEY = "dds:landon-commission-editor:unlocked";
+  const PANEL_NAME = "protected-commission-landon-desktop-profile";
+  const VIEW_PANEL_NAME = "editor-commission-landon-desktop-profile";
+  const DRAFT_KEY = "dds:commission-draft:landon:desktop-profile:structured-v1";
+  const PREVIEW_BOOT_WIDTH = 1400;
+
+  const LINK_PREFIX = String.raw`<link href="https://guindaeyo.github.io/css/commit-landdprof.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&family=Italianno&display=swap" rel="stylesheet">`;
+
+  const defaults = Object.freeze({
+    wallpaper: "https://i.pinimg.com/736x/bd/bd/c0/bdbdc0ce2162f4608fb1e1d6f42f0bc4.jpg",
+    mainImage: "https://i.pinimg.com/736x/78/53/ae/7853aeec402ed13d6146df2add711570.jpg",
+    photoOne: "https://i.pinimg.com/736x/a7/70/11/a770113ea393749c1ab94f01034840d2.jpg",
+    photoTwo: "https://i.pinimg.com/736x/24/d3/b1/24d3b1a06503232b2bc77daec164357f.jpg",
+    photoThree: "https://i.pinimg.com/736x/0f/5a/c6/0f5ac6653a0cc646d73241002f91df60.jpg",
+    avatar: "https://i.pinimg.com/736x/fe/68/b8/fe68b80ea6533c91f320040c59e5a2d3.jpg",
+    bigName: "landon",
+    bigSurname: "A. RUTHERFORD",
+    photoSmall: "somewhere between",
+    photoBig: "midnight & memory",
+    airdropText: "Landon would like to share a photo.",
+    smallWindowLetter: "K",
+    archiveText: "ARCHIVE",
+    archiveNo: "NO. 07",
+    polaroidTime: "00:17 AM",
+    bottomWord: "woof.",
+    bottomName: "LANDON A. RUTHERFORD",
+    mainCaption: "STAY AFTER DARK",
+    reminderText: "Don't disappear tonight.",
+    keyEmoji1: "10022",
+    keyEmoji2: "9824",
+    keyEmoji3: "9790",
+    keyEmoji4: "128420",
+    keyEmoji5: "9939 65039",
+    keyEmoji6: "127911",
+    float1: "9729 65039",
+    float2: "10022",
+    float3: "127911",
+    float4: "9790",
+    float5: "128420",
+    float6: "9824 65038",
+    float7: "9939 65039",
+    float8: "10023",
+    float9: "128477 65039",
+    float10: "9729 65039",
+    float11: "10022",
+    float12: "128375 65039",
+    float13: "9841",
+    float14: "127925",
+    float15: "9733",
+    dock1: "⌘", dock2: "✦", dock3: "12", dock4: "▤", dock5: "▲", dock6: "◎", dock7: "◫",
+    dock8: "◇", dock9: "◉", dock10: "N", dock11: "●", dock12: "♫", dock13: "▰", dock14: "⌫"
+  });
+
+  let panel = null;
+  let viewPanel = null;
+  let card = null;
+  let modal = null;
+  let previewTimer = 0;
+  let cardRendered = false;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function cssUrl(value) {
+    return String(value || "").replace(/[\\'\r\n]/g, (char) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[char] ?? ""));
+  }
+
+  function emojiEntities(value, fallback = "") {
+    const values = (String(value || "").match(/\d+/g) || []).slice(0, 4);
+    const source = values.length ? values : (String(fallback || "").match(/\d+/g) || []);
+    return source.map((item) => `&#${item};`).join("");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") return window.showToast(message);
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsLrProfileTimer);
+    toast.__ddsLrProfileTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value || ""));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function field(label, key, options = {}) {
+    const { full = false, type = "text", textarea = false, rows = 3, placeholder = "" } = options;
+    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${h(label)}</span>${textarea
+      ? `<textarea rows="${rows}" data-profile-field="${h(key)}" placeholder="${h(placeholder)}"></textarea>`
+      : `<input type="${h(type)}" data-profile-field="${h(key)}" placeholder="${h(placeholder)}" spellcheck="false">`}</label>`;
+  }
+
+  function getValues() {
+    const values = { ...defaults };
+    if (!panel) return values;
+    panel.querySelectorAll("[data-profile-field]").forEach((input) => {
+      values[input.dataset.profileField] = input.value;
+    });
+    return values;
+  }
+
+  function setValues(values = {}) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-profile-field]").forEach((input) => {
+      const key = input.dataset.profileField;
+      input.value = values[key] ?? defaults[key] ?? "";
+    });
+  }
+
+  function buildCode(values = getValues()) {
+    const v = { ...defaults, ...values };
+    const keyEmojis = [1,2,3,4,5,6].map((n) => emojiEntities(v[`keyEmoji${n}`], defaults[`keyEmoji${n}`]));
+    const floats = Array.from({ length: 15 }, (_, index) => emojiEntities(v[`float${index + 1}`], defaults[`float${index + 1}`]));
+    const docks = Array.from({ length: 14 }, (_, index) => h(v[`dock${index + 1}`] ?? defaults[`dock${index + 1}`]));
+
+    return LINK_PREFIX + `<div class="ddsh-landon-desktop" style="--lr-wallpaper:url('${cssUrl(v.wallpaper)}');--lr-main:url('${cssUrl(v.mainImage)}');--lr-photo-one:url('${cssUrl(v.photoOne)}');--lr-photo-two:url('${cssUrl(v.photoTwo)}');--lr-photo-three:url('${cssUrl(v.photoThree)}');--lr-avatar:url('${cssUrl(v.avatar)}');--lr-black:#07090c;--lr-deep:#0b0e13;--lr-panel:#11151c;--lr-panel-2:#171c24;--lr-silver:#d9dde3;--lr-soft:#9ca4af;--lr-muted:#727b88;--lr-blue:#7d91aa;--lr-blue-soft:#aab7c8;"><div class="ddsh-landon-menubar"><div class="ddsh-landon-menu-left"><span class="ddsh-landon-apple">●</span><b>Werewolf</b><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span></div><div class="ddsh-landon-menu-right"><span>◉</span><span>◐</span><span>⌁</span><span>100%</span><span>&#128267;</span><span>◌</span></div></div><div class="ddsh-landon-wallpaper"></div><div class="ddsh-landon-wallpaper-shade"></div><div class="ddsh-landon-big-name"><span>${h(v.bigName)}</span><small>${h(v.bigSurname)}</small></div><div class="ddsh-landon-finder"><div class="ddsh-landon-window-head"><div class="ddsh-landon-dots"><i></i><i></i><i></i></div><div class="ddsh-landon-finder-title"><span>‹</span><span>›</span><b>Macintosh HD</b></div><div class="ddsh-landon-search">Search</div></div><div class="ddsh-landon-finder-body"><div class="ddsh-landon-sidebar"><small>FAVORITES</small><span>✦ Recents</span><span>☁ iCloud Drive</span><span>⌂ Desktop</span><span>▣ Applications</span><span>▤ Documents</span><span>⬇ Downloads</span><small>LANDON</small><span>♫ Music</span><span>◇ Pictures</span><span>♠ Archive</span></div><div class="ddsh-landon-folders"><div class="ddsh-landon-folder"><i></i><span>Midnight</span></div><div class="ddsh-landon-folder"><i></i><span>Archive</span></div><div class="ddsh-landon-folder"><i></i><span>Memories</span></div><div class="ddsh-landon-folder"><i></i><span>Private</span></div><div class="ddsh-landon-folder"><i></i><span>Photobooth</span></div><div class="ddsh-landon-folder"><i></i><span>Untitled</span></div></div></div></div><div class="ddsh-landon-volume"><span>VOLUME</span><b>&#128266;</b><div class="ddsh-landon-volume-bar"><i></i></div></div><div class="ddsh-landon-photobooth"><div class="ddsh-landon-photo-head"><div class="ddsh-landon-dots"><i></i><i></i><i></i></div><span>Photo Booth</span></div><div class="ddsh-landon-main-photo"><div class="ddsh-landon-main-img"></div><div class="ddsh-landon-photo-text"><small>${h(v.photoSmall)}</small><b>${h(v.photoBig)}</b></div><div class="ddsh-landon-main-sticker one">✦</div><div class="ddsh-landon-main-caption">${h(v.mainCaption)}</div></div><div class="ddsh-landon-photo-controls"><div class="ddsh-landon-mode"><span></span><span class="active"></span><span></span></div><div class="ddsh-landon-camera">◉</div><div class="ddsh-landon-mini-control">◫</div></div></div><div class="ddsh-landon-polaroid ddsh-landon-polaroid-one"><div class="ddsh-landon-polaroid-img one"></div><div class="ddsh-landon-polaroid-caption">LANDON<small>${h(v.polaroidTime)}</small></div></div><div class="ddsh-landon-airdrop"><b>AirDrop</b><span>${h(v.airdropText)}</span><div class="ddsh-landon-airdrop-img"></div><div class="ddsh-landon-airdrop-actions"><span>Decline</span><span>Accept</span></div></div><div class="ddsh-landon-reminder"><b>Reminder</b><span>${h(v.reminderText)}</span><div>Okay</div></div><div class="ddsh-landon-toggle"><span class="active">On</span><span>Off</span></div><div class="ddsh-landon-small-window"><div class="ddsh-landon-small-head"><span>${h(v.smallWindowLetter)}</span><small>Today</small></div><div class="ddsh-landon-small-img"></div><div class="ddsh-landon-small-bottom"><span>◈</span><span>◌</span><span>⌁</span></div></div><div class="ddsh-landon-message"><div class="ddsh-landon-avatar"></div><div><b>UNKNOWN</b><span>you still awake?</span></div></div><div class="ddsh-landon-keyboard ddsh-landon-keyboard-left"><div class="ddsh-landon-key-search">⌕ &nbsp; Search Emoji</div><div class="ddsh-landon-emoji-row"><span>${keyEmojis[0]}</span><span>${keyEmojis[1]}</span><span>${keyEmojis[2]}</span><span>${keyEmojis[3]}</span><span>${keyEmojis[4]}</span><span>${keyEmojis[5]}</span></div><div class="ddsh-landon-keys"><span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span><span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span></div><div class="ddsh-landon-space">space</div></div><div class="ddsh-landon-keyboard ddsh-landon-keyboard-right"><div class="ddsh-landon-keys"><span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span><span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span></div><div class="ddsh-landon-space">space</div></div><div class="ddsh-landon-deco-photo"><div class="ddsh-landon-deco-img"></div><span>${h(v.archiveText)}<br>${h(v.archiveNo)}</span></div>${floats.map((emoji, index) => `<span class="ddsh-landon-float e${index + 1}">${emoji}</span>`).join("")}<div class="ddsh-landon-bottom-title"><b>${h(v.bottomWord)}</b><span>${h(v.bottomName)}</span></div><div class="ddsh-landon-dock">${docks.map((symbol) => `<span>${symbol}</span>`).join("")}</div></div><div class="ddshopfz-credit"><span></span></div>`;
+  }
+
+  const OFFICIAL_CODE = buildCode(defaults);
+
+  function previewDocument(code) {
+    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-landon-profile-preview-root{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;margin:0 auto}.dds-landon-profile-preview-root>.ddsh-landon-desktop{flex:0 0 auto!important}.dds-landon-profile-preview-root>.ddshopfz-credit{flex:0 0 auto!important;width:100%!important}</style></head><body><div class="dds-landon-profile-preview-root">${code}</div></body></html>`;
+  }
+
+  function writeIframe(iframe, code, fit) {
+    if (!iframe) return;
+    iframe.style.setProperty("width", `${PREVIEW_BOOT_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${PREVIEW_BOOT_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${PREVIEW_BOOT_WIDTH}px`, "important");
+    iframe.style.height = "1500px";
+    iframe.onload = () => {
+      fit?.();
+      setTimeout(() => fit?.(), 80);
+      setTimeout(() => fit?.(), 260);
+      setTimeout(() => fit?.(), 700);
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      if (!doc) return { width: 1040, height: 900 };
+      const target = doc.querySelector(".ddsh-landon-desktop");
+      const wrapper = doc.querySelector(".dds-landon-profile-preview-root") || doc.body;
+      const targetRect = target?.getBoundingClientRect?.();
+      const width = Math.max(1, Math.ceil(targetRect?.width || target?.offsetWidth || target?.scrollWidth || 1040));
+      const height = Math.max(1, Math.ceil(Math.max(
+        wrapper?.scrollHeight || 0,
+        wrapper?.getBoundingClientRect?.().height || 0,
+        doc.body?.scrollHeight || 0,
+        doc.documentElement?.scrollHeight || 0
+      )));
+      return { width, height };
+    } catch {
+      return { width: 1040, height: 900 };
+    }
+  }
+
+  function fitHolder(stage, holder, iframe) {
+    if (!stage || !holder || !iframe) return;
+    const { width, height } = measureIframe(iframe);
+    const available = Math.max(260, stage.clientWidth - 48);
+    const scale = Math.min(1, available / width);
+    holder.style.width = `${Math.ceil(width * scale)}px`;
+    holder.style.height = `${Math.ceil(height * scale)}px`;
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+  }
+
+  function fitEditorPreview() {
+    if (!panel) return;
+    fitHolder(panel.querySelector("[data-lr-profile-preview-stage]"), panel.querySelector("[data-lr-profile-preview-holder]"), panel.querySelector("[data-lr-profile-preview]"));
+  }
+
+  function fitViewPreview() {
+    if (!viewPanel) return;
+    fitHolder(viewPanel.querySelector("[data-lr-profile-view-stage]"), viewPanel.querySelector("[data-lr-profile-view-holder]"), viewPanel.querySelector("[data-lr-profile-view-preview]"));
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-lr-profile-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const { width, height } = measureIframe(iframe);
+    const scale = Math.min(stage.clientWidth / width, stage.clientHeight / height, 0.42);
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    writeIframe(panel.querySelector("[data-lr-profile-preview]"), buildCode(), fitEditorPreview);
+  }
+
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 65);
+  }
+
+  function setDraftStatus(savedAt) {
+    const status = panel?.querySelector("[data-lr-profile-draft-status]");
+    if (!status) return;
+    status.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH", { hour: "2-digit", minute: "2-digit" })}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+      showToast("บันทึกแบบร่างโปรไฟล์ Landon แล้ว");
+    } catch {
+      showToast("บันทึกแบบร่างไม่สำเร็จ");
+    }
+  }
+
+  function deleteDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode();
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("คัดลอกโค้ดโปรไฟล์ Landon แล้ว");
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      showToast("คัดลอกโค้ดโปรไฟล์ Landon แล้ว");
+    }
+  }
+
+  function setCommissionTab() {
+    document.querySelectorAll("[data-work-tab]").forEach((button) => {
+      const selected = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", String(selected));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach((workPanel) => {
+      const selected = workPanel.dataset.workPanel === "commission";
+      workPanel.hidden = !selected;
+      workPanel.classList.toggle("is-active", selected);
+    });
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => item.classList.toggle("is-active", item.dataset.panel === panelName));
+    document.querySelectorAll(".dds-nav-button").forEach((button) => button.classList.toggle("is-active", button.dataset.page === "commission"));
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
+  function goBack(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const restore = () => {
+      document.body.classList.remove("dds-editor-mode", "dds-commission-editor-mode", "dds-modal-open");
+      document.documentElement.classList.remove("dds-editor-mode", "dds-commission-editor-mode", "dds-modal-open");
+      showPanel("commission");
+      setCommissionTab();
+      history.replaceState(null, "", "#commission");
+    };
+    restore();
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+    setTimeout(restore, 90);
+  }
+
+  function emojiFields(prefix, count, labels) {
+    return Array.from({ length: count }, (_, index) => {
+      const key = `${prefix}${index + 1}`;
+      const example = defaults[key];
+      const label = labels?.[index] || `Emoji ${String(index + 1).padStart(2, "0")}`;
+      return field(label, key, { placeholder: `Decimal Value เช่น ${example}` });
+    }).join("");
+  }
+
+  function dockFields() {
+    return Array.from({ length: 14 }, (_, index) => {
+      const key = `dock${index + 1}`;
+      return field(`Dock ${String(index + 1).padStart(2, "0")}`, key, { placeholder: `เช่น ${defaults[key]}` });
+    }).join("");
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-lr-profile-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-lr-profile-back type="button">←</button>
+        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-lr-profile-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโปรไฟล์</span></h1><p>ผู้จ้าง LANDON A. RUTHERFORD — แก้ข้อความ รูป Emoji และ Dock ได้จากเครื่องมือด้านขวา</p></div>
+      </div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / PROFILE</strong></div>
+          <div class="dds-protected-commission-preview-stage dds-lr-profile-preview-stage" data-lr-profile-preview-stage><div class="dds-lr-profile-preview-holder" data-lr-profile-preview-holder><iframe class="dds-protected-commission-preview-frame" data-lr-profile-preview scrolling="no" title="ตัวอย่างโค้ดโปรไฟล์ Landon"></iframe></div></div>
+        </div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-lr-profile-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-lr-profile-save>SAVE DRAFT</button><button type="button" data-lr-profile-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-lr-profile-commission-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูปภาพทั้งหมด</h2></div><div class="dds-form-grid">
+              ${field("รูป BG หลัก — --lr-wallpaper", "wallpaper", {full:true,type:"url",placeholder:defaults.wallpaper})}
+              ${field("รูปหลัก Photo Booth — --lr-main", "mainImage", {full:true,type:"url",placeholder:defaults.mainImage})}
+              ${field("รูป Polaroid / AirDrop — --lr-photo-one", "photoOne", {full:true,type:"url",placeholder:defaults.photoOne})}
+              ${field("รูป Small Window — --lr-photo-two", "photoTwo", {full:true,type:"url",placeholder:defaults.photoTwo})}
+              ${field("รูป Deco Photo — --lr-photo-three", "photoThree", {full:true,type:"url",placeholder:defaults.photoThree})}
+              ${field("รูป Avatar ข้อความ — --lr-avatar", "avatar", {full:true,type:"url",placeholder:defaults.avatar})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ข้อความ</h2></div><div class="dds-form-grid">
+              ${field("landon", "bigName", {placeholder:"เช่น landon"})}
+              ${field("A. RUTHERFORD", "bigSurname", {placeholder:"เช่น A. RUTHERFORD"})}
+              ${field("somewhere between", "photoSmall", {full:true,placeholder:"เช่น somewhere between"})}
+              ${field("midnight & memory", "photoBig", {full:true,placeholder:"เช่น midnight & memory"})}
+              ${field("ข้อความ AirDrop", "airdropText", {full:true,placeholder:"เช่น Landon would like to share a photo."})}
+              ${field("ตัวอักษรใน Small Window", "smallWindowLetter", {placeholder:"เช่น K"})}
+              ${field("ARCHIVE", "archiveText", {placeholder:"เช่น ARCHIVE"})}
+              ${field("NO. 07", "archiveNo", {placeholder:"เช่น NO. 07"})}
+              ${field("เวลาใต้ Polaroid", "polaroidTime", {placeholder:"เช่น 00:17 AM"})}
+              ${field("woof.", "bottomWord", {placeholder:"เช่น woof."})}
+              ${field("ชื่อด้านล่าง", "bottomName", {full:true,placeholder:"เช่น LANDON A. RUTHERFORD"})}
+              ${field("STAY AFTER DARK", "mainCaption", {full:true,placeholder:"เช่น STAY AFTER DARK"})}
+              ${field("ข้อความ Reminder", "reminderText", {full:true,placeholder:"เช่น Don't disappear tonight."})}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>Emoji ใน Search Emoji</h2></div><p class="dds-lr-profile-emoji-help">กรอกเฉพาะเลขจากช่อง <strong>Decimal Value</strong> เช่น <code>127911</code> ถ้ามีหลายค่าให้เว้นวรรค เช่น <code>9939 65039</code> · <a href="https://www.dremendo.com/html-tutorial/html-emoji-codes" target="_blank" rel="noopener noreferrer">เปิดตาราง Emoji ↗</a></p><div class="dds-form-grid dds-lr-profile-emoji-grid">
+              ${emojiFields("keyEmoji", 6, ["Emoji Search 01 — ✦", "Emoji Search 02 — ♠", "Emoji Search 03 — ☾", "Emoji Search 04 — 🖤", "Emoji Search 05 — ⚓️", "Emoji Search 06 — 🎧"])}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Emoji ลอยรอบโค้ด</h2></div><p class="dds-lr-profile-emoji-help">แก้ Emoji ลอยทั้ง 15 จุดด้วย Decimal Value โดย <strong>VOLUME ถูกล็อกไว้ตามต้นฉบับ</strong></p><div class="dds-form-grid dds-lr-profile-emoji-grid">${emojiFields("float", 15)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Dock symbols</h2></div><p class="dds-lr-profile-emoji-help">แก้สัญลักษณ์ใน Dock ได้ทุกช่อง ตัวอย่างเดิมแสดงอยู่ใน placeholder</p><div class="dds-form-grid dds-lr-profile-dock-grid">${dockFields()}</div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-lr-profile-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML โปรไฟล์ที่แก้ไขเสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-lr-profile-copy>COPY CODE <span>↗</span></button><button type="button" data-lr-profile-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+
+    footer.before(panel);
+    panel.querySelector("[data-lr-profile-back]")?.addEventListener("click", goBack);
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-lr-profile-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-lr-profile-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-lr-profile-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-lr-profile-reset]")?.addEventListener("click", resetFields);
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-lr-profile-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-lr-profile-view-back type="button">←</button></div><div class="dds-lr-profile-view-stage" data-lr-profile-view-stage><div class="dds-lr-profile-view-holder" data-lr-profile-view-holder><iframe class="dds-editor-preview-frame dds-lr-profile-view-frame" data-lr-profile-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทโปรไฟล์ Landon A. Rutherford"></iframe></div></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-lr-profile-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function openView() {
+    const target = createViewPanel();
+    if (!target) return;
+    document.body.classList.add("dds-editor-mode");
+    document.documentElement.classList.add("dds-editor-mode");
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-landon-profile-view");
+    writeIframe(target.querySelector("[data-lr-profile-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+    requestAnimationFrame(() => {
+      document.body.classList.add("dds-editor-mode");
+      document.documentElement.classList.add("dds-editor-mode");
+      fitViewPreview();
+    });
+  }
+
+  function openEditor() {
+    const editor = createPanel();
+    if (!editor) return;
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#commission-landon-profile-editor");
+    updatePreview();
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("dds-modal-open");
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsLandonDesktopProfileLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-lr-profile-lock-form><small>CLIENT ACCESS / LANDON A. RUTHERFORD</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-lr-profile-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-lr-profile-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-lr-profile-lock-close>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-lr-profile-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.querySelector("[data-lr-profile-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-lr-profile-lock-input]");
+      const error = modal.querySelector("[data-lr-profile-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        if (await sha256(input.value || "") === ACCESS_HASH) {
+          sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+          error.textContent = "";
+          closeModal();
+          openEditor();
+        } else {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+        }
+      } catch {
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function openModal() {
+    const lock = createModal();
+    lock.hidden = false;
+    document.body.classList.add("dds-modal-open");
+    const input = lock.querySelector("[data-lr-profile-lock-input]");
+    const error = lock.querySelector("[data-lr-profile-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    requestAnimationFrame(() => input?.focus());
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    if (grid.querySelector(".dds-lr-profile-commission-card")) return true;
+
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-lr-profile-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-lr-profile-card-preview-frame" data-lr-profile-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Profile Landon"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>LANDON A. RUTHERFORD</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-lr-profile-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-lr-profile-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-lr-profile-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-lr-profile-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+
+    const cardPreview = card.querySelector("[data-lr-profile-card-preview]");
+    const renderCard = () => {
+      if (cardRendered || !cardPreview) return;
+      cardRendered = true;
+      writeIframe(cardPreview, OFFICIAL_CODE, fitCardPreview);
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        renderCard();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else renderCard();
+    return true;
+  }
+
+  function install() {
+    createModal();
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 80) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      fitCardPreview();
+      fitEditorPreview();
+      fitViewPreview();
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();

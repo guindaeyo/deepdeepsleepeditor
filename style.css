@@ -7853,3 +7853,130 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================================================
+   LANDON — DESKTOP PROFILE COMMISSION EDITOR
+   ================================================== */
+.dds-lr-profile-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.08em;
+}
+
+.dds-lr-profile-commission-heading > span {
+  display: block;
+}
+
+.dds-lr-profile-commission-heading > span:last-child {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 0.68em;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.dds-lr-profile-preview-stage,
+.dds-lr-profile-view-stage {
+  width: 100%;
+  min-height: 560px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-lr-profile-preview-holder,
+.dds-lr-profile-view-holder {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.dds-lr-profile-preview-holder > iframe,
+.dds-lr-profile-view-holder > iframe {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent;
+}
+
+.dds-lr-profile-view-stage {
+  min-height: 0;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dds-lr-profile-card-preview-frame {
+  position: absolute !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: #242424;
+}
+
+.dds-lr-profile-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-lr-profile-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-lr-profile-commission-editor [data-lr-profile-save],
+.dds-lr-profile-commission-editor [data-lr-profile-copy] {
+  color: #fff;
+  border-color: rgba(193, 23, 36, 0.72);
+  background: linear-gradient(135deg, #b0121d, #720810);
+}
+
+.dds-lr-profile-commission-copy .dds-protected-commission-copy-actions [data-lr-profile-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+.dds-lr-profile-emoji-help {
+  margin: 0 0 15px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  line-height: 1.75;
+}
+
+.dds-lr-profile-emoji-help strong,
+.dds-lr-profile-emoji-help code {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.dds-lr-profile-emoji-help a {
+  color: #e44b55;
+  border-bottom: 1px solid rgba(228, 75, 85, 0.35);
+}
+
+.dds-lr-profile-emoji-grid,
+.dds-lr-profile-dock-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .dds-lr-profile-commission-heading > span:last-child {
+    font-size: 0.62em;
+  }
+
+  .dds-lr-profile-preview-stage,
+  .dds-lr-profile-view-stage {
+    padding: 14px;
+  }
+
+  .dds-lr-profile-emoji-grid,
+  .dds-lr-profile-dock-grid {
+    grid-template-columns: 1fr;
+  }
+}
