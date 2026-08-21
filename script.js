@@ -13561,7 +13561,7 @@ ${stylesheetLinks}
 
   const PANEL_NAME = "editor-commission-hans-roleplay";
   const VIEW_PANEL_NAME = "view-commission-hans-roleplay";
-  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v3";
+  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v4";
   const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.css";
   const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap";
   const CANVAS_WIDTH = 770;
@@ -13806,14 +13806,14 @@ ${stylesheetLinks}
 
   function deleteDraft() {
     try { localStorage.removeItem(DRAFT_KEY); } catch {}
-    setValues(defaults);
+    setValues(editorDefaults);
     setDraftStatus(0);
     updatePreview();
     showToast("ลบแบบร่างแล้ว");
   }
 
   function resetFields() {
-    setValues(defaults);
+    setValues(editorDefaults);
     updatePreview();
     showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
   }
@@ -13907,7 +13907,7 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-back type="button">←</button>
-        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — แก้ HEAD / BOX, ตำแหน่งรูป, สี, หัวข้อ Did you know..., เนื้อหาโรลเพลย์ และหมายเหตุได้ ส่วน BARCODE ถูกล็อกไว้ตามต้นฉบับ</p></div>
+        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
@@ -13978,7 +13978,7 @@ ${stylesheetLinks}
     if (!editor) return;
     enableEditorMode();
     const draft = getDraft();
-    setValues(draft?.values || defaults);
+    setValues(draft?.values || editorDefaults);
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     history.replaceState(null, "", "#commission-hans-roleplay-editor");
