@@ -325,7 +325,7 @@
 
     if (homeDescription) {
       homeDescription.textContent =
-        "คลังโค้ดสำหรับตกแต่งโรลเพลย์ โปรไฟล์ รีวิว งานคอมมิชชั่น และโค้ดจากกิจกรรม";
+        "คลังโคดสำหรับตกแต่งโรลเพลย์ โปรไฟล์ รีวิว งานคอมมิชชั่น และโคดจากกิจกรรม";
     }
 
     const homeCommissionButton = document.querySelector(
@@ -443,7 +443,7 @@
         <div class="dds-activity-empty-mark">✦</div>
         <h3>ACTIVITY CODE ARCHIVE</h3>
         <p>
-          พื้นที่นี้เตรียมไว้สำหรับเพิ่มโค้ดจากกิจกรรม
+          พื้นที่นี้เตรียมไว้สำหรับเพิ่มโคดจากกิจกรรม
           เมื่อมีผลงานใหม่สามารถนำการ์ดและหน้าพรีวิวมาใส่ต่อได้ทันที
         </p>
         <small>NO ACTIVITY WORK ADDED YET</small>
@@ -731,7 +731,7 @@
     const canvasWidth = 1040;
     const rootSelector = ".ativfzr-movies";
 
-    const activityMarkup = String.raw`<div class="ativfzr-movies"><section class="ativfzr-hero"><div class="ativfzr-title">MY TOP</div><div class="ativfzr-sub">xxx movies</div><div class="ativfzr-burst"><span>05</span></div><span class="ativfzr-dot l"></span><span class="ativfzr-dot r"></span><div class="ativfzr-search"><span class="ativfzr-bar"></span></div><div class="ativfzr-tv-bg"><img src="https://i.pinimg.com/originals/b5/7b/7c/b57b7c724a4cb609d5f40a83f7a9e1b3.gif" alt=""></div><div class="ativfzr-tv"><img src="https://s13.gifyu.com/images/b70mu.png" alt=""></div><div class="ativfzr-arrow l">‹</div><div class="ativfzr-arrow r">›</div><div class="ativfzr-name">รายละเอียดกิจกรรม</div></section><section class="ativfzr-list"><section class="ativfzr-info"><p>ถึงเวลาของคอหนังที่จะได้เปิดลิสต์ภาพยนตร์เรื่องโปรดในใจออกมาอวดกันแล้ว! ไม่ว่าจะเป็นหนังสยองขวัญที่ทำให้นอนไม่หลับ หนังรักที่ดูทีไรก็ใจเจ็บ หรือหนังแอคชั่นสุดมันส์ที่ดูวนได้ไม่มีเบื่อ</p><p><strong>— ภาพยนตร์ทุกเรื่องล้วนมีเหตุผลที่ทำให้เราตกหลุมรักมัน</strong></p><p>ร่วมสนุกไปกับกิจกรรม MY TOP 5 MOVIES กิจกรรมจัดอันดับภาพยนตร์ตามหมวดหมู่ประจำวัน ที่จะพาทุกคนมาพูดคุย แชร์รสนิยม บางทีคุณอาจได้เจอคนรสนิยมเหมือนกัน หรือค้นพบหนังเรื่องใหม่จากลิสต์ของคนอื่นก็ได้ &#127871;✨</p><div class="ativfzr-info-tag">กติกา</div><ul><li>ในแต่ละวัน ทีมงานจะประกาศ<strong>หมวดภาพยนตร์</strong>ประจำวัน</li><li>ใช้<strong>โค้ดกิจกรรม</strong>เท่านั้นในการโพสต์</li><li>1 คน สามารถส่งได้เพียง 1 ครั้ง ต่อ 1 โจทย์</li><li>สามารถใส่คำอธิบายหรือเหตุผลเพิ่มเติมได้ตามอิสระ</li><li>ตัวอย่างเช่น: หนังสยองขวัญ / หนังโรแมนติก / หนังแอนิเมชัน</li><li>ผู้เล่นต้องจัดอันดับ<strong>ภาพยนตร์ 5 เรื่องโปรด</strong>ของตัวเองในหมวดนั้น</li><li>เมื่อโพสต์ครบตามกติกา จะได้รับทันที 10 ดอลล่าร์ ต่อ 1 โจทย์</li><li>หากเข้าร่วมครบทั้ง 7 วัน จะได้รับรวมทั้งหมด 70 ดอลล่าร์</li><li>เมื่อเข้าร่วมโจทย์ครบ 5 ครั้งได้รับ 1 คริสตัล</li></ul><div class="ativfzr-info-tag">กรณีโพสต์ย้อนหลัง</div><p>หากไม่สามารถมาร่วมกิจกรรมภายในวันนั้นได้ ยังสามารถโพสต์ย้อนหลังได้ภายหลัง แต่จะได้รับรางวัลลดลงเหลือ</p><ul><li>5 ดอลล่าร์ ต่อ 1 โจทย์ย้อนหลัง</li></ul><h2>ถ้าพร้อมแล้วก็มาเริ่มจัดอันดับกันเล้ยยยย!</h2></section><div class="ativfzr-bottom-wrap"><div class="ativfzr-check"></div></div></section></div>`;
+    const activityMarkup = String.raw`<div class="ativfzr-movies"><section class="ativfzr-hero"><div class="ativfzr-title">MY TOP</div><div class="ativfzr-sub">xxx movies</div><div class="ativfzr-burst"><span>05</span></div><span class="ativfzr-dot l"></span><span class="ativfzr-dot r"></span><div class="ativfzr-search"><span class="ativfzr-bar"></span></div><div class="ativfzr-tv-bg"><img src="https://i.pinimg.com/originals/b5/7b/7c/b57b7c724a4cb609d5f40a83f7a9e1b3.gif" alt=""></div><div class="ativfzr-tv"><img src="https://s13.gifyu.com/images/b70mu.png" alt=""></div><div class="ativfzr-arrow l">‹</div><div class="ativfzr-arrow r">›</div><div class="ativfzr-name">รายละเอียดกิจกรรม</div></section><section class="ativfzr-list"><section class="ativfzr-info"><p>ถึงเวลาของคอหนังที่จะได้เปิดลิสต์ภาพยนตร์เรื่องโปรดในใจออกมาอวดกันแล้ว! ไม่ว่าจะเป็นหนังสยองขวัญที่ทำให้นอนไม่หลับ หนังรักที่ดูทีไรก็ใจเจ็บ หรือหนังแอคชั่นสุดมันส์ที่ดูวนได้ไม่มีเบื่อ</p><p><strong>— ภาพยนตร์ทุกเรื่องล้วนมีเหตุผลที่ทำให้เราตกหลุมรักมัน</strong></p><p>ร่วมสนุกไปกับกิจกรรม MY TOP 5 MOVIES กิจกรรมจัดอันดับภาพยนตร์ตามหมวดหมู่ประจำวัน ที่จะพาทุกคนมาพูดคุย แชร์รสนิยม บางทีคุณอาจได้เจอคนรสนิยมเหมือนกัน หรือค้นพบหนังเรื่องใหม่จากลิสต์ของคนอื่นก็ได้ &#127871;✨</p><div class="ativfzr-info-tag">กติกา</div><ul><li>ในแต่ละวัน ทีมงานจะประกาศ<strong>หมวดภาพยนตร์</strong>ประจำวัน</li><li>ใช้<strong>โคดกิจกรรม</strong>เท่านั้นในการโพสต์</li><li>1 คน สามารถส่งได้เพียง 1 ครั้ง ต่อ 1 โจทย์</li><li>สามารถใส่คำอธิบายหรือเหตุผลเพิ่มเติมได้ตามอิสระ</li><li>ตัวอย่างเช่น: หนังสยองขวัญ / หนังโรแมนติก / หนังแอนิเมชัน</li><li>ผู้เล่นต้องจัดอันดับ<strong>ภาพยนตร์ 5 เรื่องโปรด</strong>ของตัวเองในหมวดนั้น</li><li>เมื่อโพสต์ครบตามกติกา จะได้รับทันที 10 ดอลล่าร์ ต่อ 1 โจทย์</li><li>หากเข้าร่วมครบทั้ง 7 วัน จะได้รับรวมทั้งหมด 70 ดอลล่าร์</li><li>เมื่อเข้าร่วมโจทย์ครบ 5 ครั้งได้รับ 1 คริสตัล</li></ul><div class="ativfzr-info-tag">กรณีโพสต์ย้อนหลัง</div><p>หากไม่สามารถมาร่วมกิจกรรมภายในวันนั้นได้ ยังสามารถโพสต์ย้อนหลังได้ภายหลัง แต่จะได้รับรางวัลลดลงเหลือ</p><ul><li>5 ดอลล่าร์ ต่อ 1 โจทย์ย้อนหลัง</li></ul><h2>ถ้าพร้อมแล้วก็มาเริ่มจัดอันดับกันเล้ยยยย!</h2></section><div class="ativfzr-bottom-wrap"><div class="ativfzr-check"></div></div></section></div>`;
 
     const previewOnlyCss = `
       <style data-activity-preview-only>
@@ -917,14 +917,14 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่างโค้ดกิจกรรม MY TOP 5 MOVIES"
+          title="ตัวอย่างโคดกิจกรรม MY TOP 5 MOVIES"
         ></iframe>
         <span class="dds-roleplay-preview-badge">ACTIVITY</span>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title">MY TOP 5 MOVIES</h2>
-        <p class="dds-commission-card-type">โค้ดกิจกรรม</p>
+        <p class="dds-commission-card-type">โคดกิจกรรม</p>
         <button
           class="dds-roleplay-edit"
           data-view-activity-top-movies
@@ -964,7 +964,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="activityTopMoviesPreview"
           scrolling="no"
-          title="โค้ดกิจกรรม MY TOP 5 MOVIES"
+          title="โคดกิจกรรม MY TOP 5 MOVIES"
         ></iframe>
       </div>
     `;
@@ -1528,14 +1528,14 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่างโค้ดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
+          title="ตัวอย่างโคดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
         ></iframe>
         <span class="dds-roleplay-preview-badge">ACTIVITY</span>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title">MY TOP 5 MOVIES</h2>
-        <p class="dds-commission-card-type">โค้ดกิจกรรม - แบบตอบกลับ</p>
+        <p class="dds-commission-card-type">โคดกิจกรรม - แบบตอบกลับ</p>
         <button
           class="dds-roleplay-edit"
           data-view-activity-top-movies-reply
@@ -1575,7 +1575,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="activityTopMoviesReplyPreview"
           scrolling="no"
-          title="โค้ดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
+          title="โคดกิจกรรม MY TOP 5 MOVIES แบบตอบกลับ"
         ></iframe>
       </div>
     `;
@@ -2089,14 +2089,14 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่างงานคอมมิชชั่นโค้ดประเภทกระทู้บ้าน"
+          title="ตัวอย่างงานคอมมิชชั่นโคดประเภทกระทู้บ้าน"
         ></iframe>
         <span class="dds-roleplay-preview-badge">COMPLETED</span>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title">COMMISSION</h2>
-        <p class="dds-commission-card-type">โค้ดประเภทกระทู้บ้าน</p>
+        <p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p>
         <p class="dds-commission-card-client">
           ผู้จ้าง <strong>MIKAEL F. KAISER</strong>
         </p>
@@ -2139,7 +2139,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="commissionPreview003"
           scrolling="no"
-          title="งานคอมมิชชั่นโค้ดประเภทกระทู้บ้านของ Mikael F. Kaiser"
+          title="งานคอมมิชชั่นโคดประเภทกระทู้บ้านของ Mikael F. Kaiser"
         ></iframe>
       </div>
     `;
@@ -2633,13 +2633,13 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่างโค้ดประเภทโปรไฟล์ — Franklin D. Bloodworth"
+          title="ตัวอย่างโคดประเภทโปรไฟล์ — Franklin D. Bloodworth"
         ></iframe>
               </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title" data-my-own-code-title>MY OWN CODE</h2>
-        <p class="dds-commission-card-type" data-my-own-code-type>โค้ดประเภทโปรไฟล์</p>
+        <p class="dds-commission-card-type" data-my-own-code-type>โคดประเภทโปรไฟล์</p>
         <button
           class="dds-roleplay-edit"
           data-view-my-own-code="my-own-code"
@@ -2679,7 +2679,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="1040"
           id="myOwnCodePreview"
           scrolling="no"
-          title="โค้ดประเภทโปรไฟล์ — Franklin D. Bloodworth"
+          title="โคดประเภทโปรไฟล์ — Franklin D. Bloodworth"
         ></iframe>
       </div>
     `;
@@ -3220,13 +3220,13 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่าง MY OWN CODE — โค้ดประเภทประวัติ"
+          title="ตัวอย่าง MY OWN CODE — โคดประเภทประวัติ"
         ></iframe>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title">MY OWN CODE</h2>
-        <p class="dds-commission-card-type">โค้ดประเภทประวัติ</p>
+        <p class="dds-commission-card-type">โคดประเภทประวัติ</p>
         <button
           class="dds-roleplay-edit"
           data-view-my-own-code-history
@@ -3265,7 +3265,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="myOwnCodeHistoryPreview"
           scrolling="no"
-          title="MY OWN CODE — โค้ดประเภทประวัติ"
+          title="MY OWN CODE — โคดประเภทประวัติ"
         ></iframe>
       </div>
     `;
@@ -3691,13 +3691,13 @@ ${stylesheetLinks}
           loading="lazy"
           scrolling="no"
           tabindex="-1"
-          title="ตัวอย่าง MY OWN CODE — โค้ดประเภทหัวกระทู้"
+          title="ตัวอย่าง MY OWN CODE — โคดประเภทหัวกระทู้"
         ></iframe>
       </div>
 
       <div class="dds-roleplay-card-body dds-commission-card-body">
         <h2 class="dds-commission-card-title">MY OWN CODE</h2>
-        <p class="dds-commission-card-type">โค้ดประเภทหัวกระทู้</p>
+        <p class="dds-commission-card-type">โคดประเภทหัวกระทู้</p>
         <button
           class="dds-roleplay-edit"
           data-view-my-own-code-topic
@@ -3736,7 +3736,7 @@ ${stylesheetLinks}
           data-commission-canvas-width="${canvasWidth}"
           id="myOwnCodeTopicPreview"
           scrolling="no"
-          title="MY OWN CODE — โค้ดประเภทหัวกระทู้"
+          title="MY OWN CODE — โคดประเภทหัวกระทู้"
         ></iframe>
       </div>
     `;
@@ -4160,7 +4160,7 @@ ${stylesheetLinks}
 
     /*
      * กรอง textarea ตั้งแต่ตอนระบบหลักเขียนค่า
-     * ปุ่ม COPY CODE จึงคัดลอกโค้ดสะอาดทันที
+     * ปุ่ม COPY CODE จึงคัดลอกโคดสะอาดทันที
      */
     if (
       generatedCode &&
@@ -5733,7 +5733,7 @@ ${stylesheetLinks}
     state.toolsColumn = toolsColumn;
 
     /*
-     * ย้ายส่วนคัดลอกโค้ดออกจากพื้นที่สกรอลล์ของเครื่องมือ
+     * ย้ายส่วนคัดลอกโคดออกจากพื้นที่สกรอลล์ของเครื่องมือ
      * เพื่อให้ปุ่ม COPY / RESET มองเห็นอยู่ด้านล่างของคอลัมน์เสมอ
      */
     const copySection = Array.from(controls.children).find((child) =>
@@ -5922,7 +5922,7 @@ ${stylesheetLinks}
       </div>
       <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
         <button type="button" data-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
-        <button type="button" data-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-bbcode="code" title="โคด [code]">&lt;/&gt;</button>
         <button type="button" data-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
         <button type="button" data-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
       </div>
@@ -7173,12 +7173,12 @@ ${stylesheetLinks}
       copyText(generatedCode.value)
         .then(() => {
           if (typeof window.showToast === "function") {
-            window.showToast("คัดลอกโค้ด CODE010 แล้ว");
+            window.showToast("คัดลอกโคด CODE010 แล้ว");
           }
         })
         .catch(() => {
           if (typeof window.showToast === "function") {
-            window.showToast("คัดลอกโค้ดไม่สำเร็จ");
+            window.showToast("คัดลอกโคดไม่สำเร็จ");
           }
         });
     });
@@ -7926,7 +7926,7 @@ ${stylesheetLinks}
     if (mode === "card") {
       /*
        * การ์ด FOR REVIEW ใช้แคนวาสเดิม 1300×920 เหมือน REVIEW CODE001
-       * ไม่ย่อ/ขยายตัวโค้ดภายใน ไม่เปลี่ยนสัดส่วน แค่จัดชิ้นงานให้อยู่กึ่งกลางแคนวาส
+       * ไม่ย่อ/ขยายตัวโคดภายใน ไม่เปลี่ยนสัดส่วน แค่จัดชิ้นงานให้อยู่กึ่งกลางแคนวาส
        */
       return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:1300px;min-width:1300px;max-width:1300px;height:920px;min-height:920px;max-height:920px;background:#242424;overflow:hidden}.dds-music-preview-shell{position:relative;width:1300px;height:920px;overflow:hidden}.dds-music-preview-target{position:absolute;inset:0;width:1300px;height:920px;transform:translate(0,0);transform-origin:0 0}.dds-music-preview-target>.ddsh-revmus-wrap{margin:0!important}</style></head><body data-preview-mode="card"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-music-preview-shell');const target=document.querySelector('.dds-music-preview-target');const wrap=document.querySelector('.ddsh-revmus-wrap');let raf=0;function centerOnly(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!wrap)return;target.style.transform='translate(0px,0px)';const shellRect=shell.getBoundingClientRect();const wrapRect=wrap.getBoundingClientRect();const dx=(shellRect.left+shellRect.width/2)-(wrapRect.left+wrapRect.width/2);const dy=(shellRect.top+shellRect.height/2)-(wrapRect.top+wrapRect.height/2);target.style.transform='translate('+dx+'px,'+dy+'px)';window.frameElement?.classList.add('dds-preview-ready');window.frameElement?.classList.remove('dds-preview-loading')})}window.addEventListener('load',centerOnly,{once:true});document.fonts?.ready?.then(centerOnly);if(window.ResizeObserver&&wrap)new ResizeObserver(centerOnly).observe(wrap);setTimeout(centerOnly,100);setTimeout(centerOnly,500);centerOnly()})();<\/script></body></html>`;
     }
@@ -8066,8 +8066,8 @@ ${stylesheetLinks}
     copyButton.addEventListener("click", () => {
       updateMusicReview();
       copyText(generatedCode.value)
-        .then(() => window.showToast?.("คัดลอกโค้ด REVIEW CODE002 แล้ว"))
-        .catch(() => window.showToast?.("คัดลอกโค้ดไม่สำเร็จ"));
+        .then(() => window.showToast?.("คัดลอกโคด REVIEW CODE002 แล้ว"))
+        .catch(() => window.showToast?.("คัดลอกโคดไม่สำเร็จ"));
     });
 
     function renderOfficialCard() {
@@ -8127,14 +8127,14 @@ ${stylesheetLinks}
   const commissions = {
     commission001: {
       panel: "protected-commission001",
-      title: "COMMISSION — โค้ดประเภทรีวิวอาหาร",
+      title: "COMMISSION — โคดประเภทรีวิวอาหาร",
       codeLabel: "LANDON / COMMISSION 01",
       sourceFrames: ["commissionPreview001", "commissionCardPreview001"],
       draftKey: "dds:commission-draft:landon:commission001"
     },
     commission002: {
       panel: "protected-commission002",
-      title: "COMMISSION 2 — โค้ดประเภทประวัติ",
+      title: "COMMISSION 2 — โคดประเภทประวัติ",
       codeLabel: "LANDON / COMMISSION 02",
       sourceFrames: ["commissionPreview002", "commissionCardPreview002"],
       draftKey: "dds:commission-draft:landon:commission002"
@@ -8328,7 +8328,7 @@ ${stylesheetLinks}
         <div>
           <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
           <h1>${escapeHtml(info.title)}</h1>
-          <p>แก้โค้ดทางขวาและดูผลลัพธ์ทางซ้ายได้ทันที</p>
+          <p>แก้โคดทางขวาและดูผลลัพธ์ทางซ้ายได้ทันที</p>
         </div>
       </div>
 
@@ -8362,10 +8362,10 @@ ${stylesheetLinks}
             <section class="dds-protected-commission-section">
               <div class="dds-control-title">
                 <span>01</span>
-                <h2>แก้ไขโค้ด HTML</h2>
+                <h2>แก้ไขโคด HTML</h2>
               </div>
               <p class="dds-protected-commission-help">
-                กล่องนี้เป็นโค้ดงานคอมมิชชั่นจริง สามารถแก้ข้อความ ลิงก์รูป สี และค่า style ได้โดยตรง
+                กล่องนี้เป็นโคดงานคอมมิชชั่นจริง สามารถแก้ข้อความ ลิงก์รูป สี และค่า style ได้โดยตรง
               </p>
               <textarea
                 class="dds-protected-code-editor"
@@ -8377,7 +8377,7 @@ ${stylesheetLinks}
           </div>
 
           <section class="dds-protected-commission-copy">
-            <p>คัดลอกโค้ดที่แก้ไขแล้ว หรือรีเซ็ตกลับเป็นงานต้นฉบับ</p>
+            <p>คัดลอกโคดที่แก้ไขแล้ว หรือรีเซ็ตกลับเป็นงานต้นฉบับ</p>
             <div class="dds-protected-commission-copy-actions">
               <button type="button" data-commission-copy>COPY CODE <span>↗</span></button>
               <button type="button" data-commission-reset>RESET</button>
@@ -8672,12 +8672,12 @@ ${stylesheetLinks}
 
     try {
       await navigator.clipboard.writeText(editor.value);
-      showToast("คัดลอกโค้ดงานคอมมิชชั่นแล้ว");
+      showToast("คัดลอกโคดงานคอมมิชชั่นแล้ว");
     } catch {
       editor.focus();
       editor.select();
       document.execCommand("copy");
-      showToast("คัดลอกโค้ดงานคอมมิชชั่นแล้ว");
+      showToast("คัดลอกโคดงานคอมมิชชั่นแล้ว");
     }
   }
 
@@ -8700,7 +8700,7 @@ ${stylesheetLinks}
 
     if (!state.originalCode) {
       state.loading = true;
-      editor.value = "กำลังโหลดโค้ดงานคอมมิชชั่น...";
+      editor.value = "กำลังโหลดโคดงานคอมมิชชั่น...";
       editor.disabled = true;
       const originalCode = await captureOriginalCode(commissionId);
       state.loading = false;
@@ -8708,7 +8708,7 @@ ${stylesheetLinks}
 
       if (!originalCode) {
         editor.value = "";
-        showToast("ยังโหลดโค้ดต้นฉบับไม่ได้ กรุณากลับไปเปิด VIEW WORK แล้วลองอีกครั้ง");
+        showToast("ยังโหลดโคดต้นฉบับไม่ได้ กรุณากลับไปเปิด VIEW WORK แล้วลองอีกครั้ง");
         return;
       }
 
@@ -8840,7 +8840,7 @@ ${stylesheetLinks}
       </div>
       <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
         <button type="button" data-food-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
-        <button type="button" data-food-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-food-bbcode="code" title="โคด [code]">&lt;/&gt;</button>
         <button type="button" data-food-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
         <button type="button" data-food-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
       </div>
@@ -9193,7 +9193,7 @@ ${stylesheetLinks}
         <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-food-back title="กลับหน้า COMMISSION" type="button">←</button>
         <div>
           <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
-          <h1 class="dds-food-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทรีวิวอาหาร</span></h1>
+          <h1 class="dds-food-commission-heading"><span>COMMISSION</span><span>— โคดประเภทรีวิวอาหาร</span></h1>
           <p>กรอกข้อมูลทางขวา แล้วดูผลลัพธ์ทางซ้ายได้ทันที สีและโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
         </div>
       </div>
@@ -9202,7 +9202,7 @@ ${stylesheetLinks}
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / COMMISSION 01</strong></div>
           <div class="dds-protected-commission-preview-stage" data-food-preview-stage>
-            <iframe class="dds-protected-commission-preview-frame" data-food-preview scrolling="no" title="ตัวอย่างโค้ดรีวิวอาหาร"></iframe>
+            <iframe class="dds-protected-commission-preview-frame" data-food-preview scrolling="no" title="ตัวอย่างโคดรีวิวอาหาร"></iframe>
           </div>
         </div>
 
@@ -9281,8 +9281,8 @@ ${stylesheetLinks}
           </div>
 
           <section class="dds-protected-commission-copy dds-food-commission-copy">
-            <div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div>
-            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโคดที่กรอกเสร็จแล้วไปใช้งาน</p>
             <div class="dds-protected-commission-copy-actions">
               <button type="button" data-food-copy>COPY CODE <span>↗</span></button>
               <button type="button" data-food-reset>RESET</button>
@@ -9496,7 +9496,7 @@ ${stylesheetLinks}
     const code = buildCode();
     try {
       await navigator.clipboard.writeText(code);
-      showToast("คัดลอกโค้ดรีวิวอาหารแล้ว");
+      showToast("คัดลอกโคดรีวิวอาหารแล้ว");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -9506,7 +9506,7 @@ ${stylesheetLinks}
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      showToast("คัดลอกโค้ดรีวิวอาหารแล้ว");
+      showToast("คัดลอกโคดรีวิวอาหารแล้ว");
     }
   }
 
@@ -9911,7 +9911,7 @@ ${stylesheetLinks}
         <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-protected-commission-back title="กลับหน้า COMMISSION" type="button">←</button>
         <div>
           <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
-          <h1 class="dds-history-commission-heading"><span>COMMISSION 2</span><span>— โค้ดประเภทประวัติ</span></h1>
+          <h1 class="dds-history-commission-heading"><span>COMMISSION 2</span><span>— โคดประเภทประวัติ</span></h1>
           <p>กรอกข้อมูลทางขวา แล้วดูผลลัพธ์ทางซ้ายได้ทันที สี พื้นหลัง และโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
         </div>
       </div>
@@ -9920,7 +9920,7 @@ ${stylesheetLinks}
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / COMMISSION 02</strong></div>
           <div class="dds-protected-commission-preview-stage dds-history-preview-stage" data-history-preview-stage>
-            <iframe class="dds-protected-commission-preview-frame" data-history-preview scrolling="no" title="ตัวอย่างโค้ดประวัติ"></iframe>
+            <iframe class="dds-protected-commission-preview-frame" data-history-preview scrolling="no" title="ตัวอย่างโคดประวัติ"></iframe>
           </div>
         </div>
 
@@ -10023,8 +10023,8 @@ ${stylesheetLinks}
           </div>
 
           <section class="dds-protected-commission-copy dds-history-commission-copy">
-            <div class="dds-control-title"><span>08</span><h2>คัดลอกโค้ด</h2></div>
-            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดประวัติที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-control-title"><span>08</span><h2>คัดลอกโคด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโคดประวัติที่กรอกเสร็จแล้วไปใช้งาน</p>
             <div class="dds-protected-commission-copy-actions">
               <button type="button" data-history-copy>COPY CODE <span>↗</span></button>
               <button type="button" data-history-reset>RESET</button>
@@ -10383,7 +10383,7 @@ ${stylesheetLinks}
     const savedAt = Date.now();
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
     setDraftStatus(savedAt);
-    showToast("บันทึกแบบร่างโค้ดประวัติแล้ว");
+    showToast("บันทึกแบบร่างโคดประวัติแล้ว");
   }
 
   function deleteDraft() {
@@ -10404,7 +10404,7 @@ ${stylesheetLinks}
     const code = buildCode(getValues(), false);
     try {
       await navigator.clipboard.writeText(code);
-      showToast("คัดลอกโค้ดประวัติแล้ว");
+      showToast("คัดลอกโคดประวัติแล้ว");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -10414,7 +10414,7 @@ ${stylesheetLinks}
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      showToast("คัดลอกโค้ดประวัติแล้ว");
+      showToast("คัดลอกโคดประวัติแล้ว");
     }
   }
 
@@ -10808,7 +10808,7 @@ ${stylesheetLinks}
     const savedAt = Date.now();
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
     setDraftStatus(savedAt);
-    showToast("บันทึกแบบร่างโค้ดบ้านแล้ว");
+    showToast("บันทึกแบบร่างโคดบ้านแล้ว");
   }
 
   function deleteDraft() {
@@ -10829,7 +10829,7 @@ ${stylesheetLinks}
     const code = buildCode(getValues());
     try {
       await navigator.clipboard.writeText(code);
-      showToast("คัดลอกโค้ดกระทู้บ้านแล้ว");
+      showToast("คัดลอกโคดกระทู้บ้านแล้ว");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -10839,7 +10839,7 @@ ${stylesheetLinks}
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      showToast("คัดลอกโค้ดกระทู้บ้านแล้ว");
+      showToast("คัดลอกโคดกระทู้บ้านแล้ว");
     }
   }
 
@@ -10857,7 +10857,7 @@ ${stylesheetLinks}
         <button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-protected-commission-back title="กลับหน้า COMMISSION" type="button">←</button>
         <div>
           <p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p>
-          <h1 class="dds-mikael-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทกระทู้บ้าน</span></h1>
+          <h1 class="dds-mikael-commission-heading"><span>COMMISSION</span><span>— โคดประเภทกระทู้บ้าน</span></h1>
           <p>กรอกข้อมูลทางขวา แล้วดูตัวอย่างทั้งหมดทางซ้าย สีและโครงสร้างถูกฟิกไว้ตามงานต้นฉบับ</p>
         </div>
       </div>
@@ -10866,7 +10866,7 @@ ${stylesheetLinks}
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>MIKAEL / COMMISSION 03</strong></div>
           <div class="dds-protected-commission-preview-stage dds-mikael-preview-stage" data-mikael-preview-stage>
-            <iframe class="dds-protected-commission-preview-frame" data-mikael-preview scrolling="no" title="ตัวอย่างโค้ดกระทู้บ้าน"></iframe>
+            <iframe class="dds-protected-commission-preview-frame" data-mikael-preview scrolling="no" title="ตัวอย่างโคดกระทู้บ้าน"></iframe>
           </div>
         </div>
 
@@ -10961,8 +10961,8 @@ ${stylesheetLinks}
           </div>
 
           <section class="dds-protected-commission-copy dds-mikael-house-copy">
-            <div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div>
-            <p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p>
+            <div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div>
+            <p>กดปุ่มด้านล่างเพื่อคัดลอกโคดที่กรอกเสร็จแล้วไปใช้งาน</p>
             <div class="dds-protected-commission-copy-actions">
               <button type="button" data-mikael-copy>COPY CODE <span>↗</span></button>
               <button type="button" data-mikael-reset>RESET</button>
@@ -11558,7 +11558,7 @@ ${stylesheetLinks}
       document.execCommand("copy");
       textarea.remove();
     }
-    showToast("คัดลอกโค้ดประวัติ Eric Hawkins แล้ว");
+    showToast("คัดลอกโคดประวัติ Eric Hawkins แล้ว");
   }
 
   function showToast(message) {
@@ -11625,13 +11625,13 @@ ${stylesheetLinks}
     editorPanel.className = "dds-panel dds-protected-commission-editor dds-eric-profile-editor";
     editorPanel.dataset.panel = PANEL_NAME;
     editorPanel.innerHTML = `
-      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-eric-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-eric-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทประวัติ</span></h1><p>ผู้จ้าง ERIC HAWKINS — แก้ข้อความ รูป สัญลักษณ์ และสีได้จากเครื่องมือด้านขวา</p></div></div>
+      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-eric-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-eric-commission-heading"><span>COMMISSION</span><span>— โคดประเภทประวัติ</span></h1><p>ผู้จ้าง ERIC HAWKINS — แก้ข้อความ รูป สัญลักษณ์ และสีได้จากเครื่องมือด้านขวา</p></div></div>
       <div class="dds-protected-commission-layout">
-        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ERIC HAWKINS / COMMISSION</strong></div><div class="dds-protected-commission-preview-stage dds-eric-preview-stage" data-eric-preview-stage><div class="dds-eric-preview-holder" data-eric-preview-holder><iframe class="dds-protected-commission-preview-frame" data-eric-preview scrolling="no" title="ตัวอย่างโค้ดประวัติ Eric Hawkins"></iframe></div></div></div>
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ERIC HAWKINS / COMMISSION</strong></div><div class="dds-protected-commission-preview-stage dds-eric-preview-stage" data-eric-preview-stage><div class="dds-eric-preview-holder" data-eric-preview-holder><iframe class="dds-protected-commission-preview-frame" data-eric-preview scrolling="no" title="ตัวอย่างโคดประวัติ Eric Hawkins"></iframe></div></div></div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-eric-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-eric-save>SAVE DRAFT</button><button type="button" data-eric-delete>DELETE SAVE</button></div>
           <div class="dds-protected-commission-scroll dds-eric-profile-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีหลัก — --erw-theme-main", "themeMain", defaults.themeMain)}${colorField("สีหลักเข้ม — --erw-theme-main-dark", "themeMainDark", defaults.themeMainDark)}${colorField("สีพื้นหลังปุ่ม 💬 Message", "messageBackground", defaults.messageBackground)}${colorField("สีพื้นหลัง — --erw-theme-background", "themeBackground", defaults.themeBackground)}${colorField("สีพาเนล — --erw-theme-panel", "themePanel", defaults.themePanel)}${colorField("สีการ์ด — --erw-theme-card", "themeCard", defaults.themeCard)}${colorField("สีตัวอักษร — --erw-theme-text", "themeText", defaults.themeText)}${colorField("สีตัวอักษรรอง — --erw-theme-text-soft", "themeTextSoft", defaults.themeTextSoft)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีหลัก — --erw-theme-main", "themeMain", defaults.themeMain)}${colorField("สีหลักเข้ม — --erw-theme-main-dark", "themeMainDark", defaults.themeMainDark)}${colorField("สีพื้นหลังปุ่ม 💬 Message", "messageBackground", defaults.messageBackground)}${colorField("สีพื้นหลัง — --erw-theme-background", "themeBackground", defaults.themeBackground)}${colorField("สีพาเนล — --erw-theme-panel", "themePanel", defaults.themePanel)}${colorField("สีการ์ด — --erw-theme-card", "themeCard", defaults.themeCard)}${colorField("สีตัวอักษร — --erw-theme-text", "themeText", defaults.themeText)}${colorField("สีตัวอักษรรอง — --erw-theme-text-soft", "themeTextSoft", defaults.themeTextSoft)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field("รูปพื้นหลัง", "bgImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปปก", "coverImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูปโปรไฟล์", "avatarImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 1", "widgetOneImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Widget 2", "widgetTwoImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}${field("รูป Mini / Music", "miniImage", {full:true,type:"url",placeholder:"วางลิงก์รูป"})}</div><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและขอบเฟดรูป</span><small>ปรับค่าเปอร์เซ็นต์</small></div>${rangeField("ตำแหน่งรูปปก", "coverY", 50)}${rangeField("ตำแหน่งรูปโปรไฟล์", "avatarY", 35)}${rangeField("ตำแหน่ง Widget 1", "widgetOneY", 50)}${rangeField("ตำแหน่ง Widget 2", "widgetTwoY", 30)}${rangeField("ขอบเฟด Widget 1", "widgetOneFade", 80)}${rangeField("ขอบเฟด Widget 2", "widgetTwoFade", 80)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อและข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${field("ดิสเพลย์เนม", "displayName")}${field("ชื่อภาษาอังกฤษ", "englishName")}${field("ชื่อภาษาไทย", "thaiName")}${field("สัญลักษณ์ปุ่มเล็กกลาง", "smallButtonOne", {placeholder:"เช่น ☻"})}${field("สัญลักษณ์ใน Bubble", "bubbleSymbol")}${field("Symbol Art บรรทัด 1", "symbolLineOne", {full:true})}${field("Symbol Art บรรทัด 2", "symbolLineTwo", {full:true})}${field("สัญลักษณ์หัวข้อ Profile", "profileIcon")}${PROFILE_LABELS.map((label,index)=>field(label,`profileValue${index+1}`,{placeholder:`กรอก${label}`})).join("")}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Biography และข้อมูลด้านล่าง</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ Biography", "biographyIcon")}${richField("เนื้อหา Biography", "biographyText", 12)}${field("Education บรรทัดหลัก", "educationMain")}${field("Education บรรทัดรอง", "educationSub")}${field("Face Claim บรรทัดหลัก", "faceclaimMain")}${field("Face Claim บรรทัดรอง", "faceclaimSub")}</div></section>
@@ -11639,7 +11639,7 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>Personality และ TMI</h2></div><div class="dds-form-grid">${field("สัญลักษณ์ Personality", "personalityIcon")}${richField("เนื้อหา Personality", "personalityText", 12)}${field("สัญลักษณ์ TMI", "tmiIcon")}</div><div class="dds-eric-tmi-toolbar"><div><strong>รายการ TMI</strong><small>เพิ่มหรือลดจำนวนได้ตามต้องการ</small></div><button type="button" data-eric-add-tmi>＋ เพิ่ม TMI</button></div><div class="dds-eric-tmi-list" data-eric-tmi-list></div><p class="dds-eric-tmi-empty" data-eric-tmi-empty hidden>ยังไม่มีรายการ TMI — กด “＋ เพิ่ม TMI” เพื่อเพิ่มรายการ</p></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>ส่วนท้าย</h2></div><div class="dds-form-grid">${field("ข้อความส่วนท้าย", "footerText", {full:true,textarea:true,rows:3,placeholder:"เช่น ☾ ERIC HAWKINS ☘ WEREWOLF ♫"})}</div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-eric-profile-copy"><div class="dds-control-title"><span>08</span><h2>คัดลอกโค้ด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ดที่กรอกเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-eric-copy>COPY CODE <span>↗</span></button><button type="button" data-eric-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-eric-profile-copy"><div class="dds-control-title"><span>08</span><h2>คัดลอกโคด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโคดที่กรอกเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-eric-copy>COPY CODE <span>↗</span></button><button type="button" data-eric-reset>RESET</button></div></section>
         </div>
       </div>`;
     if (footer) main.insertBefore(editorPanel, footer); else main.appendChild(editorPanel);
@@ -11699,7 +11699,7 @@ ${stylesheetLinks}
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-eric-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage" data-eric-view-stage><div class="dds-eric-view-holder" data-eric-view-holder><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทประวัติ Eric Hawkins"></iframe></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button class="dds-back-button" data-eric-view-back type="button">←</button></div><div class="dds-commission-preview-stage dds-eric-view-stage" data-eric-view-stage><div class="dds-eric-view-holder" data-eric-view-holder><iframe class="dds-editor-preview-frame dds-commission-view-frame" data-eric-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทประวัติ Eric Hawkins"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-eric-view-back]")?.addEventListener("click", backToCommission, true);
     return viewPanel;
@@ -11780,7 +11780,7 @@ ${stylesheetLinks}
     if (document.querySelector(".dds-eric-commission-card")) return true;
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-eric-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-eric-card-preview-frame" data-eric-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Eric Hawkins"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทประวัติ</p><p class="dds-commission-card-client">ผู้จ้าง <strong>ERIC HAWKINS</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-eric-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-eric-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-eric-card-preview-frame" data-eric-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Eric Hawkins"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ</p><p class="dds-commission-card-client">ผู้จ้าง <strong>ERIC HAWKINS</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-eric-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-eric-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-eric-view]")?.addEventListener("click", openView);
     card.querySelector("[data-eric-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
@@ -12680,7 +12680,7 @@ ${stylesheetLinks}
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
       setDraftStatus(savedAt);
-      showToast("บันทึกแบบร่างโค้ด Cover แล้ว");
+      showToast("บันทึกแบบร่างโคด Cover แล้ว");
     } catch {
       showToast("บันทึกแบบร่างไม่สำเร็จ");
     }
@@ -12704,7 +12704,7 @@ ${stylesheetLinks}
     const code = buildCode();
     try {
       await navigator.clipboard.writeText(code);
-      showToast("คัดลอกโค้ด Cover แล้ว");
+      showToast("คัดลอกโคด Cover แล้ว");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -12714,7 +12714,7 @@ ${stylesheetLinks}
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      showToast("คัดลอกโค้ด Cover แล้ว");
+      showToast("คัดลอกโคด Cover แล้ว");
     }
   }
 
@@ -12789,12 +12789,12 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-vmac-back type="button">←</button>
-        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-vmac-commission-heading"><span>COMMISSION</span><span>— โค้ดสำหรับการลงโคฟเวอร์เพลง</span></h1><p>ผู้จ้าง MIKAEL F. KAISER — แก้รูป วิดีโอ Emoji ข้อความ และ Dock ได้จากเครื่องมือด้านขวา</p></div>
+        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-vmac-commission-heading"><span>COMMISSION</span><span>— โคดสำหรับการลงโคฟเวอร์เพลง</span></h1><p>ผู้จ้าง MIKAEL F. KAISER — แก้รูป วิดีโอ Emoji ข้อความ และ Dock ได้จากเครื่องมือด้านขวา</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>MIKAEL / COVER SONG</strong></div>
-          <div class="dds-protected-commission-preview-stage dds-vmac-preview-stage" data-vmac-preview-stage><div class="dds-vmac-preview-holder" data-vmac-preview-holder><iframe class="dds-protected-commission-preview-frame" data-vmac-preview scrolling="no" title="ตัวอย่างโค้ด Cover Song"></iframe></div></div>
+          <div class="dds-protected-commission-preview-stage dds-vmac-preview-stage" data-vmac-preview-stage><div class="dds-vmac-preview-holder" data-vmac-preview-holder><iframe class="dds-protected-commission-preview-frame" data-vmac-preview scrolling="no" title="ตัวอย่างโคด Cover Song"></iframe></div></div>
         </div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-vmac-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-vmac-save>SAVE DRAFT</button><button type="button" data-vmac-delete>DELETE SAVE</button></div>
@@ -12817,7 +12817,7 @@ ${stylesheetLinks}
               ${field("Emoji 03 — ซีดี", "emojiThree", {placeholder:"128191"})}
               ${field("Emoji 04 — โบว์", "emojiFour", {placeholder:"127872"})}
             </div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>ข้อความในโค้ด</h2></div><div class="dds-form-grid">
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>ข้อความในโคด</h2></div><div class="dds-form-grid">
               ${field("วัน / เวลาแถบเมนู", "menuDate", {placeholder:"Sun 23:25"})}
               ${field("ชื่อไฟล์รูป Preview", "photoOneName", {placeholder:"IMG_0624"})}
               ${field("ป้ายคำอธิบาย", "descriptionLabel", {placeholder:"VOICE MEMO"})}
@@ -12832,7 +12832,7 @@ ${stylesheetLinks}
               ${field("Dock 01", "dock1", {placeholder:"◒"})}${field("Dock 02", "dock2", {placeholder:"▦"})}${field("Dock 03", "dock3", {placeholder:"A"})}${field("Dock 04", "dock4", {placeholder:"◎"})}${field("Dock 05", "dock5", {placeholder:"▰"})}${field("Dock 06", "dock6", {placeholder:"◉"})}${field("Dock 07", "dock7", {placeholder:"✦"})}${field("Dock 08", "dock8", {placeholder:"●"})}${field("Dock 09", "dock9", {placeholder:"□"})}${field("Dock 10", "dock10", {placeholder:"⌁"})}${field("Dock 11 — หลังเส้นคั่น", "dock11", {placeholder:"⌫"})}
             </div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-vmac-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโค้ด Cover ที่แก้เสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-vmac-copy>COPY CODE <span>↗</span></button><button type="button" data-vmac-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-vmac-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอกโคด Cover ที่แก้เสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-vmac-copy>COPY CODE <span>↗</span></button><button type="button" data-vmac-reset>RESET</button></div></section>
         </div>
       </div>`;
 
@@ -12954,7 +12954,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-vmac-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-vmac-card-preview-frame" data-vmac-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Cover Song"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดสำหรับการลงโคฟเวอร์เพลง</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-vmac-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-vmac-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-vmac-card-preview-frame" data-vmac-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Cover Song"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดสำหรับการลงโคฟเวอร์เพลง</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-vmac-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-vmac-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-vmac-view]")?.addEventListener("click", openView);
     card.querySelector("[data-vmac-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
@@ -13275,7 +13275,7 @@ ${stylesheetLinks}
     const code = buildCode();
     try {
       await navigator.clipboard.writeText(code);
-      showToast("คัดลอกโค้ดโปรไฟล์ Landon แล้ว");
+      showToast("คัดลอกโคดโปรไฟล์ Landon แล้ว");
     } catch {
       const textarea = document.createElement("textarea");
       textarea.value = code;
@@ -13285,7 +13285,7 @@ ${stylesheetLinks}
       textarea.select();
       document.execCommand("copy");
       textarea.remove();
-      showToast("คัดลอกโค้ดโปรไฟล์ Landon แล้ว");
+      showToast("คัดลอกโคดโปรไฟล์ Landon แล้ว");
     }
   }
 
@@ -13352,12 +13352,12 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-lr-profile-back type="button">←</button>
-        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-lr-profile-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโปรไฟล์</span></h1><p>ผู้จ้าง LANDON A. RUTHERFORD — แก้ข้อความ รูป Emoji และ Dock ได้จากเครื่องมือด้านขวา</p></div>
+        <div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-lr-profile-commission-heading"><span>COMMISSION</span><span>— โคดประเภทโปรไฟล์</span></h1><p>ผู้จ้าง LANDON A. RUTHERFORD — แก้ข้อความ รูป Emoji และ Dock ได้จากเครื่องมือด้านขวา</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON / PROFILE</strong></div>
-          <div class="dds-protected-commission-preview-stage dds-lr-profile-preview-stage" data-lr-profile-preview-stage><div class="dds-lr-profile-preview-holder" data-lr-profile-preview-holder><iframe class="dds-protected-commission-preview-frame" data-lr-profile-preview scrolling="no" title="ตัวอย่างโค้ดโปรไฟล์ Landon"></iframe></div></div>
+          <div class="dds-protected-commission-preview-stage dds-lr-profile-preview-stage" data-lr-profile-preview-stage><div class="dds-lr-profile-preview-holder" data-lr-profile-preview-holder><iframe class="dds-protected-commission-preview-frame" data-lr-profile-preview scrolling="no" title="ตัวอย่างโคดโปรไฟล์ Landon"></iframe></div></div>
         </div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-lr-profile-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-lr-profile-save>SAVE DRAFT</button><button type="button" data-lr-profile-delete>DELETE SAVE</button></div>
@@ -13388,10 +13388,10 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>Emoji ใน Search Emoji</h2></div><p class="dds-lr-profile-emoji-help">กรอกเฉพาะเลขจากช่อง <strong>Decimal Value</strong> เช่น <code>127911</code> ถ้ามีหลายค่าให้เว้นวรรค เช่น <code>9939 65039</code> · <a href="https://www.dremendo.com/html-tutorial/html-emoji-codes" target="_blank" rel="noopener noreferrer">เปิดตาราง Emoji ↗</a></p><div class="dds-form-grid dds-lr-profile-emoji-grid">
               ${emojiFields("keyEmoji", 6, ["Emoji Search 01 — ✦", "Emoji Search 02 — ♠", "Emoji Search 03 — ☾", "Emoji Search 04 — 🖤", "Emoji Search 05 — ⚓️", "Emoji Search 06 — 🎧"])}
             </div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Emoji ลอยรอบโค้ด</h2></div><p class="dds-lr-profile-emoji-help">แก้ Emoji ลอยทั้ง 15 จุดด้วย Decimal Value โดย <strong>VOLUME ถูกล็อกไว้ตามต้นฉบับ</strong></p><div class="dds-form-grid dds-lr-profile-emoji-grid">${emojiFields("float", 15)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Emoji ลอยรอบโคด</h2></div><p class="dds-lr-profile-emoji-help">แก้ Emoji ลอยทั้ง 15 จุดด้วย Decimal Value โดย <strong>VOLUME ถูกล็อกไว้ตามต้นฉบับ</strong></p><div class="dds-form-grid dds-lr-profile-emoji-grid">${emojiFields("float", 15)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Dock symbols</h2></div><p class="dds-lr-profile-emoji-help">แก้สัญลักษณ์ใน Dock ได้ทุกช่อง ตัวอย่างเดิมแสดงอยู่ใน placeholder</p><div class="dds-form-grid dds-lr-profile-dock-grid">${dockFields()}</div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-lr-profile-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML โปรไฟล์ที่แก้ไขเสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-lr-profile-copy>COPY CODE <span>↗</span></button><button type="button" data-lr-profile-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-lr-profile-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML โปรไฟล์ที่แก้ไขเสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-lr-profile-copy>COPY CODE <span>↗</span></button><button type="button" data-lr-profile-reset>RESET</button></div></section>
         </div>
       </div>`;
 
@@ -13413,7 +13413,7 @@ ${stylesheetLinks}
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-lr-profile-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-lr-profile-view-back type="button">←</button></div><div class="dds-lr-profile-view-stage" data-lr-profile-view-stage><div class="dds-lr-profile-view-holder" data-lr-profile-view-holder><iframe class="dds-editor-preview-frame dds-lr-profile-view-frame" data-lr-profile-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทโปรไฟล์ Landon A. Rutherford"></iframe></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-lr-profile-view-back type="button">←</button></div><div class="dds-lr-profile-view-stage" data-lr-profile-view-stage><div class="dds-lr-profile-view-holder" data-lr-profile-view-holder><iframe class="dds-editor-preview-frame dds-lr-profile-view-frame" data-lr-profile-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโปรไฟล์ Landon A. Rutherford"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-lr-profile-view-back]")?.addEventListener("click", goBack);
     return viewPanel;
@@ -13507,7 +13507,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-lr-profile-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-lr-profile-card-preview-frame" data-lr-profile-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Profile Landon"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>LANDON A. RUTHERFORD</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-lr-profile-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-lr-profile-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-lr-profile-card-preview-frame" data-lr-profile-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Profile Landon"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>LANDON A. RUTHERFORD</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-lr-profile-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-lr-profile-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-lr-profile-view]")?.addEventListener("click", openView);
     card.querySelector("[data-lr-profile-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
@@ -13843,7 +13843,7 @@ ${stylesheetLinks}
       </div>
       <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
         <button type="button" data-hans-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
-        <button type="button" data-hans-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-hans-bbcode="code" title="โคด [code]">&lt;/&gt;</button>
         <button type="button" data-hans-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
         <button type="button" data-hans-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
       </div>
@@ -14065,7 +14065,7 @@ ${stylesheetLinks}
       document.execCommand("copy");
       textarea.remove();
     }
-    showToast("คัดลอกโค้ดโรลเพลย์ Hans แล้ว");
+    showToast("คัดลอกโคดโรลเพลย์ Hans แล้ว");
   }
 
   function setCommissionTab() {
@@ -14140,17 +14140,17 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-back type="button">←</button>
-        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7</p></div>
+        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โคดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>HANS X. FROST / ROLEPLAY</strong></div>
-          <div class="dds-protected-commission-preview-stage dds-hans-preview-stage" data-hans-preview-stage><div class="dds-hans-preview-holder" data-hans-preview-holder><iframe class="dds-protected-commission-preview-frame" data-hans-preview scrolling="no" title="ตัวอย่างโค้ดโรลเพลย์ Hans X. Frost"></iframe></div></div>
+          <div class="dds-protected-commission-preview-stage dds-hans-preview-stage" data-hans-preview-stage><div class="dds-hans-preview-holder" data-hans-preview-holder><iframe class="dds-protected-commission-preview-frame" data-hans-preview scrolling="no" title="ตัวอย่างโคดโรลเพลย์ Hans X. Frost"></iframe></div></div>
         </div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-hans-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-hans-save>SAVE DRAFT</button><button type="button" data-hans-delete>DELETE SAVE</button></div>
           <div class="dds-protected-commission-scroll dds-hans-commission-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">
               <label class="dds-field"><span>ชื่อด้านบน</span><input type="text" data-hans-field="firstName" value=""></label>
               <label class="dds-field"><span>ชื่อกลาง–นามสกุลด้านล่าง</span><input type="text" data-hans-field="lastName" value=""></label>
@@ -14166,7 +14166,7 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-hans-roleplay-field"><span>ข้อความโรลเพลย์</span>${hansBbcodeToolbar()}<textarea data-hans-field="roleplay" rows="14"></textarea><div class="dds-word-counter" data-hans-word-counter data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-hans-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value=""></label></div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
         </div>
       </div>`;
 
@@ -14215,7 +14215,7 @@ ${stylesheetLinks}
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-hans-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-hans-view-back]")?.addEventListener("click", goBack);
     return viewPanel;
@@ -14253,7 +14253,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);
@@ -14597,7 +14597,7 @@ ${stylesheetLinks}
       </div>
       <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
         <button type="button" data-hans-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
-        <button type="button" data-hans-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-hans-bbcode="code" title="โคด [code]">&lt;/&gt;</button>
         <button type="button" data-hans-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
         <button type="button" data-hans-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
       </div>
@@ -14819,7 +14819,7 @@ ${stylesheetLinks}
       document.execCommand("copy");
       textarea.remove();
     }
-    showToast("คัดลอกโค้ดโรลเพลย์ Hans (สำหรับฮันส์คนเดียว) แล้ว");
+    showToast("คัดลอกโคดโรลเพลย์ Hans (สำหรับฮันส์คนเดียว) แล้ว");
   }
 
   function setCommissionTab() {
@@ -14894,17 +14894,17 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-back type="button">←</button>
-        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — สำหรับฮันส์คนเดียว</p></div>
+        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โคดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — สำหรับฮันส์คนเดียว</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
           <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>HANS X. FROST / ROLEPLAY</strong></div>
-          <div class="dds-protected-commission-preview-stage dds-hans-preview-stage" data-hans-preview-stage><div class="dds-hans-preview-holder" data-hans-preview-holder><iframe class="dds-protected-commission-preview-frame" data-hans-preview scrolling="no" title="ตัวอย่างโค้ดโรลเพลย์ Hans X. Frost"></iframe></div></div>
+          <div class="dds-protected-commission-preview-stage dds-hans-preview-stage" data-hans-preview-stage><div class="dds-hans-preview-holder" data-hans-preview-holder><iframe class="dds-protected-commission-preview-frame" data-hans-preview scrolling="no" title="ตัวอย่างโคดโรลเพลย์ Hans X. Frost"></iframe></div></div>
         </div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-hans-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-hans-save>SAVE DRAFT</button><button type="button" data-hans-delete>DELETE SAVE</button></div>
           <div class="dds-protected-commission-scroll dds-hans-commission-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">
               <label class="dds-field dds-field-full"><span>ชื่อ</span><input type="text" data-hans-field="firstName" value="Hans X. Frost"></label>
             </div></section>
@@ -14920,7 +14920,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
             <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-hans-roleplay-field"><span>ข้อความโรลเพลย์</span>${hansBbcodeToolbar()}<textarea data-hans-field="roleplay" rows="14"></textarea><div class="dds-word-counter" data-hans-word-counter data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-hans-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value=""></label></div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
         </div>
       </div>`;
 
@@ -14969,7 +14969,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-hans-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-hans-view-back]")?.addEventListener("click", goBack);
     return viewPanel;
@@ -15062,7 +15062,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card dds-hans-solo-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
@@ -15105,7 +15105,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 /* =========================================================
    HANS X. FROST — RORAIMA HOUSE COMMISSION EDITOR
-   โค้ดประเภทกระทู้บ้าน / Protected editor
+   โคดประเภทกระทู้บ้าน / Protected editor
    ========================================================= */
 (() => {
   "use strict";
@@ -15240,7 +15240,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function saveDraft(){ const data={values:getValues(),savedAt:Date.now()}; localStorage.setItem(DRAFT_KEY,JSON.stringify(data)); setDraftStatus(data.savedAt); showToast("บันทึกแบบร่าง RORAIMA แล้ว"); }
   function deleteDraft(){ localStorage.removeItem(DRAFT_KEY); setDraftStatus(0); showToast("ลบแบบร่าง RORAIMA แล้ว"); }
   function resetFields(){ setValues(defaults); updatePreview(); showToast("รีเซ็ต RORAIMA เป็นค่าต้นฉบับแล้ว"); }
-  async function copyCode(){ const code=fullCode(getValues()); try{await navigator.clipboard.writeText(code)}catch{const ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()} showToast("คัดลอกโค้ดกระทู้บ้าน RORAIMA แล้ว"); }
+  async function copyCode(){ const code=fullCode(getValues()); try{await navigator.clipboard.writeText(code)}catch{const ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()} showToast("คัดลอกโคดกระทู้บ้าน RORAIMA แล้ว"); }
 
   function setCommissionTab(){ document.querySelectorAll("[data-work-tab]").forEach(b=>{const s=b.dataset.workTab==="commission";b.classList.toggle("is-active",s);b.setAttribute("aria-selected",String(s))}); document.querySelectorAll("[data-work-panel]").forEach(p=>{const s=p.dataset.workPanel==="commission";p.hidden=!s;p.classList.toggle("is-active",s)}); }
   function showPanel(name){ document.querySelectorAll(".dds-panel").forEach(p=>p.classList.toggle("is-active",p.dataset.panel===name)); document.querySelectorAll(".dds-nav-button").forEach(b=>b.classList.toggle("is-active",b.dataset.page==="commission")); const n=document.getElementById("currentPageNumber"); if(n)n.textContent="04"; window.scrollTo({top:0,left:0,behavior:"auto"}); }
@@ -15255,13 +15255,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function createPanel(){
     if(panel?.isConnected)return panel; const footer=document.querySelector(".dds-footer"); if(!footer)return null;
     panel=document.createElement("section"); panel.className="dds-panel dds-protected-commission-editor dds-rora-commission-editor"; panel.dataset.panel=PANEL_NAME;
-    panel.innerHTML=`<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-rora-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทกระทู้บ้าน</span></h1><p>ผู้จ้าง HANS X. FROST</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>RORAIMA / HOUSE THREAD</strong></div><div class="dds-rora-preview-stage" data-rora-preview-stage><div class="dds-rora-preview-holder" data-rora-preview-holder><iframe class="dds-protected-commission-preview-frame dds-rora-preview-frame" data-rora-preview scrolling="no" title="ตัวอย่างโค้ดกระทู้บ้าน RORAIMA"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-rora-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-rora-save>SAVE DRAFT</button><button type="button" data-rora-delete>DELETE SAVE</button></div><div class="dds-protected-commission-scroll dds-rora-commission-scroll">
-      <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("พื้นหลังสีที่ 1","bg1","#ffffff")}${colorField("พื้นหลังสีที่ 2","bg2","#efeeab")}${colorField("พื้นหลังสีที่ 3","bg3","#fdca8e")}${colorField("สีขอบล่างสุด","borderColor","#000000")}</div><p class="dds-rora-color-help">สีพื้นหลังทั้ง 3 ช่องแก้ได้ และจะเกลี่ยแบบ linear-gradient(180deg, สีที่ 1 0%, สีที่ 2 52%, สีที่ 3 100%)</p></section>
+    panel.innerHTML=`<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-rora-commission-heading"><span>COMMISSION</span><span>— โคดประเภทกระทู้บ้าน</span></h1><p>ผู้จ้าง HANS X. FROST</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>RORAIMA / HOUSE THREAD</strong></div><div class="dds-rora-preview-stage" data-rora-preview-stage><div class="dds-rora-preview-holder" data-rora-preview-holder><iframe class="dds-protected-commission-preview-frame dds-rora-preview-frame" data-rora-preview scrolling="no" title="ตัวอย่างโคดกระทู้บ้าน RORAIMA"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-rora-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-rora-save>SAVE DRAFT</button><button type="button" data-rora-delete>DELETE SAVE</button></div><div class="dds-protected-commission-scroll dds-rora-commission-scroll">
+      <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("พื้นหลังสีที่ 1","bg1","#ffffff")}${colorField("พื้นหลังสีที่ 2","bg2","#efeeab")}${colorField("พื้นหลังสีที่ 3","bg3","#fdca8e")}${colorField("สีขอบล่างสุด","borderColor","#000000")}</div><p class="dds-rora-color-help">สีพื้นหลังทั้ง 3 ช่องแก้ได้ และจะเกลี่ยแบบ linear-gradient(180deg, สีที่ 1 0%, สีที่ 2 52%, สีที่ 3 100%)</p></section>
       <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>หัวข้อและเนื้อหาบ้าน</h2></div><div class="dds-form-grid">${field("หัวข้อหลัก — RORAIMA","title")}${field("หัวข้อรอง — The Garage","subtitle")}${field("เนื้อหาบ้าน","roomText",{full:true,textarea:true,rows:8})}</div></section>
       ${imageSection("03","HOUSE","houseImage","houseX","houseY")}${imageSection("04","GARAGE","garageImage","garageX","garageY")}${imageSection("05","PEACH TREE","treeImage","treeX","treeY")}${imageSection("06","IVY","ivyImage","ivyX","ivyY")}${imageSection("07","PEACH","peachImage","peachX","peachY")}${imageSection("08","WOOD","woodImage","woodX","woodY")}${imageSection("09","BENTLEY","bentleyImage","bentleyX","bentleyY")}${imageSection("10","ASTON","astonImage","astonX","astonY")}
       <section class="dds-control-section"><div class="dds-control-title"><span>11</span><h2>รายละเอียด 1–5</h2></div><div class="dds-form-grid">${[1,2,3,4,5].map(i=>`${field(`หัวข้อ ${i}`,`detailTitle${i}`,{full:true})}${field(`เนื้อหา ${i}`,`detailText${i}`,{full:true,textarea:true,rows:5})}`).join("")}</div></section>
       <section class="dds-control-section"><div class="dds-control-title"><span>12</span><h2>ข้อความท้าย</h2></div><div class="dds-form-grid">${field("ข้อความท้ายฝั่งซ้าย","footerLeft")}${field("ข้อความท้ายฝั่งขวา","footerRight")}</div></section>
-    </div><section class="dds-protected-commission-copy dds-rora-commission-copy"><div class="dds-control-title"><span>13</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอกโค้ดกระทู้บ้านที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที</p><div class="dds-protected-commission-copy-actions"><button type="button" data-rora-copy>COPY CODE <span>↗</span></button><button type="button" data-rora-reset>RESET</button></div></section></div></div>`;
+    </div><section class="dds-protected-commission-copy dds-rora-commission-copy"><div class="dds-control-title"><span>13</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอกโคดกระทู้บ้านที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที</p><div class="dds-protected-commission-copy-actions"><button type="button" data-rora-copy>COPY CODE <span>↗</span></button><button type="button" data-rora-reset>RESET</button></div></section></div></div>`;
     footer.before(panel);
     panel.querySelector("[data-rora-back]")?.addEventListener("click",goBack);
     panel.addEventListener("input",(event)=>{const picker=event.target.closest?.("[data-rora-color-picker]");if(picker){const input=panel.querySelector(`[data-rora-field="${picker.dataset.roraColorPicker}"]`);if(input)input.value=picker.value} schedulePreview()});
@@ -15269,15 +15269,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return panel;
   }
 
-  function createViewPanel(){ if(viewPanel?.isConnected)return viewPanel; const footer=document.querySelector(".dds-footer"); if(!footer)return null; viewPanel=document.createElement("section"); viewPanel.className="dds-panel dds-commission-view-panel dds-rora-view-panel"; viewPanel.dataset.panel=VIEW_PANEL_NAME; viewPanel.innerHTML=`<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-view-back type="button">←</button></div><div class="dds-rora-view-stage" data-rora-view-stage><div class="dds-rora-view-holder" data-rora-view-holder><iframe class="dds-editor-preview-frame dds-rora-view-frame" data-rora-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทกระทู้บ้าน RORAIMA"></iframe></div></div>`; footer.before(viewPanel); viewPanel.querySelector("[data-rora-view-back]")?.addEventListener("click",goBack); return viewPanel; }
+  function createViewPanel(){ if(viewPanel?.isConnected)return viewPanel; const footer=document.querySelector(".dds-footer"); if(!footer)return null; viewPanel=document.createElement("section"); viewPanel.className="dds-panel dds-commission-view-panel dds-rora-view-panel"; viewPanel.dataset.panel=VIEW_PANEL_NAME; viewPanel.innerHTML=`<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-view-back type="button">←</button></div><div class="dds-rora-view-stage" data-rora-view-stage><div class="dds-rora-view-holder" data-rora-view-holder><iframe class="dds-editor-preview-frame dds-rora-view-frame" data-rora-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทกระทู้บ้าน RORAIMA"></iframe></div></div>`; footer.before(viewPanel); viewPanel.querySelector("[data-rora-view-back]")?.addEventListener("click",goBack); return viewPanel; }
   function openView(){const target=createViewPanel();if(!target)return;enableEditorMode();showPanel(VIEW_PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-view");writeIframe(target.querySelector("[data-rora-view-preview]"),OFFICIAL_CODE,fitViewPreview,VIEW_CANVAS_WIDTH)}
-  function openEditor(){const editor=createPanel();if(!editor)return;enableEditorMode();const draft=getDraft();setValues(draft?.values?{...defaults,...draft.values}:defaults);setDraftStatus(draft?.savedAt||0);showPanel(PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-editor");updatePreview()}
+  function openEditor(){const editor=createPanel();if(!editor)return;enableEditorMode();const draft=getDraft();setValues(draft?.values?{...defaults,...draft.values}:defaults);setDraftStatus(draft?.savedAt||0);showPanel(PANEL_NAME);history.replaceState(null,"","#commission-pinewoods7-house-editor");updatePreview()}
 
   function closeModal(){if(!modal)return;modal.hidden=true;document.body.classList.remove("dds-modal-open")}
-  function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโค้ดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
+  function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
   function openModal(){const lock=createModal();lock.hidden=false;document.body.classList.add("dds-modal-open");const input=lock.querySelector("[data-rora-lock-input]"),error=lock.querySelector("[data-rora-lock-error]");if(input)input.value="";if(error)error.textContent="";requestAnimationFrame(()=>input?.focus())}
 
-  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>sessionStorage.getItem(ACCESS_SESSION_KEY)==="1"?openEditor():openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>sessionStorage.getItem(ACCESS_SESSION_KEY)==="1"?openEditor():openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();

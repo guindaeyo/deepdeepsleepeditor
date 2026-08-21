@@ -2707,7 +2707,7 @@ output {
 
 
 /* ==================================================
-   FOR REVIEW — การ์ดเหมือน FOR ROLEPLAY แต่เห็นโค้ดครบ
+   FOR REVIEW — การ์ดเหมือน FOR ROLEPLAY แต่เห็นโคดครบ
 ================================================== */
 
 .dds-review-grid {
@@ -2720,7 +2720,7 @@ output {
   min-width: 0;
 }
 
-/* เพิ่มความสูงพรีวิวเพื่อให้โค้ดรีวิวครบทั้งชิ้น แต่ยังเป็นการ์ด */
+/* เพิ่มความสูงพรีวิวเพื่อให้โคดรีวิวครบทั้งชิ้น แต่ยังเป็นการ์ด */
 .dds-review-grid
 .dds-roleplay-card-preview {
   height:
@@ -3453,7 +3453,7 @@ output {
 }
 
 
-/* หน้าแก้โค้ดใช้ความสูงคงที่ ไม่ยาวตามโค้ดเต็มจอ */
+/* หน้าแก้โคดใช้ความสูงคงที่ ไม่ยาวตามโคดเต็มจอ */
 [data-panel="editor-profile001"]
 .dds-editor-preview-column {
   overflow: hidden;
@@ -3641,7 +3641,7 @@ output {
     center center !important;
 }
 
-/* หน้าแก้โค้ด */
+/* หน้าแก้โคด */
 .dds-profile-editor-preview-frame {
   transform:
     translate3d(-50%, -50%, 0)
@@ -4581,7 +4581,7 @@ output {
 
 /* ==================================================
    FORTYONEWINKS — NATURAL VISUAL BOUNDS FIX
-   ไม่บังคับตัวโค้ดกว้าง 1100px อีกต่อไป
+   ไม่บังคับตัวโคดกว้าง 1100px อีกต่อไป
 ================================================== */
 
 .dds-fortyone-preview-stage {
@@ -5663,7 +5663,7 @@ output {
 }
 
 
-/* หน้าโชว์งานขยายตามความสูงจริงของโค้ด */
+/* หน้าโชว์งานขยายตามความสูงจริงของโคด */
 .dds-commission-preview-stage {
   width: min(1040px, 100%) !important;
   max-width: 1040px !important;
@@ -6371,7 +6371,7 @@ textarea + .dds-bbcode-toolbar {
 
 /* ==================================================
    EDITOR COPY DOCK — COPY SECTION OUTSIDE SCROLL
-   ส่วนกรอกข้อมูลเลื่อนด้านบน ส่วนคัดลอกโค้ดอยู่ล่างสุดเสมอ
+   ส่วนกรอกข้อมูลเลื่อนด้านบน ส่วนคัดลอกโคดอยู่ล่างสุดเสมอ
    ================================================== */
 .dds-editor-copy-dock {
   width: 100%;
@@ -7102,7 +7102,7 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   }
 }
 
-/* COMMISSION 01 — ปุ่มคัดลอกโค้ดสีแดงเหมือน editor อื่น */
+/* COMMISSION 01 — ปุ่มคัดลอกโคดสีแดงเหมือน editor อื่น */
 .dds-food-commission-copy [data-food-copy] {
   width: 100%;
   color: #fff;
