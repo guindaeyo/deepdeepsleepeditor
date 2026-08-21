@@ -13816,39 +13816,43 @@ ${stylesheetLinks}
 
   function hansBbcodeToolbar() {
     return `<div class="dds-rich-toolbar dds-bbcode-toolbar dds-hans-bbcode-toolbar" data-hans-bbcode-toolbar>
-      <div class="dds-bbcode-group">
-        <button type="button" data-hans-bbcode="b" title="ตัวหนา"><b>B</b></button>
-        <button type="button" data-hans-bbcode="i" title="ตัวเอียง"><i>I</i></button>
-        <button type="button" data-hans-bbcode="u" title="ขีดเส้นใต้"><u>U</u></button>
-        <button type="button" data-hans-bbcode="s" title="ขีดฆ่า"><s>S</s></button>
+      <div class="dds-bbcode-group" aria-label="รูปแบบตัวอักษร">
+        <button type="button" data-hans-bbcode="b" title="ตัวหนา [b]" aria-label="ตัวหนา"><b>B</b></button>
+        <button type="button" data-hans-bbcode="i" title="ตัวเอียง [i]" aria-label="ตัวเอียง"><i>I</i></button>
+        <button type="button" data-hans-bbcode="u" title="ขีดเส้นใต้ [u]" aria-label="ขีดเส้นใต้"><u>U</u></button>
+        <button type="button" data-hans-bbcode="s" title="ขีดฆ่า [s]" aria-label="ขีดฆ่า"><s>S</s></button>
       </div>
-      <div class="dds-bbcode-group">
-        <button type="button" data-hans-bbcode="size-small">S</button>
-        <button type="button" data-hans-bbcode="size-medium">M</button>
-        <button type="button" data-hans-bbcode="size-large">L</button>
-        <label class="dds-bbcode-color" title="สีตัวอักษร"><span>A</span><input type="color" data-hans-bbcode-color value="#000000"></label>
+      <div class="dds-bbcode-group" aria-label="สีและขนาด">
+        <label class="dds-bbcode-color" title="สีตัวอักษร [color]"><span>A</span><input type="color" data-hans-bbcode-color value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label>
+        <button type="button" data-hans-bbcode="size-small" title="ตัวอักษรเล็ก [size=small]">A−</button>
+        <button type="button" data-hans-bbcode="size-medium" title="ตัวอักษรกลาง [size=medium]">A</button>
+        <button type="button" data-hans-bbcode="size-large" title="ตัวอักษรใหญ่ [size=large]">A+</button>
       </div>
-      <div class="dds-bbcode-group">
-        <button type="button" data-hans-bbcode="align-left" title="ชิดซ้าย">LEFT</button>
-        <button type="button" data-hans-bbcode="align-center" title="กึ่งกลาง">CENTER</button>
-        <button type="button" data-hans-bbcode="align-right" title="ชิดขวา">RIGHT</button>
-        <button type="button" data-hans-bbcode="align-justify" title="เต็มบรรทัด">JUSTIFY</button>
+      <div class="dds-bbcode-group" aria-label="จัดตำแหน่ง">
+        <button type="button" data-hans-bbcode="align-left" title="ชิดซ้าย [align=left]">⇤</button>
+        <button type="button" data-hans-bbcode="align-center" title="กึ่งกลาง [align=center]">↔</button>
+        <button type="button" data-hans-bbcode="align-right" title="ชิดขวา [align=right]">⇥</button>
+        <button type="button" data-hans-bbcode="align-justify" title="เต็มบรรทัด [align=justify]">☰</button>
       </div>
-      <div class="dds-bbcode-group">
-        <button type="button" data-hans-bbcode="url">URL</button>
-        <button type="button" data-hans-bbcode="img">IMG</button>
-        <button type="button" data-hans-bbcode="video">YT</button>
-        <button type="button" data-hans-bbcode="quote">QUOTE</button>
-        <button type="button" data-hans-bbcode="code">CODE</button>
+      <div class="dds-bbcode-group" aria-label="ลิงก์และสื่อ">
+        <button type="button" data-hans-bbcode="url" title="ลิงก์ [url=]">🔗</button>
+        <button type="button" data-hans-bbcode="img" title="รูปภาพ [img]">▣</button>
+        <button type="button" data-hans-bbcode="video" title="YouTube [video=youtube]">▶</button>
       </div>
-      <div class="dds-bbcode-group">
-        <button type="button" data-hans-bbcode="list">LIST</button>
-        <button type="button" data-hans-bbcode="list-1">LIST 1</button>
-        <button type="button" data-hans-bbcode="list-item">ITEM</button>
-        <button type="button" data-hans-bbcode="hide">HIDE</button>
-        <button type="button" data-hans-bbcode="spoiler">SPOILER</button>
-        <button type="button" data-hans-bbcode="hr">HR</button>
-        <button type="button" data-hans-bbcode="clear">CLEAR</button>
+      <div class="dds-bbcode-group" aria-label="กล่องข้อความ">
+        <button type="button" data-hans-bbcode="quote" title="คำพูดอ้างอิง [quote]">❝</button>
+        <button type="button" data-hans-bbcode="code" title="โค้ด [code]">&lt;/&gt;</button>
+        <button type="button" data-hans-bbcode="hide" title="ซ่อนข้อความ [hide]">◉</button>
+        <button type="button" data-hans-bbcode="spoiler" title="สปอยล์ [spoiler]">▤</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="รายการ">
+        <button type="button" data-hans-bbcode="list" title="รายการจุด [list]">•≡</button>
+        <button type="button" data-hans-bbcode="list-1" title="รายการตัวเลข [list=1]">1≡</button>
+        <button type="button" data-hans-bbcode="list-item" title="รายการย่อย [*]">[*]</button>
+      </div>
+      <div class="dds-bbcode-group" aria-label="เครื่องมืออื่น">
+        <button type="button" data-hans-bbcode="hr" title="เส้นคั่น [hr]">―</button>
+        <button type="button" data-hans-bbcode="clear" title="ล้าง BBCode จากข้อความที่เลือก">CLEAR</button>
       </div>
     </div>`;
   }
