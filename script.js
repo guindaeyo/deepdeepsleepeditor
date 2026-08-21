@@ -13550,7 +13550,7 @@ ${stylesheetLinks}
 
 /* =========================================================
    HANS X. FROST — ROLEPLAY COMMISSION EDITOR
-   แก้ HEAD / BOX, ตำแหน่งรูป, สี, ชื่อ, Did you know..., โรลเพลย์ และหมายเหตุ
+   แก้สี, ชื่อ, HEAD / BOX, ตำแหน่งรูป, Did you know..., โรลเพลย์แบบ BBCode และหมายเหตุ
    BARCODE ถูกล็อกไว้ตามต้นฉบับ
    ========================================================= */
 (() => {
@@ -13627,8 +13627,230 @@ ${stylesheetLinks}
     return /^#[0-9a-f]{6}$/i.test(text) ? text : fallback;
   }
 
-  function roleToHtml(value) {
-    return h(value || "").replace(/\r?\n/g, "<br>");
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value || "").replace(/\r\n?/g, "\n");
+
+    const renderList = (source, ordered) => {
+      const pattern = ordered
+        ? /\[list=1\]([\s\S]*?)\[\/list\]/gi
+        : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+      const tag = ordered ? "ol" : "ul";
+      return source.replace(pattern, (_match, body) => {
+        const items = String(body || "")
+          .split(/\[\*\]/i)
+          .slice(1)
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .map((item) => `<li>${item}</li>`)
+          .join("");
+        return items ? `<${tag} style="margin:10px 0;padding-left:24px">${items}</${tag}>` : "";
+      });
+    };
+
+    text = renderList(text, true);
+    text = renderList(text, false);
+
+    text = text
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=small\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:.82em">$1</span>')
+      .replace(/\[size=medium\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1em">$1</span>')
+      .replace(/\[size=large\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1.28em">$1</span>')
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[img\]([^\[]+)\[\/img\]/gi, '<img src="$1" alt="" style="display:block;max-width:100%;height:auto;margin:10px auto">')
+      .replace(/\[video=youtube\]([^\[]+)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">▶ YouTube</a>')
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<span class="dds-hans-bbcode-block">$1</span>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code class="dds-hans-bbcode-block">$1</code>')
+      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span class="dds-hans-bbcode-block">$2</span>')
+      .replace(/\[hr\]/gi, '<hr style="margin:14px 0;border:0;border-top:1px solid currentColor;opacity:.25">')
+      .replace(/\n/g, "<br>");
+
+    return text;
+  }
+
+  function roleToHtml(value, previewMode = false) {
+    return previewMode ? bbcodeToPreviewHtml(value) : h(value || "");
+  }
+
+  function removeBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[url=[^\]]*\]/gi, " ")
+      .replace(/\[\/?(?:b|i|u|s|quote|code|hide|spoiler|color|size|align|url|img|video|list)(?:=[^\]]*)?\]/gi, " ")
+      .replace(/\[\*\]|\[hr\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countRoleplayWords(value) {
+    const clean = removeBbcodeForWordCount(value);
+    if (!clean) return 0;
+
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(clean)) {
+        if (segment.isWordLike) count += 1;
+      }
+      return count;
+    }
+
+    const words = clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+    return words ? words.length : 0;
+  }
+
+  function updateRoleplayWordCounter() {
+    const textarea = panel?.querySelector('[data-hans-field="roleplay"]');
+    const counter = panel?.querySelector("[data-hans-word-counter]");
+    if (!textarea || !counter) return;
+    const count = countRoleplayWords(textarea.value);
+    const number = counter.querySelector("[data-hans-word-count-number]");
+    if (number) number.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function replaceTextareaSelection(target, replacement, caretOffset = null) {
+    if (!target) return;
+    const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length;
+    const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start;
+    target.setRangeText(replacement, start, end, "end");
+    if (Number.isInteger(caretOffset)) {
+      const caret = start + caretOffset;
+      target.setSelectionRange(caret, caret);
+    }
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    target.focus();
+  }
+
+  function wrapHansTag(target, openTag, closeTag) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const replacement = `${openTag}${selected}${closeTag}`;
+    replaceTextareaSelection(target, replacement, selected ? replacement.length : openTag.length);
+  }
+
+  function applyHansList(target, ordered) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const lines = selected.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const openTag = ordered ? "[list=1]" : "[list]";
+    const body = lines.length ? lines.map((line) => `[*]${line}`).join("\n") : "[*]";
+    const replacement = `${openTag}\n${body}\n[/list]`;
+    replaceTextareaSelection(target, replacement, lines.length ? replacement.length : openTag.length + 4);
+  }
+
+  function applyHansBbcode(target, action, toolbar) {
+    if (!target) return;
+    if (["b", "i", "u", "s", "quote", "code", "hide", "spoiler"].includes(action)) {
+      wrapHansTag(target, `[${action}]`, `[/${action}]`);
+      return;
+    }
+
+    const wrappers = {
+      "size-small": ["[size=small]", "[/size]"],
+      "size-medium": ["[size=medium]", "[/size]"],
+      "size-large": ["[size=large]", "[/size]"],
+      "align-left": ["[align=left]", "[/align]"],
+      "align-center": ["[align=center]", "[/align]"],
+      "align-right": ["[align=right]", "[/align]"],
+      "align-justify": ["[align=justify]", "[/align]"]
+    };
+    if (wrappers[action]) {
+      wrapHansTag(target, wrappers[action][0], wrappers[action][1]);
+      return;
+    }
+
+    if (action === "color") {
+      const color = toolbar?.querySelector("[data-hans-bbcode-color]")?.value || "#000000";
+      wrapHansTag(target, `[color=${color}]`, "[/color]");
+      return;
+    }
+
+    if (action === "url") {
+      const start = target.selectionStart ?? 0;
+      const end = target.selectionEnd ?? start;
+      const selected = target.value.slice(start, end);
+      const url = window.prompt("ใส่ลิงก์ URL", /^https?:\/\//i.test(selected) ? selected : "https://");
+      if (url === null) return;
+      replaceTextareaSelection(target, `[url=${url}]${selected || url}[/url]`);
+      return;
+    }
+
+    if (action === "img") {
+      const url = window.prompt("ใส่ลิงก์รูปภาพ", "https://");
+      if (url === null) return;
+      replaceTextareaSelection(target, `[img]${url}[/img]`);
+      return;
+    }
+
+    if (action === "video") {
+      const url = window.prompt("ใส่ลิงก์ YouTube", "https://");
+      if (url === null) return;
+      replaceTextareaSelection(target, `[video=youtube]${url}[/video]`);
+      return;
+    }
+
+    if (action === "list") { applyHansList(target, false); return; }
+    if (action === "list-1") { applyHansList(target, true); return; }
+    if (action === "list-item") { replaceTextareaSelection(target, `[*]${target.value.slice(target.selectionStart ?? 0, target.selectionEnd ?? 0)}`); return; }
+    if (action === "hr") { replaceTextareaSelection(target, "[hr]"); return; }
+
+    if (action === "clear") {
+      const start = target.selectionStart ?? 0;
+      const end = target.selectionEnd ?? start;
+      if (start === end) {
+        showToast("คลุมข้อความที่ต้องการล้าง BBCode ก่อน");
+        return;
+      }
+      const selected = target.value.slice(start, end).replace(/\[[^\]]*\]/g, "");
+      replaceTextareaSelection(target, selected);
+    }
+  }
+
+  function hansBbcodeToolbar() {
+    return `<div class="dds-rich-toolbar dds-bbcode-toolbar dds-hans-bbcode-toolbar" data-hans-bbcode-toolbar>
+      <div class="dds-bbcode-group">
+        <button type="button" data-hans-bbcode="b" title="ตัวหนา"><b>B</b></button>
+        <button type="button" data-hans-bbcode="i" title="ตัวเอียง"><i>I</i></button>
+        <button type="button" data-hans-bbcode="u" title="ขีดเส้นใต้"><u>U</u></button>
+        <button type="button" data-hans-bbcode="s" title="ขีดฆ่า"><s>S</s></button>
+      </div>
+      <div class="dds-bbcode-group">
+        <button type="button" data-hans-bbcode="size-small">S</button>
+        <button type="button" data-hans-bbcode="size-medium">M</button>
+        <button type="button" data-hans-bbcode="size-large">L</button>
+        <label class="dds-bbcode-color" title="สีตัวอักษร"><span>A</span><input type="color" data-hans-bbcode-color value="#000000"></label>
+      </div>
+      <div class="dds-bbcode-group">
+        <button type="button" data-hans-bbcode="align-left" title="ชิดซ้าย">LEFT</button>
+        <button type="button" data-hans-bbcode="align-center" title="กึ่งกลาง">CENTER</button>
+        <button type="button" data-hans-bbcode="align-right" title="ชิดขวา">RIGHT</button>
+        <button type="button" data-hans-bbcode="align-justify" title="เต็มบรรทัด">JUSTIFY</button>
+      </div>
+      <div class="dds-bbcode-group">
+        <button type="button" data-hans-bbcode="url">URL</button>
+        <button type="button" data-hans-bbcode="img">IMG</button>
+        <button type="button" data-hans-bbcode="video">YT</button>
+        <button type="button" data-hans-bbcode="quote">QUOTE</button>
+        <button type="button" data-hans-bbcode="code">CODE</button>
+      </div>
+      <div class="dds-bbcode-group">
+        <button type="button" data-hans-bbcode="list">LIST</button>
+        <button type="button" data-hans-bbcode="list-1">LIST 1</button>
+        <button type="button" data-hans-bbcode="list-item">ITEM</button>
+        <button type="button" data-hans-bbcode="hide">HIDE</button>
+        <button type="button" data-hans-bbcode="spoiler">SPOILER</button>
+        <button type="button" data-hans-bbcode="hr">HR</button>
+        <button type="button" data-hans-bbcode="clear">CLEAR</button>
+      </div>
+    </div>`;
   }
 
   function getValues() {
@@ -13668,9 +13890,10 @@ ${stylesheetLinks}
     });
     syncColorPickers();
     updateRangeOutputs();
+    updateRoleplayWordCounter();
   }
 
-  function buildCode(values = getValues()) {
+  function buildCode(values = getValues(), previewMode = false) {
     const v = { ...defaults, ...values };
     const bg = normalizeColor(v.bgColor, defaults.bgColor);
     const color = normalizeColor(v.textColor, defaults.textColor);
@@ -13679,10 +13902,10 @@ ${stylesheetLinks}
     const boxX = clampPosition(v.boxX);
     const boxY = clampPosition(v.boxY);
 
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">${h(v.firstName)}</span><span class="ddsh-hxf-name-last">${h(v.lastName)}</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>${h(v.note)}</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">${h(v.firstName)}</span><span class="ddsh-hxf-name-last">${h(v.lastName)}</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay, previewMode)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>${h(v.note)}</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
   }
 
-  const OFFICIAL_CODE = buildCode(defaults);
+  const OFFICIAL_CODE = buildCode(defaults, false);
 
   function previewDocument(code) {
     return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-hans-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;display:flex;flex-direction:column;align-items:center;margin:0 auto}.dds-hans-preview-root>.ddsh-hxf{flex:0 0 auto!important}.dds-hans-preview-root>.ddshopfz-credit{flex:0 0 auto!important;width:100%!important}</style></head><body><div class="dds-hans-preview-root">${code}</div></body></html>`;
@@ -13884,7 +14107,7 @@ ${stylesheetLinks}
     if (!panel) return;
     syncColorPickers();
     updateRangeOutputs();
-    writeIframe(panel.querySelector("[data-hans-preview]"), buildCode(), fitEditorPreview);
+    writeIframe(panel.querySelector("[data-hans-preview]"), buildCode(getValues(), true), fitEditorPreview);
   }
 
   function schedulePreview() {
@@ -13921,20 +14144,20 @@ ${stylesheetLinks}
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-hans-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-hans-save>SAVE DRAFT</button><button type="button" data-hans-delete>DELETE SAVE</button></div>
           <div class="dds-protected-commission-scroll dds-hans-commission-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">
+              <label class="dds-field"><span>ชื่อด้านบน</span><input type="text" data-hans-field="firstName" value=""></label>
+              <label class="dds-field"><span>ชื่อกลาง–นามสกุลด้านล่าง</span><input type="text" data-hans-field="lastName" value=""></label>
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
               <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="" spellcheck="false"></label>
               ${positionEditor("head", "ตำแหน่งรูป HEAD")}
               <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX</span><input type="url" data-hans-field="boxImage" value="" spellcheck="false"></label>
               ${positionEditor("box", "ตำแหน่งรูป BOX")}
               <div class="dds-hans-barcode-lock dds-field-full"><span>BARCODE</span><strong>LOCKED</strong><small>ใช้รูปต้นฉบับเดิมและไม่มีช่องแก้ไข</small></div>
             </div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อ</h2></div><div class="dds-form-grid">
-              <label class="dds-field"><span>ชื่อด้านบน</span><input type="text" data-hans-field="firstName" value=""></label>
-              <label class="dds-field"><span>ชื่อกลาง–นามสกุลด้านล่าง</span><input type="text" data-hans-field="lastName" value=""></label>
-            </div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>หัวข้อ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>Did you know...</span><input type="text" data-hans-field="title" value=""></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea data-hans-field="roleplay" rows="14"></textarea></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-hans-roleplay-field"><span>ข้อความโรลเพลย์</span>${hansBbcodeToolbar()}<textarea data-hans-field="roleplay" rows="14"></textarea><div class="dds-word-counter" data-hans-word-counter data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-hans-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value=""></label></div></section>
           </div>
           <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
@@ -13949,9 +14172,29 @@ ${stylesheetLinks}
         const input = panel.querySelector(`[data-hans-field="${picker.dataset.hansColorPicker}"]`);
         if (input) input.value = picker.value;
       }
+      if (event.target.matches?.('[data-hans-field="roleplay"]')) updateRoleplayWordCounter();
       schedulePreview();
     });
-    panel.addEventListener("change", schedulePreview);
+    panel.addEventListener("change", (event) => {
+      const color = event.target.closest?.("[data-hans-bbcode-color]");
+      if (color) {
+        const textarea = panel.querySelector('[data-hans-field="roleplay"]');
+        applyHansBbcode(textarea, "color", color.closest("[data-hans-bbcode-toolbar]"));
+        return;
+      }
+      schedulePreview();
+    });
+
+    const hansToolbar = panel.querySelector("[data-hans-bbcode-toolbar]");
+    hansToolbar?.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) event.preventDefault();
+    });
+    hansToolbar?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-hans-bbcode]");
+      if (!button) return;
+      const textarea = panel.querySelector('[data-hans-field="roleplay"]');
+      applyHansBbcode(textarea, button.dataset.hansBbcode, hansToolbar);
+    });
     panel.querySelector("[data-hans-save]")?.addEventListener("click", saveDraft);
     panel.querySelector("[data-hans-delete]")?.addEventListener("click", deleteDraft);
     panel.querySelector("[data-hans-copy]")?.addEventListener("click", copyCode);
