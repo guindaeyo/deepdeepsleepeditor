@@ -13561,8 +13561,9 @@ ${stylesheetLinks}
 
   const PANEL_NAME = "editor-commission-hans-roleplay";
   const VIEW_PANEL_NAME = "view-commission-hans-roleplay";
-  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v1";
-  const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.-css";
+  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v2";
+  const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.css";
+  const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap";
   const CANVAS_WIDTH = 736;
   const BARCODE_URL = "https://i.postimg.cc/kXCjW5Ws/bc.png";
 
@@ -13576,7 +13577,7 @@ ${stylesheetLinks}
     boxX: "50",
     boxY: "50",
     title: "Did you know...",
-    roleplay: "ซัลโหลมาดายริปไดย์ ทาวน์ราชานุญาตโอ้ยแอ๊กพอดพ์โฟล์ค\n\nกาญจนาโกษาโหววเฮ้ง ทดสอบ"
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊"
   });
 
   let panel = null;
@@ -13659,7 +13660,7 @@ ${stylesheetLinks}
     const boxX = clampPosition(v.boxX);
     const boxY = clampPosition(v.boxY);
 
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><style>.ddsh-hxf .ddsh-hxf-photo{background-position:var(--ddsh-hxf-head-x) var(--ddsh-hxf-head-y)!important}.ddsh-hxf .ddsh-hxf-burst{background-position:var(--ddsh-hxf-box-x) var(--ddsh-hxf-box-y)!important}</style><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-box-x:${boxX}%;--ddsh-hxf-box-y:${boxY}%;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">Hans</span><span class="ddsh-hxf-name-last">Xilvalur Frost</span></div><div class="ddsh-hxf-photo"><div class="ddsh-hxf-burst"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>หมายเหตุ</strong> herb</div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">Hans</span><span class="ddsh-hxf-name-last">Xilvalur Frost</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>หมายเหตุ herb</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
   }
 
   const OFFICIAL_CODE = buildCode(defaults);
