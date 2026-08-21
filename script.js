@@ -14306,7 +14306,7 @@ ${stylesheetLinks}
 
   const PANEL_NAME = "editor-commission-hans-solo-roleplay";
   const VIEW_PANEL_NAME = "view-commission-hans-solo-roleplay";
-  const DRAFT_KEY = "dds:commission-draft:hans:solo-roleplay:structured-v1";
+  const DRAFT_KEY = "dds:commission-draft:hans:solo-roleplay:structured-v2";
   const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.css";
   const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap";
   const CANVAS_WIDTH = 770;
@@ -14345,7 +14345,7 @@ ${stylesheetLinks}
     burstText: defaults.burstText,
     title: defaults.title,
     roleplay: "",
-    note: defaults.note
+    note: ""
   });
 
   let panel = null;
@@ -14918,7 +14918,7 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>หัวข้อและข้อความ BOX</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความใน BOX</span><textarea data-hans-field="burstText" rows="2">Crabby
 Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัวข้อ</span><input type="text" data-hans-field="title" value="Did you know..."></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-hans-roleplay-field"><span>ข้อความโรลเพลย์</span>${hansBbcodeToolbar()}<textarea data-hans-field="roleplay" rows="14"></textarea><div class="dds-word-counter" data-hans-word-counter data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-hans-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value="หมายเหตุ herb"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value=""></label></div></section>
           </div>
           <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
         </div>
