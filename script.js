@@ -15115,7 +15115,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-commission-roraima-house";
   const VIEW_PANEL_NAME = "view-commission-roraima-house";
-  const DRAFT_KEY = "dds:commission-draft:hans:roraima-house:v3";
+  const DRAFT_KEY = "dds:commission-draft:hans:roraima-house:v4";
   const ACCESS_HASH = "944c0533242b363788a46eae05b982069f17724030ca780af603d478b4d461e9";
   const ACCESS_SESSION_KEY = "dds:roraima-house-editor:unlocked";
   const CSS_URL = "https://guindaeyo.github.io/css/commit-hansxchouse.css";
@@ -15200,7 +15200,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (b1 || b2 || b3 || border) {
       const style=doc.createElement("style");
       const c1=b1||"#ffffff", c2=b2||b1||"#f1ede7", c3=b3||b2||b1||"#ddd3c6";
-      style.textContent=`${b1||b2||b3?`.ddsh-roraima-paper{background:linear-gradient(145deg,${c1} 0%,${c2} 52%,${c3} 100%)!important;}`:""}${border?`.ddsh-roraima-footer{border-color:${border}!important}.ddsh-roraima-paper{border-bottom-color:${border}!important;}`:""}`;
+      style.textContent=`${b1||b2||b3?`.ddsh-roraima-paper{background:linear-gradient(180deg,${c1} 0%,${c2} 52%,${c3} 100%)!important;}`:""}${border?`.ddsh-roraima-footer{border-color:${border}!important}.ddsh-roraima-paper{border-bottom-color:${border}!important;}`:""}`;
       doc.body.appendChild(style);
     }
     return Array.from(doc.body.childNodes).map(n=>n.outerHTML??n.textContent).join("");
@@ -15256,7 +15256,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if(panel?.isConnected)return panel; const footer=document.querySelector(".dds-footer"); if(!footer)return null;
     panel=document.createElement("section"); panel.className="dds-panel dds-protected-commission-editor dds-rora-commission-editor"; panel.dataset.panel=PANEL_NAME;
     panel.innerHTML=`<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-rora-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทกระทู้บ้าน</span></h1><p>ผู้จ้าง HANS X. FROST</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>RORAIMA / HOUSE THREAD</strong></div><div class="dds-rora-preview-stage" data-rora-preview-stage><div class="dds-rora-preview-holder" data-rora-preview-holder><iframe class="dds-protected-commission-preview-frame dds-rora-preview-frame" data-rora-preview scrolling="no" title="ตัวอย่างโค้ดกระทู้บ้าน RORAIMA"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-rora-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-rora-save>SAVE DRAFT</button><button type="button" data-rora-delete>DELETE SAVE</button></div><div class="dds-protected-commission-scroll dds-rora-commission-scroll">
-      <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("พื้นหลังสีที่ 1","bg1","#ffffff")}${colorField("พื้นหลังสีที่ 2","bg2","#efeeab")}${colorField("พื้นหลังสีที่ 3","bg3","#fdca8e")}${colorField("สีขอบล่างสุด","borderColor","#000000")}</div><p class="dds-rora-color-help">สีพื้นหลังทั้ง 3 ช่องจะเกลี่ยเป็น Gradient เมื่อเลือกสี หากปล่อยว่างจะใช้สีต้นฉบับจาก CSS</p></section>
+      <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("พื้นหลังสีที่ 1","bg1","#ffffff")}${colorField("พื้นหลังสีที่ 2","bg2","#efeeab")}${colorField("พื้นหลังสีที่ 3","bg3","#fdca8e")}${colorField("สีขอบล่างสุด","borderColor","#000000")}</div><p class="dds-rora-color-help">สีพื้นหลังทั้ง 3 ช่องแก้ได้ และจะเกลี่ยแบบ linear-gradient(180deg, สีที่ 1 0%, สีที่ 2 52%, สีที่ 3 100%)</p></section>
       <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>หัวข้อและเนื้อหาบ้าน</h2></div><div class="dds-form-grid">${field("หัวข้อหลัก — RORAIMA","title")}${field("หัวข้อรอง — The Garage","subtitle")}${field("เนื้อหาบ้าน","roomText",{full:true,textarea:true,rows:8})}</div></section>
       ${imageSection("03","HOUSE","houseImage","houseX","houseY")}${imageSection("04","GARAGE","garageImage","garageX","garageY")}${imageSection("05","PEACH TREE","treeImage","treeX","treeY")}${imageSection("06","IVY","ivyImage","ivyX","ivyY")}${imageSection("07","PEACH","peachImage","peachX","peachY")}${imageSection("08","WOOD","woodImage","woodX","woodY")}${imageSection("09","BENTLEY","bentleyImage","bentleyX","bentleyY")}${imageSection("10","ASTON","astonImage","astonX","astonY")}
       <section class="dds-control-section"><div class="dds-control-title"><span>11</span><h2>รายละเอียด 1–5</h2></div><div class="dds-form-grid">${[1,2,3,4,5].map(i=>`${field(`หัวข้อ ${i}`,`detailTitle${i}`,{full:true})}${field(`เนื้อหา ${i}`,`detailText${i}`,{full:true,textarea:true,rows:5})}`).join("")}</div></section>
