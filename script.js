@@ -15101,3 +15101,182 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
   else install();
 })();
+
+
+/* =========================================================
+   HANS X. FROST — RORAIMA HOUSE COMMISSION EDITOR
+   โค้ดประเภทกระทู้บ้าน / Protected editor
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_RORAIMA_HOUSE_COMMISSION_INSTALLED__) return;
+  window.__DDS_RORAIMA_HOUSE_COMMISSION_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-commission-roraima-house";
+  const VIEW_PANEL_NAME = "view-commission-roraima-house";
+  const DRAFT_KEY = "dds:commission-draft:hans:roraima-house:v2";
+  const ACCESS_HASH = "944c0533242b363788a46eae05b982069f17724030ca780af603d478b4d461e9";
+  const ACCESS_SESSION_KEY = "dds:roraima-house-editor:unlocked";
+  const CSS_URL = "https://guindaeyo.github.io/css/commit-hansxchouse.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
+  const CANVAS_WIDTH = 800;
+
+  const OFFICIAL_CODE = `<link href="https://guindaeyo.github.io/css/commit-hansxchouse.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bai+Jamjuree:wght@300;400;500;600&display=swap" rel="stylesheet"><div class="ddsh-roraima"style="--ddsh-rora-house:url('https://i.postimg.cc/GmWbmjFJ/2.jpg');--ddsh-rora-garage:url('https://i.postimg.cc/KYh4HbHS/image.png');--ddsh-rora-peachtree:url('https://i.postimg.cc/x8ffSTKR/Stonepeaches.jpg');--ddsh-rora-ivy:url('https://i.postimg.cc/gJJwvDT1/3.png');--ddsh-rora-peach:url('https://i.postimg.cc/G22BkQ5W/1.png');--ddsh-rora-wood:url('https://i.postimg.cc/FRRfjZB2/22.png');--ddsh-rora-bentley:url('https://i.imgur.com/mlUZ7sC.png');--ddsh-rora-aston:url('https://iili.io/KZKSxft.png');--ddsh-rora-house-x:50%;--ddsh-rora-house-y:50%;--ddsh-rora-garage-x:50%;--ddsh-rora-garage-y:50%;--ddsh-rora-tree-x:50%;--ddsh-rora-tree-y:50%;--ddsh-rora-itembg-01:#ffffff;--ddsh-rora-itembg-02:#ffffff;--ddsh-rora-itembg-03:#ffffff;--ddsh-rora-itembg-04:#ffffff;--ddsh-rora-itembg-05:#ffffff;--ddsh-rora-ivy-x:50%;--ddsh-rora-ivy-y:50%;--ddsh-rora-peach-x:50%;--ddsh-rora-peach-y:50%;--ddsh-rora-wood-x:50%;--ddsh-rora-wood-y:50%;--ddsh-rora-bentley-x:50%;--ddsh-rora-bentley-y:65%;--ddsh-rora-aston-x:50%;--ddsh-rora-aston-y:60%;"><div class="ddsh-roraima-paper"><div class="ddsh-roraima-inner"><div class="ddsh-roraima-gallery"><div class="ddsh-roraima-photo ddsh-roraima-house"></div><div class="ddsh-roraima-side"><div class="ddsh-roraima-photo ddsh-roraima-garage"></div><div class="ddsh-roraima-photo ddsh-roraima-peachtree"></div></div></div><div class="ddsh-roraima-intro"><div class="ddsh-roraima-heading"><div class="ddsh-roraima-title">RORAIMA</div><div class="ddsh-roraima-subtitle">The Garage</div></div><div class="ddsh-roraima-roomtext">แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div></div><div class="ddsh-roraima-items ddsh-roraima-items-top"><div class="ddsh-roraima-item ddsh-roraima-item-01"><span class="ddsh-roraima-number">01</span><div class="ddsh-roraima-item-image ddsh-roraima-ivy"></div></div><div class="ddsh-roraima-item ddsh-roraima-item-02"><span class="ddsh-roraima-number">02</span><div class="ddsh-roraima-item-image ddsh-roraima-peach"></div></div><div class="ddsh-roraima-item ddsh-roraima-item-03"><span class="ddsh-roraima-number">03</span><div class="ddsh-roraima-item-image ddsh-roraima-wood"></div></div></div><div class="ddsh-roraima-items ddsh-roraima-items-car"><div class="ddsh-roraima-item ddsh-roraima-item-04"><span class="ddsh-roraima-number">04</span><div class="ddsh-roraima-item-image ddsh-roraima-bentley"></div></div><div class="ddsh-roraima-item ddsh-roraima-item-05"><span class="ddsh-roraima-number">05</span><div class="ddsh-roraima-item-image ddsh-roraima-aston"></div></div></div><div class="ddsh-roraima-details"><div class="ddsh-roraima-detail"><div class="ddsh-roraima-detail-title">1. เถาไอวี่</div><div class="ddsh-roraima-detail-text">เครือเถาเลื้อยปกคลุมไปทั่วหลังคา ห้อยย้อยคล้อยต่ำลงมาถึงทางเข้า เมื่อต้องการเรียกฮันส์ ให้พูดคุยกับเถาไอวี มันจะส่งต่อข้อความไปหาเขาเอง</div></div><div class="ddsh-roraima-detail"><div class="ddsh-roraima-detail-title">2. ต้นพีช</div><div class="ddsh-roraima-detail-text">ปลูกไว้ในกระถางข้างบ้าน และบางส่วนถูกนำลงดินแล้ว ส่งกลิ่นหอมช่วงออกผล นิสัยส่วนใหญ่เป็นอินโทรเวิต ชวนคุยไม่ค่อยตอบสนองเท่าไร</div></div><div class="ddsh-roraima-detail"><div class="ddsh-roraima-detail-title">3. ฟืน</div><div class="ddsh-roraima-detail-text">ภายในบ้านไม่ติดตั้งเครื่องทำความร้อน อาศัยความอบอุ่นจากเตาผิงในห้องนั่งเล่น หรือไม่ก็แปลงร่างเป็นสัตว์ขนหนาเพื่อป้องกันความหนาวเย็นแทน</div></div><div class="ddsh-roraima-detail"><div class="ddsh-roraima-detail-title">4. เบนท์ลีย์</div><div class="ddsh-roraima-detail-text">รถยนต์คันแรกและเป็นลูกรักอันดับหนึ่งของฮันส์ หากพังก็เหมือนเอามีกรีดหัวใจ ไม่เข้าใจเหมือนกันว่าทำไม่ถึงพังบ่อย หรือเพราะเป็นรถฮันส์?</div></div><div class="ddsh-roraima-detail"><div class="ddsh-roraima-detail-title">5. แอสตัน</div><div class="ddsh-roraima-detail-text">รถยนต์คันที่สองของฮันส์ มักใช้เดินทางภายในหมู่บ้าน เอาไว้ทำตัวโก้หรูและเก๊กเข้มแบบสายลับเจม บอน 007 ตึ่งตึงตึงตึ๊งตึงตึงตึ่งตึงตึงตึง</div></div></div></div><div class="ddsh-roraima-footer"><div class="ddsh-roraima-footer-left">Pine Woods Rd. No.7</div><div class="ddsh-roraima-footer-right">ISSUE 01</div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+
+  const defaults = Object.freeze({
+    bg1: "#ffffff", bg2: "#eee7dc", bg3: "#d8cbb8", borderColor: "#000000",
+    houseImage: "https://i.postimg.cc/GmWbmjFJ/2.jpg", houseX: "50", houseY: "50",
+    garageImage: "https://i.postimg.cc/KYh4HbHS/image.png", garageX: "50", garageY: "50",
+    treeImage: "https://i.postimg.cc/x8ffSTKR/Stonepeaches.jpg", treeX: "50", treeY: "50",
+    ivyImage: "https://i.postimg.cc/gJJwvDT1/3.png", ivyX: "50", ivyY: "50",
+    peachImage: "https://i.postimg.cc/G22BkQ5W/1.png", peachX: "50", peachY: "50",
+    woodImage: "https://i.postimg.cc/FRRfjZB2/22.png", woodX: "50", woodY: "50",
+    bentleyImage: "https://i.imgur.com/mlUZ7sC.png", bentleyX: "50", bentleyY: "65",
+    astonImage: "https://iili.io/KZKSxft.png", astonX: "50", astonY: "60",
+    title: "RORAIMA", subtitle: "The Garage",
+    roomText: "",
+    detailTitle1: "1. เถาไอวี่", detailText1: "เครือเถาเลื้อยปกคลุมไปทั่วหลังคา ห้อยย้อยคล้อยต่ำลงมาถึงทางเข้า เมื่อต้องการเรียกฮันส์ ให้พูดคุยกับเถาไอวี มันจะส่งต่อข้อความไปหาเขาเอง",
+    detailTitle2: "2. ต้นพีช", detailText2: "ปลูกไว้ในกระถางข้างบ้าน และบางส่วนถูกนำลงดินแล้ว ส่งกลิ่นหอมช่วงออกผล นิสัยส่วนใหญ่เป็นอินโทรเวิต ชวนคุยไม่ค่อยตอบสนองเท่าไร",
+    detailTitle3: "3. ฟืน", detailText3: "ภายในบ้านไม่ติดตั้งเครื่องทำความร้อน อาศัยความอบอุ่นจากเตาผิงในห้องนั่งเล่น หรือไม่ก็แปลงร่างเป็นสัตว์ขนหนาเพื่อป้องกันความหนาวเย็นแทน",
+    detailTitle4: "4. เบนท์ลีย์", detailText4: "รถยนต์คันแรกและเป็นลูกรักอันดับหนึ่งของฮันส์ หากพังก็เหมือนเอามีกรีดหัวใจ ไม่เข้าใจเหมือนกันว่าทำไม่ถึงพังบ่อย หรือเพราะเป็นรถฮันส์?",
+    detailTitle5: "5. แอสตัน", detailText5: "รถยนต์คันที่สองของฮันส์ มักใช้เดินทางภายในหมู่บ้าน เอาไว้ทำตัวโก้หรูและเก๊กเข้มแบบสายลับเจม บอน 007 ตึ่งตึงตึงตึ๊งตึงตึงตึ่งตึงตึงตึง",
+    footerLeft: "Pine Woods Rd. No.7", footerRight: "ISSUE 01"
+  });
+
+  let panel = null, viewPanel = null, card = null, modal = null, previewTimer = 0, cardRendered = false;
+
+  function h(value) { return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function cssUrl(value) { return String(value || "").replace(/[\\'\r\n]/g, (c) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[c] ?? "")); }
+  function clamp(value, fallback=50) { const n=Number(value); return Number.isFinite(n) ? Math.max(0,Math.min(100,n)) : fallback; }
+  function validColor(value) { const s=String(value||"").trim(); return /^#[0-9a-f]{6}$/i.test(s) ? s : ""; }
+  async function sha256(value) { const bytes=new TextEncoder().encode(String(value||"")); const digest=await crypto.subtle.digest("SHA-256",bytes); return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join(""); }
+
+  function getValues() {
+    const out={};
+    panel?.querySelectorAll("[data-rora-field]").forEach((el)=>out[el.dataset.roraField]=el.value);
+    return {...defaults,...out};
+  }
+  function setValues(values=defaults) {
+    panel?.querySelectorAll("[data-rora-field]").forEach((el)=>{ el.value=values?.[el.dataset.roraField] ?? defaults[el.dataset.roraField] ?? ""; });
+    syncPickers(); updateRangeOutputs();
+  }
+  function syncPickers() {
+    panel?.querySelectorAll("[data-rora-color-picker]").forEach((picker)=>{
+      const input=panel.querySelector(`[data-rora-field="${picker.dataset.roraColorPicker}"]`);
+      const color=validColor(input?.value);
+      if (color) picker.value=color;
+    });
+  }
+  function updateRangeOutputs() {
+    panel?.querySelectorAll("[data-rora-range]").forEach((range)=>{
+      const output=panel.querySelector(`[data-rora-output="${range.dataset.roraField}"]`);
+      if (output) output.textContent=`${range.value}%`;
+    });
+  }
+
+  function buildCode(values=getValues()) {
+    const doc=new DOMParser().parseFromString(`<!doctype html><html><body>${OFFICIAL_CODE}</body></html>`,"text/html");
+    const root=doc.querySelector(".ddsh-roraima");
+    if (root) {
+      const vars={
+        "--ddsh-rora-house":[values.houseImage,true], "--ddsh-rora-house-x":[`${clamp(values.houseX)}%`], "--ddsh-rora-house-y":[`${clamp(values.houseY)}%`],
+        "--ddsh-rora-garage":[values.garageImage,true], "--ddsh-rora-garage-x":[`${clamp(values.garageX)}%`], "--ddsh-rora-garage-y":[`${clamp(values.garageY)}%`],
+        "--ddsh-rora-peachtree":[values.treeImage,true], "--ddsh-rora-tree-x":[`${clamp(values.treeX)}%`], "--ddsh-rora-tree-y":[`${clamp(values.treeY)}%`],
+        "--ddsh-rora-ivy":[values.ivyImage,true], "--ddsh-rora-ivy-x":[`${clamp(values.ivyX)}%`], "--ddsh-rora-ivy-y":[`${clamp(values.ivyY)}%`],
+        "--ddsh-rora-peach":[values.peachImage,true], "--ddsh-rora-peach-x":[`${clamp(values.peachX)}%`], "--ddsh-rora-peach-y":[`${clamp(values.peachY)}%`],
+        "--ddsh-rora-wood":[values.woodImage,true], "--ddsh-rora-wood-x":[`${clamp(values.woodX)}%`], "--ddsh-rora-wood-y":[`${clamp(values.woodY)}%`],
+        "--ddsh-rora-bentley":[values.bentleyImage,true], "--ddsh-rora-bentley-x":[`${clamp(values.bentleyX)}%`], "--ddsh-rora-bentley-y":[`${clamp(values.bentleyY,65)}%`],
+        "--ddsh-rora-aston":[values.astonImage,true], "--ddsh-rora-aston-x":[`${clamp(values.astonX)}%`], "--ddsh-rora-aston-y":[`${clamp(values.astonY,60)}%`]
+      };
+      Object.entries(vars).forEach(([name,[value,isImage]])=>root.style.setProperty(name,isImage?`url('${cssUrl(value)}')`:value));
+    }
+    const setText=(sel,val)=>{ const n=doc.querySelector(sel); if(n)n.textContent=String(val??""); };
+    setText(".ddsh-roraima-title",values.title); setText(".ddsh-roraima-subtitle",values.subtitle); setText(".ddsh-roraima-roomtext",values.roomText);
+    for(let i=1;i<=5;i+=1){ const d=doc.querySelectorAll(".ddsh-roraima-detail")[i-1]; if(d){ const t=d.querySelector(".ddsh-roraima-detail-title"); const x=d.querySelector(".ddsh-roraima-detail-text"); if(t)t.textContent=values[`detailTitle${i}`]||""; if(x)x.textContent=values[`detailText${i}`]||""; } }
+    setText(".ddsh-roraima-footer-left",values.footerLeft); setText(".ddsh-roraima-footer-right",values.footerRight);
+    const b1=validColor(values.bg1), b2=validColor(values.bg2), b3=validColor(values.bg3), border=validColor(values.borderColor);
+    if (b1 || b2 || b3 || border) {
+      const style=doc.createElement("style");
+      const c1=b1||"#ffffff", c2=b2||b1||"#f1ede7", c3=b3||b2||b1||"#ddd3c6";
+      style.textContent=`${b1||b2||b3?`.ddsh-roraima-paper{background:linear-gradient(145deg,${c1} 0%,${c2} 52%,${c3} 100%)!important;}`:""}${border?`.ddsh-roraima-footer{border-color:${border}!important}.ddsh-roraima-paper{border-bottom-color:${border}!important;}`:""}`;
+      doc.body.appendChild(style);
+    }
+    return Array.from(doc.body.childNodes).map(n=>n.outerHTML??n.textContent).join("");
+  }
+
+  function fullCode(values=getValues()) {
+    return `<link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet">${buildCode(values).replace(/^<link[^>]+>\s*<link[^>]+>\s*<link[^>]+>\s*<link[^>]+>/i,"")}`;
+  }
+
+  function previewDocument(code) {
+    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;min-height:100%;background:#242424;overflow:hidden}.dds-rora-preview-shell{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;margin:0 auto;padding:26px 0;display:flex;flex-direction:column;align-items:center}.dds-rora-preview-shell>.ddsh-roraima,.dds-rora-preview-shell>.ddshopfz-credit{flex:0 0 auto;max-width:none}</style></head><body><div class="dds-rora-preview-shell">${code}</div></body></html>`;
+  }
+
+  function writeIframe(iframe, code, afterLoad) {
+    if(!iframe)return;
+    iframe.onload=()=>{ setTimeout(()=>afterLoad?.(),40); setTimeout(()=>afterLoad?.(),250); try{iframe.contentDocument?.fonts?.ready?.then(()=>afterLoad?.())}catch{} };
+    iframe.srcdoc=previewDocument(code);
+  }
+  function shellMetrics(iframe) { const doc=iframe?.contentDocument; const shell=doc?.querySelector(".dds-rora-preview-shell"); if(!doc||!shell)return null; return {width:Math.max(CANVAS_WIDTH,shell.scrollWidth),height:Math.max(1,shell.scrollHeight)}; }
+  function fitFrame(iframe, stage, holder, mode="fit") {
+    if(!iframe||!stage||!holder)return;
+    const m=shellMetrics(iframe); if(!m)return;
+    const sw=Math.max(1,stage.clientWidth-28), sh=Math.max(1,stage.clientHeight-28);
+    const scale=mode==="width"?Math.min(1,sw/m.width):Math.min(1,sw/m.width,sh/m.height);
+    iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.transform=`scale(${scale})`; iframe.style.transformOrigin="top center";
+    holder.style.width=`${m.width*scale}px`; holder.style.height=`${m.height*scale}px`;
+  }
+  function fitCardPreview(){ const iframe=card?.querySelector("[data-rora-card-preview]"); const stage=card?.querySelector(".dds-roleplay-card-preview"); if(!iframe||!stage)return; const m=shellMetrics(iframe); if(!m)return; const scale=Math.min(stage.clientWidth/m.width,stage.clientHeight/m.height); iframe.style.position="absolute"; iframe.style.left="50%"; iframe.style.top="50%"; iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.transform=`translate(-50%,-50%) scale(${scale})`; iframe.style.transformOrigin="center center"; }
+  function fitEditorPreview(){ fitFrame(panel?.querySelector("[data-rora-preview]"),panel?.querySelector("[data-rora-preview-stage]"),panel?.querySelector("[data-rora-preview-holder]"),"fit"); }
+  function fitViewPreview(){ fitFrame(viewPanel?.querySelector("[data-rora-view-preview]"),viewPanel?.querySelector("[data-rora-view-stage]"),viewPanel?.querySelector("[data-rora-view-holder]"),"width"); }
+
+  function schedulePreview(){ clearTimeout(previewTimer); previewTimer=setTimeout(updatePreview,45); }
+  function updatePreview(){ if(!panel)return; syncPickers(); updateRangeOutputs(); writeIframe(panel.querySelector("[data-rora-preview]"),fullCode(getValues()),fitEditorPreview); }
+  function showToast(msg){ if(typeof window.showToast==="function")window.showToast(msg); else { const t=document.getElementById("siteToastText"); if(t)t.textContent=msg; } }
+  function getDraft(){ try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||"null")}catch{return null} }
+  function setDraftStatus(ts=0){ const el=panel?.querySelector("[data-rora-draft-status]"); if(!el)return; el.textContent=ts?`บันทึกล่าสุด ${new Date(ts).toLocaleString("th-TH")}`:"ยังไม่มีแบบร่าง"; }
+  function saveDraft(){ const data={values:getValues(),savedAt:Date.now()}; localStorage.setItem(DRAFT_KEY,JSON.stringify(data)); setDraftStatus(data.savedAt); showToast("บันทึกแบบร่าง RORAIMA แล้ว"); }
+  function deleteDraft(){ localStorage.removeItem(DRAFT_KEY); setDraftStatus(0); showToast("ลบแบบร่าง RORAIMA แล้ว"); }
+  function resetFields(){ setValues(defaults); updatePreview(); showToast("รีเซ็ต RORAIMA เป็นค่าต้นฉบับแล้ว"); }
+  async function copyCode(){ const code=fullCode(getValues()); try{await navigator.clipboard.writeText(code)}catch{const ta=document.createElement("textarea");ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()} showToast("คัดลอกโค้ดกระทู้บ้าน RORAIMA แล้ว"); }
+
+  function setCommissionTab(){ document.querySelectorAll("[data-work-tab]").forEach(b=>{const s=b.dataset.workTab==="commission";b.classList.toggle("is-active",s);b.setAttribute("aria-selected",String(s))}); document.querySelectorAll("[data-work-panel]").forEach(p=>{const s=p.dataset.workPanel==="commission";p.hidden=!s;p.classList.toggle("is-active",s)}); }
+  function showPanel(name){ document.querySelectorAll(".dds-panel").forEach(p=>p.classList.toggle("is-active",p.dataset.panel===name)); document.querySelectorAll(".dds-nav-button").forEach(b=>b.classList.toggle("is-active",b.dataset.page==="commission")); const n=document.getElementById("currentPageNumber"); if(n)n.textContent="04"; window.scrollTo({top:0,left:0,behavior:"auto"}); }
+  function enableEditorMode(){ document.body.classList.add("dds-editor-mode","dds-commission-editor-mode"); document.documentElement.classList.add("dds-editor-mode","dds-commission-editor-mode"); }
+  function goBack(event){ event?.preventDefault?.(); event?.stopPropagation?.(); const restore=()=>{document.body.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");document.documentElement.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");showPanel("commission");setCommissionTab();history.replaceState(null,"","#commission")}; restore();requestAnimationFrame(()=>requestAnimationFrame(restore));setTimeout(restore,80); }
+
+  function colorField(label,key,picker="#ffffff") { return `<label class="dds-color-field dds-rora-color-field"><span>${h(label)}</span><div><input type="color" value="${picker}" data-rora-color-picker="${key}"><input type="text" data-rora-field="${key}" value="" placeholder="เลือกสีเพื่อเปิดใช้" spellcheck="false"></div></label>`; }
+  function field(label,key,{full=false,textarea=false,rows=3,type="text"}={}) { return `<label class="dds-field${full?" dds-field-full":""}"><span>${h(label)}</span>${textarea?`<textarea rows="${rows}" data-rora-field="${key}"></textarea>`:`<input type="${type}" data-rora-field="${key}" spellcheck="false">`}</label>`; }
+  function positionBlock(label,keyX,keyY){ return `<div class="dds-image-position dds-field-full dds-rora-position"><div class="dds-image-position-heading"><span>${h(label)}</span><small>ปรับซ้าย–ขวา และบน–ล่าง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" value="50" data-rora-field="${keyX}" data-rora-range><small>ขวา</small><output data-rora-output="${keyX}">50%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" value="50" data-rora-field="${keyY}" data-rora-range><small>ล่าง</small><output data-rora-output="${keyY}">50%</output></label></div>`; }
+  function imageSection(number,label,key,x,y){ return `<section class="dds-control-section"><div class="dds-control-title"><span>${number}</span><h2>${h(label)}</h2></div><div class="dds-form-grid">${field(`ลิงก์รูป ${label}`,key,{full:true,type:"url"})}${positionBlock(`ตำแหน่งรูป ${label}`,x,y)}</div></section>`; }
+
+  function createPanel(){
+    if(panel?.isConnected)return panel; const footer=document.querySelector(".dds-footer"); if(!footer)return null;
+    panel=document.createElement("section"); panel.className="dds-panel dds-protected-commission-editor dds-rora-commission-editor"; panel.dataset.panel=PANEL_NAME;
+    panel.innerHTML=`<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1 class="dds-rora-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทกระทู้บ้าน</span></h1><p>ผู้จ้าง HANS X. FROST</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>RORAIMA / HOUSE THREAD</strong></div><div class="dds-rora-preview-stage" data-rora-preview-stage><div class="dds-rora-preview-holder" data-rora-preview-holder><iframe class="dds-protected-commission-preview-frame dds-rora-preview-frame" data-rora-preview scrolling="no" title="ตัวอย่างโค้ดกระทู้บ้าน RORAIMA"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-rora-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-rora-save>SAVE DRAFT</button><button type="button" data-rora-delete>DELETE SAVE</button></div><div class="dds-protected-commission-scroll dds-rora-commission-scroll">
+      <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("พื้นหลังสีที่ 1","bg1","#ffffff")}${colorField("พื้นหลังสีที่ 2","bg2","#eee7dc")}${colorField("พื้นหลังสีที่ 3","bg3","#d8cbb8")}${colorField("สีขอบล่างสุด","borderColor","#000000")}</div><p class="dds-rora-color-help">สีพื้นหลังทั้ง 3 ช่องจะเกลี่ยเป็น Gradient เมื่อเลือกสี หากปล่อยว่างจะใช้สีต้นฉบับจาก CSS</p></section>
+      <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>หัวข้อและเนื้อหาบ้าน</h2></div><div class="dds-form-grid">${field("หัวข้อหลัก — RORAIMA","title")}${field("หัวข้อรอง — The Garage","subtitle")}${field("เนื้อหาบ้าน","roomText",{full:true,textarea:true,rows:8})}</div></section>
+      ${imageSection("03","HOUSE","houseImage","houseX","houseY")}${imageSection("04","GARAGE","garageImage","garageX","garageY")}${imageSection("05","PEACH TREE","treeImage","treeX","treeY")}${imageSection("06","IVY","ivyImage","ivyX","ivyY")}${imageSection("07","PEACH","peachImage","peachX","peachY")}${imageSection("08","WOOD","woodImage","woodX","woodY")}${imageSection("09","BENTLEY","bentleyImage","bentleyX","bentleyY")}${imageSection("10","ASTON","astonImage","astonX","astonY")}
+      <section class="dds-control-section"><div class="dds-control-title"><span>11</span><h2>รายละเอียด 1–5</h2></div><div class="dds-form-grid">${[1,2,3,4,5].map(i=>`${field(`หัวข้อ ${i}`,`detailTitle${i}`,{full:true})}${field(`เนื้อหา ${i}`,`detailText${i}`,{full:true,textarea:true,rows:5})}`).join("")}</div></section>
+      <section class="dds-control-section"><div class="dds-control-title"><span>12</span><h2>ข้อความท้าย</h2></div><div class="dds-form-grid">${field("ข้อความท้ายฝั่งซ้าย","footerLeft")}${field("ข้อความท้ายฝั่งขวา","footerRight")}</div></section>
+    </div><section class="dds-protected-commission-copy dds-rora-commission-copy"><div class="dds-control-title"><span>13</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอกโค้ดกระทู้บ้านที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที</p><div class="dds-protected-commission-copy-actions"><button type="button" data-rora-copy>COPY CODE <span>↗</span></button><button type="button" data-rora-reset>RESET</button></div></section></div></div>`;
+    footer.before(panel);
+    panel.querySelector("[data-rora-back]")?.addEventListener("click",goBack);
+    panel.addEventListener("input",(event)=>{const picker=event.target.closest?.("[data-rora-color-picker]");if(picker){const input=panel.querySelector(`[data-rora-field="${picker.dataset.roraColorPicker}"]`);if(input)input.value=picker.value} schedulePreview()});
+    panel.querySelector("[data-rora-save]")?.addEventListener("click",saveDraft); panel.querySelector("[data-rora-delete]")?.addEventListener("click",deleteDraft); panel.querySelector("[data-rora-copy]")?.addEventListener("click",copyCode); panel.querySelector("[data-rora-reset]")?.addEventListener("click",resetFields);
+    return panel;
+  }
+
+  function createViewPanel(){ if(viewPanel?.isConnected)return viewPanel; const footer=document.querySelector(".dds-footer"); if(!footer)return null; viewPanel=document.createElement("section"); viewPanel.className="dds-panel dds-commission-view-panel dds-rora-view-panel"; viewPanel.dataset.panel=VIEW_PANEL_NAME; viewPanel.innerHTML=`<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-view-back type="button">←</button></div><div class="dds-rora-view-stage" data-rora-view-stage><div class="dds-rora-view-holder" data-rora-view-holder><iframe class="dds-editor-preview-frame dds-rora-view-frame" data-rora-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทกระทู้บ้าน RORAIMA"></iframe></div></div>`; footer.before(viewPanel); viewPanel.querySelector("[data-rora-view-back]")?.addEventListener("click",goBack); return viewPanel; }
+  function openView(){const target=createViewPanel();if(!target)return;enableEditorMode();showPanel(VIEW_PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-view");writeIframe(target.querySelector("[data-rora-view-preview]"),OFFICIAL_CODE,fitViewPreview)}
+  function openEditor(){const editor=createPanel();if(!editor)return;enableEditorMode();const draft=getDraft();setValues(draft?.values?{...defaults,...draft.values}:defaults);setDraftStatus(draft?.savedAt||0);showPanel(PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-editor");updatePreview()}
+
+  function closeModal(){if(!modal)return;modal.hidden=true;document.body.classList.remove("dds-modal-open")}
+  function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโค้ดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
+  function openModal(){const lock=createModal();lock.hidden=false;document.body.classList.add("dds-modal-open");const input=lock.querySelector("[data-rora-lock-input]"),error=lock.querySelector("[data-rora-lock-error]");if(input)input.value="";if(error)error.textContent="";requestAnimationFrame(()=>input?.focus())}
+
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>sessionStorage.getItem(ACCESS_SESSION_KEY)==="1"?openEditor():openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
+  function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+})();

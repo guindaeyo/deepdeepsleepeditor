@@ -8149,3 +8149,54 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     text-align: left;
   }
 }
+
+
+/* ==================================================
+   HANS — RORAIMA HOUSE COMMISSION
+================================================== */
+.dds-roraima-house-commission-card .dds-roleplay-card-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden;
+  background: #242424;
+}
+.dds-rora-card-preview-frame {
+  position: absolute !important;
+  max-width: none !important;
+  border: 0 !important;
+  background: #242424;
+  transform-origin: center center;
+}
+.dds-rora-commission-heading { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 14px; }
+.dds-rora-commission-heading > span:last-child { color:rgba(255,255,255,.52); font-size:.48em; font-family:var(--dds-font-main); font-weight:400; letter-spacing:0; }
+.dds-rora-preview-stage,
+.dds-rora-view-stage {
+  min-height: 680px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+.dds-rora-preview-holder,
+.dds-rora-view-holder { position:relative; flex:0 0 auto; margin:auto; }
+.dds-rora-preview-frame,
+.dds-rora-view-frame { position:absolute !important; top:0 !important; left:50% !important; max-width:none !important; margin:0 !important; border:0 !important; background:transparent; transform-origin:top center; }
+.dds-rora-commission-scroll { display:flex; flex-direction:column; gap:14px; padding-right:4px; }
+.dds-rora-commission-scroll .dds-control-section { flex:0 0 auto; }
+.dds-rora-commission-editor [data-rora-save],
+.dds-rora-commission-editor [data-rora-copy] { color:#fff; border-color:rgba(193,23,36,.72); background:linear-gradient(135deg,#b0121d,#720810); }
+.dds-rora-commission-copy .dds-protected-commission-copy-actions [data-rora-copy] { width:100%; text-align:left; }
+.dds-rora-position { margin-top:-2px; }
+.dds-rora-color-help { margin:14px 0 0; color:rgba(255,255,255,.38); font-size:9px; line-height:1.65; }
+.dds-rora-color-field input[type="color"] { flex:0 0 42px; }
+.dds-rora-view-panel .dds-commission-view-toolbar { margin-bottom:18px; }
+.dds-rora-view-stage { min-height:760px; overflow:auto; align-items:flex-start; }
+@media (max-width:700px){
+  .dds-rora-commission-heading > span:last-child{font-size:.62em}
+  .dds-rora-preview-stage,.dds-rora-view-stage{min-height:430px;padding:14px}
+}
