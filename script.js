@@ -15281,3 +15281,109 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
+
+
+/* =========================================================
+   COMMISSION EDITOR — SHAREABLE DEEP-LINK ROUTER
+   เปิด URL #commission-...-editor ตรงเข้าหน้า editor ของงานนั้น
+   หากเป็น protected editor จะเปิดหน้ากรอกรหัสก่อนตามปกติ
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const ROUTES = Object.freeze({
+    "#commission-mikael-editor":
+      ".dds-commission-three-card [data-edit-mikael-commission]",
+    "#commission-eric-editor":
+      ".dds-eric-commission-card [data-eric-edit]",
+    "#commission-mikael-cover-editor":
+      ".dds-vmac-commission-card [data-vmac-edit]",
+    "#commission-landon-profile-editor":
+      ".dds-lr-profile-commission-card [data-lr-profile-edit]",
+    "#commission-hans-roleplay-editor":
+      ".dds-hans-roleplay-commission-card:not(.dds-hans-solo-roleplay-commission-card) [data-hans-edit]",
+    "#commission-hans-solo-roleplay-editor":
+      ".dds-hans-solo-roleplay-commission-card [data-hans-edit]",
+    "#commission-pinewoods7-house-editor":
+      ".dds-roraima-house-commission-card [data-rora-edit]"
+  });
+
+  let routeTimer = 0;
+  let activeRoute = "";
+
+  function keepHash(hash) {
+    if (window.location.hash !== hash) {
+      history.replaceState(null, "", hash);
+    }
+  }
+
+  function stopRouting() {
+    if (routeTimer) {
+      window.clearInterval(routeTimer);
+      routeTimer = 0;
+    }
+    activeRoute = "";
+  }
+
+  function routeToCommissionEditor(hash) {
+    const selector = ROUTES[hash];
+    if (!selector) return false;
+
+    stopRouting();
+    activeRoute = hash;
+    keepHash(hash);
+
+    let attempts = 0;
+    const tryOpen = () => {
+      attempts += 1;
+
+      const button = document.querySelector(selector);
+      if (button) {
+        stopRouting();
+        keepHash(hash);
+        button.click();
+        return true;
+      }
+
+      // บางการ์ดคอมมิชชั่นถูกสร้างหลังระบบหลักเริ่มทำงาน
+      // เปิดหมวด commission ไว้เบื้องหลังเพื่อให้การ์ดติดตั้งได้ครบ
+      if (typeof window.openPage === "function") {
+        try {
+          window.openPage("commission");
+        } catch {}
+      }
+      keepHash(hash);
+
+      if (attempts >= 120) {
+        stopRouting();
+      }
+      return false;
+    };
+
+    if (tryOpen()) return true;
+    routeTimer = window.setInterval(tryOpen, 100);
+    return true;
+  }
+
+  function handleInitialDeepLink() {
+    const initialHash = String(
+      window.__DDS_INITIAL_DEEP_LINK_HASH__ || window.location.hash || ""
+    );
+
+    // ใช้ได้ครั้งเดียวเพื่อกันระบบหลักที่เปิด HOME ตอนโหลดเว็บ
+    window.__DDS_INITIAL_DEEP_LINK_HASH__ = "";
+    routeToCommissionEditor(initialHash);
+  }
+
+  window.addEventListener("hashchange", () => {
+    routeToCommissionEditor(window.location.hash);
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", handleInitialDeepLink, {
+      once: true
+    });
+  } else {
+    handleInitialDeepLink();
+  }
+})();
