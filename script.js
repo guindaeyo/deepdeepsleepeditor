@@ -13564,7 +13564,7 @@ ${stylesheetLinks}
   const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v3";
   const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.css";
   const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap";
-  const CANVAS_WIDTH = 736;
+  const CANVAS_WIDTH = 770;
   const BARCODE_URL = "https://i.postimg.cc/kXCjW5Ws/bc.png";
 
   const defaults = Object.freeze({
@@ -13688,9 +13688,8 @@ ${stylesheetLinks}
     try {
       const doc = iframe?.contentDocument;
       const root = doc?.querySelector(".dds-hans-preview-root");
-      const target = doc?.querySelector(".ddsh-hxf");
       if (!doc || !root) return { width: CANVAS_WIDTH, height: 900 };
-      const width = Math.max(1, Math.ceil(target?.getBoundingClientRect?.().width || target?.offsetWidth || CANVAS_WIDTH));
+      const width = Math.max(1, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH));
       const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 900));
       return { width, height };
     } catch {
@@ -13742,22 +13741,22 @@ ${stylesheetLinks}
     const iframe = card?.querySelector("[data-hans-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
     if (!iframe || !stage) return;
+
     const { width, height } = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - 24);
-    const scale = Math.min(availableWidth / width, 0.52);
+    const padding = 18;
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
+    const scale = Math.min(1, availableWidth / width, availableHeight / height);
     const safeScale = Math.max(0.05, scale);
-    const scaledHeight = Math.ceil(height * safeScale);
-    stage.style.setProperty("height", `${scaledHeight + 24}px`, "important");
-    stage.style.setProperty("min-height", `${scaledHeight + 24}px`, "important");
-    stage.style.setProperty("aspect-ratio", "auto", "important");
+
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
     iframe.style.setProperty("max-width", `${width}px`, "important");
     iframe.style.setProperty("height", `${height}px`, "important");
     iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "12px", "important");
-    iframe.style.setProperty("transform", `translateX(-50%) scale(${safeScale})`, "important");
-    iframe.style.setProperty("transform-origin", "top center", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${safeScale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
   }
 
   function showToast(message) {
@@ -13994,7 +13993,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์ (สำหรับผู้ที่โรลเพลย์ภายในบ้าน Pine Woods Rd. No.7)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับผู้ที่โรลเพลย์ภายในบ้าน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);

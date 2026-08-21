@@ -8050,9 +8050,10 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 .dds-hans-roleplay-commission-card .dds-roleplay-card-preview {
+  width: 100%;
   height: auto !important;
   min-height: 0 !important;
-  aspect-ratio: auto !important;
+  aspect-ratio: 16 / 10 !important;
   overflow: hidden;
   background: #242424;
 }
@@ -8060,6 +8061,11 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 .dds-hans-roleplay-commission-card .dds-commission-card-type {
   max-width: 100%;
   line-height: 1.65;
+}
+
+.dds-hans-commission-card-subtype {
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .dds-hans-commission-scroll {
