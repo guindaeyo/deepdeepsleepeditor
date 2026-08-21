@@ -13588,7 +13588,7 @@ ${stylesheetLinks}
     bgColor: defaults.bgColor,
     textColor: defaults.textColor,
     headImage: "",
-    boxImage: "",
+    boxImage: "https://i.postimg.cc/ZqWjJvhN/box.png",
     headX: "50",
     headY: "50",
     boxX: "50",
@@ -14158,7 +14158,7 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
               <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="" spellcheck="false"></label>
               ${positionEditor("head", "ตำแหน่งรูป HEAD")}
-              <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX</span><input type="url" data-hans-field="boxImage" value="" spellcheck="false"></label>
+              <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX (สามารถแก้ไขลิ้งค์ได้)</span><input type="url" data-hans-field="boxImage" value="https://i.postimg.cc/ZqWjJvhN/box.png" spellcheck="false"></label>
               ${positionEditor("box", "ตำแหน่งรูป BOX")}
               <div class="dds-hans-barcode-lock dds-field-full"><span>BARCODE</span><strong>LOCKED</strong><small>ใช้รูปต้นฉบับเดิมและไม่มีช่องแก้ไข</small></div>
             </div></section>
@@ -14235,7 +14235,10 @@ ${stylesheetLinks}
     if (!editor) return;
     enableEditorMode();
     const draft = getDraft();
-    setValues(draft?.values || editorDefaults);
+    const editorValues = draft?.values
+      ? { ...editorDefaults, ...draft.values, boxImage: draft.values.boxImage || editorDefaults.boxImage }
+      : editorDefaults;
+    setValues(editorValues);
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     history.replaceState(null, "", "#commission-hans-roleplay-editor");
