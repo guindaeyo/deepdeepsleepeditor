@@ -13546,3 +13546,466 @@ ${stylesheetLinks}
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
   else install();
 })();
+
+
+/* =========================================================
+   HANS X. FROST — ROLEPLAY COMMISSION EDITOR
+   แก้เฉพาะ HEAD / BOX, ตำแหน่งรูป, สี, Did you know... และโรลเพลย์
+   BARCODE ถูกล็อกไว้ตามต้นฉบับ
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_HANS_ROLEPLAY_COMMISSION_INSTALLED__) return;
+  window.__DDS_HANS_ROLEPLAY_COMMISSION_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-commission-hans-roleplay";
+  const VIEW_PANEL_NAME = "view-commission-hans-roleplay";
+  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v1";
+  const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.-css";
+  const CANVAS_WIDTH = 736;
+  const BARCODE_URL = "https://i.postimg.cc/kXCjW5Ws/bc.png";
+
+  const defaults = Object.freeze({
+    bgColor: "#b4e7f1",
+    textColor: "#000000",
+    headImage: "https://i.postimg.cc/ZYdgrg2R/image.jpg",
+    boxImage: "https://i.postimg.cc/ZqWjJvhN/box.png",
+    headX: "50",
+    headY: "50",
+    boxX: "50",
+    boxY: "50",
+    title: "Did you know...",
+    roleplay: "ซัลโหลมาดายริปไดย์ ทาวน์ราชานุญาตโอ้ยแอ๊กพอดพ์โฟล์ค\n\nกาญจนาโกษาโหววเฮ้ง ทดสอบ"
+  });
+
+  let panel = null;
+  let viewPanel = null;
+  let card = null;
+  let previewTimer = 0;
+  let cardRendered = false;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function cssUrl(value) {
+    return String(value || "").replace(/[\\'\r\n]/g, (char) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[char] ?? ""));
+  }
+
+  function clampPosition(value, fallback = 50) {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.max(0, Math.min(100, number)) : fallback;
+  }
+
+  function normalizeColor(value, fallback) {
+    const text = String(value || "").trim();
+    return /^#[0-9a-f]{6}$/i.test(text) ? text : fallback;
+  }
+
+  function roleToHtml(value) {
+    return h(value || "").replace(/\r?\n/g, "<br>");
+  }
+
+  function getValues() {
+    const values = { ...defaults };
+    if (!panel) return values;
+    panel.querySelectorAll("[data-hans-field]").forEach((input) => {
+      values[input.dataset.hansField] = input.value;
+    });
+    return values;
+  }
+
+  function updateRangeOutputs() {
+    if (!panel) return;
+    panel.querySelectorAll("[data-hans-output]").forEach((output) => {
+      const input = panel.querySelector(`[data-hans-field="${output.dataset.hansOutput}"]`);
+      if (input) output.textContent = `${input.value}%`;
+    });
+  }
+
+  function syncColorPickers() {
+    if (!panel) return;
+    panel.querySelectorAll("[data-hans-color-picker]").forEach((picker) => {
+      const key = picker.dataset.hansColorPicker;
+      const input = panel.querySelector(`[data-hans-field="${key}"]`);
+      if (!input) return;
+      const fallback = key === "bgColor" ? defaults.bgColor : defaults.textColor;
+      const normalized = normalizeColor(input.value, fallback);
+      if (picker.value.toLowerCase() !== normalized.toLowerCase()) picker.value = normalized;
+    });
+  }
+
+  function setValues(values = {}) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-hans-field]").forEach((input) => {
+      const key = input.dataset.hansField;
+      input.value = values[key] ?? defaults[key] ?? "";
+    });
+    syncColorPickers();
+    updateRangeOutputs();
+  }
+
+  function buildCode(values = getValues()) {
+    const v = { ...defaults, ...values };
+    const bg = normalizeColor(v.bgColor, defaults.bgColor);
+    const color = normalizeColor(v.textColor, defaults.textColor);
+    const headX = clampPosition(v.headX);
+    const headY = clampPosition(v.headY);
+    const boxX = clampPosition(v.boxX);
+    const boxY = clampPosition(v.boxY);
+
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><style>.ddsh-hxf .ddsh-hxf-photo{background-position:var(--ddsh-hxf-head-x) var(--ddsh-hxf-head-y)!important}.ddsh-hxf .ddsh-hxf-burst{background-position:var(--ddsh-hxf-box-x) var(--ddsh-hxf-box-y)!important}</style><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-box-x:${boxX}%;--ddsh-hxf-box-y:${boxY}%;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">Hans</span><span class="ddsh-hxf-name-last">Xilvalur Frost</span></div><div class="ddsh-hxf-photo"><div class="ddsh-hxf-burst"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>หมายเหตุ</strong> herb</div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+  }
+
+  const OFFICIAL_CODE = buildCode(defaults);
+
+  function previewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-hans-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;display:flex;flex-direction:column;align-items:center;margin:0 auto}.dds-hans-preview-root>.ddsh-hxf{flex:0 0 auto!important}.dds-hans-preview-root>.ddshopfz-credit{flex:0 0 auto!important;width:100%!important}</style></head><body><div class="dds-hans-preview-root">${code}</div></body></html>`;
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      const root = doc?.querySelector(".dds-hans-preview-root");
+      const target = doc?.querySelector(".ddsh-hxf");
+      if (!doc || !root) return { width: CANVAS_WIDTH, height: 900 };
+      const width = Math.max(1, Math.ceil(target?.getBoundingClientRect?.().width || target?.offsetWidth || CANVAS_WIDTH));
+      const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 900));
+      return { width, height };
+    } catch {
+      return { width: CANVAS_WIDTH, height: 900 };
+    }
+  }
+
+  function writeIframe(iframe, code, fit) {
+    if (!iframe) return;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("height", "1200px", "important");
+    iframe.onload = () => {
+      fit?.();
+      setTimeout(() => fit?.(), 90);
+      setTimeout(() => fit?.(), 280);
+      setTimeout(() => fit?.(), 750);
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function fitHolder(stage, holder, iframe) {
+    if (!stage || !holder || !iframe) return;
+    const { width, height } = measureIframe(iframe);
+    const available = Math.max(260, stage.clientWidth - 48);
+    const scale = Math.min(1, available / width);
+    holder.style.width = `${Math.ceil(width * scale)}px`;
+    holder.style.height = `${Math.ceil(height * scale)}px`;
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+  }
+
+  function fitEditorPreview() {
+    if (!panel) return;
+    fitHolder(panel.querySelector("[data-hans-preview-stage]"), panel.querySelector("[data-hans-preview-holder]"), panel.querySelector("[data-hans-preview]"));
+  }
+
+  function fitViewPreview() {
+    if (!viewPanel) return;
+    fitHolder(viewPanel.querySelector("[data-hans-view-stage]"), viewPanel.querySelector("[data-hans-view-holder]"), viewPanel.querySelector("[data-hans-view-preview]"));
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-hans-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const { width, height } = measureIframe(iframe);
+    const scale = Math.min(stage.clientWidth / width, stage.clientHeight / height, 0.52);
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${Math.max(0.05, scale)})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") return window.showToast(message);
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsHansTimer);
+    toast.__ddsHansTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  function setDraftStatus(savedAt = 0) {
+    const status = panel?.querySelector("[data-hans-draft-status]");
+    if (!status) return;
+    if (!savedAt) {
+      status.textContent = "ยังไม่มีแบบร่าง";
+      return;
+    }
+    try {
+      status.textContent = `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH")}`;
+    } catch {
+      status.textContent = "มีแบบร่างที่บันทึกไว้";
+    }
+  }
+
+  function getDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+      showToast("บันทึกแบบร่าง Hans แล้ว");
+    } catch {
+      showToast("บันทึกแบบร่างไม่สำเร็จ");
+    }
+  }
+
+  function deleteDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setValues(defaults);
+    setDraftStatus(0);
+    updatePreview();
+    showToast("ลบแบบร่างแล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode();
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    showToast("คัดลอกโค้ดโรลเพลย์ Hans แล้ว");
+  }
+
+  function setCommissionTab() {
+    document.querySelectorAll("[data-work-tab]").forEach((button) => {
+      const selected = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", String(selected));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach((workPanel) => {
+      const selected = workPanel.dataset.workPanel === "commission";
+      workPanel.hidden = !selected;
+      workPanel.classList.toggle("is-active", selected);
+    });
+  }
+
+  function showPanel(panelName) {
+    document.querySelectorAll(".dds-panel").forEach((item) => item.classList.toggle("is-active", item.dataset.panel === panelName));
+    document.querySelectorAll(".dds-nav-button").forEach((button) => button.classList.toggle("is-active", button.dataset.page === "commission"));
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
+  function enableEditorMode() {
+    document.body.classList.add("dds-editor-mode", "dds-commission-editor-mode");
+    document.documentElement.classList.add("dds-editor-mode", "dds-commission-editor-mode");
+  }
+
+  function goBack(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const restore = () => {
+      document.body.classList.remove("dds-editor-mode", "dds-commission-editor-mode", "dds-modal-open");
+      document.documentElement.classList.remove("dds-editor-mode", "dds-commission-editor-mode", "dds-modal-open");
+      showPanel("commission");
+      setCommissionTab();
+      history.replaceState(null, "", "#commission");
+    };
+    restore();
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+    setTimeout(restore, 80);
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    syncColorPickers();
+    updateRangeOutputs();
+    writeIframe(panel.querySelector("[data-hans-preview]"), buildCode(), fitEditorPreview);
+  }
+
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 55);
+  }
+
+  function colorField(label, key) {
+    return `<label class="dds-color-field dds-hans-color-field"><span>${h(label)}</span><div><input type="color" data-hans-color-picker="${h(key)}" value="${h(defaults[key])}"><input type="text" data-hans-field="${h(key)}" value="${h(defaults[key])}" spellcheck="false"></div></label>`;
+  }
+
+  function positionEditor(prefix, title) {
+    return `<div class="dds-image-position dds-field-full dds-hans-position"><div class="dds-image-position-heading"><span>${h(title)}</span><small>ปรับซ้าย–ขวา และบน–ล่าง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input data-hans-field="${prefix}X" min="0" max="100" type="range" value="50"><small>ขวา</small><output data-hans-output="${prefix}X">50%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input data-hans-field="${prefix}Y" min="0" max="100" type="range" value="50"><small>ล่าง</small><output data-hans-output="${prefix}Y">50%</output></label></div>`;
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-hans-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading">
+        <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-back type="button">←</button>
+        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — แก้ HEAD / BOX, ตำแหน่งรูป, สี, หัวข้อ Did you know... และเนื้อหาโรลเพลย์ได้ ส่วน BARCODE ถูกล็อกไว้ตามต้นฉบับ</p></div>
+      </div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column">
+          <div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>HANS X. FROST / ROLEPLAY</strong></div>
+          <div class="dds-protected-commission-preview-stage dds-hans-preview-stage" data-hans-preview-stage><div class="dds-hans-preview-holder" data-hans-preview-holder><iframe class="dds-protected-commission-preview-frame" data-hans-preview scrolling="no" title="ตัวอย่างโค้ดโรลเพลย์ Hans X. Frost"></iframe></div></div>
+        </div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-hans-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-hans-save>SAVE DRAFT</button><button type="button" data-hans-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-hans-commission-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
+              <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="${h(defaults.headImage)}" spellcheck="false"></label>
+              ${positionEditor("head", "ตำแหน่งรูป HEAD")}
+              <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX</span><input type="url" data-hans-field="boxImage" value="${h(defaults.boxImage)}" spellcheck="false"></label>
+              ${positionEditor("box", "ตำแหน่งรูป BOX")}
+              <div class="dds-hans-barcode-lock dds-field-full"><span>BARCODE</span><strong>LOCKED</strong><small>ใช้รูปต้นฉบับเดิมและไม่มีช่องแก้ไข</small></div>
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>หัวข้อ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>Did you know...</span><input type="text" data-hans-field="title" value="${h(defaults.title)}"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea data-hans-field="roleplay" rows="14">${h(defaults.roleplay)}</textarea></label></div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>05</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+
+    footer.before(panel);
+    panel.querySelector("[data-hans-back]")?.addEventListener("click", goBack);
+    panel.addEventListener("input", (event) => {
+      const picker = event.target.closest?.("[data-hans-color-picker]");
+      if (picker) {
+        const input = panel.querySelector(`[data-hans-field="${picker.dataset.hansColorPicker}"]`);
+        if (input) input.value = picker.value;
+      }
+      schedulePreview();
+    });
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-hans-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-hans-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-hans-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-hans-reset]")?.addEventListener("click", resetFields);
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-hans-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโค้ดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-hans-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function openView() {
+    const target = createViewPanel();
+    if (!target) return;
+    enableEditorMode();
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-hans-roleplay-view");
+    writeIframe(target.querySelector("[data-hans-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+  }
+
+  function openEditor() {
+    const editor = createPanel();
+    if (!editor) return;
+    enableEditorMode();
+    const draft = getDraft();
+    setValues(draft?.values || defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#commission-hans-roleplay-editor");
+    updatePreview();
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    if (grid.querySelector(".dds-hans-roleplay-commission-card")) return true;
+
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);
+
+    const cardPreview = card.querySelector("[data-hans-card-preview]");
+    const renderCard = () => {
+      if (cardRendered || !cardPreview) return;
+      cardRendered = true;
+      writeIframe(cardPreview, OFFICIAL_CODE, fitCardPreview);
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        renderCard();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else renderCard();
+    return true;
+  }
+
+  function install() {
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 100) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      fitCardPreview();
+      fitEditorPreview();
+      fitViewPreview();
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();

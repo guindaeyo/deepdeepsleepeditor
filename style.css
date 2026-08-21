@@ -7980,3 +7980,152 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==================================================
+   HANS X. FROST — ROLEPLAY COMMISSION EDITOR
+   ================================================== */
+.dds-hans-commission-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.08em;
+}
+
+.dds-hans-commission-heading > span {
+  display: block;
+}
+
+.dds-hans-commission-heading > span:last-child {
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 0.68em;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.dds-hans-preview-stage,
+.dds-hans-view-stage {
+  width: 100%;
+  min-height: 520px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-hans-preview-holder,
+.dds-hans-view-holder {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.dds-hans-preview-holder > iframe,
+.dds-hans-view-holder > iframe {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent;
+}
+
+.dds-hans-view-stage {
+  min-height: 0;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dds-hans-card-preview-frame {
+  position: absolute !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: #242424;
+}
+
+.dds-hans-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-hans-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-hans-commission-editor [data-hans-save],
+.dds-hans-commission-editor [data-hans-copy] {
+  color: #fff;
+  border-color: rgba(193, 23, 36, 0.72);
+  background: linear-gradient(135deg, #b0121d, #720810);
+}
+
+.dds-hans-commission-copy .dds-protected-commission-copy-actions [data-hans-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+.dds-hans-position {
+  margin-top: -2px;
+}
+
+.dds-hans-barcode-lock {
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.dds-hans-barcode-lock > span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.dds-hans-barcode-lock > strong {
+  padding: 3px 7px;
+  color: #e04d58;
+  border: 1px solid rgba(193, 23, 36, 0.42);
+  font-size: 8px;
+  letter-spacing: 0.13em;
+}
+
+.dds-hans-barcode-lock > small {
+  color: rgba(255, 255, 255, 0.36);
+  font-size: 9px;
+  text-align: right;
+}
+
+.dds-hans-color-field input[type="color"] {
+  flex: 0 0 42px;
+}
+
+@media (max-width: 700px) {
+  .dds-hans-commission-heading > span:last-child {
+    font-size: 0.62em;
+  }
+
+  .dds-hans-preview-stage,
+  .dds-hans-view-stage {
+    padding: 14px;
+  }
+
+  .dds-hans-barcode-lock {
+    grid-template-columns: auto auto;
+  }
+
+  .dds-hans-barcode-lock > small {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+}
