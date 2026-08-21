@@ -9514,7 +9514,7 @@ ${stylesheetLinks}
     const editorPanel = createPanel();
     if (!editorPanel) return;
     const draft = getDraft();
-    setValues(draft?.values || defaults);
+    setValues(draft?.values || editorDefaults);
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     updatePreview();
@@ -12688,14 +12688,14 @@ ${stylesheetLinks}
 
   function deleteDraft() {
     try { localStorage.removeItem(DRAFT_KEY); } catch {}
-    setValues(defaults);
+    setValues(editorDefaults);
     setDraftStatus(0);
     updatePreview();
     showToast("ลบแบบร่างแล้ว");
   }
 
   function resetFields() {
-    setValues(defaults);
+    setValues(editorDefaults);
     updatePreview();
     showToast("รีเซ็ตช่องกรอกทั้งหมดแล้ว");
   }
@@ -13561,7 +13561,7 @@ ${stylesheetLinks}
 
   const PANEL_NAME = "editor-commission-hans-roleplay";
   const VIEW_PANEL_NAME = "view-commission-hans-roleplay";
-  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v2";
+  const DRAFT_KEY = "dds:commission-draft:hans:roleplay:structured-v3";
   const STYLESHEET_URL = "https://guindaeyo.github.io/css/commit-hansxcodrole.css";
   const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap";
   const CANVAS_WIDTH = 736;
@@ -13577,7 +13577,22 @@ ${stylesheetLinks}
     boxX: "50",
     boxY: "50",
     title: "Did you know...",
-    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊"
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    note: "หมายเหตุ herb"
+  });
+
+  const editorDefaults = Object.freeze({
+    bgColor: defaults.bgColor,
+    textColor: defaults.textColor,
+    headImage: "",
+    boxImage: "",
+    headX: "50",
+    headY: "50",
+    boxX: "50",
+    boxY: "50",
+    title: "",
+    roleplay: "",
+    note: ""
   });
 
   let panel = null;
@@ -13660,7 +13675,7 @@ ${stylesheetLinks}
     const boxX = clampPosition(v.boxX);
     const boxY = clampPosition(v.boxY);
 
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">Hans</span><span class="ddsh-hxf-name-last">Xilvalur Frost</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>หมายเหตุ herb</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">Hans</span><span class="ddsh-hxf-name-last">Xilvalur Frost</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">Crabby<br>Fairy</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>${h(v.note)}</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
   }
 
   const OFFICIAL_CODE = buildCode(defaults);
@@ -13728,15 +13743,21 @@ ${stylesheetLinks}
     const stage = iframe?.closest(".dds-roleplay-card-preview");
     if (!iframe || !stage) return;
     const { width, height } = measureIframe(iframe);
-    const scale = Math.min(stage.clientWidth / width, stage.clientHeight / height, 0.52);
+    const availableWidth = Math.max(1, stage.clientWidth - 24);
+    const scale = Math.min(availableWidth / width, 0.52);
+    const safeScale = Math.max(0.05, scale);
+    const scaledHeight = Math.ceil(height * safeScale);
+    stage.style.setProperty("height", `${scaledHeight + 24}px`, "important");
+    stage.style.setProperty("min-height", `${scaledHeight + 24}px`, "important");
+    stage.style.setProperty("aspect-ratio", "auto", "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
     iframe.style.setProperty("max-width", `${width}px`, "important");
     iframe.style.setProperty("height", `${height}px`, "important");
     iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "50%", "important");
-    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${Math.max(0.05, scale)})`, "important");
-    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("top", "12px", "important");
+    iframe.style.setProperty("transform", `translateX(-50%) scale(${safeScale})`, "important");
+    iframe.style.setProperty("transform-origin", "top center", "important");
   }
 
   function showToast(message) {
@@ -13887,7 +13908,7 @@ ${stylesheetLinks}
     panel.innerHTML = `
       <div class="dds-editor-heading">
         <button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-back type="button">←</button>
-        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — แก้ HEAD / BOX, ตำแหน่งรูป, สี, หัวข้อ Did you know... และเนื้อหาโรลเพลย์ได้ ส่วน BARCODE ถูกล็อกไว้ตามต้นฉบับ</p></div>
+        <div><p class="dds-eyebrow">COMMISSION EDITOR</p><h1 class="dds-hans-commission-heading"><span>COMMISSION</span><span>— โค้ดประเภทโรลเพลย์</span></h1><p>ผู้จ้าง HANS X. FROST — แก้ HEAD / BOX, ตำแหน่งรูป, สี, หัวข้อ Did you know..., เนื้อหาโรลเพลย์ และหมายเหตุได้ ส่วน BARCODE ถูกล็อกไว้ตามต้นฉบับ</p></div>
       </div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column">
@@ -13898,17 +13919,18 @@ ${stylesheetLinks}
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-hans-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-hans-save>SAVE DRAFT</button><button type="button" data-hans-delete>DELETE SAVE</button></div>
           <div class="dds-protected-commission-scroll dds-hans-commission-scroll">
             <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
-              <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="${h(defaults.headImage)}" spellcheck="false"></label>
+              <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="" spellcheck="false"></label>
               ${positionEditor("head", "ตำแหน่งรูป HEAD")}
-              <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX</span><input type="url" data-hans-field="boxImage" value="${h(defaults.boxImage)}" spellcheck="false"></label>
+              <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX</span><input type="url" data-hans-field="boxImage" value="" spellcheck="false"></label>
               ${positionEditor("box", "ตำแหน่งรูป BOX")}
               <div class="dds-hans-barcode-lock dds-field-full"><span>BARCODE</span><strong>LOCKED</strong><small>ใช้รูปต้นฉบับเดิมและไม่มีช่องแก้ไข</small></div>
             </div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>สีของโค้ด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง — --ddsh-hxf-bg", "bgColor")}${colorField("สีตัวอักษร — --ddsh-hxf-color", "textColor")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>หัวข้อ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>Did you know...</span><input type="text" data-hans-field="title" value="${h(defaults.title)}"></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea data-hans-field="roleplay" rows="14">${h(defaults.roleplay)}</textarea></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>หัวข้อ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>Did you know...</span><input type="text" data-hans-field="title" value=""></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea data-hans-field="roleplay" rows="14"></textarea></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความหมายเหตุ</span><input type="text" data-hans-field="note" value=""></label></div></section>
           </div>
-          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>05</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy dds-hans-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโค้ด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML ที่แก้ไขเสร็จแล้ว โดย BARCODE จะติดไปเป็นรูปต้นฉบับอัตโนมัติ</p><div class="dds-protected-commission-copy-actions"><button type="button" data-hans-copy>COPY CODE <span>↗</span></button><button type="button" data-hans-reset>RESET</button></div></section>
         </div>
       </div>`;
 
@@ -13972,7 +13994,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โค้ดประเภทโรลเพลย์ (สำหรับผู้ที่โรลเพลย์ภายในบ้าน Pine Woods Rd. No.7)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);
