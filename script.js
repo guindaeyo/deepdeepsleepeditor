@@ -5403,6 +5403,7 @@ ${stylesheetLinks}
       field.matches(
         '.dds-generated-code, [data-dds-no-save], [type="button"], [type="submit"], [type="reset"], button'
       ) ||
+        field.closest?.(".dds-rich-toolbar, .dds-named-save-library") ||
         field.readOnly ||
         field.disabled
     );
@@ -5883,6 +5884,10 @@ ${stylesheetLinks}
   }
 
   function isLongTextTarget(target) {
+    if (target.closest?.(".dds-rich-toolbar, .dds-named-save-library") || target.matches?.("[data-named-save-name], [data-bbcode-color]")) {
+      return false;
+    }
+
     if (target.matches("[contenteditable='true']")) {
       return true;
     }
@@ -5912,7 +5917,7 @@ ${stylesheetLinks}
         <button type="button" data-bbcode="s" title="ขีดฆ่า [s]" aria-label="ขีดฆ่า"><s>S</s></button>
       </div>
       <div class="dds-bbcode-group" aria-label="สีและขนาด">
-        <label class="dds-bbcode-color" title="สีตัวอักษร [color]"><span>A</span><input type="color" data-bbcode-color value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label>
+        <label class="dds-bbcode-color" title="สีตัวอักษร [color]"><span>A</span><input type="color" data-bbcode-color data-dds-no-save value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label>
         <button type="button" data-bbcode="size-small" title="ตัวอักษรเล็ก [size=small]">A−</button>
         <button type="button" data-bbcode="size-medium" title="ตัวอักษรกลาง [size=medium]">A</button>
         <button type="button" data-bbcode="size-large" title="ตัวอักษรใหญ่ [size=large]">A+</button>
@@ -12319,6 +12324,7 @@ ${stylesheetLinks}
     if (!field) return false;
     if (field.matches("button, [type='button'], [type='submit'], [type='reset'], [type='file']")) return false;
     if (field.matches(".dds-generated-code, [data-dds-no-save]")) return false;
+    if (field.closest?.(".dds-rich-toolbar, .dds-named-save-library")) return false;
     if (field.readOnly || field.disabled) return false;
     if (field.matches("[data-history-tag], [data-lwl-side-word-input]")) return false;
     return true;
@@ -12613,7 +12619,8 @@ ${stylesheetLinks}
       return;
     }
 
-    syncCurrentDraft(host);
+    // SAVE AS บันทึก snapshot นี้อย่างเดียว ไม่คลิก SAVE DRAFT ซ้ำ
+    // เพื่อไม่ให้ event ของ editor/BBCode ถูกเรียกโดยไม่จำเป็น
     if (input) input.value = "";
     renderList(host, panel);
     notify(`บันทึก “${name}” ลงในเครื่องนี้แล้ว`);
