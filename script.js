@@ -8076,6 +8076,16 @@ ${stylesheetLinks}
     const id = (name) => document.getElementById(name);
     const value = (name, fallback = "") => id(name)?.value ?? fallback;
 
+    // ใส่ค่าไกด์ลงในช่องกรอกจริง ๆ เพื่อให้เปิด Editor มาแล้วเห็นและแก้ต่อได้ทันที
+    [
+      ["onCloudHeartOne", "♡"],
+      ["onCloudHeartTwo", "♥"],
+      ["onCloudCloud", "9729"]
+    ].forEach(([name, guide]) => {
+      const input = id(name);
+      if (input && !String(input.value || "").trim()) input.value = guide;
+    });
+
     function readValues() {
       return {
         title: value("onCloudTitle"),
