@@ -4322,6 +4322,7 @@ ${stylesheetLinks}
       "editor-code008": "updateDumbDumber",
       "editor-code009": "updateHigherHeaven",
       "editor-code010": "updateLongWayLongRide",
+      "editor-code011": "updateOnCloud",
       "editor-profile001": "updatePolaroidLove",
       "editor-profile002": "updateMoodboard",
       "editor-profile003": "updateFortyOne",
@@ -7845,6 +7846,368 @@ ${stylesheetLinks}
   }
 })();
 
+
+
+/* ============================================================
+   CODE011 — ON CLOUD
+============================================================ */
+(() => {
+  if (window.__DDS_ON_CLOUD_INSTALLED__) {
+    return;
+  }
+
+  window.__DDS_ON_CLOUD_INSTALLED__ = true;
+
+  const stylesheetUrls = [
+    "https://guindaeyo.github.io/deepdshop/ddsh-oncloud.css",
+    "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500&family=Courier+Prime:wght@400;700&family=Fredoka:wght@500;600&display=swap"
+  ];
+
+  const officialValues = Object.freeze({
+    title: "Franklin D. Bloodworth",
+    subtitle: "୨ৎ nothing just meow meow ୨ৎ",
+    mainImage: "https://i.pinimg.com/1200x/40/7d/d4/407dd4a7dd9359f79fa32f518d036a2e.jpg",
+    topImage: "https://i.pinimg.com/736x/29/7b/89/297b8970ba31c0fe9b72fdd76e2fa6de.jpg",
+    bottomImage: "https://i.pinimg.com/736x/27/7e/d1/277ed1e0c128296ea8c4c0504ce1b715.jpg",
+    mainX: 50,
+    mainY: 50,
+    topX: 50,
+    topY: 50,
+    bottomX: 50,
+    bottomY: 50,
+    imageBorderColor: "",
+    boxBorderColor: "",
+    titleColor: "",
+    titleStrokeColor: "",
+    subtitleColor: "",
+    decoColor: "",
+    contentColor: "",
+    heartOne: "♡",
+    heartTwo: "♥",
+    cloud: "☁",
+    decoX: 0,
+    cloudX: 0,
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    note: "หมายเหตุ : สามารถใส่ข้อความหมายเหตุเพิ่มเติมตรงนี้ได้"
+  });
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]+/g, "");
+  }
+
+  function editableText(element) {
+    if (!element) return "";
+    return String(element.innerText || element.textContent || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n");
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value);
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%;height:auto;">')
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_m, size, content) => {
+        const sizes = { small: "0.82em", medium: "1em", large: "1.28em" };
+        return `<span style="font-size:${sizes[size]}">${content}</span>`;
+      })
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[(quote|code|hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span class="dds-bbcode-$1">$2</span>')
+      .replace(/\[list(?:=1)?\]/gi, "<div>")
+      .replace(/\[\/list\]/gi, "</div>")
+      .replace(/\[\*\]/g, "<br>• ")
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\n/g, "<br>");
+    return text;
+  }
+
+  function normalizeEmoji(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return "";
+    const entity = raw.match(/^&#(\d+);?$/);
+    const decimal = entity ? entity[1] : (/^\d{2,7}$/.test(raw) ? raw : "");
+    if (decimal) {
+      const codePoint = Number(decimal);
+      if (Number.isInteger(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff) {
+        try { return String.fromCodePoint(codePoint); } catch (_error) {}
+      }
+    }
+    return raw;
+  }
+
+  function optionalColorStyle(property, value) {
+    const color = String(value || "").trim();
+    return color ? `${property}:${h(color)};` : "";
+  }
+
+  function buildMarkup(values, previewMode) {
+    const roleplay = previewMode ? bbcodeToPreviewHtml(values.roleplay) : h(values.roleplay);
+    const note = previewMode ? bbcodeToPreviewHtml(values.note) : h(values.note);
+    const imageBorder = optionalColorStyle("border-color", values.imageBorderColor);
+    const boxBorder = optionalColorStyle("border-color", values.boxBorderColor);
+    const titleColor = optionalColorStyle("color", values.titleColor);
+    const subtitleColor = optionalColorStyle("color", values.subtitleColor);
+    const decoColor = optionalColorStyle("color", values.decoColor);
+    const contentColor = optionalColorStyle("color", values.contentColor);
+    const titleStrokeColor = String(values.titleStrokeColor || "").trim();
+    const titleStroke = titleStrokeColor
+      ? `-webkit-text-stroke:1px ${h(titleStrokeColor)};paint-order:stroke fill;`
+      : "";
+    const decoX = Number(values.decoX) || 0;
+    const cloudX = Number(values.cloudX) || 0;
+    const cloud = normalizeEmoji(values.cloud);
+
+    return `<div class="ddsh-oncloud" style="--ddsh-oncloud-bg:#fff;--ddsh-oncloud-main:url('${cssUrl(values.mainImage)}');--ddsh-oncloud-top:url('${cssUrl(values.topImage)}');--ddsh-oncloud-bottom:url('${cssUrl(values.bottomImage)}');--ddsh-oncloud-main-x:${Number(values.mainX) || 0}%;--ddsh-oncloud-main-y:${Number(values.mainY) || 0}%;--ddsh-oncloud-top-x:${Number(values.topX) || 0}%;--ddsh-oncloud-top-y:${Number(values.topY) || 0}%;--ddsh-oncloud-bottom-x:${Number(values.bottomX) || 0}%;--ddsh-oncloud-bottom-y:${Number(values.bottomY) || 0}%;"><div class="ddsh-oncloud-header"><div class="ddsh-oncloud-deco ddsh-oncloud-deco-left" style="${decoColor}translate:${decoX}px 0;"><span class="ddsh-oncloud-dot dot-one"></span><span class="ddsh-oncloud-heart heart-one">${h(values.heartOne)}</span><span class="ddsh-oncloud-heart heart-two">${h(values.heartTwo)}</span><span class="ddsh-oncloud-dot dot-two"></span></div><div class="ddsh-oncloud-heading"><div class="ddsh-oncloud-title" style="${titleColor}${titleStroke}">${h(values.title)}</div><div class="ddsh-oncloud-subtitle" style="${subtitleColor}">${h(values.subtitle)}</div></div><div class="ddsh-oncloud-cloud" style="translate:${cloudX}px 0;">${h(cloud)}</div></div><div class="ddsh-oncloud-gallery"><div class="ddsh-oncloud-main-photo" style="${imageBorder}"></div><div class="ddsh-oncloud-side"><div class="ddsh-oncloud-top-photo" style="${imageBorder}"></div><div class="ddsh-oncloud-bottom-photo" style="${imageBorder}"></div></div></div><div class="ddsh-oncloud-text" style="${boxBorder}${contentColor}">${roleplay}</div><div class="ddsh-oncloud-note" style="${boxBorder}${contentColor}"><strong>${note}</strong></div></div><div class="ddshopfz-credit"><span></span></div>`;
+  }
+
+  function buildCopyCode(values) {
+    return `<link href="https://guindaeyo.github.io/deepdshop/ddsh-oncloud.css" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500&family=Courier+Prime:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">${buildMarkup(values, false)}`;
+  }
+
+  function previewDocument(markup) {
+    const links = stylesheetUrls.map((url) => `<link href="${url}" rel="stylesheet">`).join("");
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}<style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-oncloud-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:760px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-oncloud-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+  }
+
+  function resizePreview(iframe, isCard) {
+    const doc = iframe?.contentDocument;
+    const target = doc?.querySelector(".dds-preview-target");
+    const root = doc?.querySelector(".ddsh-oncloud");
+    const shell = doc?.querySelector(".dds-oncloud-preview-shell");
+    if (!iframe || !target || !root || !shell) return;
+
+    target.style.transform = "none";
+    shell.style.height = "auto";
+    const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, 760);
+    const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
+    const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
+    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 28);
+    let scale = Math.min(1, availableWidth / naturalWidth);
+    if (isCard) {
+      const availableHeight = Math.max(1, (stage?.clientHeight || 300) - 28);
+      scale = Math.min(scale, availableHeight / naturalHeight);
+    }
+    scale = Math.max(0.01, scale);
+    const scaledHeight = Math.ceil(naturalHeight * scale);
+    target.style.transform = `scale(${scale})`;
+    shell.style.height = `${scaledHeight}px`;
+    if (!isCard) iframe.style.height = `${Math.max(720, scaledHeight + 40)}px`;
+    iframe.classList.remove("dds-preview-loading");
+    iframe.classList.add("dds-preview-ready");
+    if (typeof window.revealPreview === "function") window.revealPreview(iframe);
+  }
+
+  const previewStates = new WeakMap();
+
+  function renderPreview(iframe, markup, isCard) {
+    if (!iframe) return;
+    const srcdoc = previewDocument(markup);
+    const resize = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resizePreview(iframe, isCard)));
+      [90, 260, 600, 1200, 2000].forEach((delay) => window.setTimeout(() => resizePreview(iframe, isCard), delay));
+    };
+    const state = previewStates.get(iframe) || { loaded: false, token: 0 };
+    state.token += 1;
+    const token = state.token;
+    previewStates.set(iframe, state);
+
+    if (state.loaded && iframe.contentDocument?.readyState !== "loading" && typeof window.updateLoadedPreviewDocument === "function") {
+      try {
+        if (window.updateLoadedPreviewDocument(iframe, srcdoc, resize)) {
+          resize();
+          return;
+        }
+      } catch (error) {
+        console.warn("[DDS CODE011] preview patch failed", error);
+      }
+    }
+
+    iframe.classList.add("dds-preview-loading");
+    iframe.classList.remove("dds-preview-ready");
+    iframe.addEventListener("load", () => {
+      const current = previewStates.get(iframe);
+      if (!current || current.token !== token) return;
+      current.loaded = true;
+      resize();
+    }, { once: true });
+    iframe.srcdoc = srcdoc;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+    return Promise.resolve();
+  }
+
+  function initialize() {
+    const panel = document.querySelector('[data-panel="editor-code011"]');
+    const cardIframe = document.getElementById("roleplayCardPreview011");
+    const editorIframe = document.getElementById("onCloudPreview");
+    const generated = document.getElementById("generatedOnCloudCode");
+    const copyButton = document.getElementById("copyGeneratedOnCloudCode");
+    const editButton = document.querySelector('[data-edit-code="code011"]');
+    if (!panel || !cardIframe || !editorIframe || !generated) return;
+
+    const id = (name) => document.getElementById(name);
+    const value = (name, fallback = "") => id(name)?.value ?? fallback;
+
+    function readValues() {
+      return {
+        title: value("onCloudTitle"),
+        subtitle: value("onCloudSubtitle"),
+        mainImage: value("onCloudMainImage"),
+        topImage: value("onCloudTopImage"),
+        bottomImage: value("onCloudBottomImage"),
+        mainX: Number(value("onCloudMainX", 50)),
+        mainY: Number(value("onCloudMainY", 50)),
+        topX: Number(value("onCloudTopX", 50)),
+        topY: Number(value("onCloudTopY", 50)),
+        bottomX: Number(value("onCloudBottomX", 50)),
+        bottomY: Number(value("onCloudBottomY", 50)),
+        imageBorderColor: value("onCloudImageBorderColor"),
+        boxBorderColor: value("onCloudBoxBorderColor"),
+        titleColor: value("onCloudTitleColor"),
+        titleStrokeColor: value("onCloudTitleStrokeColor"),
+        subtitleColor: value("onCloudSubtitleColor"),
+        decoColor: value("onCloudDecoColor"),
+        contentColor: value("onCloudContentColor"),
+        heartOne: value("onCloudHeartOne"),
+        heartTwo: value("onCloudHeartTwo"),
+        cloud: value("onCloudCloud"),
+        decoX: Number(value("onCloudDecoX", 0)),
+        cloudX: Number(value("onCloudCloudX", 0)),
+        roleplay: editableText(id("onCloudRoleplayEditor")),
+        note: value("onCloudNote")
+      };
+    }
+
+    function syncOutputs() {
+      const outputs = [
+        ["onCloudMainX", "%"], ["onCloudMainY", "%"],
+        ["onCloudTopX", "%"], ["onCloudTopY", "%"],
+        ["onCloudBottomX", "%"], ["onCloudBottomY", "%"],
+        ["onCloudDecoX", "px"], ["onCloudCloudX", "px"]
+      ];
+      outputs.forEach(([name, suffix]) => {
+        const input = id(name);
+        const output = panel.querySelector(`[data-position-output="${name}"]`);
+        if (input && output) output.textContent = `${input.value}${suffix}`;
+      });
+    }
+
+    function updateOnCloud() {
+      syncOutputs();
+      const values = readValues();
+      generated.value = buildCopyCode(values);
+      renderPreview(editorIframe, buildMarkup(values, true), false);
+    }
+
+    window.updateOnCloud = updateOnCloud;
+
+    [
+      ["onCloudImageBorderColorPicker", "onCloudImageBorderColor"],
+      ["onCloudBoxBorderColorPicker", "onCloudBoxBorderColor"],
+      ["onCloudTitleColorPicker", "onCloudTitleColor"],
+      ["onCloudTitleStrokeColorPicker", "onCloudTitleStrokeColor"],
+      ["onCloudSubtitleColorPicker", "onCloudSubtitleColor"],
+      ["onCloudDecoColorPicker", "onCloudDecoColor"],
+      ["onCloudContentColorPicker", "onCloudContentColor"]
+    ].forEach(([pickerName, textName]) => {
+      const picker = id(pickerName);
+      const text = id(textName);
+      picker?.addEventListener("input", () => {
+        if (!text) return;
+        text.value = picker.value;
+        text.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      text?.addEventListener("input", () => {
+        const next = text.value.trim();
+        if (picker && /^#[0-9a-f]{6}$/i.test(next)) picker.value = next;
+      });
+    });
+
+    panel.addEventListener("input", updateOnCloud);
+    panel.addEventListener("change", updateOnCloud);
+
+    copyButton?.addEventListener("click", () => {
+      updateOnCloud();
+      copyText(generated.value).then(() => {
+        if (typeof window.showToast === "function") window.showToast("คัดลอกโคด CODE011 แล้ว");
+      }).catch(() => {
+        if (typeof window.showToast === "function") window.showToast("คัดลอกโคดไม่สำเร็จ");
+      });
+    });
+
+    function openEditor() {
+      document.body.classList.add("dds-editor-mode");
+      document.querySelectorAll("[data-panel]").forEach((candidate) => {
+        candidate.classList.toggle("is-active", candidate === panel);
+      });
+      document.querySelectorAll("[data-page]").forEach((button) => {
+        const active = button.dataset.page === "roleplay";
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-current", active ? "page" : "false");
+      });
+      const pageNumber = document.getElementById("currentPageNumber");
+      if (pageNumber) pageNumber.textContent = "01";
+      history.replaceState(null, "", "#editor-code011");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(updateOnCloud);
+    }
+
+    editButton?.addEventListener("click", openEditor);
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#editor-code011") openEditor();
+    });
+    if (window.location.hash === "#editor-code011") queueMicrotask(openEditor);
+
+    panel.querySelector(".dds-back-button")?.addEventListener("click", () => {
+      requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+    });
+    document.querySelectorAll('[data-page="roleplay"], [data-go="roleplay"]').forEach((button) => {
+      button.addEventListener("click", () => requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true)));
+    });
+
+    renderPreview(cardIframe, buildMarkup(officialValues, true), true);
+    updateOnCloud();
+
+    window.addEventListener("resize", () => {
+      resizePreview(cardIframe, true);
+      if (panel.classList.contains("is-active")) resizePreview(editorIframe, false);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
+})();
 
 /* ============================================================
    FOR REVIEW — REVIEW CODE002 / LO$ER=LO♡ER
