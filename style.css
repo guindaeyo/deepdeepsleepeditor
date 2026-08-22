@@ -8223,6 +8223,13 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 
 
 /* CODE011 — ON CLOUD */
+[data-panel="editor-code011"] .dds-copy-description {
+  display: block;
+  clear: both;
+  position: relative;
+  margin: 14px 0 20px;
+}
+
 [data-panel="editor-code011"] .dds-copy-description a {
   color: var(--dds-white);
   border-bottom: 1px solid rgba(255, 255, 255, 0.22);
