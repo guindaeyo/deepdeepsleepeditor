@@ -4726,6 +4726,12 @@ ${stylesheetLinks}
       });
 
     function isProtectedField(field) {
+      // CODE011: heart/cloud are real guideline values, not blank starter fields.
+      // Keep them visible when opening the editor and when RESET runs.
+      if (["onCloudHeartOne", "onCloudHeartTwo", "onCloudCloud"].includes(field.id)) {
+        return true;
+      }
+
       if (
         field.matches(
           'input[type="color"], input[type="range"], input[type="checkbox"], input[type="radio"], input[type="hidden"], input[type="button"], input[type="submit"], input[type="reset"], input[type="file"], button, output, select'
