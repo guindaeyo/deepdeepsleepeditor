@@ -7976,7 +7976,7 @@ ${stylesheetLinks}
     const contentColor = optionalColorStyle("color", values.contentColor);
     const titleStrokeColor = String(values.titleStrokeColor || "").trim();
     const titleStroke = titleStrokeColor
-      ? `-webkit-text-stroke:1px ${h(titleStrokeColor)};paint-order:stroke fill;`
+      ? `-webkit-text-stroke-color:${h(titleStrokeColor)};`
       : "";
     const decoX = Number(values.decoX) || 0;
     const cloudX = Number(values.cloudX) || 0;
