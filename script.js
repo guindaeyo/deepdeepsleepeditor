@@ -5615,6 +5615,7 @@ ${stylesheetLinks}
   function shouldKeepBaselineValue(field) {
     return Boolean(
       field.dataset.ddsKeepBaseline === "true" ||
+        ["onCloudHeartOne", "onCloudHeartTwo", "onCloudCloud"].includes(field.id) ||
         isColorValueField(field) ||
         ["range", "checkbox", "radio"].includes(field.type) ||
         field.tagName === "SELECT"
@@ -8082,15 +8083,23 @@ ${stylesheetLinks}
     const id = (name) => document.getElementById(name);
     const value = (name, fallback = "") => id(name)?.value ?? fallback;
 
-    // ใส่ค่าไกด์ลงในช่องกรอกจริง ๆ เพื่อให้เปิด Editor มาแล้วเห็นและแก้ต่อได้ทันที
-    [
+    // ค่าไกด์ 3 ช่องนี้ต้องเป็น value จริง และต้องกลับมาเสมอหากระบบ draft เก่าเคยบันทึกค่าว่างไว้
+    const onCloudGuideValues = [
       ["onCloudHeartOne", "♡"],
       ["onCloudHeartTwo", "♥"],
       ["onCloudCloud", "9729"]
-    ].forEach(([name, guide]) => {
-      const input = id(name);
-      if (input && !String(input.value || "").trim()) input.value = guide;
-    });
+    ];
+
+    function ensureOnCloudGuideValues() {
+      onCloudGuideValues.forEach(([name, guide]) => {
+        const input = id(name);
+        if (input && !String(input.value || "").trim()) {
+          input.value = guide;
+        }
+      });
+    }
+
+    ensureOnCloudGuideValues();
 
     function readValues() {
       return {
@@ -8193,7 +8202,16 @@ ${stylesheetLinks}
       if (pageNumber) pageNumber.textContent = "01";
       history.replaceState(null, "", "#editor-code011");
       window.scrollTo({ top: 0, behavior: "smooth" });
-      requestAnimationFrame(updateOnCloud);
+
+      // Draft manager อาจ restore ค่าว่างหลัง panel ถูกเปิด จึงเติมไกด์ซ้ำหลัง activation อีกครั้ง
+      queueMicrotask(() => {
+        ensureOnCloudGuideValues();
+        updateOnCloud();
+      });
+      requestAnimationFrame(() => {
+        ensureOnCloudGuideValues();
+        updateOnCloud();
+      });
     }
 
     editButton?.addEventListener("click", openEditor);
