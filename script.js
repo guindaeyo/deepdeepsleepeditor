@@ -13978,6 +13978,7 @@ ${stylesheetLinks}
     boxImage: "https://i.postimg.cc/ZqWjJvhN/box.png",
     headX: "50",
     headY: "50",
+    headZoom: "100",
     boxX: "50",
     boxY: "50",
     firstName: "Hans",
@@ -13995,6 +13996,7 @@ ${stylesheetLinks}
     boxImage: "https://i.postimg.cc/ZqWjJvhN/box.png",
     headX: "50",
     headY: "50",
+    headZoom: "100",
     boxX: "50",
     boxY: "50",
     firstName: "",
@@ -14026,6 +14028,11 @@ ${stylesheetLinks}
   function clampPosition(value, fallback = 50) {
     const number = Number(value);
     return Number.isFinite(number) ? Math.max(0, Math.min(100, number)) : fallback;
+  }
+
+  function clampZoom(value, fallback = 100) {
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.max(50, Math.min(200, number)) : fallback;
   }
 
   function normalizeColor(value, fallback) {
@@ -14309,10 +14316,12 @@ ${stylesheetLinks}
     const color = normalizeColor(v.textColor, defaults.textColor);
     const headX = clampPosition(v.headX);
     const headY = clampPosition(v.headY);
+    const headZoom = clampZoom(v.headZoom);
+    const headZoomStyle = headZoom === 100 ? "" : `;background-size:${headZoom}% auto`;
     const boxX = clampPosition(v.boxX);
     const boxY = clampPosition(v.boxY);
 
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">${h(v.firstName)}</span><span class="ddsh-hxf-name-last">${h(v.lastName)}</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">${h(v.burstText).replace(/\r?\n/g, "<br>")}</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay, previewMode)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>${h(v.note)}</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-hxf" style="--ddsh-hxf-bg:${bg};--ddsh-hxf-color:${color};--ddsh-hxf-head:url('${cssUrl(v.headImage)}');--ddsh-hxf-box:url('${cssUrl(v.boxImage)}');--ddsh-hxf-barcode:url('${BARCODE_URL}');--ddsh-hxf-head-x:${headX}%;--ddsh-hxf-head-y:${headY}%;--ddsh-hxf-burst-text-x:-5px;"><div class="ddsh-hxf-core"><div class="ddsh-hxf-name"><span class="ddsh-hxf-name-first">${h(v.firstName)}</span><span class="ddsh-hxf-name-last">${h(v.lastName)}</span></div><div class="ddsh-hxf-photo" style="background-position:${headX}% ${headY}%${headZoomStyle}"><div class="ddsh-hxf-burst" style="background-position:${boxX}% ${boxY}%"><div class="ddsh-hxf-burst-text">${h(v.burstText).replace(/\r?\n/g, "<br>")}</div></div><div class="ddsh-hxf-side ddsh-hxf-side-top">Pine Woods Rd.</div><div class="ddsh-hxf-side ddsh-hxf-side-bottom">ISSUE 01</div></div><div class="ddsh-hxf-title">${h(v.title)}</div><div class="ddsh-hxf-role">${roleToHtml(v.roleplay, previewMode)}</div><div class="ddsh-hxf-bottom"><div class="ddsh-hxf-note"><strong>${h(v.note)}</strong></div><div class="ddsh-hxf-barcode"></div></div></div></div><div class="ddshopfz-credit"><span></span></div>`;
   }
 
   const OFFICIAL_CODE = buildCode(defaults, false);
@@ -14533,6 +14542,10 @@ ${stylesheetLinks}
     return `<div class="dds-image-position dds-field-full dds-hans-position"><div class="dds-image-position-heading"><span>${h(title)}</span><small>ปรับซ้าย–ขวา และบน–ล่าง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input data-hans-field="${prefix}X" min="0" max="100" type="range" value="50"><small>ขวา</small><output data-hans-output="${prefix}X">50%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input data-hans-field="${prefix}Y" min="0" max="100" type="range" value="50"><small>ล่าง</small><output data-hans-output="${prefix}Y">50%</output></label></div>`;
   }
 
+  function headZoomEditor() {
+    return `<div class="dds-image-position dds-field-full dds-hans-position dds-hans-head-zoom"><div class="dds-image-position-heading"><span>ซูมรูป HEAD</span><small>ซูมออก–ซูมเข้า (ค่าเดิม 100%)</small></div><label class="dds-position-row"><span>ซูม</span><small>ออก</small><input data-hans-field="headZoom" min="50" max="200" step="1" type="range" value="100"><small>เข้า</small><output data-hans-output="headZoom">100%</output></label></div>`;
+  }
+
   function createPanel() {
     if (panel?.isConnected) return panel;
     const footer = document.querySelector(".dds-footer");
@@ -14562,6 +14575,7 @@ ${stylesheetLinks}
             <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>รูป HEAD / BOX</h2></div><div class="dds-form-grid">
               <label class="dds-field dds-field-full"><span>ลิงก์รูป HEAD</span><input type="url" data-hans-field="headImage" value="" spellcheck="false"></label>
               ${positionEditor("head", "ตำแหน่งรูป HEAD")}
+              ${headZoomEditor()}
               <label class="dds-field dds-field-full"><span>ลิงก์รูป BOX (สามารถแก้ไขลิ้งค์ได้)</span><input type="url" data-hans-field="boxImage" value="https://i.postimg.cc/ZqWjJvhN/box.png" spellcheck="false"></label>
               ${positionEditor("box", "ตำแหน่งรูป BOX")}
               <div class="dds-hans-barcode-lock dds-field-full"><span>BARCODE</span><strong>LOCKED</strong><small>ใช้รูปต้นฉบับเดิมและไม่มีช่องแก้ไข</small></div>
