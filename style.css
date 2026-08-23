@@ -8378,3 +8378,31 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   /* actual size/scale is calculated from the rendered code in JS */
   max-width: none;
 }
+
+
+/* CODE012 — make position controls easier to read */
+[data-panel="editor-code012"] .dds-image-position-heading > span,
+[data-panel="editor-code012"] .dds-image-position-heading > small,
+[data-panel="editor-code012"] .dds-position-row > span,
+[data-panel="editor-code012"] .dds-position-row > small,
+[data-panel="editor-code012"] .dds-position-row output {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+[data-panel="editor-code012"] .dds-image-position-heading > small {
+  color: rgba(255,255,255,.46);
+}
+
+[data-panel="editor-code012"] .dds-position-row > span {
+  color: rgba(255,255,255,.58);
+}
+
+[data-panel="editor-code012"] .dds-position-row > small {
+  color: rgba(255,255,255,.42);
+}
+
+[data-panel="editor-code012"] .dds-position-row output {
+  min-width: 50px;
+  padding: 6px 5px;
+}
