@@ -8303,6 +8303,10 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   clear: both;
 }
 
+[data-panel="editor-code012"] .dds-chocolove-sticker-help {
+  margin-top: 10px;
+}
+
 @media (max-width: 560px) {
   [data-panel="editor-code012"] .dds-sticker-editor-row {
     grid-template-columns: 1fr;
@@ -8310,4 +8314,11 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   [data-panel="editor-code012"] [data-chocolove-remove-sticker] {
     width: 100%;
   }
+}
+
+
+/* CODE012 — CATEGORY 01 card preview: fit the full 650px code inside a 1040px preview canvas */
+#roleplayCardPreview012 {
+  width: 100%;
+  height: 100%;
 }

@@ -27,7 +27,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260823-chocolate-love-code012-35" rel="stylesheet"/>
+<link href="./style.css?v=20260823-chocolate-love-code012-37" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -3076,13 +3076,13 @@ Just like that, just you and me. I wanna dive in deeper. Into your ocean, I like
 <label class="dds-color-field"><span>สีขอบชื่อ</span><div><input id="chocoloveScriptOutlineColorPicker" type="color" value="#a68c83"><input id="chocoloveScriptOutlineColor" type="text" value="#a68c83" spellcheck="false"></div></label>
 <label class="dds-color-field"><span>สีนามสกุล</span><div><input id="chocolovePixelColorPicker" type="color" value="#a68c83"><input id="chocolovePixelColor" type="text" value="#a68c83" spellcheck="false"></div></label>
 <label class="dds-color-field"><span>สีอีโมจิ</span><div><input id="chocoloveFaceColorPicker" type="color" value="#a68c83"><input id="chocoloveFaceColor" type="text" value="#a68c83" spellcheck="false"></div></label>
-<label class="dds-color-field"><span>สีขอบกรอบโรลเพลย์</span><div><input id="chocoloveRoleBorderColorPicker" type="color" value="#a68c83"><input id="chocoloveRoleBorderColor" type="text" value="#a68c83" spellcheck="false"></div></label>
+<label class="dds-color-field"><span>สีขอบกรอบโรลเพลย์ / หมายเหตุ</span><div><input id="chocoloveRoleBorderColorPicker" type="color" value="#a68c83"><input id="chocoloveRoleBorderColor" type="text" value="#a68c83" spellcheck="false"></div></label>
 <label class="dds-color-field"><span>สีพื้นกรอบโรลเพลย์</span><div><input id="chocoloveRoleBgColorPicker" type="color" value="#ffffff"><input id="chocoloveRoleBgColor" type="text" value="#ffffff" spellcheck="false"></div></label>
 <label class="dds-color-field"><span>สีข้อความโรลเพลย์</span><div><input id="chocoloveRoleTextColorPicker" type="color" value="#987f76"><input id="chocoloveRoleTextColor" type="text" value="#987f76" spellcheck="false"></div></label>
-<label class="dds-color-field"><span>สีขอบกรอบหมายเหตุ</span><div><input id="chocoloveNoteBorderColorPicker" type="color" value="#a68c83"><input id="chocoloveNoteBorderColor" type="text" value="#a68c83" spellcheck="false"></div></label>
+
 <label class="dds-color-field"><span>สีพื้นกรอบหมายเหตุ</span><div><input id="chocoloveNoteBgColorPicker" type="color" value="#ffffff"><input id="chocoloveNoteBgColor" type="text" value="#ffffff" spellcheck="false"></div></label>
 <label class="dds-color-field"><span>สีข้อความหมายเหตุ</span><div><input id="chocoloveNoteColorPicker" type="color" value="#a68c83"><input id="chocoloveNoteColor" type="text" value="#a68c83" spellcheck="false"></div></label>
-<label class="dds-color-field"><span>สีจุดข้างล่าง</span><div><input id="chocoloveBottomDotColorPicker" type="color" value="#b9b9b9"><input id="chocoloveBottomDotColor" type="text" value="#b9b9b9" spellcheck="false"></div></label>
+<label class="dds-color-field"><span>สีจุดด้านหลังกรอบรูป</span><div><input id="chocoloveDotColorPicker" type="color" value="#c9b6ae"><input id="chocoloveDotColor" type="text" value="#c9b6ae" spellcheck="false"></div></label>
 </div>
 </section>
 <section class="dds-control-section">
@@ -3103,7 +3103,7 @@ Just like that, just you and me. I wanna dive in deeper. Into your ocean, I like
 </section>
 <section class="dds-control-section">
 <div class="dds-control-title"><span>03</span><h2>Topnote และ Stickers</h2></div>
-<div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ddsh-chocolove-topnote</span><input id="chocoloveTopnote" type="text" value="かわいいだけじゃだめですか？! ♡＋°"></label></div>
+<div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความด้านบน</span><input id="chocoloveTopnote" type="text" value="かわいいだけじゃだめですか？! ♡＋°"></label></div>
 <div class="dds-sticker-editor" data-chocolove-sticker-list id="chocoloveStickerList">
 <div class="dds-sticker-editor-row" data-chocolove-sticker-row><input data-chocolove-sticker-input data-dds-no-save type="text" value="cranky"><button data-chocolove-remove-sticker type="button" aria-label="ลบ sticker">REMOVE</button></div>
 <div class="dds-sticker-editor-row" data-chocolove-sticker-row><input data-chocolove-sticker-input data-dds-no-save type="text" value="blood"><button data-chocolove-remove-sticker type="button" aria-label="ลบ sticker">REMOVE</button></div>
@@ -3111,14 +3111,14 @@ Just like that, just you and me. I wanna dive in deeper. Into your ocean, I like
 <div class="dds-sticker-editor-row" data-chocolove-sticker-row><input data-chocolove-sticker-input data-dds-no-save type="text" value="stubborn"><button data-chocolove-remove-sticker type="button" aria-label="ลบ sticker">REMOVE</button></div>
 </div>
 <button class="dds-secondary-action dds-chocolove-add-sticker" data-chocolove-add-sticker id="chocoloveAddSticker" type="button">＋ ADD STICKER</button>
-<p class="dds-copy-description">เพิ่มหรือลดจำนวน Sticker ได้ตามต้องการ แต่ละช่องคือข้อความ Sticker หนึ่งอัน</p>
+<p class="dds-copy-description dds-chocolove-sticker-help">เพิ่มหรือลดจำนวน Sticker ได้ตามต้องการ แต่ละช่องคือข้อความ Sticker หนึ่งอัน</p>
 </section>
 <section class="dds-control-section">
 <div class="dds-control-title"><span>04</span><h2>ชื่อ นามสกุล อีโมจิ และตำแหน่ง</h2></div>
 <div class="dds-form-grid">
-<label class="dds-field dds-field-full"><span>ชื่อ — ddsh-chocolove-script</span><input id="chocoloveScript" type="text" value="Franklin D."></label>
-<label class="dds-field dds-field-full"><span>นามสกุล — ddsh-chocolove-pixel</span><input id="chocolovePixel" type="text" value="Bloodworth"></label>
-<label class="dds-field dds-field-full"><span>อีโมจิ — ddsh-chocolove-face</span><input id="chocoloveFace" type="text" value="ˆ &gt;ヮ&lt; ˆ"></label>
+<label class="dds-field dds-field-full"><span>ชื่อ</span><input id="chocoloveScript" type="text" value="Franklin D."></label>
+<label class="dds-field dds-field-full"><span>นามสกุล</span><input id="chocolovePixel" type="text" value="Bloodworth"></label>
+<label class="dds-field dds-field-full"><span>อีโมจิ</span><input id="chocoloveFace" type="text" value="ˆ &gt;ヮ&lt; ˆ"></label>
 </div>
 <div class="dds-image-position">
 <div class="dds-image-position-heading"><span>ตำแหน่งกลุ่มชื่อ / นามสกุล</span><small>เลื่อนซ้าย–ขวา และขึ้น–ลง</small></div>
@@ -5494,6 +5494,6 @@ You were mine forever</textarea>
 </div>
 <!-- ระบบหลักเวอร์ชันล็อก + ชุดรวม COMMISSION / ACTIVITY / DRAFT / BBCODE / WORD COUNTER -->
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
-<script src="./script.js?v=20260823-chocolate-love-code012-35"></script>
+<script src="./script.js?v=20260823-chocolate-love-code012-37"></script>
 </body>
 </html>

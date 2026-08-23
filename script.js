@@ -8032,7 +8032,7 @@ ${stylesheetLinks}
 
   function renderPreview(iframe, markup, isCard) {
     if (!iframe) return;
-    const srcdoc = previewDocument(markup);
+    const srcdoc = previewDocument(markup, isCard);
     const resize = () => {
       requestAnimationFrame(() => requestAnimationFrame(() => resizePreview(iframe, isCard)));
       [90, 260, 600, 1200, 2000].forEach((delay) => window.setTimeout(() => resizePreview(iframe, isCard), delay));
@@ -15860,10 +15860,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     roleBorderColor: "#a68c83",
     roleBgColor: "#ffffff",
     roleTextColor: "#987f76",
-    noteBorderColor: "#a68c83",
     noteBgColor: "#ffffff",
     noteColor: "#a68c83",
-    bottomDotColor: "#b9b9b9",
+    dotColor: "#c9b6ae",
     topnote: "かわいいだけじゃだめですか？! ♡＋°",
     stickers: ["cranky", "blood", "naughty", "stubborn"],
     script: "Franklin D.",
@@ -15935,6 +15934,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
+
+  function colorToRgbTuple(raw, fallback = "201, 182, 174") {
+    const value = String(raw || "").trim();
+    const hexMatch = /^#?([0-9a-f]{6})$/i.exec(value);
+    if (hexMatch) {
+      const hex = hexMatch[1];
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `${r}, ${g}, ${b}`;
+    }
+    const rgbMatch = /^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i.exec(value);
+    if (rgbMatch) return `${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}`;
+    return fallback;
+  }
+
   function frameSvg(kind, outer, inner) {
     const heartStyle = kind === "heart" ? "" : "display:none;";
     const starStyle = kind === "star" ? "transform:scale(1.10);transform-origin:center center;transform-box:fill-box;" : "display:none;";
@@ -15964,18 +15979,20 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-ys-line:${h(values.lineColor)}`,
       `--ddsh-ys-text:${h(values.roleTextColor)}`,
       `--ddsh-ys-tagbg:${h(values.stickerBgColor)}`,
-      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`
+      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`,
+      `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
     ].join(";") + ";";
 
-    return `<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.noteBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span style="color:${h(values.bottomDotColor)};"></span></div>`;
+    return `<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
     return `<link href="${stylesheetUrl}" rel="stylesheet">${buildMarkup(values, false)}`;
   }
 
-  function previewDocument(markup) {
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:760px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+  function previewDocument(markup, isCard) {
+    const canvasWidth = isCard ? 1040 : 760;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
   }
 
   function resizePreview(iframe, isCard) {
@@ -15986,7 +16003,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!iframe || !target || !root || !shell) return;
     target.style.transform = "none";
     shell.style.height = "auto";
-    const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, 760);
+    const baseWidth = isCard ? 1040 : 760;
+    const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, baseWidth);
     const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
     const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
     const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 28);
@@ -16008,7 +16026,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const previewStates = new WeakMap();
   function renderPreview(iframe, markup, isCard) {
     if (!iframe) return;
-    const srcdoc = previewDocument(markup);
+    const srcdoc = previewDocument(markup, isCard);
     const resize = () => {
       requestAnimationFrame(() => requestAnimationFrame(() => resizePreview(iframe, isCard)));
       [90, 260, 600, 1200, 2000].forEach((delay) => window.setTimeout(() => resizePreview(iframe, isCard), delay));
@@ -16121,10 +16139,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         roleBorderColor: value("chocoloveRoleBorderColor", "#a68c83"),
         roleBgColor: value("chocoloveRoleBgColor", "#ffffff"),
         roleTextColor: value("chocoloveRoleTextColor", "#987f76"),
-        noteBorderColor: value("chocoloveNoteBorderColor", "#a68c83"),
         noteBgColor: value("chocoloveNoteBgColor", "#ffffff"),
         noteColor: value("chocoloveNoteColor", "#a68c83"),
-        bottomDotColor: value("chocoloveBottomDotColor", "#b9b9b9"),
+        dotColor: value("chocoloveDotColor", "#c9b6ae"),
         topnote: value("chocoloveTopnote"),
         stickers: stickerValues(),
         script: value("chocoloveScript"),
@@ -16175,11 +16192,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       ["chocoloveFaceColorPicker", "chocoloveFaceColor"],
       ["chocoloveRoleBorderColorPicker", "chocoloveRoleBorderColor"],
       ["chocoloveRoleBgColorPicker", "chocoloveRoleBgColor"],
-      ["chocoloveRoleTextColorPicker", "chocoloveRoleTextColor"],
-      ["chocoloveNoteBorderColorPicker", "chocoloveNoteBorderColor"],
+["chocoloveRoleTextColorPicker", "chocoloveRoleTextColor"],
       ["chocoloveNoteBgColorPicker", "chocoloveNoteBgColor"],
       ["chocoloveNoteColorPicker", "chocoloveNoteColor"],
-      ["chocoloveBottomDotColorPicker", "chocoloveBottomDotColor"]
+      ["chocoloveDotColorPicker", "chocoloveDotColor"]
     ];
     colorPairs.forEach(([pickerName, textName]) => {
       const picker = id(pickerName);
