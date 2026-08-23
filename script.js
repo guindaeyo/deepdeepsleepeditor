@@ -15994,8 +15994,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function previewDocument(markup, isCard) {
-    const canvasWidth = isCard ? 670 : 760;
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+    const canvasWidth = isCard ? 650 : 820;
+    const background = "#242424";
+    const padding = isCard ? "16px" : "24px 20px 32px";
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:${background}}body{padding:${padding};overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
   }
 
   function resizePreview(iframe, isCard) {
@@ -16006,11 +16008,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!iframe || !target || !root || !shell) return;
     target.style.transform = "none";
     shell.style.height = "auto";
-    const baseWidth = isCard ? 670 : 760;
+    const baseWidth = isCard ? 650 : 820;
     const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, baseWidth);
     const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
     const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
-    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 28);
+    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - (isCard ? 28 : 20));
     let scale = Math.min(1, availableWidth / naturalWidth);
     if (isCard) {
       const availableHeight = Math.max(1, (stage?.clientHeight || 300) - 28);
@@ -16020,7 +16022,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const scaledHeight = Math.ceil(naturalHeight * scale);
     target.style.transform = `scale(${scale})`;
     shell.style.height = `${scaledHeight}px`;
-    if (!isCard) iframe.style.height = `${Math.max(720, scaledHeight + 40)}px`;
+    if (!isCard) iframe.style.height = `${Math.max(860, scaledHeight + 28)}px`;
     iframe.classList.remove("dds-preview-loading");
     iframe.classList.add("dds-preview-ready");
     if (typeof window.revealPreview === "function") window.revealPreview(iframe);
