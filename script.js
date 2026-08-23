@@ -15860,8 +15860,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     roleBorderColor: "#a68c83",
     roleBgColor: "#ffffff",
     roleTextColor: "#987f76",
-    noteBgColor: "#ffffff",
-    noteColor: "#a68c83",
     dotColor: "#c9b6ae",
     topnote: "かわいいだけじゃだめですか？! ♡＋°",
     stickers: ["cranky", "blood", "naughty", "stubborn"],
@@ -15970,7 +15968,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const shape = values.shape === "star" ? "star" : "heart";
     const roleplay = previewMode ? bbcodeToPreviewHtml(values.roleplay) : h(values.roleplay);
     const roleBg = alphaColor(values.roleBgColor, 0.18);
-    const noteBg = alphaColor(values.noteBgColor, 0.18);
+    const noteBg = roleBg;
     const stickers = (Array.isArray(values.stickers) ? values.stickers : [])
       .map((item) => `<span style="background:${h(values.stickerBgColor)};color:${h(values.stickerTextColor)};padding:3px 8px 4px;font-size:11px;font-weight:600;">${h(item)}</span>`)
       .join("");
@@ -15988,7 +15986,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
     ].join(";") + ";";
 
-    return `${DOT_OVERRIDE_CSS}<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
+    return `${DOT_OVERRIDE_CSS}<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
@@ -15996,7 +15994,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function previewDocument(markup, isCard) {
-    const canvasWidth = isCard ? 1040 : 760;
+    const canvasWidth = isCard ? 670 : 760;
     return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
   }
 
@@ -16008,7 +16006,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!iframe || !target || !root || !shell) return;
     target.style.transform = "none";
     shell.style.height = "auto";
-    const baseWidth = isCard ? 1040 : 760;
+    const baseWidth = isCard ? 670 : 760;
     const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, baseWidth);
     const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
     const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
@@ -16159,8 +16157,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         roleBorderColor: value("chocoloveRoleBorderColor", "#a68c83"),
         roleBgColor: value("chocoloveRoleBgColor", "#ffffff"),
         roleTextColor: value("chocoloveRoleTextColor", "#987f76"),
-        noteBgColor: value("chocoloveNoteBgColor", "#ffffff"),
-        noteColor: value("chocoloveNoteColor", "#a68c83"),
         dotColor: value("chocoloveDotColor", "#c9b6ae"),
         topnote: value("chocoloveTopnote"),
         stickers: stickerValues(),
@@ -16212,8 +16208,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       ["chocoloveRoleBorderColorPicker", "chocoloveRoleBorderColor"],
       ["chocoloveRoleBgColorPicker", "chocoloveRoleBgColor"],
 ["chocoloveRoleTextColorPicker", "chocoloveRoleTextColor"],
-      ["chocoloveNoteBgColorPicker", "chocoloveNoteBgColor"],
-      ["chocoloveNoteColorPicker", "chocoloveNoteColor"],
       ["chocoloveDotColorPicker", "chocoloveDotColor"]
     ];
     colorPairs.forEach(([pickerName, textName]) => {
