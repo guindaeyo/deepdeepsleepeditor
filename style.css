@@ -8375,10 +8375,6 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 #roleplayCardPreview012.dds-roleplay-card-preview-frame {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: none;
-  transform-origin: top left;
+  /* actual size/scale is calculated from the rendered code in JS */
+  max-width: none;
 }

@@ -16006,23 +16006,42 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const root = doc?.querySelector(".ddsh-chocolove-wrap");
     const shell = doc?.querySelector(".dds-chocolove-preview-shell");
     if (!iframe || !target || !root || !shell) return;
+
     target.style.transform = "none";
     shell.style.height = "auto";
+
     const baseWidth = isCard ? 650 : 820;
-    const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, baseWidth);
-    const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
+    const naturalWidth = Math.max(root.scrollWidth, root.offsetWidth, target.scrollWidth, baseWidth);
+    const naturalHeight = Math.max(root.scrollHeight, root.offsetHeight, target.scrollHeight, 1);
     const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
-    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - (isCard ? 28 : 20));
-    let scale = Math.min(1, availableWidth / naturalWidth);
+
     if (isCard) {
+      /* CARD PREVIEW: render the real code at 1:1 inside the iframe,
+         then shrink the entire iframe to fit the same preview box as other cards.
+         This keeps the exact chocolate-love proportions and guarantees the whole code is visible. */
+      const iframeWidth = Math.ceil(naturalWidth + 32);
+      const iframeHeight = Math.ceil(naturalHeight + 32);
+      const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || iframeWidth) - 28);
       const availableHeight = Math.max(1, (stage?.clientHeight || 300) - 28);
-      scale = Math.min(scale, availableHeight / naturalHeight);
+      const scale = Math.max(0.01, Math.min(1, availableWidth / iframeWidth, availableHeight / iframeHeight));
+
+      iframe.style.width = `${iframeWidth}px`;
+      iframe.style.height = `${iframeHeight}px`;
+      iframe.style.left = "50%";
+      iframe.style.top = "50%";
+      iframe.style.transformOrigin = "center center";
+      iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      target.style.transform = "none";
+      shell.style.height = `${naturalHeight}px`;
+    } else {
+      const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 20);
+      const scale = Math.max(0.01, Math.min(1, availableWidth / naturalWidth));
+      const scaledHeight = Math.ceil(naturalHeight * scale);
+      target.style.transform = `scale(${scale})`;
+      shell.style.height = `${scaledHeight}px`;
+      iframe.style.height = `${Math.max(860, scaledHeight + 28)}px`;
     }
-    scale = Math.max(0.01, scale);
-    const scaledHeight = Math.ceil(naturalHeight * scale);
-    target.style.transform = `scale(${scale})`;
-    shell.style.height = `${scaledHeight}px`;
-    if (!isCard) iframe.style.height = `${Math.max(860, scaledHeight + 28)}px`;
+
     iframe.classList.remove("dds-preview-loading");
     iframe.classList.add("dds-preview-ready");
     if (typeof window.revealPreview === "function") window.revealPreview(iframe);
