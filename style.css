@@ -8322,3 +8322,48 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   width: 100%;
   height: 100%;
 }
+
+
+/* CODE012 — หมายเหตุเป็นข้อความธรรมดา ไม่มี BBCode */
+[data-panel="editor-code012"] .dds-rich-toolbar[data-toolbar-for="chocoloveNote"] {
+  display: none !important;
+}
+
+
+/* CODE012 — CHOCOLATE LOVE / SHAPE SELECT */
+[data-panel="editor-code012"] #chocoloveShape {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 44px 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0;
+  background-color: #111;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23b8b8b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 7px;
+  color: rgba(255, 255, 255, 0.88);
+  font: 400 12px/1.4 "Bai Jamjuree", sans-serif;
+  letter-spacing: 0.1px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-panel="editor-code012"] #chocoloveShape:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  background-color: #151515;
+}
+
+[data-panel="editor-code012"] #chocoloveShape:focus {
+  border-color: rgba(169, 14, 24, 0.88);
+  box-shadow: 0 0 0 1px rgba(169, 14, 24, 0.18);
+  background-color: #151515;
+}
+
+[data-panel="editor-code012"] #chocoloveShape option {
+  background: #111;
+  color: #f1f1f1;
+}

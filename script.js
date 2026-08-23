@@ -5885,7 +5885,7 @@ ${stylesheetLinks}
   }
 
   function isLongTextTarget(target) {
-    if (target.closest?.(".dds-rich-toolbar, .dds-named-save-library") || target.matches?.("[data-named-save-name], [data-bbcode-color]")) {
+    if (target.matches?.("[data-dds-no-bbcode]") || target.closest?.(".dds-rich-toolbar, .dds-named-save-library") || target.matches?.("[data-named-save-name], [data-bbcode-color]")) {
       return false;
     }
 
@@ -15961,6 +15961,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `-1.6px -1.6px 0 ${c},1.6px -1.6px 0 ${c},-1.6px 1.6px 0 ${c},1.6px 1.6px 0 ${c}`;
   }
 
+  const DOT_OVERRIDE_CSS = `<style class="dds-chocolove-dot-override">
+.ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.72) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.55) 25%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.34) 45%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.18) 62%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.06) 76%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 88%)!important;}
+.ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.52) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.40) 28%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.25) 48%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.10) 68%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 86%)!important;}
+</style>`;
+
   function buildMarkup(values, previewMode) {
     const shape = values.shape === "star" ? "star" : "heart";
     const roleplay = previewMode ? bbcodeToPreviewHtml(values.roleplay) : h(values.roleplay);
@@ -15983,7 +15988,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
     ].join(";") + ";";
 
-    return `<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
+    return `${DOT_OVERRIDE_CSS}<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
@@ -16081,6 +16086,21 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!panel || !cardIframe || !editorIframe || !generated || !stickerList) return;
 
     const id = (name) => document.getElementById(name);
+
+    function removeChocolateLoveNoteToolbar() {
+      const note = id("chocoloveNote");
+      if (!note) return;
+      note.dataset.ddsNoBbcode = "";
+      const previous = note.previousElementSibling;
+      if (previous?.classList?.contains("dds-rich-toolbar")) previous.remove();
+      panel.querySelectorAll('[data-toolbar-for="chocoloveNote"]').forEach((toolbar) => toolbar.remove());
+      delete note.dataset.ddsBbcodeReady;
+    }
+
+    removeChocolateLoveNoteToolbar();
+    document.addEventListener("DOMContentLoaded", removeChocolateLoveNoteToolbar, { once: true });
+    window.setTimeout(removeChocolateLoveNoteToolbar, 0);
+    window.setTimeout(removeChocolateLoveNoteToolbar, 100);
     const value = (name, fallback = "") => id(name)?.value ?? fallback;
 
     function stickerValues() {
@@ -16180,7 +16200,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const colorPairs = [
       ["chocoloveBgColorPicker", "chocoloveBgColor"],
       ["chocolovePaperColorPicker", "chocolovePaperColor"],
-      ["chocoloveLineColorPicker", "chocoloveLineColor"],
       ["chocoloveTopnoteColorPicker", "chocoloveTopnoteColor"],
       ["chocoloveStickerBgColorPicker", "chocoloveStickerBgColor"],
       ["chocoloveStickerTextColorPicker", "chocoloveStickerTextColor"],
