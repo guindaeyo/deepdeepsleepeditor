@@ -5475,6 +5475,35 @@ ${stylesheetLinks}
     }
   }
 
+  function capturePanelSpecial(panel) {
+    const special = {};
+    const stickerList = panel.querySelector("[data-chocolove-sticker-list]");
+    if (stickerList) {
+      special.chocolateLoveStickers = Array.from(
+        stickerList.querySelectorAll("[data-chocolove-sticker-input]"),
+        (input) => input.value || ""
+      );
+    }
+    return special;
+  }
+
+  function restorePanelSpecial(panel, special = {}) {
+    if (!Array.isArray(special.chocolateLoveStickers)) return;
+    const stickerList = panel.querySelector("[data-chocolove-sticker-list]");
+    if (!stickerList) return;
+
+    stickerList.innerHTML = "";
+    special.chocolateLoveStickers.forEach((text, index) => {
+      const row = document.createElement("div");
+      row.className = "dds-sticker-editor-row";
+      row.dataset.chocoloveStickerRow = "";
+      row.innerHTML = `<input data-chocolove-sticker-input data-dds-no-save type="text" id="chocoloveSticker${index + 1}" placeholder="Sticker ${index + 1}"><button data-chocolove-remove-sticker type="button" aria-label="ลบ sticker">REMOVE</button>`;
+      const input = row.querySelector("[data-chocolove-sticker-input]");
+      if (input) input.value = String(text ?? "");
+      stickerList.appendChild(row);
+    });
+  }
+
   function capturePanel(panel) {
     const fields = {};
 
@@ -5483,10 +5512,11 @@ ${stylesheetLinks}
     });
 
     return {
-      version: 3,
+      version: 4,
       panel: panel.dataset.panel || "",
       savedAt: Date.now(),
-      fields
+      fields,
+      special: capturePanelSpecial(panel)
     };
   }
 
@@ -5682,6 +5712,8 @@ ${stylesheetLinks}
 
     state.restoring = true;
 
+    restorePanelSpecial(panel, payload.special || {});
+
     getSavableFields(panel).forEach((field) => {
       const entry = payload.fields?.[ensureFieldKey(field)];
       if (entry) {
@@ -5860,6 +5892,24 @@ ${stylesheetLinks}
     getSavableFields(panel).forEach((field) => {
       field.addEventListener("input", () => schedulePanelSave(panel));
       field.addEventListener("change", () => schedulePanelSave(panel));
+    });
+
+    // CODE012: Sticker เป็นช่องแบบ dynamic จึงบันทึกจำนวนและข้อความผ่าน special draft
+    // โดยไม่ต้องพึ่ง id ของช่องที่เพิ่ม/ลบระหว่างใช้งาน
+    panel.addEventListener("input", (event) => {
+      if (event.target?.matches?.("[data-chocolove-sticker-input]")) {
+        schedulePanelSave(panel);
+      }
+    });
+    panel.addEventListener("change", (event) => {
+      if (event.target?.matches?.("[data-chocolove-sticker-input]")) {
+        schedulePanelSave(panel);
+      }
+    });
+    panel.addEventListener("click", (event) => {
+      if (event.target?.closest?.("[data-chocolove-add-sticker], [data-chocolove-remove-sticker]")) {
+        window.setTimeout(() => schedulePanelSave(panel), 0);
+      }
     });
 
     panel.querySelectorAll(".dds-reset-button").forEach((button) => {
@@ -16051,17 +16101,35 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function renderPreview(iframe, markup, isCard) {
     if (!iframe) return;
     const srcdoc = previewDocument(markup, isCard);
-    const resize = () => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resizePreview(iframe, isCard)));
-      [90, 260, 600, 1200, 2000].forEach((delay) => window.setTimeout(() => resizePreview(iframe, isCard), delay));
-    };
-    const state = previewStates.get(iframe) || { loaded: false, token: 0 };
+    const state = previewStates.get(iframe) || { loaded: false, token: 0, srcdoc: "" };
     state.token += 1;
     const token = state.token;
     previewStates.set(iframe, state);
+
+    const resize = () => {
+      requestAnimationFrame(() => resizePreview(iframe, isCard));
+      window.setTimeout(() => resizePreview(iframe, isCard), 180);
+      window.setTimeout(() => resizePreview(iframe, isCard), 700);
+    };
+
+    const revealAsSoonAsParsed = () => {
+      const current = previewStates.get(iframe);
+      if (!current || current.token !== token) return false;
+      const doc = iframe.contentDocument;
+      if (!doc?.querySelector(".ddsh-chocolove-wrap")) return false;
+      resizePreview(iframe, isCard);
+      return true;
+    };
+
+    if (state.loaded && state.srcdoc === srcdoc && iframe.contentDocument?.querySelector(".ddsh-chocolove-wrap")) {
+      resize();
+      return;
+    }
+
     if (state.loaded && iframe.contentDocument?.readyState !== "loading" && typeof window.updateLoadedPreviewDocument === "function") {
       try {
         if (window.updateLoadedPreviewDocument(iframe, srcdoc, resize)) {
+          state.srcdoc = srcdoc;
           resize();
           return;
         }
@@ -16069,15 +16137,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         console.warn("[DDS CODE012] preview patch failed", error);
       }
     }
+
     iframe.classList.add("dds-preview-loading");
     iframe.classList.remove("dds-preview-ready");
+    state.srcdoc = srcdoc;
+
     iframe.addEventListener("load", () => {
       const current = previewStates.get(iframe);
       if (!current || current.token !== token) return;
       current.loaded = true;
       resize();
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => {
+          const latest = previewStates.get(iframe);
+          if (latest?.token === token) resizePreview(iframe, isCard);
+        });
+      } catch (_) {}
     }, { once: true });
+
     iframe.srcdoc = srcdoc;
+
+    /* Do not keep the card hidden while remote CSS/fonts/images finish loading.
+       As soon as srcdoc HTML is parsed we can size/reveal it; assets paint in afterward. */
+    requestAnimationFrame(() => {
+      if (revealAsSoonAsParsed()) return;
+      window.setTimeout(revealAsSoonAsParsed, 16);
+      window.setTimeout(revealAsSoonAsParsed, 50);
+      window.setTimeout(revealAsSoonAsParsed, 120);
+    });
   }
 
   function copyText(text) {
