@@ -15996,7 +15996,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function previewDocument(markup, isCard) {
     const canvasWidth = isCard ? 650 : 820;
     const background = "#242424";
-    const padding = isCard ? "8px" : "24px 20px 32px";
+    const padding = isCard ? "16px" : "24px 20px 32px";
     return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:${background}}body{padding:${padding};overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
   }
 
