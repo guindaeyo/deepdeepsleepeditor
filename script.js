@@ -9613,7 +9613,6 @@ ${stylesheetLinks}
           input.select();
           return;
         }
-        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
         close();
         openEditor();
       } catch (err) {
@@ -9982,7 +9981,7 @@ ${stylesheetLinks}
     const editorPanel = createPanel();
     if (!editorPanel) return;
     const draft = getDraft();
-    setValues(draft?.values || editorDefaults);
+    setValues(draft?.values || defaults);
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     updatePreview();
