@@ -8406,3 +8406,42 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   min-width: 50px;
   padding: 6px 5px;
 }
+
+
+/* ==================================================
+   GLOBAL EDITOR READABILITY — 12PX LABELS / DETAILS
+   ใช้กับหน้า Editor ทุกประเภท โดยไม่แตะหัวข้อใหญ่ ปุ่ม และตัวพรีวิว
+================================================== */
+[data-panel^="editor-"] .dds-field > span,
+[data-panel^="editor-"] .dds-color-field > span,
+[data-panel^="editor-"] .dds-option-row > span,
+[data-panel^="editor-"] .dds-option-row small,
+[data-panel^="editor-"] .dds-image-position-heading > span,
+[data-panel^="editor-"] .dds-image-position-heading > small,
+[data-panel^="editor-"] .dds-position-row > span,
+[data-panel^="editor-"] .dds-position-row > small,
+[data-panel^="editor-"] .dds-position-row output,
+[data-panel^="editor-"] .dds-copy-description,
+[data-panel^="editor-"] .dds-emoji-help {
+  font-size: 12px !important;
+  line-height: 1.55;
+}
+
+/* ช่องกรอกข้อมูลของ Editor ให้ตัวอักษรขั้นต่ำ 12px เหมือนกัน */
+[data-panel^="editor-"] .dds-field input,
+[data-panel^="editor-"] .dds-field textarea,
+[data-panel^="editor-"] .dds-field select,
+[data-panel^="editor-"] .dds-color-field input[type="text"],
+[data-panel^="editor-"] input[type="text"].dds-input,
+[data-panel^="editor-"] input[type="url"].dds-input,
+[data-panel^="editor-"] textarea.dds-input,
+[data-panel^="editor-"] select.dds-input {
+  font-size: 12px !important;
+}
+
+/* placeholder ให้อ่านได้เท่าข้อความในช่อง */
+[data-panel^="editor-"] .dds-field input::placeholder,
+[data-panel^="editor-"] .dds-field textarea::placeholder,
+[data-panel^="editor-"] .dds-color-field input[type="text"]::placeholder {
+  font-size: 12px !important;
+}
