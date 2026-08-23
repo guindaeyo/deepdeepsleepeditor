@@ -6410,7 +6410,20 @@ ${stylesheetLinks}
     });
   }
 
+  function removeDisabledBbcodeToolbars(panel) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-dds-no-bbcode]").forEach((target) => {
+      const previous = target.previousElementSibling;
+      if (previous?.classList?.contains("dds-rich-toolbar")) previous.remove();
+      if (target.id) {
+        panel.querySelectorAll(`[data-toolbar-for="${target.id}"]`).forEach((toolbar) => toolbar.remove());
+      }
+      delete target.dataset.ddsBbcodeReady;
+    });
+  }
+
   function installBbcodeToolbars(panel) {
+    removeDisabledBbcodeToolbars(panel);
     const candidates = Array.from(
       panel.querySelectorAll(
         "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
@@ -9177,17 +9190,19 @@ ${stylesheetLinks}
   function handleProtectedEditClick(event) {
     const button = event.target.closest("[data-edit-protected-commission]");
     if (!button) return;
-    event.preventDefault();
-    event.stopPropagation();
 
     const commissionId = button.dataset.editProtectedCommission;
     if (!commissions[commissionId]) return;
 
-    if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
-      openEditor(commissionId);
-    } else {
-      openModal(commissionId);
-    }
+    // commission001 / commission002 มี structured editor ของตัวเอง
+    // ปล่อย event ผ่านไปให้ editor ใหม่รับเอง ห้าม raw editor แย่ง click
+    if (commissionId === "commission001" || commissionId === "commission002") return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // งานคอมมิชชั่นทุกใบต้องกรอกรหัสใหม่ตอนกด EDIT CODE
+    openModal(commissionId);
   }
 
   function install() {
@@ -9974,16 +9989,19 @@ ${stylesheetLinks}
   }
 
   function install() {
-    const button = document.querySelector('[data-edit-protected-commission="commission001"]');
+    const button = document.querySelector('[data-edit-food-commission="commission001"], [data-edit-protected-commission="commission001"]');
     if (!button) return;
+
+    // ให้ structured food editor เป็นเจ้าของปุ่มนี้เพียงตัวเดียว
     button.removeAttribute("data-edit-protected-commission");
     button.setAttribute("data-edit-food-commission", "commission001");
+
     button.addEventListener("click", (event) => {
       event.preventDefault();
-      event.stopPropagation();
-      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
-      else openModal();
-    });
+      event.stopImmediatePropagation();
+      openModal();
+    }, true);
+
     window.addEventListener("resize", fitPreview);
   }
 
@@ -10910,8 +10928,7 @@ ${stylesheetLinks}
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
-      else openModal();
+      openModal();
     });
 
     window.addEventListener("resize", fitPreview);
@@ -11565,8 +11582,7 @@ ${stylesheetLinks}
     editButton.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") openEditor();
-      else openModal();
+      openModal();
     });
 
     return true;
@@ -12236,7 +12252,7 @@ ${stylesheetLinks}
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-eric-card-preview-frame" data-eric-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Eric Hawkins"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ</p><p class="dds-commission-card-client">ผู้จ้าง <strong>ERIC HAWKINS</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-eric-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-eric-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-eric-view]")?.addEventListener("click", openView);
-    card.querySelector("[data-eric-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    card.querySelector("[data-eric-edit]")?.addEventListener("click", () => openModal());
     const iframe = card.querySelector("[data-eric-card-preview]");
     const renderCard = () => {
       if (cardRendered) return;
@@ -13429,7 +13445,7 @@ ${stylesheetLinks}
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-vmac-card-preview-frame" data-vmac-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Cover Song"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดสำหรับการลงโคฟเวอร์เพลง</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-vmac-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-vmac-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-vmac-view]")?.addEventListener("click", openView);
-    card.querySelector("[data-vmac-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    card.querySelector("[data-vmac-edit]")?.addEventListener("click", () => openModal());
 
     const cardPreview = card.querySelector("[data-vmac-card-preview]");
     let cardPreviewRendered = false;
@@ -13982,7 +13998,7 @@ ${stylesheetLinks}
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-lr-profile-card-preview-frame" data-lr-profile-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Profile Landon"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>LANDON A. RUTHERFORD</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-lr-profile-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-lr-profile-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-lr-profile-view]")?.addEventListener("click", openView);
-    card.querySelector("[data-lr-profile-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    card.querySelector("[data-lr-profile-edit]")?.addEventListener("click", () => openModal());
 
     const cardPreview = card.querySelector("[data-lr-profile-card-preview]");
     const renderCard = () => {
@@ -15551,7 +15567,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
-    card.querySelector("[data-hans-edit]")?.addEventListener("click", () => sessionStorage.getItem(ACCESS_SESSION_KEY) === "1" ? openEditor() : openModal());
+    card.querySelector("[data-hans-edit]")?.addEventListener("click", () => openModal());
 
     const cardPreview = card.querySelector("[data-hans-card-preview]");
     const renderCard = () => {
@@ -15763,7 +15779,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
   function openModal(){const lock=createModal();lock.hidden=false;document.body.classList.add("dds-modal-open");const input=lock.querySelector("[data-rora-lock-input]"),error=lock.querySelector("[data-rora-lock-error]");if(input)input.value="";if(error)error.textContent="";requestAnimationFrame(()=>input?.focus())}
 
-  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>sessionStorage.getItem(ACCESS_SESSION_KEY)==="1"?openEditor():openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
@@ -16289,7 +16305,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         shape: value("chocoloveShape", "heart"),
         frameX: Number(value("chocoloveFrameX", 0)),
         titleX: Number(value("chocoloveTitleX", 0)),
-        titleY: Number(value("chocoloveTitleY", 0)),
+        titleY: 0,
         pixelX: Number(value("chocolovePixelX", 0)),
         faceX: Number(value("chocoloveFaceX", 0)),
         faceY: Number(value("chocoloveFaceY", 0)),
@@ -16326,7 +16342,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         ["chocolovePhotoY", "%"],
         ["chocolovePhotoZoom", "%"],
         ["chocoloveTitleX", "px"],
-        ["chocoloveTitleY", "px"],
         ["chocolovePixelX", "px"],
         ["chocoloveFaceX", "px"],
         ["chocoloveFaceY", "px"]

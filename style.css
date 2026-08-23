@@ -8445,3 +8445,10 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 [data-panel^="editor-"] .dds-color-field input[type="text"]::placeholder {
   font-size: 12px !important;
 }
+
+
+/* v53 — top text fields without BBCode */
+[data-panel="editor-code001"] [data-toolbar-for="creditText"],
+[data-panel="editor-code001"] [data-toolbar-for="quoteText"] {
+  display: none !important;
+}
