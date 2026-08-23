@@ -8238,3 +8238,76 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 [data-panel="editor-code011"] .dds-image-position + .dds-image-position {
   margin-top: 14px;
 }
+
+
+/* CODE012 — CHOCOLATE LOVE */
+[data-panel="editor-code012"] .dds-sticker-editor {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+[data-panel="editor-code012"] .dds-sticker-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+[data-panel="editor-code012"] .dds-sticker-editor-row input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.025);
+  color: #fff;
+  font: 400 12px/1.4 "Bai Jamjuree", sans-serif;
+  outline: none;
+}
+
+[data-panel="editor-code012"] .dds-sticker-editor-row input:focus {
+  border-color: rgba(169,14,24,.78);
+}
+
+[data-panel="editor-code012"] [data-chocolove-remove-sticker],
+[data-panel="editor-code012"] .dds-chocolove-add-sticker {
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.72);
+  font: 600 9px/1 Arial, sans-serif;
+  letter-spacing: .8px;
+  cursor: pointer;
+}
+
+[data-panel="editor-code012"] .dds-chocolove-add-sticker {
+  width: 100%;
+  margin-top: 10px;
+}
+
+[data-panel="editor-code012"] [data-chocolove-remove-sticker]:hover,
+[data-panel="editor-code012"] .dds-chocolove-add-sticker:hover {
+  border-color: rgba(169,14,24,.8);
+  background: rgba(169,14,24,.14);
+  color: #fff;
+}
+
+[data-panel="editor-code012"] .dds-image-position + .dds-image-position {
+  margin-top: 14px;
+}
+
+[data-panel="editor-code012"] .dds-copy-description {
+  clear: both;
+}
+
+@media (max-width: 560px) {
+  [data-panel="editor-code012"] .dds-sticker-editor-row {
+    grid-template-columns: 1fr;
+  }
+  [data-panel="editor-code012"] [data-chocolove-remove-sticker] {
+    width: 100%;
+  }
+}

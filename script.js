@@ -4323,6 +4323,7 @@ ${stylesheetLinks}
       "editor-code009": "updateHigherHeaven",
       "editor-code010": "updateLongWayLongRide",
       "editor-code011": "updateOnCloud",
+      "editor-code012": "updateChocolateLove",
       "editor-profile001": "updatePolaroidLove",
       "editor-profile002": "updateMoodboard",
       "editor-profile003": "updateFortyOne",
@@ -12353,6 +12354,11 @@ ${stylesheetLinks}
       special.sideWords = Array.from(sideWords, (input) => input.value || "");
     }
 
+    const chocolateLoveStickers = panel.querySelectorAll("[data-chocolove-sticker-input]");
+    if (chocolateLoveStickers.length || panel.querySelector("[data-chocolove-sticker-list]")) {
+      special.chocolateLoveStickers = Array.from(chocolateLoveStickers, (input) => input.value || "");
+    }
+
     const tmiGroups = panel.querySelectorAll("[data-eric-tmi-group]");
     if (tmiGroups.length || panel.querySelector("[data-eric-tmi-list]")) {
       special.ericTmi = Array.from(tmiGroups, (group) => ({
@@ -12462,6 +12468,18 @@ ${stylesheetLinks}
         clickUntil(panel, count, desired, "[data-lwl-add-side-word], #lwlAddSideWord", "[data-lwl-remove-side-word]");
         list.querySelectorAll("[data-lwl-side-word-input]").forEach((input, index) => {
           input.value = special.sideWords[index] ?? "";
+        });
+      }
+    }
+
+    if (Array.isArray(special.chocolateLoveStickers)) {
+      const list = panel.querySelector("[data-chocolove-sticker-list]");
+      if (list) {
+        const desired = special.chocolateLoveStickers.length;
+        const count = () => list.querySelectorAll("[data-chocolove-sticker-input]").length;
+        clickUntil(panel, count, desired, "[data-chocolove-add-sticker]", "[data-chocolove-remove-sticker]");
+        list.querySelectorAll("[data-chocolove-sticker-input]").forEach((input, index) => {
+          input.value = special.chocolateLoveStickers[index] ?? "";
         });
       }
     }
@@ -15804,4 +15822,444 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   } else {
     handleInitialDeepLink();
   }
+})();
+
+
+/* ============================================================
+   CODE012 — CHOCOLATE LOVE
+============================================================ */
+(() => {
+  if (window.__DDS_CHOCOLATE_LOVE_INSTALLED__) return;
+  window.__DDS_CHOCOLATE_LOVE_INSTALLED__ = true;
+
+  const stylesheetUrl = "https://guindaeyo.github.io/deepdshop/ddsh-chocolate-love.css";
+  const roleplayText = "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊";
+
+  const officialValues = Object.freeze({
+    photo: "https://i.pinimg.com/736x/af/c1/1e/afc11e6e78a06c4e91b504a1f21f19e8.jpg",
+    photoX: 50,
+    photoY: 20,
+    shape: "heart",
+    frameX: 0,
+    titleX: 0,
+    titleY: 0,
+    faceX: 0,
+    faceY: 0,
+    bgColor: "#f7f3f3",
+    paperColor: "#fffdfb",
+    lineColor: "#a68c83",
+    topnoteColor: "#a68c83",
+    stickerBgColor: "#a68c83",
+    stickerTextColor: "#fffdfc",
+    frameOuterColor: "#a68c83",
+    frameInnerColor: "#fffdfb",
+    scriptColor: "#fffdfb",
+    scriptOutlineColor: "#a68c83",
+    pixelColor: "#a68c83",
+    faceColor: "#a68c83",
+    roleBorderColor: "#a68c83",
+    roleBgColor: "#ffffff",
+    roleTextColor: "#987f76",
+    noteBorderColor: "#a68c83",
+    noteBgColor: "#ffffff",
+    noteColor: "#a68c83",
+    bottomDotColor: "#b9b9b9",
+    topnote: "かわいいだけじゃだめですか？! ♡＋°",
+    stickers: ["cranky", "blood", "naughty", "stubborn"],
+    script: "Franklin D.",
+    pixel: "Bloodworth",
+    face: "ˆ >ヮ< ˆ",
+    roleplay: roleplayText,
+    note: "กั้งงง!"
+  });
+
+  const HEART_PATH = "M173 317C144 303 110 281 81 253C52 225 30 194 24 159C17 118 28 82 54 58C75 39 99 30 123 32C150 34 171 49 182 72C186 81 187 91 187 99C187 106 190 111 196 111C203 111 207 106 208 99C208 88 208 79 212 70C224 45 246 32 272 33C299 35 324 50 339 75C358 105 359 144 346 178C332 214 307 242 280 266C254 289 226 306 204 317C194 322 183 322 173 317Z";
+  const STAR_PATH = "M190 14C194 14 198 17 200 22L231 91C233 96 237 99 242 99L327 106C340 107 345 123 335 132L270 188C266 192 264 198 266 204L286 286C289 299 276 309 265 302L199 259C194 256 186 256 181 259L115 302C104 309 91 299 94 286L114 204C116 198 114 192 110 188L45 132C35 123 40 107 53 106L138 99C143 99 147 96 149 91L180 22C182 17 186 14 190 14Z";
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]+/g, "");
+  }
+
+  function editableText(element) {
+    if (!element) return "";
+    return String(element.innerText || element.textContent || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n");
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value);
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%;height:auto;">')
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_m, size, content) => {
+        const sizes = { small: "0.82em", medium: "1em", large: "1.28em" };
+        return `<span style="font-size:${sizes[size]}">${content}</span>`;
+      })
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[(quote|code|hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span class="dds-bbcode-$1">$2</span>')
+      .replace(/\[list(?:=1)?\]/gi, "<div>")
+      .replace(/\[\/list\]/gi, "</div>")
+      .replace(/\[\*\]/g, "<br>• ")
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\n/g, "<br>");
+    return text;
+  }
+
+  function alphaColor(value, alpha) {
+    const raw = String(value || "").trim();
+    const m = raw.match(/^#([0-9a-f]{6})$/i);
+    if (!m) return raw;
+    const hex = m[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function frameSvg(kind, outer, inner) {
+    const heartStyle = kind === "heart" ? "" : "display:none;";
+    const starStyle = kind === "star" ? "transform:scale(1.10);transform-origin:center center;transform-box:fill-box;" : "display:none;";
+    return `<svg class="ddsh-chocolove-frame-svg ddsh-chocolove-heart-svg" viewBox="0 0 380 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="${heartStyle}"><path class="ddsh-chocolove-frame-outer" style="stroke:${h(outer)};" d="${HEART_PATH}"/><path class="ddsh-chocolove-frame-white" style="stroke:${h(inner)};" d="${HEART_PATH}"/></svg><svg class="ddsh-chocolove-frame-svg ddsh-chocolove-star-svg" viewBox="0 0 380 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="${starStyle}"><path class="ddsh-chocolove-frame-outer" style="stroke:${h(outer)};" d="${STAR_PATH}"/><path class="ddsh-chocolove-frame-white" style="stroke:${h(inner)};" d="${STAR_PATH}"/></svg>`;
+  }
+
+  function scriptShadow(color) {
+    const c = h(color);
+    return `-1.6px -1.6px 0 ${c},1.6px -1.6px 0 ${c},-1.6px 1.6px 0 ${c},1.6px 1.6px 0 ${c}`;
+  }
+
+  function buildMarkup(values, previewMode) {
+    const shape = values.shape === "star" ? "star" : "heart";
+    const roleplay = previewMode ? bbcodeToPreviewHtml(values.roleplay) : h(values.roleplay);
+    const roleBg = alphaColor(values.roleBgColor, 0.18);
+    const noteBg = alphaColor(values.noteBgColor, 0.18);
+    const stickers = (Array.isArray(values.stickers) ? values.stickers : [])
+      .map((item) => `<span style="background:${h(values.stickerBgColor)};color:${h(values.stickerTextColor)};padding:3px 8px 4px;font-size:11px;font-weight:600;">${h(item)}</span>`)
+      .join("");
+    const rootStyle = [
+      `--ddsh-chocolove-photo:url('${cssUrl(values.photo)}')`,
+      `--ddsh-chocolove-photo-x:${Number(values.photoX) || 0}%`,
+      `--ddsh-chocolove-photo-y:${Number(values.photoY) || 0}%`,
+      `--ddsh-chocolove-shape-rotate:0deg`,
+      `--ddsh-ys-bg:${h(values.bgColor)}`,
+      `--ddsh-ys-paper:${h(values.paperColor)}`,
+      `--ddsh-ys-line:${h(values.lineColor)}`,
+      `--ddsh-ys-text:${h(values.roleTextColor)}`,
+      `--ddsh-ys-tagbg:${h(values.stickerBgColor)}`,
+      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`
+    ].join(";") + ";";
+
+    return `<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.noteBorderColor)};background:${h(noteBg)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.noteColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span style="color:${h(values.bottomDotColor)};"></span></div>`;
+  }
+
+  function buildCopyCode(values) {
+    return `<link href="${stylesheetUrl}" rel="stylesheet">${buildMarkup(values, false)}`;
+  }
+
+  function previewDocument(markup) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:#242424}body{padding:16px;overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:760px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+  }
+
+  function resizePreview(iframe, isCard) {
+    const doc = iframe?.contentDocument;
+    const target = doc?.querySelector(".dds-preview-target");
+    const root = doc?.querySelector(".ddsh-chocolove-wrap");
+    const shell = doc?.querySelector(".dds-chocolove-preview-shell");
+    if (!iframe || !target || !root || !shell) return;
+    target.style.transform = "none";
+    shell.style.height = "auto";
+    const naturalWidth = Math.max(target.scrollWidth, target.offsetWidth, 760);
+    const naturalHeight = Math.max(target.scrollHeight, target.offsetHeight, root.scrollHeight, 1);
+    const stage = iframe.closest(".dds-roleplay-card-preview, .dds-editor-preview-column");
+    const availableWidth = Math.max(1, (stage?.clientWidth || iframe.clientWidth || naturalWidth) - 28);
+    let scale = Math.min(1, availableWidth / naturalWidth);
+    if (isCard) {
+      const availableHeight = Math.max(1, (stage?.clientHeight || 300) - 28);
+      scale = Math.min(scale, availableHeight / naturalHeight);
+    }
+    scale = Math.max(0.01, scale);
+    const scaledHeight = Math.ceil(naturalHeight * scale);
+    target.style.transform = `scale(${scale})`;
+    shell.style.height = `${scaledHeight}px`;
+    if (!isCard) iframe.style.height = `${Math.max(720, scaledHeight + 40)}px`;
+    iframe.classList.remove("dds-preview-loading");
+    iframe.classList.add("dds-preview-ready");
+    if (typeof window.revealPreview === "function") window.revealPreview(iframe);
+  }
+
+  const previewStates = new WeakMap();
+  function renderPreview(iframe, markup, isCard) {
+    if (!iframe) return;
+    const srcdoc = previewDocument(markup);
+    const resize = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resizePreview(iframe, isCard)));
+      [90, 260, 600, 1200, 2000].forEach((delay) => window.setTimeout(() => resizePreview(iframe, isCard), delay));
+    };
+    const state = previewStates.get(iframe) || { loaded: false, token: 0 };
+    state.token += 1;
+    const token = state.token;
+    previewStates.set(iframe, state);
+    if (state.loaded && iframe.contentDocument?.readyState !== "loading" && typeof window.updateLoadedPreviewDocument === "function") {
+      try {
+        if (window.updateLoadedPreviewDocument(iframe, srcdoc, resize)) {
+          resize();
+          return;
+        }
+      } catch (error) {
+        console.warn("[DDS CODE012] preview patch failed", error);
+      }
+    }
+    iframe.classList.add("dds-preview-loading");
+    iframe.classList.remove("dds-preview-ready");
+    iframe.addEventListener("load", () => {
+      const current = previewStates.get(iframe);
+      if (!current || current.token !== token) return;
+      current.loaded = true;
+      resize();
+    }, { once: true });
+    iframe.srcdoc = srcdoc;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+    return Promise.resolve();
+  }
+
+  function initialize() {
+    const panel = document.querySelector('[data-panel="editor-code012"]');
+    const cardIframe = document.getElementById("roleplayCardPreview012");
+    const editorIframe = document.getElementById("chocolateLovePreview");
+    const generated = document.getElementById("generatedChocolateLoveCode");
+    const copyButton = document.getElementById("copyGeneratedChocolateLoveCode");
+    const editButton = document.querySelector('[data-edit-code="code012"]');
+    const stickerList = document.getElementById("chocoloveStickerList");
+    const addStickerButton = document.getElementById("chocoloveAddSticker");
+    if (!panel || !cardIframe || !editorIframe || !generated || !stickerList) return;
+
+    const id = (name) => document.getElementById(name);
+    const value = (name, fallback = "") => id(name)?.value ?? fallback;
+
+    function stickerValues() {
+      return Array.from(stickerList.querySelectorAll("[data-chocolove-sticker-input]"), (input) => input.value);
+    }
+
+    function renumberStickers() {
+      stickerList.querySelectorAll("[data-chocolove-sticker-row]").forEach((row, index) => {
+        const input = row.querySelector("[data-chocolove-sticker-input]");
+        if (input) {
+          input.id = `chocoloveSticker${index + 1}`;
+          input.placeholder = `Sticker ${index + 1}`;
+        }
+      });
+    }
+
+    function addSticker(text = "") {
+      const row = document.createElement("div");
+      row.className = "dds-sticker-editor-row";
+      row.dataset.chocoloveStickerRow = "";
+      row.innerHTML = `<input data-chocolove-sticker-input data-dds-no-save type="text"><button data-chocolove-remove-sticker type="button" aria-label="ลบ sticker">REMOVE</button>`;
+      const input = row.querySelector("input");
+      input.value = text;
+      stickerList.appendChild(row);
+      renumberStickers();
+      updateChocolateLove();
+      return row;
+    }
+
+    window.__DDS_CHOCLOVE_ADD_STICKER__ = addSticker;
+    renumberStickers();
+
+    function readValues() {
+      return {
+        photo: value("chocolovePhoto"),
+        photoX: Number(value("chocolovePhotoX", 50)),
+        photoY: Number(value("chocolovePhotoY", 20)),
+        shape: value("chocoloveShape", "heart"),
+        frameX: Number(value("chocoloveFrameX", 0)),
+        titleX: Number(value("chocoloveTitleX", 0)),
+        titleY: Number(value("chocoloveTitleY", 0)),
+        faceX: Number(value("chocoloveFaceX", 0)),
+        faceY: Number(value("chocoloveFaceY", 0)),
+        bgColor: value("chocoloveBgColor", "#f7f3f3"),
+        paperColor: value("chocolovePaperColor", "#fffdfb"),
+        lineColor: value("chocoloveLineColor", "#a68c83"),
+        topnoteColor: value("chocoloveTopnoteColor", "#a68c83"),
+        stickerBgColor: value("chocoloveStickerBgColor", "#a68c83"),
+        stickerTextColor: value("chocoloveStickerTextColor", "#fffdfc"),
+        frameOuterColor: value("chocoloveFrameOuterColor", "#a68c83"),
+        frameInnerColor: value("chocoloveFrameInnerColor", "#fffdfb"),
+        scriptColor: value("chocoloveScriptColor", "#fffdfb"),
+        scriptOutlineColor: value("chocoloveScriptOutlineColor", "#a68c83"),
+        pixelColor: value("chocolovePixelColor", "#a68c83"),
+        faceColor: value("chocoloveFaceColor", "#a68c83"),
+        roleBorderColor: value("chocoloveRoleBorderColor", "#a68c83"),
+        roleBgColor: value("chocoloveRoleBgColor", "#ffffff"),
+        roleTextColor: value("chocoloveRoleTextColor", "#987f76"),
+        noteBorderColor: value("chocoloveNoteBorderColor", "#a68c83"),
+        noteBgColor: value("chocoloveNoteBgColor", "#ffffff"),
+        noteColor: value("chocoloveNoteColor", "#a68c83"),
+        bottomDotColor: value("chocoloveBottomDotColor", "#b9b9b9"),
+        topnote: value("chocoloveTopnote"),
+        stickers: stickerValues(),
+        script: value("chocoloveScript"),
+        pixel: value("chocolovePixel"),
+        face: value("chocoloveFace"),
+        roleplay: editableText(id("chocoloveRoleplayEditor")),
+        note: value("chocoloveNote")
+      };
+    }
+
+    function syncOutputs() {
+      const outputs = [
+        ["chocoloveFrameX", "px"],
+        ["chocolovePhotoX", "%"],
+        ["chocolovePhotoY", "%"],
+        ["chocoloveTitleX", "px"],
+        ["chocoloveTitleY", "px"],
+        ["chocoloveFaceX", "px"],
+        ["chocoloveFaceY", "px"]
+      ];
+      outputs.forEach(([name, suffix]) => {
+        const input = id(name);
+        const output = panel.querySelector(`[data-position-output="${name}"]`);
+        if (input && output) output.textContent = `${input.value}${suffix}`;
+      });
+    }
+
+    function updateChocolateLove() {
+      syncOutputs();
+      const values = readValues();
+      generated.value = buildCopyCode(values);
+      renderPreview(editorIframe, buildMarkup(values, true), false);
+    }
+    window.updateChocolateLove = updateChocolateLove;
+
+    const colorPairs = [
+      ["chocoloveBgColorPicker", "chocoloveBgColor"],
+      ["chocolovePaperColorPicker", "chocolovePaperColor"],
+      ["chocoloveLineColorPicker", "chocoloveLineColor"],
+      ["chocoloveTopnoteColorPicker", "chocoloveTopnoteColor"],
+      ["chocoloveStickerBgColorPicker", "chocoloveStickerBgColor"],
+      ["chocoloveStickerTextColorPicker", "chocoloveStickerTextColor"],
+      ["chocoloveFrameOuterColorPicker", "chocoloveFrameOuterColor"],
+      ["chocoloveFrameInnerColorPicker", "chocoloveFrameInnerColor"],
+      ["chocoloveScriptColorPicker", "chocoloveScriptColor"],
+      ["chocoloveScriptOutlineColorPicker", "chocoloveScriptOutlineColor"],
+      ["chocolovePixelColorPicker", "chocolovePixelColor"],
+      ["chocoloveFaceColorPicker", "chocoloveFaceColor"],
+      ["chocoloveRoleBorderColorPicker", "chocoloveRoleBorderColor"],
+      ["chocoloveRoleBgColorPicker", "chocoloveRoleBgColor"],
+      ["chocoloveRoleTextColorPicker", "chocoloveRoleTextColor"],
+      ["chocoloveNoteBorderColorPicker", "chocoloveNoteBorderColor"],
+      ["chocoloveNoteBgColorPicker", "chocoloveNoteBgColor"],
+      ["chocoloveNoteColorPicker", "chocoloveNoteColor"],
+      ["chocoloveBottomDotColorPicker", "chocoloveBottomDotColor"]
+    ];
+    colorPairs.forEach(([pickerName, textName]) => {
+      const picker = id(pickerName);
+      const text = id(textName);
+      picker?.addEventListener("input", () => {
+        if (!text) return;
+        text.value = picker.value;
+        text.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      text?.addEventListener("input", () => {
+        const next = text.value.trim();
+        if (picker && /^#[0-9a-f]{6}$/i.test(next)) picker.value = next;
+      });
+    });
+
+    addStickerButton?.addEventListener("click", () => addSticker(""));
+    stickerList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-chocolove-remove-sticker]");
+      if (!button) return;
+      button.closest("[data-chocolove-sticker-row]")?.remove();
+      renumberStickers();
+      updateChocolateLove();
+    });
+    stickerList.addEventListener("input", updateChocolateLove);
+
+    panel.addEventListener("input", (event) => {
+      if (event.target.closest("[data-chocolove-sticker-list]")) return;
+      updateChocolateLove();
+    });
+    panel.addEventListener("change", updateChocolateLove);
+
+    copyButton?.addEventListener("click", () => {
+      updateChocolateLove();
+      copyText(generated.value).then(() => {
+        if (typeof window.showToast === "function") window.showToast("คัดลอกโคด CODE012 แล้ว");
+      }).catch(() => {
+        if (typeof window.showToast === "function") window.showToast("คัดลอกโคดไม่สำเร็จ");
+      });
+    });
+
+    function openEditor() {
+      document.body.classList.add("dds-editor-mode");
+      document.querySelectorAll("[data-panel]").forEach((candidate) => {
+        candidate.classList.toggle("is-active", candidate === panel);
+      });
+      document.querySelectorAll("[data-page]").forEach((button) => {
+        const active = button.dataset.page === "roleplay";
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-current", active ? "page" : "false");
+      });
+      const pageNumber = document.getElementById("currentPageNumber");
+      if (pageNumber) pageNumber.textContent = "01";
+      history.replaceState(null, "", "#editor-code012");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(updateChocolateLove);
+    }
+
+    editButton?.addEventListener("click", openEditor);
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#editor-code012") openEditor();
+    });
+    if (window.location.hash === "#editor-code012") queueMicrotask(openEditor);
+
+    panel.querySelector(".dds-back-button")?.addEventListener("click", () => {
+      requestAnimationFrame(() => renderPreview(cardIframe, buildMarkup(officialValues, true), true));
+    });
+
+    // RESET ของระบบกลางจะล้างข้อความให้ว่าง; คืนจำนวนช่อง Sticker เป็น 4 ช่องว่างเพื่อเริ่มใหม่ง่าย ๆ
+    id("resetChocolateLove")?.addEventListener("click", () => {
+      window.setTimeout(() => {
+        stickerList.innerHTML = "";
+        for (let i = 0; i < 4; i += 1) addSticker("");
+        renumberStickers();
+        updateChocolateLove();
+      }, 10);
+    });
+
+    renderPreview(cardIframe, buildMarkup(officialValues, true), true);
+    updateChocolateLove();
+  }
+
+  initialize();
 })();
