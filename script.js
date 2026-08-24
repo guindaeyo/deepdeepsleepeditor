@@ -16045,11 +16045,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `-1.6px -1.6px 0 ${c},1.6px -1.6px 0 ${c},-1.6px 1.6px 0 ${c},1.6px 1.6px 0 ${c}`;
   }
 
+  const CHOCOLATE_DOT_OVERRIDE_CSS = `<style class="dds-chocolove-dot-override">
+.ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.72) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.55) 25%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.34) 45%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.18) 62%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.06) 76%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 88%)!important;}
+.ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.52) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.40) 28%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.25) 48%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.10) 68%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 86%)!important;}
+</style>`;
+
   function buildChocolateScopedCss(scope, values, photoSize, photoX, photoY) {
-    const rgb=colorToRgbTuple(values.dotColor);
     return `<style class="dds-chocolove-instance-style">
-.${scope} .ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(${rgb},.72) 0%,rgba(${rgb},.55) 25%,rgba(${rgb},.34) 45%,rgba(${rgb},.18) 62%,rgba(${rgb},.06) 76%,rgba(${rgb},0) 88%)!important;}
-.${scope} .ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(${rgb},.52) 0%,rgba(${rgb},.40) 28%,rgba(${rgb},.25) 48%,rgba(${rgb},.10) 68%,rgba(${rgb},0) 86%)!important;}
 .${scope} .ddsh-chocolove-photo-image{background-position:${photoX}% ${photoY}%!important;background-size:${photoSize}!important;}
 </style>`;
   }
@@ -16078,10 +16080,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-ys-line:${h(values.lineColor)}`,
       `--ddsh-ys-text:${h(values.roleTextColor)}`,
       `--ddsh-ys-tagbg:${h(values.stickerBgColor)}`,
-      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`
+      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`,
+      `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
     ].join(";") + ";";
 
-    return `${scopedCss}<div class="ddsh-chocolove-wrap ${scope}"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image" style="background-position:${photoX}% ${photoY}% !important;background-size:${photoSize} !important;"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
+    const dotRgb = colorToRgbTuple(values.dotColor);
+    return `${CHOCOLATE_DOT_OVERRIDE_CSS}${scopedCss}<div class="ddsh-chocolove-wrap ${scope}"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;--ddsh-chocolove-dot-rgb:${dotRgb};"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image" style="background-position:${photoX}% ${photoY}% !important;background-size:${photoSize} !important;"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
