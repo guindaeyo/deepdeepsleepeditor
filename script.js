@@ -15652,6 +15652,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function cssUrl(value) { return String(value || "").replace(/[\\'\r\n]/g, (c) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[c] ?? "")); }
   function clamp(value, fallback=50) { const n=Number(value); return Number.isFinite(n) ? Math.max(0,Math.min(100,n)) : fallback; }
   function validColor(value) { const s=String(value||"").trim(); return /^#[0-9a-f]{6}$/i.test(s) ? s : ""; }
+  function makeRoraScope() { return `dds-rora-instance-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`; }
   async function sha256(value) { const bytes=new TextEncoder().encode(String(value||"")); const digest=await crypto.subtle.digest("SHA-256",bytes); return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join(""); }
 
   function getValues() {
@@ -15680,7 +15681,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function buildCode(values=getValues()) {
     const doc=new DOMParser().parseFromString(`<!doctype html><html><body>${OFFICIAL_CODE}</body></html>`,"text/html");
     const root=doc.querySelector(".ddsh-roraima");
+    const scope=makeRoraScope();
     if (root) {
+      root.classList.add(scope);
       const vars={
         "--ddsh-rora-house":[values.houseImage,true], "--ddsh-rora-house-x":[`${clamp(values.houseX)}%`], "--ddsh-rora-house-y":[`${clamp(values.houseY)}%`],
         "--ddsh-rora-garage":[values.garageImage,true], "--ddsh-rora-garage-x":[`${clamp(values.garageX)}%`], "--ddsh-rora-garage-y":[`${clamp(values.garageY)}%`],
@@ -15706,6 +15709,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (border) paper.style.setProperty("border-bottom-color",border,"important");
     }
     if (footer && border) footer.style.setProperty("border-color",border,"important");
+
+    // Scope the house colors to this copied instance only.
+    // This prevents another RORAIMA post on the same thread from overriding it.
+    if (root) {
+      const style=doc.createElement("style");
+      const borderCss=border ? `border-bottom-color:${border}!important;` : "";
+      const footerCss=border ? `border-color:${border}!important;` : "";
+      style.textContent=`.${scope} .ddsh-roraima-paper{background:linear-gradient(180deg,${c1} 0%,${c2} 52%,${c3} 100%)!important;${borderCss}}.${scope} .ddsh-roraima-footer{${footerCss}}`;
+      doc.body.insertBefore(style,root);
+    }
     return Array.from(doc.body.childNodes).map(n=>n.outerHTML??n.textContent).join("");
   }
 
@@ -16017,6 +16030,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return fallback;
   }
 
+  function makeChocolateScope() {
+    return `dds-chocolove-instance-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
+  }
+
   function frameSvg(kind, outer, inner) {
     const heartStyle = kind === "heart" ? "" : "display:none;";
     const starStyle = kind === "star" ? "transform:scale(1.10);transform-origin:center center;transform-box:fill-box;" : "display:none;";
@@ -16028,11 +16045,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `-1.6px -1.6px 0 ${c},1.6px -1.6px 0 ${c},-1.6px 1.6px 0 ${c},1.6px 1.6px 0 ${c}`;
   }
 
-  const DOT_OVERRIDE_CSS = `<style class="dds-chocolove-dot-override">
-.ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.72) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.55) 25%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.34) 45%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.18) 62%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.06) 76%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 88%)!important;}
-.ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.52) 0%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.40) 28%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.25) 48%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),.10) 68%,rgba(var(--ddsh-chocolove-dot-rgb,201,182,174),0) 86%)!important;}
-.ddsh-chocolove-photo-image{background-size:var(--ddsh-chocolove-photo-size,cover)!important;}
+  function buildChocolateScopedCss(scope, values, photoSize, photoX, photoY) {
+    const rgb=colorToRgbTuple(values.dotColor);
+    return `<style class="dds-chocolove-instance-style">
+.${scope} .ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(${rgb},.72) 0%,rgba(${rgb},.55) 25%,rgba(${rgb},.34) 45%,rgba(${rgb},.18) 62%,rgba(${rgb},.06) 76%,rgba(${rgb},0) 88%)!important;}
+.${scope} .ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(${rgb},.52) 0%,rgba(${rgb},.40) 28%,rgba(${rgb},.25) 48%,rgba(${rgb},.10) 68%,rgba(${rgb},0) 86%)!important;}
+.${scope} .ddsh-chocolove-photo-image{background-position:${photoX}% ${photoY}%!important;background-size:${photoSize}!important;}
 </style>`;
+  }
 
   function buildMarkup(values, previewMode) {
     const shape = values.shape === "star" ? "star" : "heart";
@@ -16041,25 +16061,27 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const noteBg = roleBg;
     const photoZoom = Math.max(60, Math.min(200, Number(values.photoZoom) || 100));
     const photoSize = photoZoom === 100 ? "cover" : `${photoZoom}% auto`;
+    const photoX = Math.max(0, Math.min(100, Number(values.photoX) || 0));
+    const photoY = Math.max(0, Math.min(100, Number(values.photoY) || 0));
+    const scope = makeChocolateScope();
+    const scopedCss = buildChocolateScopedCss(scope, values, photoSize, photoX, photoY);
     const stickers = (Array.isArray(values.stickers) ? values.stickers : [])
       .map((item) => `<span style="background:${h(values.stickerBgColor)};color:${h(values.stickerTextColor)};padding:3px 8px 4px;font-size:11px;font-weight:600;">${h(item)}</span>`)
       .join("");
     const rootStyle = [
       `--ddsh-chocolove-photo:url('${cssUrl(values.photo)}')`,
-      `--ddsh-chocolove-photo-x:${Number(values.photoX) || 0}%`,
-      `--ddsh-chocolove-photo-y:${Number(values.photoY) || 0}%`,
-      `--ddsh-chocolove-photo-size:${photoSize}`,
+      `--ddsh-chocolove-photo-x:${photoX}%`,
+      `--ddsh-chocolove-photo-y:${photoY}%`,
       `--ddsh-chocolove-shape-rotate:0deg`,
       `--ddsh-ys-bg:${h(values.bgColor)}`,
       `--ddsh-ys-paper:${h(values.paperColor)}`,
       `--ddsh-ys-line:${h(values.lineColor)}`,
       `--ddsh-ys-text:${h(values.roleTextColor)}`,
       `--ddsh-ys-tagbg:${h(values.stickerBgColor)}`,
-      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`,
-      `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
+      `--ddsh-ys-tagtext:${h(values.stickerTextColor)}`
     ].join(";") + ";";
 
-    return `${DOT_OVERRIDE_CSS}<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
+    return `${scopedCss}<div class="ddsh-chocolove-wrap ${scope}"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image" style="background-position:${photoX}% ${photoY}% !important;background-size:${photoSize} !important;"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
@@ -16461,3 +16483,158 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   initialize();
 })();
+
+/* ============================================================
+   HANS COMMISSION CARD PREVIEW — FIT WHOLE CODE / CENTERED
+   Scope: Hans roleplay, Hans solo roleplay, RORAIMA house cards only.
+   Keeps every other editor/card untouched.
+============================================================ */
+(() => {
+  "use strict";
+
+  if (window.__DDS_HANS_COMMISSION_CARD_FIT_V60__) return;
+  window.__DDS_HANS_COMMISSION_CARD_FIT_V60__ = true;
+
+  const CARD_IFRAME_SELECTORS = [
+    ".dds-hans-roleplay-commission-card [data-hans-card-preview]",
+    ".dds-roraima-house-commission-card [data-rora-card-preview]"
+  ].join(",");
+
+  const observedFrames = new WeakSet();
+  const resizeTimers = new WeakMap();
+
+  function measurePreview(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      if (!doc) return null;
+
+      const root =
+        doc.querySelector(".dds-hans-preview-root") ||
+        doc.querySelector(".dds-rora-preview-shell") ||
+        doc.body;
+
+      if (!root) return null;
+
+      const rootRect = root.getBoundingClientRect();
+
+      // Measure the code root itself, not the iframe viewport.
+      // The Hans iframe is initially 1200px tall; including body/html height
+      // would make the card shrink more than necessary.
+      const width = Math.max(
+        1,
+        Math.ceil(rootRect.width || 0),
+        root.offsetWidth || 0,
+        root.scrollWidth || 0
+      );
+
+      const height = Math.max(
+        1,
+        Math.ceil(rootRect.height || 0),
+        root.offsetHeight || 0,
+        root.scrollHeight || 0
+      );
+
+      return { width, height };
+    } catch {
+      return null;
+    }
+  }
+
+  function fitHansCommissionCard(iframe) {
+    if (!iframe?.isConnected) return;
+
+    const stage = iframe.closest(".dds-roleplay-card-preview");
+    if (!stage || stage.clientWidth < 20 || stage.clientHeight < 20) return;
+
+    const metrics = measurePreview(iframe);
+    if (!metrics) return;
+
+    const padding = 18;
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
+    const scale = Math.max(
+      0.01,
+      Math.min(
+        1,
+        availableWidth / metrics.width,
+        availableHeight / metrics.height
+      )
+    );
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("min-width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("max-width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("min-height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("max-height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty(
+      "transform",
+      `translate(-50%, -50%) scale(${scale})`,
+      "important"
+    );
+    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("border", "0", "important");
+    iframe.style.setProperty("max-width", "none", "important");
+  }
+
+  function scheduleFit(iframe) {
+    if (!iframe?.isConnected) return;
+
+    const previous = resizeTimers.get(iframe);
+    if (previous) window.clearTimeout(previous);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => fitHansCommissionCard(iframe));
+    });
+
+    [80, 220, 520, 1000, 1800].forEach((delay) => {
+      window.setTimeout(() => fitHansCommissionCard(iframe), delay);
+    });
+
+    const timer = window.setTimeout(() => {
+      fitHansCommissionCard(iframe);
+      resizeTimers.delete(iframe);
+    }, 2400);
+    resizeTimers.set(iframe, timer);
+  }
+
+  function hookFrame(iframe) {
+    if (!iframe || observedFrames.has(iframe)) return;
+    observedFrames.add(iframe);
+
+    iframe.addEventListener("load", () => {
+      scheduleFit(iframe);
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => scheduleFit(iframe));
+      } catch {}
+    });
+
+    // The iframe may already be loaded by the commission installer.
+    scheduleFit(iframe);
+  }
+
+  function scan() {
+    document.querySelectorAll(CARD_IFRAME_SELECTORS).forEach(hookFrame);
+  }
+
+  const observer = new MutationObserver(scan);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  window.addEventListener("resize", () => {
+    document.querySelectorAll(CARD_IFRAME_SELECTORS).forEach(scheduleFit);
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scan, { once: true });
+  } else {
+    scan();
+  }
+
+  window.setTimeout(scan, 300);
+  window.setTimeout(scan, 1200);
+})();
+
