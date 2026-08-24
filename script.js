@@ -15727,7 +15727,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if(!iframe||!stage||!holder)return;
     const m=shellMetrics(iframe); if(!m)return;
     const sw=Math.max(1,stage.clientWidth-28), sh=Math.max(1,stage.clientHeight-28);
-    // Editor uses width-only fitting so repeated content/image/font reflow cannot make the preview zoom in/out.
     const scale=mode==="width"?Math.min(1,sw/m.width):Math.min(1,sw/m.width,sh/m.height);
     iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.left="0"; iframe.style.top="0"; iframe.style.transform=`scale(${scale})`; iframe.style.transformOrigin="top left";
     holder.style.width=`${m.width*scale}px`; holder.style.height=`${m.height*scale}px`; holder.style.margin="auto";
