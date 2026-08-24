@@ -15698,12 +15698,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     for(let i=1;i<=5;i+=1){ const d=doc.querySelectorAll(".ddsh-roraima-detail")[i-1]; if(d){ const t=d.querySelector(".ddsh-roraima-detail-title"); const x=d.querySelector(".ddsh-roraima-detail-text"); if(t)t.textContent=values[`detailTitle${i}`]||""; if(x)x.textContent=values[`detailText${i}`]||""; } }
     setText(".ddsh-roraima-footer-left",values.footerLeft); setText(".ddsh-roraima-footer-right",values.footerRight);
     const b1=validColor(values.bg1), b2=validColor(values.bg2), b3=validColor(values.bg3), border=validColor(values.borderColor);
-    if (b1 || b2 || b3 || border) {
-      const style=doc.createElement("style");
-      const c1=b1||"#ffffff", c2=b2||b1||"#f1ede7", c3=b3||b2||b1||"#ddd3c6";
-      style.textContent=`${b1||b2||b3?`.ddsh-roraima-paper{background:linear-gradient(180deg,${c1} 0%,${c2} 52%,${c3} 100%)!important;}`:""}${border?`.ddsh-roraima-footer{border-color:${border}!important}.ddsh-roraima-paper{border-bottom-color:${border}!important;}`:""}`;
-      doc.body.appendChild(style);
+    const c1=b1||"#ffffff", c2=b2||b1||"#f1ede7", c3=b3||b2||b1||"#ddd3c6";
+    const paper=doc.querySelector(".ddsh-roraima-paper");
+    const footer=doc.querySelector(".ddsh-roraima-footer");
+    if (paper) {
+      paper.style.setProperty("background",`linear-gradient(180deg,${c1} 0%,${c2} 52%,${c3} 100%)`,"important");
+      if (border) paper.style.setProperty("border-bottom-color",border,"important");
     }
+    if (footer && border) footer.style.setProperty("border-color",border,"important");
     return Array.from(doc.body.childNodes).map(n=>n.outerHTML??n.textContent).join("");
   }
 
@@ -15725,12 +15727,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if(!iframe||!stage||!holder)return;
     const m=shellMetrics(iframe); if(!m)return;
     const sw=Math.max(1,stage.clientWidth-28), sh=Math.max(1,stage.clientHeight-28);
+    // Editor uses width-only fitting so repeated content/image/font reflow cannot make the preview zoom in/out.
     const scale=mode==="width"?Math.min(1,sw/m.width):Math.min(1,sw/m.width,sh/m.height);
     iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.left="0"; iframe.style.top="0"; iframe.style.transform=`scale(${scale})`; iframe.style.transformOrigin="top left";
     holder.style.width=`${m.width*scale}px`; holder.style.height=`${m.height*scale}px`; holder.style.margin="auto";
   }
   function fitCardPreview(){ const iframe=card?.querySelector("[data-rora-card-preview]"); const stage=card?.querySelector(".dds-roleplay-card-preview"); if(!iframe||!stage)return; const m=shellMetrics(iframe); if(!m)return; const scale=Math.min(stage.clientWidth/m.width,stage.clientHeight/m.height); iframe.style.position="absolute"; iframe.style.left="50%"; iframe.style.top="50%"; iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.transform=`translate(-50%,-50%) scale(${scale})`; iframe.style.transformOrigin="center center"; }
-  function fitEditorPreview(){ fitFrame(panel?.querySelector("[data-rora-preview]"),panel?.querySelector("[data-rora-preview-stage]"),panel?.querySelector("[data-rora-preview-holder]"),"fit"); }
+  function fitEditorPreview(){ fitFrame(panel?.querySelector("[data-rora-preview]"),panel?.querySelector("[data-rora-preview-stage]"),panel?.querySelector("[data-rora-preview-holder]"),"width"); }
   function fitViewPreview(){ fitFrame(viewPanel?.querySelector("[data-rora-view-preview]"),viewPanel?.querySelector("[data-rora-view-stage]"),viewPanel?.querySelector("[data-rora-view-holder]"),"width"); }
 
   function schedulePreview(){ clearTimeout(previewTimer); previewTimer=setTimeout(updatePreview,45); }
