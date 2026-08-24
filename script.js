@@ -16051,7 +16051,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 </style>`;
 
   function buildChocolateScopedCss(scope, values, photoSize, photoX, photoY) {
+    const dotRgb = colorToRgbTuple(values.dotColor);
     return `<style class="dds-chocolove-instance-style">
+.${scope} .ddsh-chocolove-photo::before{background:radial-gradient(ellipse at center,rgba(${dotRgb},.72) 0%,rgba(${dotRgb},.55) 25%,rgba(${dotRgb},.34) 45%,rgba(${dotRgb},.18) 62%,rgba(${dotRgb},.06) 76%,rgba(${dotRgb},0) 88%)!important;}
+.${scope} .ddsh-chocolove-photo::after{background:radial-gradient(ellipse at center,rgba(${dotRgb},.52) 0%,rgba(${dotRgb},.40) 28%,rgba(${dotRgb},.25) 48%,rgba(${dotRgb},.10) 68%,rgba(${dotRgb},0) 86%)!important;}
 .${scope} .ddsh-chocolove-photo-image{background-position:${photoX}% ${photoY}%!important;background-size:${photoSize}!important;}
 </style>`;
   }
