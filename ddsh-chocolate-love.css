@@ -1,0 +1,732 @@
+@import url('https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Pixelify+Sans:wght@400;500;600&display=swap');
+
+.ddsh-chocolove-wrap {
+  width: min(650px, calc(100% - 20px));
+  margin: 0 auto;
+  padding: 20px 0 0;
+  box-sizing: border-box;
+}
+
+.ddsh-chocolove,
+.ddsh-chocolove *,
+.ddsh-chocolove *::before,
+.ddsh-chocolove *::after {
+  box-sizing: border-box;
+}
+
+.ddsh-chocolove {
+  width: 100%;
+  margin: 0 auto;
+  padding: 36px 30px 38px;
+  position: relative;
+  overflow: hidden;
+  color: var(--ddsh-ys-text);
+  background: var(--ddsh-ys-bg);
+  font-family: "Bai Jamjuree", sans-serif;
+}
+
+.ddsh-chocolove-topnote {
+  width: min(560px, 100%);
+  margin: 0 auto 9px;
+  position: relative;
+  z-index: 10;
+  color: var(--ddsh-ys-line);
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.ddsh-chocolove-stickers {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.ddsh-chocolove-stickers span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  margin: 0 !important;
+  padding: 3px 8px 4px;
+  background: var(--ddsh-ys-tagbg);
+  color: var(--ddsh-ys-tagtext);
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ddsh-chocolove-stickers span:nth-child(5) {
+  padding: 0;
+  background: transparent;
+  color: var(--ddsh-ys-line);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.ddsh-chocolove-photo {
+  width: 340px;
+  height: 313px;
+  position: relative;
+  z-index: 5;
+  margin-top: -70px;
+  margin-right: -15px;
+  margin-bottom: 0;
+  margin-left: auto;
+  overflow: visible;
+  isolation: isolate;
+  transform: rotate(10deg);
+  transform-origin: center;
+}
+
+.ddsh-chocolove-photo::before {
+  content: "";
+  width: 530px;
+  height: 420px;
+  position: absolute;
+  z-index: 0;
+  top: -90px;
+  left: -33px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0.72) 0%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0.55) 25%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0.34) 45%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0.18) 62%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0.06) 76%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 166, 140, 131), 0) 88%
+    );
+  filter: blur(14px);
+  pointer-events: none;
+}
+
+.ddsh-chocolove-photo::after {
+  content: "";
+  width: 400px;
+  height: 380px;
+  position: absolute;
+  z-index: 0;
+  top: -90px;
+  left: 18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(var(--ddsh-chocolove-dot-rgb, 196, 174, 166), 0.52) 0%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 196, 174, 166), 0.40) 28%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 196, 174, 166), 0.25) 48%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 196, 174, 166), 0.10) 68%,
+      rgba(var(--ddsh-chocolove-dot-rgb, 196, 174, 166), 0) 86%
+    );
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.ddsh-chocolove-photo-rotator {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  transform: rotate(var(--ddsh-chocolove-shape-rotate, 0deg));
+  transform-origin: center center;
+}
+
+.ddsh-chocolove-photo-image {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background-image: var(--ddsh-chocolove-photo);
+  background-size: var(--ddsh-chocolove-photo-size, cover);
+  background-repeat: no-repeat;
+  background-position:
+    var(--ddsh-chocolove-photo-x, 50%)
+    var(--ddsh-chocolove-photo-y, 50%);
+  background-color: var(--ddsh-ys-paper);
+}
+
+.ddsh-chocolove-heart .ddsh-chocolove-photo-image {
+  -webkit-mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 380 340'%3E%3Cpath fill='black' d='M173 317C144 303 110 281 81 253C52 225 30 194 24 159C17 118 28 82 54 58C75 39 99 30 123 32C150 34 171 49 182 72C186 81 187 91 187 99C187 106 190 111 196 111C203 111 207 106 208 99C208 88 208 79 212 70C224 45 246 32 272 33C299 35 324 50 339 75C358 105 359 144 346 178C332 214 307 242 280 266C254 289 226 306 204 317C194 322 183 322 173 317Z'/%3E%3C/svg%3E");
+  mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 380 340'%3E%3Cpath fill='black' d='M173 317C144 303 110 281 81 253C52 225 30 194 24 159C17 118 28 82 54 58C75 39 99 30 123 32C150 34 171 49 182 72C186 81 187 91 187 99C187 106 190 111 196 111C203 111 207 106 208 99C208 88 208 79 212 70C224 45 246 32 272 33C299 35 324 50 339 75C358 105 359 144 346 178C332 214 307 242 280 266C254 289 226 306 204 317C194 322 183 322 173 317Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.ddsh-chocolove-star .ddsh-chocolove-photo-image {
+  -webkit-mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 380 340'%3E%3Cpath fill='black' d='M190 14C194 14 198 17 200 22L231 91C233 96 237 99 242 99L327 106C340 107 345 123 335 132L270 188C266 192 264 198 266 204L286 286C289 299 276 309 265 302L199 259C194 256 186 256 181 259L115 302C104 309 91 299 94 286L114 204C116 198 114 192 110 188L45 132C35 123 40 107 53 106L138 99C143 99 147 96 149 91L180 22C182 17 186 14 190 14Z'/%3E%3C/svg%3E");
+  mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 380 340'%3E%3Cpath fill='black' d='M190 14C194 14 198 17 200 22L231 91C233 96 237 99 242 99L327 106C340 107 345 123 335 132L270 188C266 192 264 198 266 204L286 286C289 299 276 309 265 302L199 259C194 256 186 256 181 259L115 302C104 309 91 299 94 286L114 204C116 198 114 192 110 188L45 132C35 123 40 107 53 106L138 99C143 99 147 96 149 91L180 22C182 17 186 14 190 14Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.ddsh-chocolove-frame-svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ddsh-chocolove-star .ddsh-chocolove-star-svg {
+  transform: scale(1.10);
+  transform-origin: center center;
+  transform-box: fill-box;
+}
+
+.ddsh-chocolove-frame-outer {
+  fill: none;
+  stroke: var(--ddsh-ys-line);
+  stroke-width: 27;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ddsh-chocolove-frame-white {
+  fill: none;
+  stroke: var(--ddsh-ys-paper);
+  stroke-width: 21;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.ddsh-chocolove-heart .ddsh-chocolove-star-svg {
+  display: none;
+}
+
+.ddsh-chocolove-star .ddsh-chocolove-heart-svg {
+  display: none;
+}
+
+.ddsh-chocolove-titlewrap {
+  width: min(560px, 100%);
+  height: 88px;
+  margin: -106px auto 0;
+  position: relative;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.ddsh-chocolove-script {
+  width: max-content;
+  position: relative;
+  left: -10px;
+  top: 0;
+  color: #fffdfb;
+  font-family: "Mea Culpa", cursive;
+  font-size: 85px;
+  font-weight: 400;
+  line-height: 0.78;
+  white-space: nowrap;
+  text-shadow:
+    -1.6px -1.6px 0 var(--ddsh-ys-line),
+     1.6px -1.6px 0 var(--ddsh-ys-line),
+    -1.6px  1.6px 0 var(--ddsh-ys-line),
+     1.6px  1.6px 0 var(--ddsh-ys-line);
+}
+
+.ddsh-chocolove-pixel {
+  width: max-content;
+  margin-top: -5px;
+  margin-left: 100px;
+  color: var(--ddsh-ys-line);
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.ddsh-chocolove-face {
+  position: absolute;
+  right: 208px;
+  bottom: -3px;
+  color: var(--ddsh-ys-line);
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.ddsh-chocolove-maintext {
+  width: min(560px, 100%);
+  height: auto;
+  min-height: 0;
+  margin: 16px auto 0;
+  padding: 14px 20px 16px;
+  border: 2px solid var(--ddsh-ys-line);
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--ddsh-ys-text);
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: justify;
+  overflow-wrap: anywhere;
+}
+
+.ddsh-chocolove-notebox {
+  width: min(560px, 100%);
+  margin: 13px auto 0;
+  padding: 11px 15px 12px;
+  border: 2px solid var(--ddsh-ys-line);
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--ddsh-ys-text);
+  font-family: "Bai Jamjuree", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.ddsh-chocolove-notehead {
+  display: inline;
+  margin-right: 4px;
+  color: var(--ddsh-ys-line);
+  font-weight: 600;
+}
+
+.ddsh-chocolove-notetext {
+  display: inline;
+}
+
+.ddshopfz-creditchol {
+  width: min(650px, calc(100% - 20px));
+  min-height: 20px;
+  margin: -10px auto 0;
+  padding: 0 12px 5px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+  background: transparent;
+  font-family: Arial, sans-serif;
+}
+
+.ddshopfz-creditchol span {
+  width: 11px;
+  height: 10px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  color: rgba(185, 185, 185, 0.58);
+  font-size: 7px;
+  font-weight: 400;
+  line-height: 10px;
+  letter-spacing: 0.7px;
+  text-align: left;
+  cursor: help;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    width 0.35s ease,
+    color 0.25s ease;
+}
+
+.ddshopfz-creditchol span::before {
+  content: "✦ deepdeepsleepfranklin";
+  display: block;
+  width: 135px;
+  font-style: italic;
+}
+
+.ddshopfz-creditchol span:hover {
+  width: 135px;
+  color: rgba(215, 215, 215, 0.92);
+}
+
+@media (min-width: 681px) and (max-width: 1024px) {
+
+  .ddsh-chocolove-wrap {
+    width: min(650px, calc(100% - 24px));
+  }
+
+  .ddsh-chocolove {
+    padding: 34px 28px 36px;
+  }
+
+  .ddsh-chocolove-topnote,
+  .ddsh-chocolove-stickers,
+  .ddsh-chocolove-titlewrap,
+  .ddsh-chocolove-maintext,
+  .ddsh-chocolove-notebox {
+    width: min(560px, 100%);
+  }
+
+  .ddsh-chocolove-photo {
+    width: 325px;
+    height: 299px;
+    margin-top: -65px;
+    margin-right: -8px;
+  }
+
+  .ddsh-chocolove-photo::before {
+    width: 505px;
+    height: 400px;
+    top: -86px;
+    left: -38px;
+    filter: blur(13px);
+  }
+
+  .ddsh-chocolove-photo::after {
+    width: 380px;
+    height: 360px;
+    top: -86px;
+    left: 12px;
+    filter: blur(9px);
+  }
+
+  .ddsh-chocolove-titlewrap {
+    height: 84px;
+    margin-top: -101px;
+  }
+
+  .ddsh-chocolove-script {
+    left: -6px;
+    font-size: 81px;
+  }
+
+  .ddsh-chocolove-pixel {
+    margin-top: -5px;
+    margin-left: 96px;
+    font-size: 24px;
+  }
+
+  .ddsh-chocolove-face {
+    right: 202px;
+    bottom: -2px;
+    font-size: 11px;
+  }
+
+  .ddshopfz-creditchol {
+    width: min(650px, calc(100% - 24px));
+  }
+
+}
+
+
+@media (max-width: 680px) {
+
+  .ddsh-chocolove-wrap {
+    width: calc(100% - 20px);
+    padding-top: 18px;
+  }
+
+  .ddsh-chocolove {
+    padding: 30px clamp(18px, 4.5vw, 26px) 32px;
+  }
+
+  .ddsh-chocolove-topnote,
+  .ddsh-chocolove-stickers,
+  .ddsh-chocolove-titlewrap,
+  .ddsh-chocolove-maintext,
+  .ddsh-chocolove-notebox {
+    width: 100%;
+  }
+
+  .ddsh-chocolove-topnote {
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .ddsh-chocolove-stickers {
+    gap: 7px;
+    flex-wrap: nowrap;
+  }
+
+  .ddsh-chocolove-stickers span {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 3px 7px 4px;
+    font-size: 10px;
+  }
+
+  .ddsh-chocolove-stickers span:nth-child(5) {
+    padding: 0;
+    font-size: 11px;
+  }
+
+  .ddsh-chocolove-photo {
+    width: 300px;
+    height: 276px;
+    margin-top: -55px;
+    margin-right: -5px;
+  }
+
+  .ddsh-chocolove-photo::before {
+    width: 465px;
+    height: 370px;
+    top: -82px;
+    left: -43px;
+    filter: blur(12px);
+  }
+
+  .ddsh-chocolove-photo::after {
+    width: 350px;
+    height: 330px;
+    top: -80px;
+    left: 3px;
+    filter: blur(9px);
+  }
+
+  .ddsh-chocolove-titlewrap {
+    height: 78px;
+    margin-top: -93px;
+  }
+
+  .ddsh-chocolove-script {
+    left: -4px;
+    font-size: 73px;
+  }
+
+  .ddsh-chocolove-pixel {
+    margin-top: -4px;
+    margin-left: 86px;
+    font-size: 21px;
+  }
+
+  .ddsh-chocolove-face {
+    right: 36%;
+    bottom: -1px;
+    font-size: 10px;
+  }
+
+  .ddsh-chocolove-maintext {
+    margin-top: 14px;
+    padding: 13px 17px 15px;
+    font-size: 14px;
+    line-height: 1.62;
+  }
+
+  .ddsh-chocolove-notebox {
+    margin-top: 12px;
+    padding: 10px 14px 11px;
+    font-size: 14px;
+  }
+
+  .ddshopfz-creditchol {
+    width: calc(100% - 20px);
+  }
+
+}
+
+
+@media (max-width: 560px) {
+
+  .ddsh-chocolove-wrap {
+    width: calc(100% - 16px);
+    padding-top: 14px;
+  }
+
+  .ddsh-chocolove {
+    padding: 25px 16px 27px;
+  }
+
+  .ddsh-chocolove-topnote {
+    margin-bottom: 7px;
+    font-size: 13px;
+  }
+
+  .ddsh-chocolove-stickers {
+    gap: 4px;
+    overflow: hidden;
+  }
+
+  .ddsh-chocolove-stickers span {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 3px 5px;
+    font-size: 8px;
+  }
+
+  .ddsh-chocolove-stickers span:nth-child(5) {
+    padding: 0;
+    font-size: 9px;
+  }
+
+  .ddsh-chocolove-photo {
+    width: 255px;
+    height: 235px;
+    margin-top: -40px;
+    margin-right: -3px;
+  }
+
+  .ddsh-chocolove-photo::before {
+    width: 400px;
+    height: 315px;
+    top: -70px;
+    left: -55px;
+    filter: blur(10px);
+  }
+
+  .ddsh-chocolove-photo::after {
+    width: 300px;
+    height: 285px;
+    top: -68px;
+    left: -14px;
+    filter: blur(8px);
+  }
+
+  .ddsh-chocolove-titlewrap {
+    height: 68px;
+    margin-top: -80px;
+  }
+
+  .ddsh-chocolove-script {
+    left: -1px;
+    font-size: 61px;
+  }
+
+  .ddsh-chocolove-pixel {
+    margin-top: -3px;
+    margin-left: 72px;
+    font-size: 18px;
+  }
+
+  .ddsh-chocolove-face {
+    right: 32%;
+    bottom: 0;
+    font-size: 9px;
+  }
+
+  .ddsh-chocolove-maintext {
+    margin-top: 12px;
+    padding: 12px 14px 14px;
+    font-size: 13.5px;
+    line-height: 1.62;
+  }
+
+  .ddsh-chocolove-notebox {
+    margin-top: 11px;
+    padding: 10px 13px 11px;
+    font-size: 13.5px;
+  }
+
+  .ddshopfz-creditchol {
+    width: calc(100% - 16px);
+  }
+
+}
+
+
+@media (max-width: 410px) {
+
+  .ddsh-chocolove-wrap {
+    width: calc(100% - 12px);
+    padding-top: 12px;
+  }
+
+  .ddsh-chocolove {
+    padding: 22px 13px 24px;
+  }
+
+  .ddsh-chocolove-topnote {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .ddsh-chocolove-stickers {
+    gap: 3px;
+  }
+
+  .ddsh-chocolove-stickers span {
+    padding: 2px 4px;
+    font-size: 7.5px;
+  }
+
+  .ddsh-chocolove-stickers span:nth-child(5) {
+    padding: 0;
+    font-size: 8px;
+  }
+
+  .ddsh-chocolove-photo {
+    width: 225px;
+    height: 207px;
+    margin-top: -32px;
+    margin-right: -2px;
+  }
+
+  .ddsh-chocolove-photo::before {
+    width: 350px;
+    height: 280px;
+    top: -63px;
+    left: -49px;
+    filter: blur(9px);
+  }
+
+  .ddsh-chocolove-photo::after {
+    width: 265px;
+    height: 250px;
+    top: -60px;
+    left: -12px;
+    filter: blur(7px);
+  }
+
+  .ddsh-chocolove-titlewrap {
+    height: 60px;
+    margin-top: -70px;
+  }
+
+  .ddsh-chocolove-script {
+    left: 0;
+    font-size: 53px;
+  }
+
+  .ddsh-chocolove-pixel {
+    margin-top: -2px;
+    margin-left: 62px;
+    font-size: 16px;
+  }
+
+  .ddsh-chocolove-face {
+    right: 29%;
+    bottom: 0;
+    font-size: 8px;
+  }
+
+  .ddsh-chocolove-maintext {
+    margin-top: 10px;
+    padding: 11px 12px 13px;
+    font-size: 13px;
+    line-height: 1.62;
+  }
+
+  .ddsh-chocolove-notebox {
+    margin-top: 10px;
+    padding: 9px 12px 10px;
+    font-size: 13px;
+  }
+
+  .ddshopfz-creditchol {
+    width: calc(100% - 12px);
+  }
+
+}

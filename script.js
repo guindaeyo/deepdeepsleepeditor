@@ -15912,7 +15912,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if (window.__DDS_CHOCOLATE_LOVE_INSTALLED__) return;
   window.__DDS_CHOCOLATE_LOVE_INSTALLED__ = true;
 
-  const stylesheetUrl = "https://guindaeyo.github.io/deepdshop/ddsh-chocolate-love.css";
+  const stylesheetUrl = "https://guindaeyo.github.io/deepdshop/ddsh-chocolate-love.css?v=20260825-chocolove-css-vars-64";
+  const previewStylesheetUrl = "./ddsh-chocolate-love.css?v=20260825-chocolove-css-vars-64";
   const roleplayText = "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊";
 
   const officialValues = Object.freeze({
@@ -16068,8 +16069,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const photoSize = photoZoom === 100 ? "cover" : `${photoZoom}% auto`;
     const photoX = Math.max(0, Math.min(100, Number(values.photoX) || 0));
     const photoY = Math.max(0, Math.min(100, Number(values.photoY) || 0));
-    const scope = makeChocolateScope();
-    const scopedCss = buildChocolateScopedCss(scope, values, photoSize, photoX, photoY);
     const stickers = (Array.isArray(values.stickers) ? values.stickers : [])
       .map((item) => `<span style="background:${h(values.stickerBgColor)};color:${h(values.stickerTextColor)};padding:3px 8px 4px;font-size:11px;font-weight:600;">${h(item)}</span>`)
       .join("");
@@ -16077,6 +16076,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-chocolove-photo:url('${cssUrl(values.photo)}')`,
       `--ddsh-chocolove-photo-x:${photoX}%`,
       `--ddsh-chocolove-photo-y:${photoY}%`,
+      `--ddsh-chocolove-photo-size:${photoSize}`,
       `--ddsh-chocolove-shape-rotate:0deg`,
       `--ddsh-ys-bg:${h(values.bgColor)}`,
       `--ddsh-ys-paper:${h(values.paperColor)}`,
@@ -16087,8 +16087,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       `--ddsh-chocolove-dot-rgb:${colorToRgbTuple(values.dotColor)}`
     ].join(";") + ";";
 
-    const dotRgb = colorToRgbTuple(values.dotColor);
-    return `${CHOCOLATE_DOT_OVERRIDE_CSS}${scopedCss}<div class="ddsh-chocolove-wrap ${scope}"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;--ddsh-chocolove-dot-rgb:${dotRgb};"><div class="ddsh-chocolove-dot-inline" aria-hidden="true" style="width:165%;height:142%;position:absolute;z-index:1;top:-31%;left:-22%;pointer-events:none;background:radial-gradient(ellipse at 45% 48%,rgba(${dotRgb},.78) 0%,rgba(${dotRgb},.60) 25%,rgba(${dotRgb},.38) 45%,rgba(${dotRgb},.20) 62%,rgba(${dotRgb},.07) 76%,rgba(${dotRgb},0) 88%),radial-gradient(ellipse at 60% 50%,rgba(${dotRgb},.58) 0%,rgba(${dotRgb},.44) 28%,rgba(${dotRgb},.28) 48%,rgba(${dotRgb},.12) 68%,rgba(${dotRgb},0) 86%),${h(values.bgColor)};"></div><div class="ddsh-chocolove-photo-rotator" style="z-index:2;"><div class="ddsh-chocolove-photo-image" style="background-position:${photoX}% ${photoY}% !important;background-size:${photoSize} !important;"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
+    return `<div class="ddsh-chocolove-wrap"><div class="ddsh-chocolove" style="${rootStyle}"><div class="ddsh-chocolove-topnote" style="color:${h(values.topnoteColor)};">${h(values.topnote)}</div><div class="ddsh-chocolove-stickers">${stickers}</div><div class="ddsh-chocolove-photo ddsh-chocolove-${shape}" style="translate:${Number(values.frameX) || 0}px 0;"><div class="ddsh-chocolove-photo-rotator"><div class="ddsh-chocolove-photo-image"></div>${frameSvg(shape, values.frameOuterColor, values.frameInnerColor)}</div></div><div class="ddsh-chocolove-titlewrap" style="translate:${Number(values.titleX) || 0}px ${Number(values.titleY) || 0}px;"><div class="ddsh-chocolove-script" style="color:${h(values.scriptColor)};text-shadow:${scriptShadow(values.scriptOutlineColor)};">${h(values.script)}</div><div class="ddsh-chocolove-pixel" style="color:${h(values.pixelColor)};translate:${Number(values.pixelX) || 0}px 0;">${h(values.pixel)}</div><div class="ddsh-chocolove-face" style="color:${h(values.faceColor)};translate:${Number(values.faceX) || 0}px ${Number(values.faceY) || 0}px;">${h(values.face)}</div></div><div class="ddsh-chocolove-maintext" style="border-color:${h(values.roleBorderColor)};background:${h(roleBg)};color:${h(values.roleTextColor)};">${roleplay}</div><div class="ddsh-chocolove-notebox" style="border-color:${h(values.roleBorderColor)};background:${h(noteBg)};color:${h(values.roleTextColor)};"><div class="ddsh-chocolove-notehead" style="color:${h(values.roleTextColor)};">${h(values.note)}</div></div></div></div><div class="ddshopfz-creditchol"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
@@ -16099,7 +16098,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const canvasWidth = isCard ? 650 : 820;
     const background = "#242424";
     const padding = isCard ? "16px" : "24px 20px 32px";
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${stylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:${background}}body{padding:${padding};overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="${previewStylesheetUrl}" rel="stylesheet"><style>html,body{margin:0;min-height:100%;background:${background}}body{padding:${padding};overflow:hidden}.dds-chocolove-preview-shell{width:100%;display:flex;justify-content:center;align-items:flex-start}.dds-preview-target{width:${canvasWidth}px;max-width:none;display:flex;flex-direction:column;align-items:center;flex:0 0 auto;transform-origin:top center}.dds-bbcode-quote,.dds-bbcode-code,.dds-bbcode-hide,.dds-bbcode-spoiler{display:inline-block;padding:2px 5px;border:1px solid rgba(0,0,0,.12)}</style></head><body><div class="dds-chocolove-preview-shell"><div class="dds-preview-target">${markup}</div></div></body></html>`;
   }
 
   function resizePreview(iframe, isCard) {
