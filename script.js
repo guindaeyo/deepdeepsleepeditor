@@ -16644,3 +16644,689 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.setTimeout(scan, 1200);
 })();
 
+
+
+/* =========================================================
+   JEWEL ZIMMONNE — ROLEPLAY COMMISSION
+   Scoped installer: card + view + password-gated structured editor.
+   No existing commission/code editor is modified here.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_JEWEL_ROLEPLAY_COMMISSION_INSTALLED__) return;
+  window.__DDS_JEWEL_ROLEPLAY_COMMISSION_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-commission-jewel-roleplay";
+  const VIEW_PANEL_NAME = "view-commission-jewel-roleplay";
+  const DRAFT_KEY = "dds:commission-draft:jewel-zimmonne:roleplay:v1";
+  const ACCESS_HASH = "1e11b4f0d508e84a07a91d3cc0646ad2e0a530011b7932356e2bf742f0dca927";
+  const STYLESHEET_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-jewwrolez.css";
+  const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&display=swap";
+  const CANVAS_WIDTH = 760;
+
+  const defaults = Object.freeze({
+    backgroundImage: "https://i.pinimg.com/736x/2f/db/a4/2fdba4a3ebee0744cfb2bafd67e7829f.jpg",
+    backgroundX: 50,
+    backgroundY: 50,
+    photoImage: "https://i.pinimg.com/736x/cc/5b/e3/cc5be3f1c1d23c94203c0ec3edc27eec.jpg",
+    photoX: 50,
+    photoY: 45,
+    photoZoom: 100,
+    symbol: "⏾",
+    frameColor: "#ffffff",
+    noteBorderColor: "#ffffff",
+    lineColor: "#ffffff",
+    symbolColor: "#ffffff",
+    quoteColor: "#ffffff",
+    roleplayColor: "#f7f5ff",
+    quote: "THE MOON WILL SING A\nSONG ABOUT THE SONG",
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอา มาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    noteLabel: "หมายเหตุ :",
+    noteText: "โทนสีของโคดขึ้นอยู่กับภาพพื้นหลัง"
+  });
+
+  let card = null;
+  let panel = null;
+  let viewPanel = null;
+  let modal = null;
+  let previewTimer = 0;
+  let cardRendered = false;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function cssUrl(value) {
+    return String(value || "").replace(/[\\'\r\n]/g, (char) => ({"\\":"\\\\", "'":"\\'", "\r":"", "\n":""}[char] ?? ""));
+  }
+
+  function normalizeColor(value, fallback) {
+    const text = String(value || "").trim();
+    return /^#[0-9a-f]{6}$/i.test(text) ? text : fallback;
+  }
+
+  async function sha256(value) {
+    const data = new TextEncoder().encode(String(value || ""));
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsJewelTimer);
+    toast.__ddsJewelTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value || "").replace(/\r\n?/g, "\n");
+    const renderList = (source, ordered) => {
+      const pattern = ordered ? /\[list=1\]([\s\S]*?)\[\/list\]/gi : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+      const tag = ordered ? "ol" : "ul";
+      return source.replace(pattern, (_match, body) => {
+        const items = String(body || "").split(/\[\*\]/i).slice(1).map((item) => item.trim()).filter(Boolean).map((item) => `<li>${item}</li>`).join("");
+        return items ? `<${tag} style="margin:10px 0;padding-left:24px">${items}</${tag}>` : "";
+      });
+    };
+    text = renderList(text, true);
+    text = renderList(text, false);
+    return text
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=small\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:.82em">$1</span>')
+      .replace(/\[size=medium\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1em">$1</span>')
+      .replace(/\[size=large\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1.28em">$1</span>')
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<span style="display:block;text-align:$1">$2</span>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[img\]([^\[]+)\[\/img\]/gi, '<img src="$1" alt="" style="display:block;max-width:100%;height:auto;margin:10px auto">')
+      .replace(/\[video=youtube\]([^\[]+)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">▶ YouTube</a>')
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<span style="display:block;padding:7px 9px;border:1px solid currentColor">$1</span>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code style="display:block;padding:7px 9px;border:1px solid currentColor">$1</code>')
+      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span style="display:block;padding:7px 9px;border:1px solid currentColor">$2</span>')
+      .replace(/\[hr\]/gi, '<hr style="margin:14px 0;border:0;border-top:1px solid currentColor;opacity:.25">')
+      .replace(/\n/g, "<br>");
+  }
+
+  function roleToHtml(value, previewMode) {
+    return previewMode ? bbcodeToPreviewHtml(value) : h(value || "");
+  }
+
+  function removeBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[url=[^\]]*\]/gi, " ")
+      .replace(/\[\/?(?:b|i|u|s|quote|code|hide|spoiler|color|size|align|url|img|video|list)(?:=[^\]]*)?\]/gi, " ")
+      .replace(/\[\*\]|\[hr\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countWords(value) {
+    const clean = removeBbcodeForWordCount(value);
+    if (!clean) return 0;
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(clean)) if (segment.isWordLike) count += 1;
+      return count;
+    }
+    const words = clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+    return words ? words.length : 0;
+  }
+
+  function updateWordCounter() {
+    const textarea = panel?.querySelector('[data-jewel-field="roleplay"]');
+    const counter = panel?.querySelector("[data-jewel-word-counter]");
+    if (!textarea || !counter) return;
+    const count = countWords(textarea.value);
+    const number = counter.querySelector("[data-jewel-word-count-number]");
+    if (number) number.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function replaceSelection(target, replacement, caretOffset = null) {
+    if (!target) return;
+    const start = Number.isInteger(target.selectionStart) ? target.selectionStart : target.value.length;
+    const end = Number.isInteger(target.selectionEnd) ? target.selectionEnd : start;
+    target.setRangeText(replacement, start, end, "end");
+    if (Number.isInteger(caretOffset)) {
+      const caret = start + caretOffset;
+      target.setSelectionRange(caret, caret);
+    }
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    target.focus();
+  }
+
+  function wrapTag(target, openTag, closeTag) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const replacement = `${openTag}${selected}${closeTag}`;
+    replaceSelection(target, replacement, selected ? replacement.length : openTag.length);
+  }
+
+  function applyList(target, ordered) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const lines = selected.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const openTag = ordered ? "[list=1]" : "[list]";
+    const body = lines.length ? lines.map((line) => `[*]${line}`).join("\n") : "[*]";
+    const replacement = `${openTag}\n${body}\n[/list]`;
+    replaceSelection(target, replacement, lines.length ? replacement.length : openTag.length + 4);
+  }
+
+  function applyBbcode(target, action, toolbar) {
+    if (!target) return;
+    if (["b","i","u","s","quote","code","hide","spoiler"].includes(action)) {
+      wrapTag(target, `[${action}]`, `[/${action}]`);
+      return;
+    }
+    const wrappers = {
+      "size-small": ["[size=small]","[/size]"],
+      "size-medium": ["[size=medium]","[/size]"],
+      "size-large": ["[size=large]","[/size]"],
+      "align-left": ["[align=left]","[/align]"],
+      "align-center": ["[align=center]","[/align]"],
+      "align-right": ["[align=right]","[/align]"],
+      "align-justify": ["[align=justify]","[/align]"]
+    };
+    if (wrappers[action]) { wrapTag(target, wrappers[action][0], wrappers[action][1]); return; }
+    if (action === "color") {
+      const color = toolbar?.querySelector("[data-jewel-bbcode-color]")?.value || "#8f0e16";
+      wrapTag(target, `[color=${color}]`, "[/color]");
+      return;
+    }
+    if (action === "url") {
+      const start = target.selectionStart ?? 0;
+      const end = target.selectionEnd ?? start;
+      const selected = target.value.slice(start, end);
+      const url = window.prompt("ใส่ลิงก์ URL", /^https?:\/\//i.test(selected) ? selected : "https://");
+      if (url !== null) replaceSelection(target, `[url=${url}]${selected || url}[/url]`);
+      return;
+    }
+    if (action === "img") {
+      const url = window.prompt("ใส่ลิงก์รูปภาพ", "https://");
+      if (url !== null) replaceSelection(target, `[img]${url}[/img]`);
+      return;
+    }
+    if (action === "video") {
+      const url = window.prompt("ใส่ลิงก์ YouTube", "https://");
+      if (url !== null) replaceSelection(target, `[video=youtube]${url}[/video]`);
+      return;
+    }
+    if (action === "list") { applyList(target, false); return; }
+    if (action === "list-1") { applyList(target, true); return; }
+    if (action === "list-item") {
+      replaceSelection(target, `[*]${target.value.slice(target.selectionStart ?? 0, target.selectionEnd ?? 0)}`);
+      return;
+    }
+    if (action === "hr") { replaceSelection(target, "[hr]"); return; }
+    if (action === "clear") {
+      const start = target.selectionStart ?? 0;
+      const end = target.selectionEnd ?? start;
+      if (start === end) { showToast("คลุมข้อความที่ต้องการล้าง BBCode ก่อน"); return; }
+      replaceSelection(target, target.value.slice(start, end).replace(/\[[^\]]*\]/g, ""));
+    }
+  }
+
+  function toolbarMarkup() {
+    return `<div class="dds-rich-toolbar dds-bbcode-toolbar dds-jewel-bbcode-toolbar" data-jewel-bbcode-toolbar>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="b"><b>B</b></button><button type="button" data-jewel-bbcode="i"><i>I</i></button><button type="button" data-jewel-bbcode="u"><u>U</u></button><button type="button" data-jewel-bbcode="s"><s>S</s></button></div>
+      <div class="dds-bbcode-group"><label class="dds-bbcode-color"><span>A</span><input type="color" data-jewel-bbcode-color value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label><button type="button" data-jewel-bbcode="size-small">A−</button><button type="button" data-jewel-bbcode="size-medium">A</button><button type="button" data-jewel-bbcode="size-large">A+</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="align-left">⇤</button><button type="button" data-jewel-bbcode="align-center">↔</button><button type="button" data-jewel-bbcode="align-right">⇥</button><button type="button" data-jewel-bbcode="align-justify">☰</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="url">🔗</button><button type="button" data-jewel-bbcode="img">▣</button><button type="button" data-jewel-bbcode="video">▶</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="quote">❝</button><button type="button" data-jewel-bbcode="code">&lt;/&gt;</button><button type="button" data-jewel-bbcode="hide">◉</button><button type="button" data-jewel-bbcode="spoiler">▤</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="list">•≡</button><button type="button" data-jewel-bbcode="list-1">1≡</button><button type="button" data-jewel-bbcode="list-item">[*]</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-jewel-bbcode="hr">―</button><button type="button" data-jewel-bbcode="clear">CLEAR</button></div>
+    </div>`;
+  }
+
+  function getValues() {
+    const values = { ...defaults };
+    if (!panel) return values;
+    panel.querySelectorAll("[data-jewel-field]").forEach((input) => {
+      values[input.dataset.jewelField] = input.value;
+    });
+    return values;
+  }
+
+  function setValues(values = defaults) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-jewel-field]").forEach((input) => {
+      const key = input.dataset.jewelField;
+      input.value = values[key] ?? defaults[key] ?? "";
+    });
+    syncColorPickers();
+    syncImageOutputs();
+    updateWordCounter();
+  }
+
+  function syncColorPickers() {
+    if (!panel) return;
+    panel.querySelectorAll("[data-jewel-color-picker]").forEach((picker) => {
+      const key = picker.dataset.jewelColorPicker;
+      const input = panel.querySelector(`[data-jewel-field="${key}"]`);
+      if (!input) return;
+      picker.value = normalizeColor(input.value, defaults[key] || "#ffffff");
+    });
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(min, Math.min(max, number));
+  }
+
+  function syncImageOutputs() {
+    if (!panel) return;
+    const items = [
+      ["backgroundX", "%"],
+      ["backgroundY", "%"],
+      ["photoX", "%"],
+      ["photoY", "%"],
+      ["photoZoom", "%"]
+    ];
+    items.forEach(([key, suffix]) => {
+      const input = panel.querySelector(`[data-jewel-field="${key}"]`);
+      const output = panel.querySelector(`[data-jewel-output="${key}"]`);
+      if (input && output) output.textContent = `${input.value}${suffix}`;
+    });
+  }
+
+  function buildCode(values = defaults, previewMode = false) {
+    const v = { ...defaults, ...values };
+    const frameColor = normalizeColor(v.frameColor, defaults.frameColor);
+    const noteBorderColor = normalizeColor(v.noteBorderColor, defaults.noteBorderColor);
+    const lineColor = normalizeColor(v.lineColor, defaults.lineColor);
+    const symbolColor = normalizeColor(v.symbolColor, defaults.symbolColor);
+    const quoteColor = normalizeColor(v.quoteColor, defaults.quoteColor);
+    const roleplayColor = normalizeColor(v.roleplayColor, defaults.roleplayColor);
+    const roleplay = roleToHtml(v.roleplay, previewMode);
+    const quote = h(v.quote).replace(/\r?\n/g, "<br>");
+    const backgroundX = clampNumber(v.backgroundX, 0, 100, defaults.backgroundX);
+    const backgroundY = clampNumber(v.backgroundY, 0, 100, defaults.backgroundY);
+    const photoX = clampNumber(v.photoX, 0, 100, defaults.photoX);
+    const photoY = clampNumber(v.photoY, 0, 100, defaults.photoY);
+    const photoZoom = clampNumber(v.photoZoom, 50, 200, defaults.photoZoom);
+    const photoSize = photoZoom === 100 ? "cover" : `${photoZoom}% auto`;
+
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-moonsong" style="--ddsh-ms-bg:url('${cssUrl(v.backgroundImage)}');--ddsh-ms-bg-x:${backgroundX}%;--ddsh-ms-bg-y:${backgroundY}%;--ddsh-ms-photo:url('${cssUrl(v.photoImage)}');--ddsh-ms-photo-x:${photoX}%;--ddsh-ms-photo-y:${photoY}%;--ddsh-ms-photo-size:${photoSize};--ddsh-ms-accent:${lineColor};--ddsh-ms-text:${roleplayColor};--ddsh-ms-credit:#999999;--ddsh-ms-overlay:rgba(30,20,85,.68);background-position:${backgroundX}% ${backgroundY}%;"><div class="ddsh-ms-inner" style="border-color:${frameColor};"><div class="ddsh-ms-symbol" style="color:${symbolColor};">${h(v.symbol)}</div><div class="ddsh-ms-line ddsh-ms-line-top" style="background-color:${lineColor};border-color:${lineColor};"></div><div class="ddsh-ms-photo" style="background-position:${photoX}% ${photoY}%;background-size:${photoSize};"></div><div class="ddsh-ms-quote" style="color:${quoteColor};">${quote}</div><div class="ddsh-ms-line ddsh-ms-line-short" style="background-color:${lineColor};border-color:${lineColor};"></div><div class="ddsh-ms-roleplay" style="color:${roleplayColor};"><p style="color:inherit;">${roleplay}</p></div><div class="ddsh-ms-line ddsh-ms-line-bottom" style="background-color:${lineColor};border-color:${lineColor};"></div><div class="ddsh-ms-note" style="border-color:${noteBorderColor};"><strong>${h(v.noteLabel)}</strong> ${h(v.noteText)}</div></div></div><div class="ddshopfz-creditjw01"><span></span></div>`;
+  }
+
+  const OFFICIAL_CODE = buildCode(defaults, false);
+
+  function previewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-jewel-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;display:flex;flex-direction:column;align-items:center;margin:0 auto}</style></head><body><div class="dds-jewel-preview-root">${code}</div></body></html>`;
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      const root = doc?.querySelector(".dds-jewel-preview-root");
+      if (!doc || !root) return { width: CANVAS_WIDTH, height: 950 };
+      return {
+        width: Math.max(1, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH)),
+        height: Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 950))
+      };
+    } catch { return { width: CANVAS_WIDTH, height: 950 }; }
+  }
+
+  function writeIframe(iframe, code, fit) {
+    if (!iframe) return;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("height", "1200px", "important");
+    iframe.onload = () => {
+      fit?.();
+      setTimeout(() => fit?.(), 100);
+      setTimeout(() => fit?.(), 320);
+      setTimeout(() => fit?.(), 850);
+      try { iframe.contentDocument?.fonts?.ready?.then(() => fit?.()); } catch {}
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function fitHolder(stage, holder, iframe, fitHeight = true) {
+    if (!stage || !holder || !iframe) return;
+    const metrics = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - 48);
+    const availableHeight = Math.max(1, stage.clientHeight - 48);
+    let scale = Math.min(1, availableWidth / metrics.width);
+    if (fitHeight) scale = Math.min(scale, availableHeight / metrics.height);
+    scale = Math.max(.05, scale);
+    const w = Math.ceil(metrics.width * scale);
+    const hgt = Math.ceil(metrics.height * scale);
+    holder.style.width = `${w}px`;
+    holder.style.height = `${hgt}px`;
+    iframe.style.setProperty("width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-jewel-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - 28);
+    const availableHeight = Math.max(1, stage.clientHeight - 28);
+    const scale = Math.max(.05, Math.min(1, availableWidth / m.width, availableHeight / m.height));
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("transform", `translate(-50%,-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function fitEditorPreview() {
+    fitHolder(panel?.querySelector("[data-jewel-preview-stage]"), panel?.querySelector("[data-jewel-preview-holder]"), panel?.querySelector("[data-jewel-preview]"), true);
+  }
+
+  function fitViewPreview() {
+    const stage = viewPanel?.querySelector("[data-jewel-view-stage]");
+    const holder = viewPanel?.querySelector("[data-jewel-view-holder]");
+    const iframe = viewPanel?.querySelector("[data-jewel-view-preview]");
+    if (!stage || !holder || !iframe) return;
+    const metrics = measureIframe(iframe);
+    const scale = Math.max(.05, Math.min(1, (stage.clientWidth - 48) / metrics.width));
+    holder.style.width = `${Math.ceil(metrics.width * scale)}px`;
+    holder.style.height = `${Math.ceil(metrics.height * scale)}px`;
+    iframe.style.setProperty("width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+  }
+
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 55);
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    syncColorPickers();
+    syncImageOutputs();
+    updateWordCounter();
+    writeIframe(panel.querySelector("[data-jewel-preview]"), buildCode(getValues(), true), fitEditorPreview);
+  }
+
+  function colorField(label, key) {
+    return `<label class="dds-color-field"><span>${h(label)}</span><div><input type="color" data-jewel-color-picker="${h(key)}" value="${h(defaults[key])}"><input type="text" data-jewel-field="${h(key)}" value="${h(defaults[key])}" spellcheck="false"></div></label>`;
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-jewel-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-jewel-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1>COMMISSION — ROLEPLAY</h1><p>ผู้จ้าง Jewel Zimmonne</p></div></div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>JEWEL ZIMMONNE</strong></div><div class="dds-jewel-preview-stage" data-jewel-preview-stage><div class="dds-jewel-preview-holder" data-jewel-preview-holder><iframe class="dds-protected-commission-preview-frame" data-jewel-preview scrolling="no" title="ตัวอย่างโคดโรลเพลย์ Jewel Zimmonne"></iframe></div></div></div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-jewel-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-jewel-save>SAVE DRAFT</button><button type="button" data-jewel-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-jewel-commission-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูปพื้นหลัง</span><input type="url" data-jewel-field="backgroundImage" spellcheck="false"></label><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งรูปพื้นหลัง</span><small>ปรับซ้าย–ขวา และขึ้น–ลง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" value="50" data-jewel-field="backgroundX"><small>ขวา</small><output data-jewel-output="backgroundX">50%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>ขึ้น</small><input type="range" min="0" max="100" step="1" value="50" data-jewel-field="backgroundY"><small>ลง</small><output data-jewel-output="backgroundY">50%</output></label></div><label class="dds-field dds-field-full"><span>ลิงก์รูปในโคด</span><input type="url" data-jewel-field="photoImage" spellcheck="false"></label><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและขนาดรูปในโคด</span><small>ปรับซ้าย–ขวา ขึ้น–ลง และซูม</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" value="50" data-jewel-field="photoX"><small>ขวา</small><output data-jewel-output="photoX">50%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>ขึ้น</small><input type="range" min="0" max="100" step="1" value="45" data-jewel-field="photoY"><small>ลง</small><output data-jewel-output="photoY">45%</output></label><label class="dds-position-row dds-zoom-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" value="100" data-jewel-field="photoZoom"><small>เข้า</small><output data-jewel-output="photoZoom">100%</output></label></div></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>Symbol</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>สัญลักษณ์พระจันทร์</span><input type="text" data-jewel-field="symbol"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบโคด", "frameColor")}${colorField("สีกรอบหมายเหตุ", "noteBorderColor")}${colorField("สีขีด", "lineColor")}${colorField("สี Symbol", "symbolColor")}${colorField("สีตัวอักษรโควต", "quoteColor")}${colorField("สีเนื้อหาโรลเพลย์", "roleplayColor")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>โควต / Display name</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโควต</span><textarea data-jewel-field="quote" rows="3"></textarea><small class="dds-jewel-quote-help">ใส่โควต หรือแก้เป็นชื่อ Display name ได้</small></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-jewel-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea data-jewel-field="roleplay" rows="14"></textarea><div class="dds-word-counter" data-jewel-word-counter data-empty="true"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-jewel-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field"><span>คำหน้าหมายเหตุ</span><input type="text" data-jewel-field="noteLabel"></label><label class="dds-field"><span>ข้อความหมายเหตุ</span><input type="text" data-jewel-field="noteText"></label></div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-jewel-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอกโคดโรลเพลย์ที่แก้ไขเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-jewel-copy>COPY CODE <span>↗</span></button><button type="button" data-jewel-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+    footer.before(panel);
+
+    panel.querySelector("[data-jewel-back]")?.addEventListener("click", goBack);
+    panel.addEventListener("input", (event) => {
+      const picker = event.target.closest?.("[data-jewel-color-picker]");
+      if (picker) {
+        const input = panel.querySelector(`[data-jewel-field="${picker.dataset.jewelColorPicker}"]`);
+        if (input) input.value = picker.value;
+      }
+      if (event.target.matches?.('[data-jewel-field="roleplay"]')) updateWordCounter();
+      schedulePreview();
+    });
+    panel.addEventListener("change", schedulePreview);
+
+    const toolbar = panel.querySelector("[data-jewel-bbcode-toolbar]");
+    toolbar?.addEventListener("pointerdown", (event) => { if (event.target.closest("button")) event.preventDefault(); });
+    toolbar?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-jewel-bbcode]");
+      if (!button) return;
+      applyBbcode(panel.querySelector('[data-jewel-field="roleplay"]'), button.dataset.jewelBbcode, toolbar);
+    });
+    toolbar?.querySelector("[data-jewel-bbcode-color]")?.addEventListener("change", (event) => {
+      applyBbcode(panel.querySelector('[data-jewel-field="roleplay"]'), "color", toolbar);
+    });
+
+    panel.querySelector("[data-jewel-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-jewel-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-jewel-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-jewel-reset]")?.addEventListener("click", resetFields);
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-jewel-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-jewel-view-back type="button">←</button></div><div class="dds-jewel-view-stage" data-jewel-view-stage><div class="dds-jewel-view-holder" data-jewel-view-holder><iframe class="dds-editor-preview-frame" data-jewel-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ Jewel Zimmonne"></iframe></div></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-jewel-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function setDraftStatus(savedAt = 0) {
+    const status = panel?.querySelector("[data-jewel-draft-status]");
+    if (!status) return;
+    status.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH")}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch { return null; }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+      showToast("บันทึกแบบร่าง Jewel แล้ว");
+    } catch { showToast("บันทึกแบบร่างไม่สำเร็จ"); }
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setDraftStatus(0);
+    showToast("ลบแบบร่าง Jewel แล้ว");
+  }
+
+  function resetFields() {
+    setValues(defaults);
+    updatePreview();
+    showToast("รีเซ็ต Jewel เป็นค่าต้นฉบับแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode(getValues(), false);
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    showToast("คัดลอกโคด Jewel แล้ว");
+  }
+
+  function showPanel(name) {
+    document.body.classList.add("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === name));
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-editor-mode");
+    const commissionButton = document.querySelector('[data-page="commission"]');
+    if (commissionButton) commissionButton.click();
+    else {
+      document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === "commission"));
+    }
+    history.replaceState(null, "", "#commission");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openView() {
+    const target = createViewPanel();
+    if (!target) return;
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-jewel-roleplay-view");
+    writeIframe(target.querySelector("[data-jewel-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+  }
+
+  function openEditor() {
+    const editor = createPanel();
+    if (!editor) return;
+    const draft = getDraft();
+    setValues(draft?.values ? { ...defaults, ...draft.values } : defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#commission-jewel-roleplay-editor");
+    updatePreview();
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    const input = modal.querySelector("[data-jewel-lock-input]");
+    const error = modal.querySelector("[data-jewel-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+  }
+
+  function openModal() {
+    createModal();
+    if (!modal) return;
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.querySelector("[data-jewel-lock-input]")?.focus());
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsJewelRoleplayLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-jewel-lock-form><small>CLIENT ACCESS / JEWEL ZIMMONNE</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดโรลเพลย์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-jewel-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-jewel-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-jewel-lock-close>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-jewel-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.querySelector("[data-jewel-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-jewel-lock-input]");
+      const error = modal.querySelector("[data-jewel-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        if (await sha256(input.value || "") === ACCESS_HASH) {
+          error.textContent = "";
+          closeModal();
+          openEditor();
+        } else {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+        }
+      } catch {
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally { submit.disabled = false; }
+    });
+    return modal;
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    const existing = grid.querySelector(".dds-jewel-roleplay-commission-card");
+    if (existing) { card = existing; return true; }
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-jewel-roleplay-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-jewel-card-preview-frame" data-jewel-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Jewel Zimmonne"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Jewel Zimmonne</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-jewel-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-jewel-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-jewel-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-jewel-edit]")?.addEventListener("click", openModal);
+    const iframe = card.querySelector("[data-jewel-card-preview]");
+    const render = () => {
+      if (cardRendered || !iframe) return;
+      cardRendered = true;
+      writeIframe(iframe, OFFICIAL_CODE, fitCardPreview);
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        render();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else render();
+    return true;
+  }
+
+  function handleHash() {
+    if (location.hash === "#commission-jewel-roleplay-view") openView();
+    if (location.hash === "#commission-jewel-roleplay-editor") openModal();
+  }
+
+  function install() {
+    createModal();
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 100) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => { fitCardPreview(); fitEditorPreview(); fitViewPreview(); });
+    window.addEventListener("hashchange", handleHash);
+    setTimeout(handleHash, 250);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();
