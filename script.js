@@ -17804,3 +17804,492 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     start();
   }
 })();
+
+/* =========================================================
+   LANDON A. RUTHERFORD — FILE ROLEPLAY COMMISSION
+   Scoped installer: new commission card + view + password editor only.
+   Existing commissions and code editors are not modified here.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_LANDON_FILE_ROLEPLAY_COMMISSION_INSTALLED__) return;
+  window.__DDS_LANDON_FILE_ROLEPLAY_COMMISSION_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-commission-landon-file-roleplay";
+  const VIEW_PANEL_NAME = "view-commission-landon-file-roleplay";
+  const DRAFT_KEY = "dds:commission-draft:landon-file-roleplay:v1";
+  const ACCESS_HASH = "6d05de9e9a208dc2beb7d5e594b39064b36142353ffc8db10295131098a1bcd6";
+  const STYLESHEET_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-landdrolez.css";
+  const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
+  const CANVAS_WIDTH = 820;
+
+  const defaults = Object.freeze({
+    mode: "light",
+    photoImage: "https://i.pinimg.com/736x/b9/98/63/b99863ad8999146089100c416ab271a7.jpg",
+    photoX: 50,
+    photoZoom: 100,
+    backImage: "https://i.pinimg.com/736x/5b/f7/12/5bf712ec632d15e35597f20f7221dd16.jpg",
+    backX: 50,
+    backZoom: 100,
+    location: "LAKE TAHOE",
+    quote: "QUOTE QUOTE QUOTE",
+    firstName: "Landon A.",
+    lastName: "Rutherford",
+    fileLabel: "FILE 001",
+    dateLabel: "25 AUG 2026",
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอา มาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    sign: "saved automatically",
+    noteContent: "หมายเหตุ อะไรไม่รู้",
+    bottomCenter: "LAST EDITED — 01:17 AM",
+    bottomRight: "✦"
+  });
+
+  const editorDefaults = Object.freeze({
+    ...defaults,
+    roleplay: "",
+    noteContent: ""
+  });
+
+  let card = null;
+  let panel = null;
+  let viewPanel = null;
+  let modal = null;
+  let previewTimer = 0;
+  let cardRendered = false;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function cssUrl(value) {
+    return String(value || "").replace(/[\\'\r\n]/g, (char) => ({ "\\": "\\\\", "'": "\\'", "\r": "", "\n": "" }[char] ?? ""));
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  function zoomSize(value) {
+    const zoom = clampNumber(value, 50, 200, 100);
+    return zoom === 100 ? "cover" : `${zoom}% auto`;
+  }
+
+  async function sha256(value) {
+    const data = new TextEncoder().encode(String(value || ""));
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function showToast(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.getElementById("siteToast");
+    const text = document.getElementById("siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsLandonFileTimer);
+    toast.__ddsLandonFileTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+  }
+
+  function buildCode(values = defaults) {
+    const v = { ...defaults, ...values };
+    const modeClass = v.mode === "dark" ? "ddsh-file-dark" : "ddsh-file-light";
+    const photoX = clampNumber(v.photoX, 0, 100, 50);
+    const backX = clampNumber(v.backX, 0, 100, 50);
+    const photoSize = zoomSize(v.photoZoom);
+    const backSize = zoomSize(v.backZoom);
+
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_STYLESHEET_URL}" rel="stylesheet"><div class="ddsh-file-roll ${modeClass}" style="--ddsh-file-img:url('${cssUrl(v.photoImage)}');--ddsh-file-back-img:url('${cssUrl(v.backImage)}');--ddsh-file-img-x:${photoX}%;--ddsh-file-img-y:50%;--ddsh-file-back-x:${backX}%;--ddsh-file-back-y:50%;--ddsh-file-accent:#9da8ba;--ddsh-lldon01:#8a8a8a;"><div class="ddsh-file-back-photo" style="background-size:${h(backSize)};"></div><div class="ddsh-file-window"><div class="ddsh-file-toolbar"><div class="ddsh-file-dots"><span></span><span></span><span></span></div><div class="ddsh-file-location"><span class="ddsh-file-folder">✦</span><span>Locations</span><span class="ddsh-file-slash">/</span><strong>${h(v.location)}</strong></div><div class="ddsh-file-mode"><span class="ddsh-file-moon">◐</span></div></div><div class="ddsh-file-path"><span>Macintosh HD</span><b>›</b><span>Race</span><b>›</b><span class="ddsh-file-path-current">Werewolf</span></div><div class="ddsh-file-content"><div class="ddsh-file-heading"><div class="ddsh-file-smalltitle">${h(v.quote)}</div><div class="ddsh-file-title">${h(v.firstName)}<br>${h(v.lastName)}</div><div class="ddsh-file-meta"><span>${h(v.fileLabel)}</span><span>${h(v.dateLabel)}</span></div></div><div class="ddsh-file-photo-wrap"><div class="ddsh-file-photo"><div class="ddsh-file-photo-img" style="background-size:${h(photoSize)};"></div><div class="ddsh-file-photo-bottom"><span>IMG_0525.JPG</span><span>01:17 AM</span></div></div><div class="ddsh-file-pin"><img src="https://iili.io/CDN1azx.png" alt=""></div></div><div class="ddsh-file-textbox"><div class="ddsh-file-text-top"><span>TEXT DOCUMENT</span><span>•••</span></div><div class="ddsh-file-text">${h(v.roleplay).replace(/\r?\n/g, "<br>")}</div><div class="ddsh-file-sign">${h(v.sign)}</div></div><div class="ddsh-file-note"><div class="ddsh-file-note-content"><strong>${h(v.noteContent).replace(/\r?\n/g, "<br>")}</strong></div></div></div><div class="ddsh-file-bottom"><div class="ddsh-file-bottom-left"><span></span><span></span><span></span></div><div class="ddsh-file-bottom-center">${h(v.bottomCenter)}</div><div class="ddsh-file-bottom-right">${h(v.bottomRight)}</div></div></div><div class="ddshopfz-creditld1"><span></span></div></div>`;
+  }
+
+  const OFFICIAL_CODE = buildCode(defaults);
+
+  function previewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-landon-file-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;display:flex;flex-direction:column;align-items:center;margin:0 auto}</style></head><body><div class="dds-landon-file-preview-root">${code}</div></body></html>`;
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      const root = doc?.querySelector(".dds-landon-file-preview-root");
+      if (!doc || !root) return { width: CANVAS_WIDTH, height: 1000 };
+      const rect = root.getBoundingClientRect();
+      return {
+        width: Math.max(CANVAS_WIDTH, Math.ceil(root.scrollWidth || rect.width || CANVAS_WIDTH)),
+        height: Math.max(1, Math.ceil(root.scrollHeight || rect.height || doc.body.scrollHeight || 1000))
+      };
+    } catch {
+      return { width: CANVAS_WIDTH, height: 1000 };
+    }
+  }
+
+  function writeIframe(iframe, code, fit) {
+    if (!iframe) return;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("height", "1300px", "important");
+    iframe.onload = () => {
+      fit?.();
+      [80, 240, 600, 1100].forEach((delay) => window.setTimeout(() => fit?.(), delay));
+      try { iframe.contentDocument?.fonts?.ready?.then(() => fit?.()); } catch {}
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function fitHolder(stage, holder, iframe) {
+    if (!stage || !holder || !iframe) return;
+    const metrics = measureIframe(iframe);
+    const availableWidth = Math.max(1, (stage.clientWidth || CANVAS_WIDTH) - 48);
+    const scale = Math.max(0.05, Math.min(1, availableWidth / metrics.width));
+    iframe.style.setProperty("width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    holder.style.width = `${Math.ceil(metrics.width * scale)}px`;
+    holder.style.height = `${Math.ceil(metrics.height * scale)}px`;
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-landon-file-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const metrics = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - 28);
+    const availableHeight = Math.max(1, stage.clientHeight - 28);
+    const scale = Math.max(0.04, Math.min(1, availableWidth / metrics.width, availableHeight / metrics.height));
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function fitEditorPreview() {
+    fitHolder(
+      panel?.querySelector("[data-landon-file-preview-stage]"),
+      panel?.querySelector("[data-landon-file-preview-holder]"),
+      panel?.querySelector("[data-landon-file-preview]")
+    );
+  }
+
+  function fitViewPreview() {
+    fitHolder(
+      viewPanel?.querySelector("[data-landon-file-view-stage]"),
+      viewPanel?.querySelector("[data-landon-file-view-holder]"),
+      viewPanel?.querySelector("[data-landon-file-view-preview]")
+    );
+  }
+
+  function getValues() {
+    const values = { ...editorDefaults };
+    if (!panel) return values;
+    panel.querySelectorAll("[data-landon-file-field]").forEach((input) => {
+      values[input.dataset.landonFileField] = input.value;
+    });
+    return values;
+  }
+
+  function setValues(values = editorDefaults) {
+    if (!panel) return;
+    panel.querySelectorAll("[data-landon-file-field]").forEach((input) => {
+      const key = input.dataset.landonFileField;
+      input.value = values[key] ?? editorDefaults[key] ?? "";
+    });
+    syncOutputs();
+  }
+
+  function syncOutputs() {
+    if (!panel) return;
+    const suffixes = { photoX: "%", photoZoom: "%", backX: "%", backZoom: "%" };
+    Object.entries(suffixes).forEach(([key, suffix]) => {
+      const input = panel.querySelector(`[data-landon-file-field="${key}"]`);
+      const output = panel.querySelector(`[data-landon-file-output="${key}"]`);
+      if (input && output) output.textContent = `${input.value}${suffix}`;
+    });
+  }
+
+  function updatePreview() {
+    if (!panel) return;
+    syncOutputs();
+    writeIframe(panel.querySelector("[data-landon-file-preview]"), buildCode(getValues()), fitEditorPreview);
+  }
+
+  function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(updatePreview, 55);
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-landon-file-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-landon-file-back type="button">←</button><div><p class="dds-eyebrow">PROTECTED COMMISSION EDITOR</p><h1>COMMISSION — ROLEPLAY</h1><p>ผู้จ้าง LANDON A. RUTHERFORD</p></div></div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>LANDON A. RUTHERFORD</strong></div><div class="dds-landon-file-preview-stage" data-landon-file-preview-stage><div class="dds-landon-file-preview-holder" data-landon-file-preview-holder><iframe class="dds-protected-commission-preview-frame" data-landon-file-preview scrolling="no" title="ตัวอย่างโคดโรลเพลย์ LANDON A. RUTHERFORD"></iframe></div></div></div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-landon-file-draft-status>ยังไม่มีแบบร่าง</small></div><button type="button" data-landon-file-save>SAVE DRAFT</button><button type="button" data-landon-file-delete>DELETE SAVE</button></div>
+          <div class="dds-protected-commission-scroll dds-landon-file-commission-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>โหมดของโคด</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>เลือกโหมด</span><select data-landon-file-field="mode"><option value="light">LIGHT MODE</option><option value="dark">DARK MODE</option></select></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>รูปโพลารอยด์</span><input type="url" data-landon-file-field="photoImage" spellcheck="false"></label><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและซูมรูปโพลารอยด์</span><small>ปรับซ้าย–ขวา และซูมเข้า–ออก</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-landon-file-field="photoX"><small>ขวา</small><output data-landon-file-output="photoX">50%</output></label><label class="dds-position-row dds-zoom-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" data-landon-file-field="photoZoom"><small>เข้า</small><output data-landon-file-output="photoZoom">100%</output></label></div><label class="dds-field dds-field-full"><span>รูปด้านหลัง</span><input type="url" data-landon-file-field="backImage" spellcheck="false"></label><div class="dds-image-position dds-field-full"><div class="dds-image-position-heading"><span>ตำแหน่งและซูมรูปด้านหลัง</span><small>ปรับซ้าย–ขวา และซูมเข้า–ออก</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-landon-file-field="backX"><small>ขวา</small><output data-landon-file-output="backX">50%</output></label><label class="dds-position-row dds-zoom-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" data-landon-file-field="backZoom"><small>เข้า</small><output data-landon-file-output="backZoom">100%</output></label></div></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ข้อมูลส่วนหัว</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>Locations / สถานที่</span><input type="text" data-landon-file-field="location"></label><label class="dds-field dds-field-full"><span>QUOTE</span><input type="text" data-landon-file-field="quote"></label><label class="dds-field"><span>ชื่อบรรทัดบน</span><input type="text" data-landon-file-field="firstName"></label><label class="dds-field"><span>นามสกุลบรรทัดล่าง</span><input type="text" data-landon-file-field="lastName"></label><label class="dds-field"><span>FILE</span><input type="text" data-landon-file-field="fileLabel"></label><label class="dds-field"><span>วันที่</span><input type="text" data-landon-file-field="dateLabel"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ddsh-file-text</span><textarea rows="14" data-landon-file-field="roleplay" placeholder="กรอกเนื้อหาโรลเพลย์"></textarea></label><label class="dds-field dds-field-full"><span>ddsh-file-sign</span><input type="text" data-landon-file-field="sign"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ddsh-file-note-content</span><textarea rows="5" data-landon-file-field="noteContent" placeholder="กรอกข้อความหมายเหตุ"></textarea></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>ข้อความด้านล่าง</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ddsh-file-bottom-center</span><input type="text" data-landon-file-field="bottomCenter"></label><label class="dds-field dds-field-full"><span>ddsh-file-bottom-right</span><input type="text" data-landon-file-field="bottomRight"></label></div></section>
+          </div>
+          <section class="dds-protected-commission-copy dds-landon-file-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอกโคดโรลเพลย์ที่แก้ไขเสร็จแล้วไปใช้งาน</p><div class="dds-protected-commission-copy-actions"><button type="button" data-landon-file-copy>COPY CODE <span>↗</span></button><button type="button" data-landon-file-reset>RESET</button></div></section>
+        </div>
+      </div>`;
+
+    footer.before(panel);
+    panel.querySelector("[data-landon-file-back]")?.addEventListener("click", goBack);
+    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("change", schedulePreview);
+    panel.querySelector("[data-landon-file-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-landon-file-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-landon-file-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-landon-file-reset]")?.addEventListener("click", resetFields);
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    const footer = document.querySelector(".dds-footer");
+    if (!footer) return null;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-landon-file-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-landon-file-view-back type="button">←</button></div><div class="dds-landon-file-view-stage" data-landon-file-view-stage><div class="dds-landon-file-view-holder" data-landon-file-view-holder><iframe class="dds-editor-preview-frame" data-landon-file-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ LANDON A. RUTHERFORD"></iframe></div></div>`;
+    footer.before(viewPanel);
+    viewPanel.querySelector("[data-landon-file-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function setDraftStatus(savedAt = 0) {
+    const status = panel?.querySelector("[data-landon-file-draft-status]");
+    if (!status) return;
+    status.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH")}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch { return null; }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+      showToast("บันทึกแบบร่าง LANDON แล้ว");
+    } catch {
+      showToast("บันทึกแบบร่างไม่สำเร็จ");
+    }
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setDraftStatus(0);
+    showToast("ลบแบบร่าง LANDON แล้ว");
+  }
+
+  function resetFields() {
+    setValues(editorDefaults);
+    updatePreview();
+    showToast("รีเซ็ต LANDON เป็นค่าเริ่มต้นแล้ว");
+  }
+
+  async function copyCode() {
+    const code = buildCode(getValues());
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = code;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    showToast("คัดลอกโคด LANDON แล้ว");
+  }
+
+  function showPanel(name) {
+    document.body.classList.add("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === name));
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => {
+      candidate.classList.toggle("is-active", candidate.dataset.panel === "commission");
+    });
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+    history.replaceState(null, "", "#commission");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openView() {
+    const target = createViewPanel();
+    if (!target) return;
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null, "", "#commission-landon-file-roleplay-view");
+    writeIframe(target.querySelector("[data-landon-file-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+  }
+
+  function openEditor() {
+    const editor = createPanel();
+    if (!editor) return;
+    const draft = getDraft();
+    setValues(draft?.values ? { ...editorDefaults, ...draft.values } : editorDefaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#commission-landon-file-roleplay-editor");
+    updatePreview();
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    const input = modal.querySelector("[data-landon-file-lock-input]");
+    const error = modal.querySelector("[data-landon-file-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+  }
+
+  function openModal() {
+    createModal();
+    if (!modal) return;
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.querySelector("[data-landon-file-lock-input]")?.focus());
+  }
+
+  function createModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsLandonFileRoleplayLockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-landon-file-lock-form><small>CLIENT ACCESS / LANDON A. RUTHERFORD</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดโรลเพลย์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-landon-file-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-landon-file-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-landon-file-lock-close>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-landon-file-lock-close]")?.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+    modal.querySelector("[data-landon-file-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-landon-file-lock-input]");
+      const error = modal.querySelector("[data-landon-file-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        if (await sha256(input.value || "") === ACCESS_HASH) {
+          error.textContent = "";
+          closeModal();
+          openEditor();
+        } else {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+        }
+      } catch {
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector(".dds-commission-grid");
+    if (!grid) return false;
+    const existing = grid.querySelector(".dds-landon-file-roleplay-commission-card");
+    if (existing) {
+      card = existing;
+      return true;
+    }
+
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-landon-file-roleplay-commission-card";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-landon-file-card-preview-frame" data-landon-file-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay LANDON A. RUTHERFORD"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>LANDON A. RUTHERFORD</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-landon-file-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-landon-file-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-landon-file-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-landon-file-edit]")?.addEventListener("click", openModal);
+
+    const iframe = card.querySelector("[data-landon-file-card-preview]");
+    const render = () => {
+      if (cardRendered || !iframe) return;
+      cardRendered = true;
+      writeIframe(iframe, OFFICIAL_CODE, fitCardPreview);
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        render();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else {
+      render();
+    }
+    return true;
+  }
+
+  function handleHash() {
+    if (location.hash === "#commission-landon-file-roleplay-view") openView();
+    if (location.hash === "#commission-landon-file-roleplay-editor") openModal();
+  }
+
+  function install() {
+    createModal();
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 100) clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      fitCardPreview();
+      fitEditorPreview();
+      fitViewPreview();
+    });
+    window.addEventListener("hashchange", handleHash);
+    setTimeout(handleHash, 250);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
+})();

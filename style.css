@@ -8549,3 +8549,90 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   .dds-jewel-preview-stage,
   .dds-jewel-view-stage { padding: 14px; }
 }
+
+/* ==================================================
+   LANDON A. RUTHERFORD — FILE ROLEPLAY COMMISSION
+   Scoped styles for the newly added commission only.
+   ================================================== */
+.dds-landon-file-preview-stage,
+.dds-landon-file-view-stage {
+  width: 100%;
+  min-height: 680px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-landon-file-preview-holder,
+.dds-landon-file-view-holder {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.dds-landon-file-preview-holder > iframe,
+.dds-landon-file-view-holder > iframe {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.dds-landon-file-view-stage {
+  min-height: 0;
+  margin: 0 auto;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.dds-landon-file-card-preview-frame {
+  position: absolute !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: #242424 !important;
+}
+
+.dds-landon-file-roleplay-commission-card .dds-roleplay-card-preview {
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 16 / 10 !important;
+  overflow: hidden;
+  background: #242424;
+}
+
+.dds-landon-file-commission-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.dds-landon-file-commission-scroll .dds-control-section {
+  flex: 0 0 auto;
+}
+
+.dds-landon-file-commission-editor [data-landon-file-save],
+.dds-landon-file-commission-editor [data-landon-file-copy] {
+  color: #fff;
+  border-color: rgba(193,23,36,.72);
+  background: linear-gradient(135deg,#b0121d,#720810);
+}
+
+.dds-landon-file-commission-copy .dds-protected-commission-copy-actions [data-landon-file-copy] {
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width:700px) {
+  .dds-landon-file-preview-stage,
+  .dds-landon-file-view-stage {
+    padding: 14px;
+  }
+}
