@@ -8455,6 +8455,43 @@ ${stylesheetLinks}
       );
     }
 
+    function removeReviewBbcodeForWordCount(value) {
+      return String(value || "")
+        .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
+        .replace(/\[video(?:=[^\]]*)?\][\s\S]*?\[\/video\]/gi, " ")
+        .replace(/\[url(?:=[^\]]*)?\]([\s\S]*?)\[\/url\]/gi, " $1 ")
+        .replace(/\[(?:\/?[a-z][a-z0-9_-]*(?:=[^\]]*)?|\*|hr)\]/gi, " ")
+        .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function countReviewWords(value) {
+      const clean = removeReviewBbcodeForWordCount(value);
+      if (!clean) return 0;
+      if (typeof Intl?.Segmenter === "function") {
+        const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+        let count = 0;
+        for (const segment of segmenter.segment(clean)) {
+          if (segment.isWordLike) count += 1;
+        }
+        return count;
+      }
+      const words = clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+      return words ? words.length : 0;
+    }
+
+    function updateReviewWordCounter() {
+      const textarea = document.getElementById(ids.reviewText);
+      const counter = panel.querySelector("[data-music-review-word-counter]");
+      if (!textarea || !counter) return;
+      const count = countReviewWords(textarea.value);
+      const number = counter.querySelector("[data-music-review-word-count-number]");
+      if (number) number.textContent = count.toLocaleString("th-TH");
+      counter.dataset.empty = count === 0 ? "true" : "false";
+    }
+
     function renderIframe(iframe, markup, mode) {
       const srcdoc = buildPreviewDocument(markup, mode);
       if (iframe.dataset.ddsMusicSrcdoc === srcdoc) return;
@@ -8502,6 +8539,7 @@ ${stylesheetLinks}
     function updateMusicReview() {
       const values = readValues();
       generatedCode.value = buildCopyCode(values);
+      updateReviewWordCounter();
       renderIframe(editorIframe, buildMarkup(values, true), "editor");
     }
 
