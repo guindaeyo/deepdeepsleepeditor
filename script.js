@@ -17389,3 +17389,159 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
   else install();
 })();
+
+/* =========================================================
+   GLOBAL BBCODE TOOLBAR — HOVER LABELS
+   Adds native hover descriptions to every BBCode toolbar only.
+   Does not alter editor contents or generated post code.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_BBCODE_HOVER_LABELS_INSTALLED__) return;
+  window.__DDS_BBCODE_HOVER_LABELS_INSTALLED__ = true;
+
+  const labels = {
+    b: "ตัวหนา [b]",
+    bold: "ตัวหนา [b]",
+    i: "ตัวเอียง [i]",
+    italic: "ตัวเอียง [i]",
+    u: "ขีดเส้นใต้ [u]",
+    underline: "ขีดเส้นใต้ [u]",
+    s: "ขีดฆ่า [s]",
+    strikeThrough: "ขีดฆ่า [s]",
+    "size-small": "ลดขนาดตัวอักษร [size=small]",
+    "size-medium": "ขนาดตัวอักษรปกติ [size=medium]",
+    "size-large": "เพิ่มขนาดตัวอักษร [size=large]",
+    "align-left": "จัดข้อความชิดซ้าย [align=left]",
+    "align-center": "จัดข้อความกึ่งกลาง [align=center]",
+    "align-right": "จัดข้อความชิดขวา [align=right]",
+    "align-justify": "จัดข้อความเต็มบรรทัด [align=justify]",
+    url: "แทรกลิงก์ [url]",
+    img: "แทรกรูปภาพ [img]",
+    video: "แทรกวิดีโอ YouTube [video]",
+    quote: "ข้อความอ้างอิง [quote]",
+    code: "กล่องโคด [code]",
+    hide: "ซ่อนข้อความ [hide]",
+    spoiler: "ข้อความสปอยล์ [spoiler]",
+    list: "รายการแบบจุด [list]",
+    "list-1": "รายการแบบตัวเลข [list=1]",
+    "list-item": "เพิ่มรายการย่อย [*]",
+    hr: "เส้นคั่น [hr]",
+    clear: "ล้าง BBCode / รูปแบบจากข้อความที่เลือก",
+    removeFormat: "ล้างรูปแบบข้อความที่เลือก"
+  };
+
+  function keyFromControl(control) {
+    if (!control) return "";
+
+    const direct =
+      control.dataset?.bbcode ||
+      control.dataset?.foodBbcode ||
+      control.dataset?.historyBbcode ||
+      control.dataset?.hansBbcode ||
+      control.dataset?.jewelBbcode ||
+      control.dataset?.command ||
+      "";
+
+    if (direct) return direct;
+    if (control.hasAttribute?.("data-eric-clear")) return "clear";
+
+    const ericOpen = control.dataset?.ericOpen || "";
+    if (ericOpen) {
+      const normalized = ericOpen
+        .replace(/^\[/, "")
+        .replace(/\]$/, "")
+        .replace(/=.*/, "")
+        .toLowerCase();
+      if (normalized === "align") {
+        const match = ericOpen.match(/align=(left|center|right|justify)/i);
+        return match ? `align-${match[1].toLowerCase()}` : "";
+      }
+      if (normalized === "size") {
+        const match = ericOpen.match(/size=(small|medium|large)/i);
+        return match ? `size-${match[1].toLowerCase()}` : "";
+      }
+      return normalized;
+    }
+
+    return "";
+  }
+
+  function fallbackFromText(control) {
+    const text = String(control?.textContent || "").trim();
+    const normalized = text.toUpperCase();
+    const byText = {
+      "B": "ตัวหนา [b]",
+      "I": "ตัวเอียง [i]",
+      "U": "ขีดเส้นใต้ [u]",
+      "S": "ขีดฆ่า [s]",
+      "A−": "ลดขนาดตัวอักษร",
+      "A-": "ลดขนาดตัวอักษร",
+      "A+": "เพิ่มขนาดตัวอักษร",
+      "⇤": "จัดข้อความชิดซ้าย",
+      "↔": "จัดข้อความกึ่งกลาง",
+      "⇥": "จัดข้อความชิดขวา",
+      "☰": "จัดข้อความเต็มบรรทัด",
+      "🔗": "แทรกลิงก์",
+      "▣": "แทรกรูปภาพ",
+      "▶": "แทรกวิดีโอ YouTube",
+      "❝": "ข้อความอ้างอิง",
+      "</>": "กล่องโคด",
+      "◉": "ซ่อนข้อความ",
+      "▤": "ข้อความสปอยล์",
+      "•≡": "รายการแบบจุด",
+      "1≡": "รายการแบบตัวเลข",
+      "[*]": "เพิ่มรายการย่อย",
+      "―": "เส้นคั่น",
+      "CLEAR": "ล้าง BBCode / รูปแบบจากข้อความที่เลือก"
+    };
+    return byText[text] || byText[normalized] || "";
+  }
+
+  function decorateToolbar(toolbar) {
+    if (!(toolbar instanceof Element)) return;
+    if (!toolbar.matches(".dds-rich-toolbar")) return;
+
+    toolbar.querySelectorAll("button").forEach((button) => {
+      const key = keyFromControl(button);
+      const description = labels[key] || button.getAttribute("aria-label") || fallbackFromText(button);
+      if (!description) return;
+      button.setAttribute("title", description);
+      if (!button.getAttribute("aria-label")) button.setAttribute("aria-label", description);
+    });
+
+    toolbar.querySelectorAll("label.dds-rich-color, label.dds-bbcode-color").forEach((label) => {
+      const description = "เลือกสีตัวอักษร [color]";
+      label.setAttribute("title", description);
+      const input = label.querySelector('input[type="color"]');
+      if (input) {
+        input.setAttribute("title", description);
+        if (!input.getAttribute("aria-label")) input.setAttribute("aria-label", description);
+      }
+    });
+  }
+
+  function scan(root = document) {
+    if (root instanceof Element && root.matches(".dds-rich-toolbar")) decorateToolbar(root);
+    root.querySelectorAll?.(".dds-rich-toolbar").forEach(decorateToolbar);
+  }
+
+  const start = () => {
+    scan(document);
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof Element) scan(node);
+        });
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();
