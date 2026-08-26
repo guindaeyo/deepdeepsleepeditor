@@ -17545,3 +17545,262 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     start();
   }
 })();
+
+/* =========================================================
+   BBCode — LIVE PREVIEW FALLBACK v72
+   Render any BBCode that an individual editor preview leaves as raw text.
+   Scoped to editor preview iframes only; COPY CODE is untouched.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_BBCODE_LIVE_PREVIEW_FALLBACK_V72__) return;
+  window.__DDS_BBCODE_LIVE_PREVIEW_FALLBACK_V72__ = true;
+
+  const SUPPORTED_BBCODE = /\[(?:\/?(?:b|i|u|s|quote|code|hide|spoiler|list|left|center|right|justify)(?:=[^\]]+)?|color=[^\]]+|size=(?:small|medium|large)|align=(?:left|center|right|justify)|url(?:=[^\]]+)?|img|\/img|video=youtube|\/video|youtube|\/youtube|\*|hr)\]/i;
+  const hookedFrames = new WeakSet();
+  const documentObservers = new WeakMap();
+  const patchTimers = new WeakMap();
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function decodeBasicEntities(value) {
+    return String(value || "")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">");
+  }
+
+  function safeHref(value) {
+    const decoded = decodeBasicEntities(value).trim();
+    return /^(?:https?:\/\/|mailto:)/i.test(decoded) ? value : "#";
+  }
+
+  function safeImageSrc(value) {
+    const decoded = decodeBasicEntities(value).trim();
+    return /^(?:https?:\/\/|data:image\/)/i.test(decoded) ? value : "";
+  }
+
+  function safeColor(value) {
+    const decoded = decodeBasicEntities(value).trim();
+    if (/^#[0-9a-f]{3,8}$/i.test(decoded)) return decoded;
+    if (/^(?:rgb|rgba|hsl|hsla)\([^)]{1,90}\)$/i.test(decoded)) return decoded;
+    if (/^[a-z]{1,30}$/i.test(decoded)) return decoded;
+    return "inherit";
+  }
+
+  function renderLists(source, ordered) {
+    const pattern = ordered
+      ? /\[list=1\]([\s\S]*?)\[\/list\]/gi
+      : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+
+    return source.replace(pattern, (_match, body) => {
+      const items = String(body || "")
+        .split(/\[\*\]/i)
+        .slice(1)
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      if (!items.length) return "";
+
+      const rows = items
+        .map((item, index) => `${ordered ? `${index + 1}.` : "•"} ${item}`)
+        .join("<br>");
+
+      return `<span class="dds-bbcode-preview-list" style="display:block;margin:8px 0;padding-left:14px">${rows}</span>`;
+    });
+  }
+
+  function bbcodeToPreviewHtml(rawValue) {
+    let text = escapeHtml(String(rawValue ?? "").replace(/\r\n?/g, "\n"));
+    const codeBlocks = [];
+
+    // Protect [code] bodies so BBCode written inside a code box stays literal.
+    text = text.replace(/\[code\]([\s\S]*?)\[\/code\]/gi, (_match, body) => {
+      const token = `@@DDSBBCODECODE${codeBlocks.length}@@`;
+      codeBlocks.push(`<code class="dds-bbcode-code" style="display:block;white-space:pre-wrap;padding:7px 9px;border:1px solid currentColor;overflow-wrap:anywhere">${body}</code>`);
+      return token;
+    });
+
+    text = renderLists(text, true);
+    text = renderLists(text, false);
+
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, (_match, url) => {
+        const src = safeImageSrc(url);
+        return src ? `<img src="${src}" alt="" style="display:block;max-width:100%;height:auto;margin:10px auto">` : "";
+      })
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, (_match, url) => {
+        const href = safeHref(url);
+        return href === "#" ? `<span>▶ YouTube</span>` : `<a href="${href}" target="_blank" rel="noopener noreferrer">▶ YouTube</a>`;
+      })
+      .replace(/\[youtube\]([\s\S]*?)\[\/youtube\]/gi, (_match, url) => {
+        const href = safeHref(url);
+        return href === "#" ? `<span>▶ YouTube</span>` : `<a href="${href}" target="_blank" rel="noopener noreferrer">▶ YouTube</a>`;
+      })
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, (_match, url, label) => {
+        const href = safeHref(url);
+        return href === "#" ? `<span>${label}</span>` : `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      })
+      .replace(/\[url\]([\s\S]*?)\[\/url\]/gi, (_match, url) => {
+        const href = safeHref(url);
+        return href === "#" ? `<span>${url}</span>` : `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+      })
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, (_match, color, body) => `<span style="color:${safeColor(color)}">${body}</span>`)
+      .replace(/\[size=small\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:.82em">$1</span>')
+      .replace(/\[size=medium\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1em">$1</span>')
+      .replace(/\[size=large\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1.28em">$1</span>')
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<span style="display:block;text-align:$1">$2</span>')
+      .replace(/\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi, '<span style="display:block;text-align:$1">$2</span>');
+
+    // Repeat paired inline replacements a few times so simple nesting previews correctly.
+    for (let pass = 0; pass < 4; pass += 1) {
+      const before = text;
+      text = text
+        .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+        .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+        .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+        .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+        .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<span class="dds-bbcode-quote" style="display:block;padding:7px 9px;border:1px solid currentColor">$1</span>')
+        .replace(/\[hide\]([\s\S]*?)\[\/hide\]/gi, '<span class="dds-bbcode-hide" style="display:block;padding:7px 9px;border:1px solid currentColor">$1</span>')
+        .replace(/\[spoiler\]([\s\S]*?)\[\/spoiler\]/gi, '<span class="dds-bbcode-spoiler" style="display:block;padding:7px 9px;border:1px solid currentColor">$1</span>');
+      if (text === before) break;
+    }
+
+    text = text.replace(/\[hr\]/gi, '<hr style="margin:14px 0;border:0;border-top:1px solid currentColor;opacity:.28">');
+
+    codeBlocks.forEach((markup, index) => {
+      text = text.replace(`@@DDSBBCODECODE${index}@@`, markup);
+    });
+
+    return text.replace(/\n/g, "<br>");
+  }
+
+  function shouldSkipTextNode(node) {
+    const parent = node?.parentElement;
+    if (!parent) return true;
+    return Boolean(parent.closest("script,style,noscript,textarea,input,select,option,svg,math"));
+  }
+
+  function patchPreviewDocument(doc) {
+    if (!doc?.body || doc.documentElement?.dataset?.ddsBbcodePatchRunning === "true") return;
+
+    doc.documentElement.dataset.ddsBbcodePatchRunning = "true";
+    try {
+      const win = doc.defaultView;
+      const showText = win?.NodeFilter?.SHOW_TEXT ?? 4;
+      const walker = doc.createTreeWalker(doc.body, showText);
+      const candidates = [];
+      let node;
+
+      while ((node = walker.nextNode())) {
+        if (shouldSkipTextNode(node)) continue;
+        const raw = String(node.nodeValue || "");
+        if (SUPPORTED_BBCODE.test(raw)) candidates.push(node);
+      }
+
+      candidates.forEach((textNode) => {
+        if (!textNode.isConnected) return;
+        const raw = String(textNode.nodeValue || "");
+        if (!SUPPORTED_BBCODE.test(raw)) return;
+        const html = bbcodeToPreviewHtml(raw);
+        const template = doc.createElement("template");
+        template.innerHTML = html;
+        textNode.replaceWith(template.content);
+      });
+    } catch (_error) {
+      // A preview should never be blocked because a fallback renderer could not run.
+    } finally {
+      delete doc.documentElement.dataset.ddsBbcodePatchRunning;
+    }
+  }
+
+  function queuePatch(iframe, delay = 0) {
+    if (!iframe) return;
+    const previous = patchTimers.get(iframe);
+    if (previous) window.clearTimeout(previous);
+    const timer = window.setTimeout(() => {
+      patchTimers.delete(iframe);
+      try { patchPreviewDocument(iframe.contentDocument); } catch (_error) {}
+    }, delay);
+    patchTimers.set(iframe, timer);
+  }
+
+  function watchIframeDocument(iframe) {
+    let doc;
+    try { doc = iframe.contentDocument; } catch (_error) { return; }
+    if (!doc?.documentElement || documentObservers.has(doc)) return;
+
+    const observer = new MutationObserver(() => queuePatch(iframe, 0));
+    observer.observe(doc.documentElement, { childList: true, subtree: true, characterData: true });
+    documentObservers.set(doc, observer);
+  }
+
+  function hookIframe(iframe) {
+    if (!iframe || hookedFrames.has(iframe)) return;
+    hookedFrames.add(iframe);
+
+    iframe.addEventListener("load", () => {
+      queuePatch(iframe, 0);
+      queuePatch(iframe, 70);
+      queuePatch(iframe, 250);
+      watchIframeDocument(iframe);
+    });
+
+    queuePatch(iframe, 0);
+    watchIframeDocument(iframe);
+  }
+
+  function isEditorPreviewIframe(iframe) {
+    if (!(iframe instanceof HTMLIFrameElement)) return false;
+    const panel = iframe.closest('[data-panel^="editor-"]');
+    return Boolean(panel && (iframe.classList.contains("dds-editor-preview-frame") || /preview/i.test(iframe.id || iframe.title || "")));
+  }
+
+  function scan(root = document) {
+    if (root instanceof HTMLIFrameElement && isEditorPreviewIframe(root)) hookIframe(root);
+    root.querySelectorAll?.('[data-panel^="editor-"] iframe').forEach((iframe) => {
+      if (isEditorPreviewIframe(iframe)) hookIframe(iframe);
+    });
+  }
+
+  function patchActiveEditorPreviews() {
+    document.querySelectorAll('[data-panel^="editor-"].is-active iframe').forEach((iframe) => {
+      if (isEditorPreviewIframe(iframe)) queuePatch(iframe, 0);
+    });
+  }
+
+  const start = () => {
+    scan(document);
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((added) => {
+          if (added instanceof Element) scan(added);
+        });
+      });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    document.addEventListener("input", () => {
+      window.setTimeout(patchActiveEditorPreviews, 0);
+      window.setTimeout(patchActiveEditorPreviews, 80);
+    }, true);
+    document.addEventListener("change", () => window.setTimeout(patchActiveEditorPreviews, 40), true);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();
