@@ -8636,3 +8636,40 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     padding: 14px;
   }
 }
+
+
+/* ==================================================
+   LANDON ROLEPLAY COMMISSION — MODE SELECT ONLY
+   Scoped dark dropdown to match the editor UI.
+   ================================================== */
+.dds-landon-file-commission-editor select[data-landon-file-field="mode"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: #e8e5e3;
+  background-color: #0d0d0d;
+  border: 1px solid rgba(174, 28, 39, 0.55);
+  border-radius: 0;
+  outline: none;
+  color-scheme: dark;
+  font-family: var(--dds-font-main);
+  font-size: 12px !important;
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+
+.dds-landon-file-commission-editor select[data-landon-file-field="mode"]:hover {
+  background-color: #111;
+  border-color: rgba(196, 34, 47, 0.82);
+}
+
+.dds-landon-file-commission-editor select[data-landon-file-field="mode"]:focus {
+  background-color: #111;
+  border-color: #c52230;
+  box-shadow: 0 0 0 1px rgba(197, 34, 48, 0.20);
+}
+
+.dds-landon-file-commission-editor select[data-landon-file-field="mode"] option {
+  color: #e8e5e3;
+  background: #111;
+}
