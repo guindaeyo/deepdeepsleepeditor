@@ -16659,7 +16659,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-commission-jewel-roleplay";
   const VIEW_PANEL_NAME = "view-commission-jewel-roleplay";
-  const DRAFT_KEY = "dds:commission-draft:jewel-zimmonne:roleplay:v1";
+  const DRAFT_KEY = "dds:commission-draft:jewel-zimmonne:roleplay:v2";
   const ACCESS_HASH = "1e11b4f0d508e84a07a91d3cc0646ad2e0a530011b7932356e2bf742f0dca927";
   const STYLESHEET_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-jewwrolez.css";
   const FONT_STYLESHEET_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&display=swap";
@@ -16684,6 +16684,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอา มาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
     noteLabel: "หมายเหตุ :",
     noteText: "โทนสีของโคดขึ้นอยู่กับภาพพื้นหลัง"
+  });
+
+  const editorDefaults = Object.freeze({
+    ...defaults,
+    quote: "",
+    roleplay: "",
+    noteLabel: "",
+    noteText: ""
   });
 
   let card = null;
@@ -17166,9 +17174,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function resetFields() {
-    setValues(defaults);
+    setValues(editorDefaults);
     updatePreview();
-    showToast("รีเซ็ต Jewel เป็นค่าต้นฉบับแล้ว");
+    showToast("รีเซ็ต Jewel เป็นช่องเริ่มต้นแล้ว");
   }
 
   async function copyCode() {
@@ -17203,11 +17211,20 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function goBack() {
     document.body.classList.remove("dds-editor-mode");
-    const commissionButton = document.querySelector('[data-page="commission"]');
-    if (commissionButton) commissionButton.click();
-    else {
-      document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === "commission"));
-    }
+
+    document.querySelectorAll("[data-panel]").forEach((candidate) => {
+      candidate.classList.toggle("is-active", candidate.dataset.panel === "commission");
+    });
+
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "04";
+
     history.replaceState(null, "", "#commission");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -17224,7 +17241,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const editor = createPanel();
     if (!editor) return;
     const draft = getDraft();
-    setValues(draft?.values ? { ...defaults, ...draft.values } : defaults);
+    setValues(draft?.values ? { ...editorDefaults, ...draft.values } : editorDefaults);
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     history.replaceState(null, "", "#commission-jewel-roleplay-editor");
