@@ -13609,9 +13609,9 @@ ${stylesheetLinks}
   }
 
   function emojiEntities(value, fallback = "") {
-    const values = (String(value || "").match(/\d+/g) || []).slice(0, 4);
-    const source = values.length ? values : (String(fallback || "").match(/\d+/g) || []);
-    return source.map((item) => `&#${item};`).join("");
+    const raw = value == null ? String(fallback || "") : String(value);
+    const values = (raw.match(/\d+/g) || []).slice(0, 4);
+    return values.map((item) => `&#${item};`).join("");
   }
 
   function showToast(message) {
@@ -13910,10 +13910,10 @@ ${stylesheetLinks}
               ${field("STAY AFTER DARK", "mainCaption", {full:true,placeholder:"เช่น STAY AFTER DARK"})}
               ${field("ข้อความ Reminder", "reminderText", {full:true,placeholder:"เช่น Don't disappear tonight."})}
             </div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>Emoji ใน Search Emoji</h2></div><p class="dds-lr-profile-emoji-help">กรอกเฉพาะเลขจากช่อง <strong>Decimal Value</strong> เช่น <code>127911</code> ถ้ามีหลายค่าให้เว้นวรรค เช่น <code>9939 65039</code> · <a href="https://www.dremendo.com/html-tutorial/html-emoji-codes" target="_blank" rel="noopener noreferrer">เปิดตาราง Emoji ↗</a></p><div class="dds-form-grid dds-lr-profile-emoji-grid">
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>Emoji ใน Search Emoji</h2></div><p class="dds-lr-profile-emoji-help">กรอกเฉพาะเลขจากช่อง <strong>Decimal Value</strong> เช่น <code>127911</code> ถ้ามีหลายค่าให้เว้นวรรค เช่น <code>9939 65039</code> · <strong>เว้นว่างเพื่อลบ Emoji จุดนั้นออก</strong> · <a href="https://www.dremendo.com/html-tutorial/html-emoji-codes" target="_blank" rel="noopener noreferrer">เปิดตาราง Emoji ↗</a></p><div class="dds-form-grid dds-lr-profile-emoji-grid">
               ${emojiFields("keyEmoji", 6, ["Emoji Search 01 — ✦", "Emoji Search 02 — ♠", "Emoji Search 03 — ☾", "Emoji Search 04 — 🖤", "Emoji Search 05 — ⚓️", "Emoji Search 06 — 🎧"])}
             </div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Emoji ลอยรอบโคด</h2></div><p class="dds-lr-profile-emoji-help">แก้ Emoji ลอยทั้ง 15 จุดด้วย Decimal Value โดย <strong>VOLUME ถูกล็อกไว้ตามต้นฉบับ</strong></p><div class="dds-form-grid dds-lr-profile-emoji-grid">${emojiFields("float", 15)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>Emoji ลอยรอบโคด</h2></div><p class="dds-lr-profile-emoji-help">แก้ Emoji ลอยทั้ง 15 จุดด้วย Decimal Value · <strong>เว้นว่างเพื่อลบ Emoji จุดนั้นออก</strong> · VOLUME ถูกล็อกไว้ตามต้นฉบับ</p><div class="dds-form-grid dds-lr-profile-emoji-grid">${emojiFields("float", 15)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>Dock symbols</h2></div><p class="dds-lr-profile-emoji-help">แก้สัญลักษณ์ใน Dock ได้ทุกช่อง ตัวอย่างเดิมแสดงอยู่ใน placeholder</p><div class="dds-form-grid dds-lr-profile-dock-grid">${dockFields()}</div></section>
           </div>
           <section class="dds-protected-commission-copy dds-lr-profile-commission-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><p>กด COPY CODE เพื่อคัดลอก HTML โปรไฟล์ที่แก้ไขเสร็จแล้ว</p><div class="dds-protected-commission-copy-actions"><button type="button" data-lr-profile-copy>COPY CODE <span>↗</span></button><button type="button" data-lr-profile-reset>RESET</button></div></section>
