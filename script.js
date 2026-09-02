@@ -18308,7 +18308,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-code013";
   const ACCESS_HASH = "d0dce33d42fbe3ef37ea9dba8485d0342cae71b1446a1a83a7c1570edc2b1a51";
-  const DRAFT_KEY = "dds:roleplay:code013:draft:v2";
+  const DRAFT_KEY = "dds:roleplay:code013:draft:v3";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-cpmhfp.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
   const CANVAS_WIDTH = 720;
@@ -18333,6 +18333,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
     noteLabel: "หมายเหตุ :",
     noteText: "ม่ายบอก"
+  });
+
+  const editorDefaults = Object.freeze({
+    ...defaults,
+    image: "",
+    title: "",
+    roleplay: "",
+    noteLabel: "",
+    noteText: ""
   });
 
   let card = null;
@@ -18617,10 +18626,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           <div class="dds-protected-commission-draft dds-code013-draft"><div><strong>บันทึกแบบร่าง</strong><small data-code013-draft-status>ยังไม่มีแบบร่าง</small></div></div>
           <div class="dds-protected-commission-scroll dds-code013-commission-scroll">
             <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบนอก","outer",defaults.outer)}${colorField("สีแถบชื่อ","titleColor",defaults.titleColor)}${colorField("สีแถบเมนู","menu",defaults.menu)}${colorField("สีพื้นหลัก","main",defaults.main)}${colorField("สีกรอบรูป","photoFrame",defaults.photoFrame)}${colorField("สีพื้นหมายเหตุ","note",defaults.note)}${colorField("สีปุ่มควบคุม","button",defaults.button)}${colorField("สีแถบ Slider","slider",defaults.slider)}${colorField("สี App / Icon","app",defaults.app)}${colorField("สีเส้น / ขอบ","line",defaults.line)}${colorField("สี UI / ตัวอักษร","ui",defaults.ui)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป</span><input type="url" data-code013-field="image" data-dds-field-key="code013-image" value="${h(defaults.image)}"></label></div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งและขนาดรูป</span><small>ปรับซ้าย–ขวา / ขึ้น–ลง / ซูมเข้า–ออก</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-code013-field="imageX" data-dds-field-key="code013-imageX" value="${defaults.imageX}"><small>ขวา</small><output data-code013-output="imageX">${defaults.imageX}%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" step="1" data-code013-field="imageY" data-dds-field-key="code013-imageY" value="${defaults.imageY}"><small>ล่าง</small><output data-code013-output="imageY">${defaults.imageY}%</output></label><label class="dds-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" data-code013-field="imageZoom" data-dds-field-key="code013-imageZoom" value="${defaults.imageZoom}"><small>เข้า</small><output data-code013-output="imageZoom">${defaults.imageZoom}%</output></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อไฟล์ / Display name</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ชื่อด้านบน</span><input type="text" data-code013-field="title" data-dds-field-key="code013-title" value="${h(defaults.title)}"></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code013-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea id="code013RoleplayEditor" data-code013-field="roleplay" data-dds-field-key="code013-roleplay" rows="14">${h(defaults.roleplay)}</textarea><div class="dds-word-counter" data-code013-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code013-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field"><span>คำหน้าหมายเหตุ</span><input type="text" data-code013-field="noteLabel" data-dds-field-key="code013-noteLabel" value="${h(defaults.noteLabel)}"></label><label class="dds-field"><span>ข้อความหมายเหตุ</span><input type="text" data-code013-field="noteText" data-dds-field-key="code013-noteText" value="${h(defaults.noteText)}"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป</span><input type="url" data-code013-field="image" data-dds-field-key="code013-image" value="${h(editorDefaults.image)}"></label></div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งและขนาดรูป</span><small>ปรับซ้าย–ขวา / ขึ้น–ลง / ซูมเข้า–ออก</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-code013-field="imageX" data-dds-field-key="code013-imageX" value="${defaults.imageX}"><small>ขวา</small><output data-code013-output="imageX">${defaults.imageX}%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" step="1" data-code013-field="imageY" data-dds-field-key="code013-imageY" value="${defaults.imageY}"><small>ล่าง</small><output data-code013-output="imageY">${defaults.imageY}%</output></label><label class="dds-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" data-code013-field="imageZoom" data-dds-field-key="code013-imageZoom" value="${defaults.imageZoom}"><small>เข้า</small><output data-code013-output="imageZoom">${defaults.imageZoom}%</output></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อไฟล์ / Display name</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ชื่อด้านบน</span><input type="text" data-code013-field="title" data-dds-field-key="code013-title" value="${h(editorDefaults.title)}"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code013-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea id="code013RoleplayEditor" data-code013-field="roleplay" data-dds-field-key="code013-roleplay" rows="14">${h(editorDefaults.roleplay)}</textarea><div class="dds-word-counter" data-code013-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code013-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field"><span>คำหน้าหมายเหตุ</span><input type="text" data-code013-field="noteLabel" data-dds-field-key="code013-noteLabel" value="${h(editorDefaults.noteLabel)}"></label><label class="dds-field"><span>ข้อความหมายเหตุ</span><input type="text" data-code013-field="noteText" data-dds-field-key="code013-noteText" value="${h(editorDefaults.noteText)}"></label></div></section>
           </div>
           <section class="dds-protected-commission-copy dds-code013-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p>กดปุ่มด้านล่างเพื่อคัดลอก CODE013 ที่แก้ไขเสร็จแล้วไปใช้งานได้ทันที</p><div class="dds-protected-commission-copy-actions"><button type="button" data-code013-copy>COPY CODE <span>↗</span></button><button type="button" data-code013-reset>RESET</button></div></section>
         </div>
@@ -18631,7 +18640,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function getValues() {
-    const result = { ...defaults };
+    const result = { ...editorDefaults };
     panel?.querySelectorAll("[data-code013-field]").forEach((input) => {
       const key = input.dataset.code013Field;
       result[key] = input.value;
@@ -18642,8 +18651,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return result;
   }
 
-  function setValues(values = defaults) {
-    const v = { ...defaults, ...values };
+  function setValues(values = editorDefaults) {
+    const v = { ...editorDefaults, ...values };
     panel?.querySelectorAll("[data-code013-field]").forEach((input) => {
       const key = input.dataset.code013Field;
       input.value = v[key] ?? "";
@@ -18827,7 +18836,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
     toolbar?.querySelector("[data-code013-bbcode-color]")?.addEventListener("change", () => applyBbcode(textarea, "color", toolbar));
     panel.querySelector("[data-code013-copy]")?.addEventListener("click", copyCode);
-    panel.querySelector("[data-code013-reset]")?.addEventListener("click", () => { setValues(defaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE013 แล้ว"); });
+    panel.querySelector("[data-code013-reset]")?.addEventListener("click", () => { setValues(editorDefaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE013 แล้ว"); });
   }
 
   function showPanel(name) {
@@ -18858,7 +18867,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function openEditor() {
     createPanel();
     const draft = getDraft();
-    const restored = draft?.values ? { ...defaults, ...draft.values } : { ...defaults };
+    const restored = draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults };
     if (draft?.values?.control && !draft?.values?.button) restored.button = draft.values.control;
     delete restored.control;
     setValues(restored);
