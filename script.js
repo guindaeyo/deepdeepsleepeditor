@@ -18463,6 +18463,31 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.srcdoc = previewDocument(code);
   }
 
+  function sizeEditorPreviewActual(iframe, stage, padding = 28) {
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const scale = Math.min(1, availableWidth / m.width);
+    const renderedHeight = Math.ceil(m.height * scale);
+    const stageHeight = renderedHeight + padding * 2;
+
+    stage.style.setProperty("height", `${stageHeight}px`, "important");
+    stage.style.setProperty("min-height", `${stageHeight}px`, "important");
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", `${padding}px`, "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("transform", `translateX(-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top center", "important");
+
+    const previewColumn = stage.closest(".dds-protected-commission-preview-column");
+    const previewTop = previewColumn?.querySelector(".dds-editor-preview-top");
+    const totalHeight = stageHeight + (previewTop?.offsetHeight || 0);
+    if (panel && totalHeight > 0) panel.style.setProperty("--dds-code013-editor-height", `${totalHeight}px`);
+  }
+
   async function sha256(value) {
     const data = new TextEncoder().encode(String(value ?? ""));
     const digest = await crypto.subtle.digest("SHA-256", data);
@@ -18729,7 +18754,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     previewTimer = window.setTimeout(() => {
       const iframe = panel.querySelector("[data-code013-editor-preview]");
       const stage = panel.querySelector(".dds-code013-editor-stage");
-      writeIframe(iframe, buildCode(getValues(), true), () => fitIframe(iframe, stage, 28));
+      writeIframe(iframe, buildCode(getValues(), true), () => sizeEditorPreviewActual(iframe, stage, 28));
     }, 40);
     syncOutputs();
     updateWordCounter();
@@ -18859,7 +18884,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const cardFrame = card?.querySelector("[data-code013-card-preview]");
       if (cardFrame) fitIframe(cardFrame, card?.querySelector(".dds-roleplay-card-preview"), 16);
       const editorFrame = panel?.querySelector("[data-code013-editor-preview]");
-      if (editorFrame && panel?.classList.contains("is-active")) fitIframe(editorFrame, panel.querySelector(".dds-code013-editor-stage"), 28);
+      if (editorFrame && panel?.classList.contains("is-active")) sizeEditorPreviewActual(editorFrame, panel.querySelector(".dds-code013-editor-stage"), 28);
     });
     window.addEventListener("hashchange", handleHash);
     window.setTimeout(handleHash, 300);

@@ -8681,10 +8681,10 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 .dds-code013-lock-center{position:absolute;left:50%;top:50%;z-index:10;transform:translate(-50%,-50%);display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(14,14,14,.94);box-shadow:0 12px 35px rgba(0,0,0,.44);font-size:22px;line-height:1;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .dds-code013-lock-badge{min-width:32px;text-align:center;font-size:12px;letter-spacing:0;z-index:11}
 .dds-code013-edit-button{cursor:pointer}
-.dds-code013-editor-stage{width:100%;height:min(760px,calc(100vh - 150px));min-height:560px;position:relative;overflow:hidden;background:#202020}
-.dds-code013-editor-preview{position:absolute!important;left:50%!important;top:50%!important;margin:0!important;border:0!important;background:transparent!important}
-.dds-code013-editor .dds-protected-commission-preview-column{align-self:start;position:sticky;top:20px}
-.dds-code013-editor .dds-protected-commission-controls-column{height:min(1000px,calc(100vh - 92px));min-height:720px}
+.dds-code013-editor-stage{width:100%;height:auto;min-height:0;position:relative;overflow:hidden;background:#202020}
+.dds-code013-editor-preview{position:absolute!important;left:50%!important;top:28px!important;margin:0!important;border:0!important;background:transparent!important;transform-origin:top center!important}
+.dds-code013-editor .dds-protected-commission-preview-column{align-self:start;position:relative;top:auto}
+.dds-code013-editor .dds-protected-commission-controls-column{height:var(--dds-code013-editor-height,1000px);min-height:720px;align-self:start}
 .dds-code013-commission-scroll{display:flex;flex-direction:column;gap:14px;padding-right:4px}
 .dds-code013-commission-scroll .dds-control-section{flex:0 0 auto}
 .dds-code013-editor .dds-code013-roleplay-field textarea{min-height:260px;resize:vertical}
@@ -8692,5 +8692,4 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 .dds-code013-editor .dds-code013-commission-copy .dds-protected-commission-copy-actions [data-code013-copy]{width:100%;text-align:left;color:#fff;border-color:rgba(193,23,36,.72);background:linear-gradient(135deg,#b0121d,#720810)}
 .dds-code013-editor .dds-code013-commission-copy [data-code013-reset]{color:#bdb5b5}
 @media(max-width:1250px){.dds-code013-editor .dds-protected-commission-preview-column{position:relative;top:auto}.dds-code013-editor .dds-protected-commission-controls-column{height:auto;min-height:0}.dds-code013-commission-scroll{overflow:visible}}
-@media(max-width:900px){.dds-code013-editor-stage{height:620px;min-height:500px}}
-@media(max-width:620px){.dds-code013-editor-stage{height:520px;min-height:430px}.dds-code013-lock-center{width:46px;height:46px;font-size:18px}}
+@media(max-width:620px){.dds-code013-lock-center{width:46px;height:46px;font-size:18px}}
