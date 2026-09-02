@@ -18308,21 +18308,27 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-code013";
   const ACCESS_HASH = "d0dce33d42fbe3ef37ea9dba8485d0342cae71b1446a1a83a7c1570edc2b1a51";
-  const DRAFT_KEY = "dds:roleplay:code013:draft:v1";
+  const DRAFT_KEY = "dds:roleplay:code013:draft:v2";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-cpmhfp.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
   const CANVAS_WIDTH = 720;
 
   const defaults = Object.freeze({
-    frame: "#d5d5d1",
-    light: "#efefec",
+    outer: "#d5d5d1",
+    titleColor: "#d5d5d1",
+    menu: "#d5d5d1",
+    main: "#d5d5d1",
+    photoFrame: "#e7e7e3",
+    note: "#e7e7e3",
+    control: "#ededeb",
+    slider: "#ccccc8",
+    app: "#575754",
     line: "#696965",
-    inner: "#e7e7e3",
-    text: "#171717",
-    soft: "#626260",
+    ui: "#171717",
     image: "https://i.pinimg.com/1200x/f6/c8/ed/f6c8edb78d68d07adeb2ad557f387566.jpg",
     imageX: 50,
     imageY: 40,
+    imageZoom: 100,
     title: "Franklin D. Bloodworth.mp3",
     roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
     noteLabel: "หมายเหตุ :",
@@ -18405,7 +18411,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function buildCode(values = defaults, previewMode = false) {
     const v = { ...defaults, ...values };
     const roleplay = roleToHtml(v.roleplay, previewMode);
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><div class="ddsh-esq" style="--ddsh-esq-frame:${validHex(v.frame, defaults.frame)};--ddsh-esq-light:${validHex(v.light, defaults.light)};--ddsh-esq-line:${validHex(v.line, defaults.line)};--ddsh-esq-inner:${validHex(v.inner, defaults.inner)};--ddsh-esq-text:${validHex(v.text, defaults.text)};--ddsh-esq-soft:${validHex(v.soft, defaults.soft)};--ddsh-esq-image:url('${cssUrl(v.image)}');--ddsh-esq-image-x:${Number(v.imageX) || 0}%;--ddsh-esq-image-y:${Number(v.imageY) || 0}%;"><div class="ddsh-esq-window"><div class="ddsh-esq-titlebar" data-title="${h(v.title)}"><span class="ddsh-esq-appicon"></span><div class="ddsh-esq-window-controls"><span class="ddsh-esq-win-min"></span><span class="ddsh-esq-win-max"></span><span class="ddsh-esq-win-close"></span></div></div><div class="ddsh-esq-menu"></div><div class="ddsh-esq-main"><div class="ddsh-esq-photo-frame"><div class="ddsh-esq-photo"></div></div><div class="ddsh-esq-albumtext">${roleplay}</div><div class="ddsh-esq-note"><strong>${h(v.noteLabel)}</strong><span>${h(v.noteText)}</span></div><div class="ddsh-esq-seek"><div class="ddsh-esq-seek-buttons"><span class="ddsh-esq-seek-prev"></span><span class="ddsh-esq-seek-stop"></span></div><div class="ddsh-esq-seek-line"></div></div><div class="ddsh-esq-player"><div class="ddsh-esq-player-left"><span class="ddsh-esq-btn ddsh-esq-btn-prev"></span><span class="ddsh-esq-btn ddsh-esq-btn-main"></span><span class="ddsh-esq-btn ddsh-esq-btn-next"></span></div><div class="ddsh-esq-player-middle"><div class="ddsh-esq-volume"><span class="ddsh-esq-volume-knob"></span></div><span class="ddsh-esq-speaker"></span></div><div class="ddsh-esq-player-right"><span class="ddsh-esq-btn-small ddsh-esq-btn-pause"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-music"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-radio"></span></div></div></div></div></div><div class="ddshopfz-ff1"><span></span></div>`;
+    const imageX = Math.min(100, Math.max(0, Number(v.imageX) || 0));
+    const imageY = Math.min(100, Math.max(0, Number(v.imageY) || 0));
+    const imageZoom = Math.min(200, Math.max(50, Number(v.imageZoom) || defaults.imageZoom));
+    const photoSize = imageZoom === 100 ? "cover" : `${imageZoom}% auto`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><div class="ddsh-esq" style="--ddsh-esq-outer:${validHex(v.outer, defaults.outer)};--ddsh-esq-title:${validHex(v.titleColor, defaults.titleColor)};--ddsh-esq-menu:${validHex(v.menu, defaults.menu)};--ddsh-esq-main:${validHex(v.main, defaults.main)};--ddsh-esq-photo-frame:${validHex(v.photoFrame, defaults.photoFrame)};--ddsh-esq-note:${validHex(v.note, defaults.note)};--ddsh-esq-control:${validHex(v.control, defaults.control)};--ddsh-esq-slider:${validHex(v.slider, defaults.slider)};--ddsh-esq-app:${validHex(v.app, defaults.app)};--ddsh-esq-line:${validHex(v.line, defaults.line)};--ddsh-esq-ui:${validHex(v.ui, defaults.ui)};--ddsh-esq-image:url('${cssUrl(v.image)}');--ddsh-esq-image-x:${imageX}%;--ddsh-esq-image-y:${imageY}%;"><div class="ddsh-esq-window"><div class="ddsh-esq-titlebar" data-title="${h(v.title)}"><span class="ddsh-esq-appicon"></span><div class="ddsh-esq-window-controls"><span class="ddsh-esq-win-min"></span><span class="ddsh-esq-win-max"></span><span class="ddsh-esq-win-close"></span></div></div><div class="ddsh-esq-menu"></div><div class="ddsh-esq-main"><div class="ddsh-esq-photo-frame"><div class="ddsh-esq-photo" style="background-position:${imageX}% ${imageY}%;background-size:${photoSize};"></div></div><div class="ddsh-esq-albumtext">${roleplay}</div><div class="ddsh-esq-note"><strong>${h(v.noteLabel)}</strong><span>${h(v.noteText)}</span></div><div class="ddsh-esq-seek"><div class="ddsh-esq-seek-buttons"><span class="ddsh-esq-seek-prev"></span><span class="ddsh-esq-seek-stop"></span></div><div class="ddsh-esq-seek-line"></div></div><div class="ddsh-esq-player"><div class="ddsh-esq-player-left"><span class="ddsh-esq-btn ddsh-esq-btn-prev"></span><span class="ddsh-esq-btn ddsh-esq-btn-main"></span><span class="ddsh-esq-btn ddsh-esq-btn-next"></span></div><div class="ddsh-esq-player-middle"><div class="ddsh-esq-volume"><span class="ddsh-esq-volume-knob"></span></div><span class="ddsh-esq-speaker"></span></div><div class="ddsh-esq-player-right"><span class="ddsh-esq-btn-small ddsh-esq-btn-pause"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-music"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-radio"></span></div></div></div></div></div><div class="ddshopfz-ff1"><span></span></div>`;
   }
 
   const OFFICIAL_CODE = buildCode(defaults, false);
@@ -18577,8 +18587,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code013-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">LOCKED ROLEPLAY CODE EDITOR</p><h1>CANDY PINK MAGIC HOLE FLIP PHONE</h1><p>CODE013 อยู่ในสถานะล็อกและเปิดหน้าแก้ไขด้วยรหัสผ่าน</p></div></div>
       <div class="dds-editor-layout"><div class="dds-editor-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE013</strong></div><div class="dds-code013-editor-stage"><iframe class="dds-editor-preview-frame dds-code013-editor-preview" data-code013-editor-preview scrolling="no" title="ตัวอย่าง CODE013"></iframe></div></div>
       <div class="dds-editor-controls">
-        <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบหลัก","frame",defaults.frame)}${colorField("สีพื้นที่สว่าง","light",defaults.light)}${colorField("สีเส้น / ขอบ","line",defaults.line)}${colorField("สีพื้นด้านใน","inner",defaults.inner)}${colorField("สีข้อความหลัก","text",defaults.text)}${colorField("สีข้อความรอง","soft",defaults.soft)}</div></section>
-        <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป</span><input type="url" data-code013-field="image" value="${h(defaults.image)}"></label></div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งรูป</span><small>ปรับซ้าย–ขวา และบน–ล่าง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-code013-field="imageX" value="${defaults.imageX}"><small>ขวา</small><output data-code013-output="imageX">${defaults.imageX}%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" step="1" data-code013-field="imageY" value="${defaults.imageY}"><small>ล่าง</small><output data-code013-output="imageY">${defaults.imageY}%</output></label></div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบนอก","outer",defaults.outer)}${colorField("สีแถบชื่อ","titleColor",defaults.titleColor)}${colorField("สีแถบเมนู","menu",defaults.menu)}${colorField("สีพื้นหลัก","main",defaults.main)}${colorField("สีกรอบรูป","photoFrame",defaults.photoFrame)}${colorField("สีพื้นหมายเหตุ","note",defaults.note)}${colorField("สีปุ่มควบคุม","control",defaults.control)}${colorField("สีแถบ Slider","slider",defaults.slider)}${colorField("สี App / Icon","app",defaults.app)}${colorField("สีเส้น / ขอบ","line",defaults.line)}${colorField("สี UI / ตัวอักษร","ui",defaults.ui)}</div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป</span><input type="url" data-code013-field="image" value="${h(defaults.image)}"></label></div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งและขนาดรูป</span><small>ปรับซ้าย–ขวา / ขึ้น–ลง / ซูมเข้า–ออก</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-code013-field="imageX" value="${defaults.imageX}"><small>ขวา</small><output data-code013-output="imageX">${defaults.imageX}%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" step="1" data-code013-field="imageY" value="${defaults.imageY}"><small>ล่าง</small><output data-code013-output="imageY">${defaults.imageY}%</output></label><label class="dds-position-row"><span>ซูมรูป</span><small>ออก</small><input type="range" min="50" max="200" step="1" data-code013-field="imageZoom" value="${defaults.imageZoom}"><small>เข้า</small><output data-code013-output="imageZoom">${defaults.imageZoom}%</output></label></div></section>
         <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อไฟล์ / Display name</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ชื่อด้านบน</span><input type="text" data-code013-field="title" value="${h(defaults.title)}"></label></div></section>
         <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code013-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea id="code013RoleplayEditor" data-code013-field="roleplay" rows="14">${h(defaults.roleplay)}</textarea><div class="dds-word-counter" data-code013-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code013-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
         <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field"><span>คำหน้าหมายเหตุ</span><input type="text" data-code013-field="noteLabel" value="${h(defaults.noteLabel)}"></label><label class="dds-field"><span>ข้อความหมายเหตุ</span><input type="text" data-code013-field="noteText" value="${h(defaults.noteText)}"></label></div></section>
@@ -18598,6 +18608,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
     result.imageX = Number(result.imageX) || 0;
     result.imageY = Number(result.imageY) || 0;
+    result.imageZoom = Math.min(200, Math.max(50, Number(result.imageZoom) || defaults.imageZoom));
     return result;
   }
 

@@ -8676,8 +8676,8 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 
 
 .dds-roleplay-card-code013 .dds-roleplay-card-preview-code013{position:relative;overflow:hidden;background:#111}
-.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013::after{content:"";position:absolute;inset:0;z-index:6;background:rgba(12,12,12,.95);pointer-events:none}
-.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013 iframe{filter:blur(95px) brightness(.08) saturate(.1);opacity:.03;pointer-events:none}
+.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013::after{content:"";position:absolute;inset:0;z-index:6;background:rgba(12,12,12,.22);pointer-events:none}
+.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013 iframe{filter:blur(28px) brightness(.58) saturate(.35);opacity:.80;pointer-events:none}
 .dds-code013-lock-center{position:absolute;left:50%;top:50%;z-index:10;transform:translate(-50%,-50%);display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(14,14,14,.94);box-shadow:0 12px 35px rgba(0,0,0,.44);font-size:22px;line-height:1;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
 .dds-code013-lock-badge{min-width:32px;text-align:center;font-size:12px;letter-spacing:0;z-index:11}
 .dds-code013-edit-button{cursor:pointer}
