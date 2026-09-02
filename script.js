@@ -18307,8 +18307,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.__DDS_CODE013_CPMHFP_INSTALLED__ = true;
 
   const PANEL_NAME = "editor-code013";
-  const OWNER_SESSION_KEY = "dds:owner:code013";
-  const DRAFT_KEY = "dds:roleplay:code013:owner:draft:v1";
+  const ACCESS_HASH = "d0dce33d42fbe3ef37ea9dba8485d0342cae71b1446a1a83a7c1570edc2b1a51";
+  const DRAFT_KEY = "dds:roleplay:code013:draft:v1";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-cpmhfp.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
   const CANVAS_WIDTH = 720;
@@ -18331,6 +18331,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   let card = null;
   let panel = null;
+  let modal = null;
   let cardRendered = false;
   let previewTimer = 0;
 
@@ -18451,18 +18452,76 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.srcdoc = previewDocument(code);
   }
 
-  function isOwnerMode() {
-    try { return sessionStorage.getItem(OWNER_SESSION_KEY) === "1"; } catch { return false; }
+  async function sha256(value) {
+    const data = new TextEncoder().encode(String(value ?? ""));
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
   }
 
-  function updateCardOwnerState() {
+  function closeAccessModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    const input = modal.querySelector("[data-code013-lock-input]");
+    const error = modal.querySelector("[data-code013-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+  }
+
+  function createAccessModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.id = "ddsCode013LockModal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-code013-lock-form><small>CODE013 / PROTECTED ACCESS</small><h2>Protected editor</h2><p>กรอกรหัสผ่านเพื่อเปิดหน้าแก้ไข CODE013</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-code013-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-code013-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-code013-lock-close>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-code013-lock-close]")?.addEventListener("click", closeAccessModal);
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeAccessModal(); });
+    modal.querySelector("[data-code013-lock-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-code013-lock-input]");
+      const error = modal.querySelector("[data-code013-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        if (await sha256(input.value || "") === ACCESS_HASH) {
+          error.textContent = "";
+          closeAccessModal();
+          openEditor();
+        } else {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+        }
+      } catch {
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function requestAccess() {
+    const dialog = createAccessModal();
+    dialog.hidden = false;
+    const input = dialog.querySelector("[data-code013-lock-input]");
+    const error = dialog.querySelector("[data-code013-lock-error]");
+    if (error) error.textContent = "";
+    if (input) {
+      input.value = "";
+      window.setTimeout(() => input.focus(), 0);
+    }
+  }
+
+  function updateCardLockState() {
     const button = card?.querySelector("[data-code013-edit]");
     if (!button) return;
-    const owner = isOwnerMode();
-    button.disabled = !owner;
-    button.classList.toggle("is-owner-enabled", owner);
-    button.innerHTML = owner ? `EDIT CODE <span>↗</span>` : `<span aria-hidden="true">🔒</span> LOCKED`;
-    button.title = owner ? "OWNER ACCESS — เปิดหน้าแก้ไข CODE013" : "CODE013 ยังล็อกสำหรับผู้ใช้ทั่วไป";
+    button.disabled = false;
+    button.classList.remove("is-owner-enabled");
+    button.innerHTML = `<span aria-hidden="true">🔒</span> LOCKED`;
+    button.title = "ใส่รหัสเพื่อเปิดหน้าแก้ไข CODE013";
   }
 
   function installCard() {
@@ -18470,13 +18529,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
     if (!grid) return false;
     const existing = grid.querySelector(".dds-roleplay-card-code013");
-    if (existing) { card = existing; updateCardOwnerState(); return true; }
+    if (existing) { card = existing; updateCardLockState(); return true; }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code013 dds-roleplay-card-locked";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-code013-lock-center" aria-hidden="true">🔒</span><span class="dds-roleplay-preview-badge dds-code013-lock-badge" aria-label="LOCKED">🔒</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button" disabled><span aria-hidden="true">🔒</span> LOCKED</button></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-code013-lock-center" aria-hidden="true">🔒</span><span class="dds-roleplay-preview-badge dds-code013-lock-badge" aria-label="LOCKED">🔒</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button"><span aria-hidden="true">🔒</span> LOCKED</button></div>`;
     grid.appendChild(card);
-    card.querySelector("[data-code013-edit]")?.addEventListener("click", () => { if (isOwnerMode()) openEditor(); });
-    updateCardOwnerState();
+    card.querySelector("[data-code013-edit]")?.addEventListener("click", requestAccess);
+    updateCardLockState();
     const iframe = card.querySelector("[data-code013-card-preview]");
     const render = () => {
       if (cardRendered || !iframe) return;
@@ -18515,7 +18574,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel = document.createElement("section");
     panel.className = "dds-panel dds-code013-editor";
     panel.dataset.panel = PANEL_NAME;
-    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code013-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">OWNER ROLEPLAY CODE EDITOR</p><h1>CANDY PINK MAGIC HOLE FLIP PHONE</h1><p>CODE013 อยู่ในสถานะล็อกสำหรับผู้ใช้ทั่วไป ขณะนี้เปิดผ่าน OWNER MODE เท่านั้น</p></div></div>
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code013-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">LOCKED ROLEPLAY CODE EDITOR</p><h1>CANDY PINK MAGIC HOLE FLIP PHONE</h1><p>CODE013 อยู่ในสถานะล็อกและเปิดหน้าแก้ไขด้วยรหัสผ่าน</p></div></div>
       <div class="dds-editor-layout"><div class="dds-editor-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE013</strong></div><div class="dds-code013-editor-stage"><iframe class="dds-editor-preview-frame dds-code013-editor-preview" data-code013-editor-preview scrolling="no" title="ตัวอย่าง CODE013"></iframe></div></div>
       <div class="dds-editor-controls">
         <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบหลัก","frame",defaults.frame)}${colorField("สีพื้นที่สว่าง","light",defaults.light)}${colorField("สีเส้น / ขอบ","line",defaults.line)}${colorField("สีพื้นด้านใน","inner",defaults.inner)}${colorField("สีข้อความหลัก","text",defaults.text)}${colorField("สีข้อความรอง","soft",defaults.soft)}</div></section>
@@ -18744,7 +18803,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function openEditor() {
-    if (!isOwnerMode()) { notify("CODE013 ถูกล็อกไว้สำหรับ OWNER MODE"); return; }
     createPanel();
     const draft = getDraft();
     setValues(draft?.values ? { ...defaults, ...draft.values } : defaults);
@@ -18754,26 +18812,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     updatePreview();
   }
 
-  window.DDS_CODE013_OWNER = Object.freeze({
-    unlock() {
-      try { sessionStorage.setItem(OWNER_SESSION_KEY, "1"); } catch {}
-      updateCardOwnerState();
-      openEditor();
-      return true;
-    },
-    lock() {
-      try { sessionStorage.removeItem(OWNER_SESSION_KEY); } catch {}
-      updateCardOwnerState();
-      if (panel?.classList.contains("is-active")) goBack();
-      return true;
-    },
-    isUnlocked: isOwnerMode
-  });
-
   function handleHash() {
-    if (location.hash === "#editor-code013") {
-      if (isOwnerMode()) openEditor();
-      else goBack();
+    if (location.hash === "#editor-code013" && !panel?.classList.contains("is-active")) {
+      goBack();
     }
   }
 

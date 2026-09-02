@@ -8675,12 +8675,12 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 }
 
 
-.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013{position:relative;overflow:hidden}
-.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013 iframe{filter:blur(9px) brightness(.62) saturate(.72);opacity:.82;pointer-events:none}
-.dds-code013-lock-center{position:absolute;left:50%;top:50%;z-index:10;transform:translate(-50%,-50%);display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(14,14,14,.76);box-shadow:0 12px 35px rgba(0,0,0,.34);font-size:22px;line-height:1;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
-.dds-code013-lock-badge{min-width:32px;text-align:center;font-size:12px;letter-spacing:0}
-.dds-code013-edit-button:disabled{cursor:not-allowed;opacity:.46;filter:saturate(.45)}
-.dds-code013-edit-button.is-owner-enabled{cursor:pointer;opacity:1;filter:none}
+.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013{position:relative;overflow:hidden;background:#111}
+.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013::after{content:"";position:absolute;inset:0;z-index:6;background:rgba(12,12,12,.95);pointer-events:none}
+.dds-roleplay-card-code013 .dds-roleplay-card-preview-code013 iframe{filter:blur(95px) brightness(.08) saturate(.1);opacity:.03;pointer-events:none}
+.dds-code013-lock-center{position:absolute;left:50%;top:50%;z-index:10;transform:translate(-50%,-50%);display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.2);border-radius:50%;background:rgba(14,14,14,.94);box-shadow:0 12px 35px rgba(0,0,0,.44);font-size:22px;line-height:1;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.dds-code013-lock-badge{min-width:32px;text-align:center;font-size:12px;letter-spacing:0;z-index:11}
+.dds-code013-edit-button{cursor:pointer}
 .dds-code013-editor-stage{width:100%;height:min(760px,calc(100vh - 150px));min-height:560px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#202020}
 .dds-code013-editor-preview{position:absolute!important;left:50%!important;top:50%!important;margin:0!important;border:0!important;background:transparent!important}
 .dds-code013-editor .dds-editor-preview-column{align-self:start;position:sticky;top:20px}
