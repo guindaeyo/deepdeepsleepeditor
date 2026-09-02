@@ -18297,3 +18297,502 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     install();
   }
 })();
+
+
+/* CODE013 — candy pink magic hole flip phone */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE013_CPMHFP_INSTALLED__) return;
+  window.__DDS_CODE013_CPMHFP_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-code013";
+  const OWNER_SESSION_KEY = "dds:owner:code013";
+  const DRAFT_KEY = "dds:roleplay:code013:owner:draft:v1";
+  const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-cpmhfp.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&display=swap";
+  const CANVAS_WIDTH = 720;
+
+  const defaults = Object.freeze({
+    frame: "#d5d5d1",
+    light: "#efefec",
+    line: "#696965",
+    inner: "#e7e7e3",
+    text: "#171717",
+    soft: "#626260",
+    image: "https://i.pinimg.com/1200x/f6/c8/ed/f6c8edb78d68d07adeb2ad557f387566.jpg",
+    imageX: 50,
+    imageY: 40,
+    title: "Franklin D. Bloodworth.mp3",
+    roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
+    noteLabel: "หมายเหตุ :",
+    noteText: "ม่ายบอก"
+  });
+
+  let card = null;
+  let panel = null;
+  let cardRendered = false;
+  let previewTimer = 0;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "").replace(/[\\'\"\n\r]/g, (char) => ({"\\":"\\\\", "'":"\\'", '\"':'\\\"', "\n":"", "\r":""}[char] || ""));
+  }
+
+  function validHex(value, fallback) {
+    const raw = String(value || "").trim();
+    return /^#[0-9a-f]{6}$/i.test(raw) ? raw : fallback;
+  }
+
+  function notify(message) {
+    if (typeof window.showToast === "function") window.showToast(message);
+    else {
+      const toast = document.getElementById("siteToast");
+      const text = document.getElementById("siteToastText");
+      if (text) text.textContent = message;
+      if (toast) {
+        toast.classList.add("is-visible");
+        window.setTimeout(() => toast.classList.remove("is-visible"), 1800);
+      }
+    }
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value || "").replace(/\r\n?/g, "\n");
+    const renderList = (source, ordered) => {
+      const pattern = ordered ? /\[list=1\]([\s\S]*?)\[\/list\]/gi : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+      const tag = ordered ? "ol" : "ul";
+      return source.replace(pattern, (_match, body) => {
+        const items = String(body || "").split(/\[\*\]/i).slice(1).map((item) => item.trim()).filter(Boolean).map((item) => `<li>${item}</li>`).join("");
+        return items ? `<${tag} style="margin:10px 0;padding-left:24px">${items}</${tag}>` : "";
+      });
+    };
+    text = renderList(text, true);
+    text = renderList(text, false);
+    return text
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=small\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:.82em">$1</span>')
+      .replace(/\[size=medium\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1em">$1</span>')
+      .replace(/\[size=large\]([\s\S]*?)\[\/size\]/gi, '<span style="font-size:1.28em">$1</span>')
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<span style="display:block;text-align:$1">$2</span>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[img\]([^\[]+)\[\/img\]/gi, '<img src="$1" alt="" style="display:block;max-width:100%;height:auto;margin:10px auto">')
+      .replace(/\[video=youtube\]([^\[]+)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">▶ YouTube</a>')
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<span style="display:block;padding:7px 9px;border:1px solid currentColor">$1</span>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code style="display:block;padding:7px 9px;border:1px solid currentColor">$1</code>')
+      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span style="display:block;padding:7px 9px;border:1px solid currentColor">$2</span>')
+      .replace(/\[hr\]/gi, '<hr style="margin:14px 0;border:0;border-top:1px solid currentColor;opacity:.3">')
+      .replace(/\n/g, "<br>");
+  }
+
+  function roleToHtml(value, previewMode) {
+    return previewMode ? bbcodeToPreviewHtml(value) : h(value || "");
+  }
+
+  function buildCode(values = defaults, previewMode = false) {
+    const v = { ...defaults, ...values };
+    const roleplay = roleToHtml(v.roleplay, previewMode);
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><div class="ddsh-esq" style="--ddsh-esq-frame:${validHex(v.frame, defaults.frame)};--ddsh-esq-light:${validHex(v.light, defaults.light)};--ddsh-esq-line:${validHex(v.line, defaults.line)};--ddsh-esq-inner:${validHex(v.inner, defaults.inner)};--ddsh-esq-text:${validHex(v.text, defaults.text)};--ddsh-esq-soft:${validHex(v.soft, defaults.soft)};--ddsh-esq-image:url('${cssUrl(v.image)}');--ddsh-esq-image-x:${Number(v.imageX) || 0}%;--ddsh-esq-image-y:${Number(v.imageY) || 0}%;"><div class="ddsh-esq-window"><div class="ddsh-esq-titlebar" data-title="${h(v.title)}"><span class="ddsh-esq-appicon"></span><div class="ddsh-esq-window-controls"><span class="ddsh-esq-win-min"></span><span class="ddsh-esq-win-max"></span><span class="ddsh-esq-win-close"></span></div></div><div class="ddsh-esq-menu"></div><div class="ddsh-esq-main"><div class="ddsh-esq-photo-frame"><div class="ddsh-esq-photo"></div></div><div class="ddsh-esq-albumtext">${roleplay}</div><div class="ddsh-esq-note"><strong>${h(v.noteLabel)}</strong><span>${h(v.noteText)}</span></div><div class="ddsh-esq-seek"><div class="ddsh-esq-seek-buttons"><span class="ddsh-esq-seek-prev"></span><span class="ddsh-esq-seek-stop"></span></div><div class="ddsh-esq-seek-line"></div></div><div class="ddsh-esq-player"><div class="ddsh-esq-player-left"><span class="ddsh-esq-btn ddsh-esq-btn-prev"></span><span class="ddsh-esq-btn ddsh-esq-btn-main"></span><span class="ddsh-esq-btn ddsh-esq-btn-next"></span></div><div class="ddsh-esq-player-middle"><div class="ddsh-esq-volume"><span class="ddsh-esq-volume-knob"></span></div><span class="ddsh-esq-speaker"></span></div><div class="ddsh-esq-player-right"><span class="ddsh-esq-btn-small ddsh-esq-btn-pause"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-music"></span><span class="ddsh-esq-btn-small ddsh-esq-btn-radio"></span></div></div></div></div></div><div class="ddshopfz-ff1"><span></span></div>`;
+  }
+
+  const OFFICIAL_CODE = buildCode(defaults, false);
+
+  function previewDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-code013-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code013-preview-root">${code}</div></body></html>`;
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      const root = doc?.querySelector(".dds-code013-preview-root");
+      if (!root) return { width: CANVAS_WIDTH, height: 850 };
+      return {
+        width: Math.max(CANVAS_WIDTH, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH)),
+        height: Math.max(320, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 850))
+      };
+    } catch { return { width: CANVAS_WIDTH, height: 850 }; }
+  }
+
+  function fitIframe(iframe, stage, padding = 22) {
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const aw = Math.max(1, stage.clientWidth - padding * 2);
+    const ah = Math.max(1, stage.clientHeight - padding * 2);
+    const scale = Math.min(1, aw / m.width, ah / m.height);
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("transform", `translate(-50%,-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function writeIframe(iframe, code, fit) {
+    if (!iframe) return;
+    iframe.onload = () => {
+      fit?.();
+      [80, 220, 520, 1000].forEach((delay) => window.setTimeout(() => fit?.(), delay));
+      try { iframe.contentDocument?.fonts?.ready?.then(() => fit?.()); } catch {}
+    };
+    iframe.srcdoc = previewDocument(code);
+  }
+
+  function isOwnerMode() {
+    try { return sessionStorage.getItem(OWNER_SESSION_KEY) === "1"; } catch { return false; }
+  }
+
+  function updateCardOwnerState() {
+    const button = card?.querySelector("[data-code013-edit]");
+    if (!button) return;
+    const owner = isOwnerMode();
+    button.disabled = !owner;
+    button.classList.toggle("is-owner-enabled", owner);
+    button.innerHTML = owner ? `EDIT CODE <span>↗</span>` : `<span aria-hidden="true">🔒</span> LOCKED`;
+    button.title = owner ? "OWNER ACCESS — เปิดหน้าแก้ไข CODE013" : "CODE013 ยังล็อกสำหรับผู้ใช้ทั่วไป";
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
+    if (!grid) return false;
+    const existing = grid.querySelector(".dds-roleplay-card-code013");
+    if (existing) { card = existing; updateCardOwnerState(); return true; }
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-roleplay-card-code013 dds-roleplay-card-locked";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-code013-lock-center" aria-hidden="true">🔒</span><span class="dds-roleplay-preview-badge dds-code013-lock-badge" aria-label="LOCKED">🔒</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button" disabled><span aria-hidden="true">🔒</span> LOCKED</button></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-code013-edit]")?.addEventListener("click", () => { if (isOwnerMode()) openEditor(); });
+    updateCardOwnerState();
+    const iframe = card.querySelector("[data-code013-card-preview]");
+    const render = () => {
+      if (cardRendered || !iframe) return;
+      cardRendered = true;
+      writeIframe(iframe, OFFICIAL_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
+    };
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        render();
+      }, { rootMargin: "420px 0px" });
+      observer.observe(card);
+    } else render();
+    return true;
+  }
+
+  function toolbarMarkup() {
+    return `<div class="dds-rich-toolbar dds-bbcode-toolbar dds-code013-bbcode-toolbar" data-code013-toolbar>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="b"><b>B</b></button><button type="button" data-code013-bbcode="i"><i>I</i></button><button type="button" data-code013-bbcode="u"><u>U</u></button><button type="button" data-code013-bbcode="s"><s>S</s></button></div>
+      <div class="dds-bbcode-group"><label class="dds-bbcode-color"><span>A</span><input type="color" data-code013-bbcode-color value="#8f0e16" aria-label="เลือกสีตัวอักษร"></label><button type="button" data-code013-bbcode="size-small">A−</button><button type="button" data-code013-bbcode="size-medium">A</button><button type="button" data-code013-bbcode="size-large">A+</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="align-left">⇤</button><button type="button" data-code013-bbcode="align-center">↔</button><button type="button" data-code013-bbcode="align-right">⇥</button><button type="button" data-code013-bbcode="align-justify">☰</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="url">🔗</button><button type="button" data-code013-bbcode="img">▣</button><button type="button" data-code013-bbcode="video">▶</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="quote">❝</button><button type="button" data-code013-bbcode="code">&lt;/&gt;</button><button type="button" data-code013-bbcode="hide">◉</button><button type="button" data-code013-bbcode="spoiler">▤</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="list">•≡</button><button type="button" data-code013-bbcode="list-1">1≡</button><button type="button" data-code013-bbcode="list-item">[*]</button></div>
+      <div class="dds-bbcode-group"><button type="button" data-code013-bbcode="hr">―</button><button type="button" data-code013-bbcode="clear">CLEAR</button></div>
+    </div>`;
+  }
+
+  function colorField(label, key, value) {
+    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-code013-color-picker="${key}" value="${value}"><input type="text" data-code013-field="${key}" value="${value}" spellcheck="false"></div></label>`;
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-code013-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code013-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">OWNER ROLEPLAY CODE EDITOR</p><h1>CANDY PINK MAGIC HOLE FLIP PHONE</h1><p>CODE013 อยู่ในสถานะล็อกสำหรับผู้ใช้ทั่วไป ขณะนี้เปิดผ่าน OWNER MODE เท่านั้น</p></div></div>
+      <div class="dds-editor-layout"><div class="dds-editor-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE013</strong></div><div class="dds-code013-editor-stage"><iframe class="dds-editor-preview-frame dds-code013-editor-preview" data-code013-editor-preview scrolling="no" title="ตัวอย่าง CODE013"></iframe></div></div>
+      <div class="dds-editor-controls">
+        <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีกรอบหลัก","frame",defaults.frame)}${colorField("สีพื้นที่สว่าง","light",defaults.light)}${colorField("สีเส้น / ขอบ","line",defaults.line)}${colorField("สีพื้นด้านใน","inner",defaults.inner)}${colorField("สีข้อความหลัก","text",defaults.text)}${colorField("สีข้อความรอง","soft",defaults.soft)}</div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป</span><input type="url" data-code013-field="image" value="${h(defaults.image)}"></label></div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งรูป</span><small>ปรับซ้าย–ขวา และบน–ล่าง</small></div><label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" data-code013-field="imageX" value="${defaults.imageX}"><small>ขวา</small><output data-code013-output="imageX">${defaults.imageX}%</output></label><label class="dds-position-row"><span>แนวตั้ง</span><small>บน</small><input type="range" min="0" max="100" step="1" data-code013-field="imageY" value="${defaults.imageY}"><small>ล่าง</small><output data-code013-output="imageY">${defaults.imageY}%</output></label></div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อไฟล์ / Display name</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ชื่อด้านบน</span><input type="text" data-code013-field="title" value="${h(defaults.title)}"></label></div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code013-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea id="code013RoleplayEditor" data-code013-field="roleplay" rows="14">${h(defaults.roleplay)}</textarea><div class="dds-word-counter" data-code013-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code013-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field"><span>คำหน้าหมายเหตุ</span><input type="text" data-code013-field="noteLabel" value="${h(defaults.noteLabel)}"></label><label class="dds-field"><span>ข้อความหมายเหตุ</span><input type="text" data-code013-field="noteText" value="${h(defaults.noteText)}"></label></div></section>
+        <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>แบบร่าง</h2></div><div class="dds-editor-actions"><button class="dds-secondary-action" data-code013-save type="button">SAVE DRAFT</button><button class="dds-reset-button" data-code013-delete type="button">DELETE SAVE</button></div><p class="dds-copy-description" data-code013-draft-status>ยังไม่มีแบบร่าง</p></section>
+        <section class="dds-control-section dds-copy-section"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><p class="dds-copy-description">คัดลอก CODE013 ที่แก้ไขแล้วไปใช้งานได้ทันที</p><div class="dds-editor-actions"><button class="dds-copy-button" data-code013-copy type="button">COPY CODE <span>↗</span></button><button class="dds-reset-button" data-code013-reset type="button">RESET</button></div></section>
+      </div></div>`;
+    document.querySelector("main")?.appendChild(panel) || document.body.appendChild(panel);
+    bindPanel();
+    return panel;
+  }
+
+  function getValues() {
+    const result = { ...defaults };
+    panel?.querySelectorAll("[data-code013-field]").forEach((input) => {
+      const key = input.dataset.code013Field;
+      result[key] = input.value;
+    });
+    result.imageX = Number(result.imageX) || 0;
+    result.imageY = Number(result.imageY) || 0;
+    return result;
+  }
+
+  function setValues(values = defaults) {
+    const v = { ...defaults, ...values };
+    panel?.querySelectorAll("[data-code013-field]").forEach((input) => {
+      const key = input.dataset.code013Field;
+      input.value = v[key] ?? "";
+    });
+    panel?.querySelectorAll("[data-code013-color-picker]").forEach((picker) => {
+      const key = picker.dataset.code013ColorPicker;
+      picker.value = validHex(v[key], defaults[key]);
+    });
+    syncOutputs();
+    updateWordCounter();
+  }
+
+  function syncOutputs() {
+    panel?.querySelectorAll("[data-code013-output]").forEach((output) => {
+      const input = panel.querySelector(`[data-code013-field="${output.dataset.code013Output}"]`);
+      if (input) output.textContent = `${input.value}%`;
+    });
+  }
+
+  function removeBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
+      .replace(/\[video(?:=[^\]]*)?\][\s\S]*?\[\/video\]/gi, " ")
+      .replace(/\[url(?:=[^\]]*)?\]([\s\S]*?)\[\/url\]/gi, " $1 ")
+      .replace(/\[(?:\/?[a-z][a-z0-9_-]*(?:=[^\]]*)?|\*|hr)\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/\s+/g, " ").trim();
+  }
+
+  function countWords(value) {
+    const clean = removeBbcodeForWordCount(value);
+    if (!clean) return 0;
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(clean)) if (segment.isWordLike) count += 1;
+      return count;
+    }
+    const words = clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+    return words ? words.length : 0;
+  }
+
+  function updateWordCounter() {
+    const textarea = panel?.querySelector('[data-code013-field="roleplay"]');
+    const counter = panel?.querySelector("[data-code013-word-counter]");
+    if (!textarea || !counter) return;
+    const count = countWords(textarea.value);
+    const number = counter.querySelector("[data-code013-word-count-number]");
+    if (number) number.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function replaceSelection(target, replacement, caretOffset = null) {
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    target.setRangeText(replacement, start, end, "end");
+    if (Number.isInteger(caretOffset)) {
+      const caret = start + caretOffset;
+      target.setSelectionRange(caret, caret);
+    }
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+    target.focus();
+  }
+
+  function wrapTag(target, openTag, closeTag) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const replacement = `${openTag}${selected}${closeTag}`;
+    replaceSelection(target, replacement, selected ? replacement.length : openTag.length);
+  }
+
+  function applyList(target, ordered) {
+    const start = target.selectionStart ?? 0;
+    const end = target.selectionEnd ?? start;
+    const selected = target.value.slice(start, end);
+    const lines = selected.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const openTag = ordered ? "[list=1]" : "[list]";
+    const body = lines.length ? lines.map((line) => `[*]${line}`).join("\n") : "[*]";
+    replaceSelection(target, `${openTag}\n${body}\n[/list]`);
+  }
+
+  function applyBbcode(target, action, toolbar) {
+    if (["b","i","u","s","quote","code","hide","spoiler"].includes(action)) { wrapTag(target, `[${action}]`, `[/${action}]`); return; }
+    const wrappers = {
+      "size-small":["[size=small]","[/size]"], "size-medium":["[size=medium]","[/size]"], "size-large":["[size=large]","[/size]"],
+      "align-left":["[align=left]","[/align]"], "align-center":["[align=center]","[/align]"], "align-right":["[align=right]","[/align]"], "align-justify":["[align=justify]","[/align]"]
+    };
+    if (wrappers[action]) { wrapTag(target, wrappers[action][0], wrappers[action][1]); return; }
+    if (action === "color") { const color = toolbar.querySelector("[data-code013-bbcode-color]")?.value || "#8f0e16"; wrapTag(target, `[color=${color}]`, "[/color]"); return; }
+    if (action === "url") { const selected = target.value.slice(target.selectionStart ?? 0, target.selectionEnd ?? 0); const url = window.prompt("ใส่ลิงก์ URL", "https://"); if (url !== null) replaceSelection(target, `[url=${url}]${selected || url}[/url]`); return; }
+    if (action === "img") { const url = window.prompt("ใส่ลิงก์รูปภาพ", "https://"); if (url !== null) replaceSelection(target, `[img]${url}[/img]`); return; }
+    if (action === "video") { const url = window.prompt("ใส่ลิงก์ YouTube", "https://"); if (url !== null) replaceSelection(target, `[video=youtube]${url}[/video]`); return; }
+    if (action === "list") { applyList(target, false); return; }
+    if (action === "list-1") { applyList(target, true); return; }
+    if (action === "list-item") { replaceSelection(target, `[*]${target.value.slice(target.selectionStart ?? 0, target.selectionEnd ?? 0)}`); return; }
+    if (action === "hr") { replaceSelection(target, "[hr]"); return; }
+    if (action === "clear") {
+      const start = target.selectionStart ?? 0, end = target.selectionEnd ?? start;
+      if (start === end) { notify("คลุมข้อความที่ต้องการล้าง BBCode ก่อน"); return; }
+      replaceSelection(target, target.value.slice(start, end).replace(/\[[^\]]*\]/g, ""));
+    }
+  }
+
+  function updatePreview() {
+    if (!panel?.classList.contains("is-active")) return;
+    window.clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(() => {
+      const iframe = panel.querySelector("[data-code013-editor-preview]");
+      const stage = panel.querySelector(".dds-code013-editor-stage");
+      writeIframe(iframe, buildCode(getValues(), true), () => fitIframe(iframe, stage, 28));
+    }, 40);
+    syncOutputs();
+    updateWordCounter();
+  }
+
+  function setDraftStatus(savedAt) {
+    const target = panel?.querySelector("[data-code013-draft-status]");
+    if (!target) return;
+    target.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleString("th-TH")}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch { return null; }
+  }
+
+  function saveDraft() {
+    const savedAt = Date.now();
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt })); setDraftStatus(savedAt); notify("บันทึกแบบร่าง CODE013 แล้ว"); }
+    catch { notify("บันทึกแบบร่างไม่สำเร็จ"); }
+  }
+
+  function deleteDraft() {
+    localStorage.removeItem(DRAFT_KEY); setDraftStatus(0); notify("ลบแบบร่าง CODE013 แล้ว");
+  }
+
+  async function copyCode() {
+    const output = buildCode(getValues(), false);
+    try { await navigator.clipboard.writeText(output); }
+    catch {
+      const temp = document.createElement("textarea"); temp.value = output; temp.style.position = "fixed"; temp.style.opacity = "0"; document.body.appendChild(temp); temp.select(); document.execCommand("copy"); temp.remove();
+    }
+    notify("คัดลอกโคด CODE013 แล้ว");
+  }
+
+  function bindPanel() {
+    panel.querySelector("[data-code013-back]")?.addEventListener("click", goBack);
+    panel.querySelectorAll("[data-code013-field]").forEach((input) => {
+      input.addEventListener("input", () => {
+        const picker = panel.querySelector(`[data-code013-color-picker="${input.dataset.code013Field}"]`);
+        if (picker && /^#[0-9a-f]{6}$/i.test(input.value.trim())) picker.value = input.value.trim();
+        updatePreview();
+      });
+      input.addEventListener("change", updatePreview);
+    });
+    panel.querySelectorAll("[data-code013-color-picker]").forEach((picker) => {
+      picker.addEventListener("input", () => {
+        const field = panel.querySelector(`[data-code013-field="${picker.dataset.code013ColorPicker}"]`);
+        if (field) field.value = picker.value;
+        updatePreview();
+      });
+    });
+    const textarea = panel.querySelector('[data-code013-field="roleplay"]');
+    const toolbar = panel.querySelector("[data-code013-toolbar]");
+    toolbar?.querySelectorAll("[data-code013-bbcode]").forEach((button) => {
+      button.addEventListener("click", () => applyBbcode(textarea, button.dataset.code013Bbcode, toolbar));
+    });
+    toolbar?.querySelector("[data-code013-bbcode-color]")?.addEventListener("change", () => applyBbcode(textarea, "color", toolbar));
+    panel.querySelector("[data-code013-save]")?.addEventListener("click", saveDraft);
+    panel.querySelector("[data-code013-delete]")?.addEventListener("click", deleteDraft);
+    panel.querySelector("[data-code013-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-code013-reset]")?.addEventListener("click", () => { setValues(defaults); updatePreview(); notify("รีเซ็ต CODE013 แล้ว"); });
+  }
+
+  function showPanel(name) {
+    document.body.classList.add("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === name));
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "roleplay";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.getElementById("currentPageNumber"); if (pageNumber) pageNumber.textContent = "01";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => candidate.classList.toggle("is-active", candidate.dataset.panel === "roleplay"));
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "roleplay";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.getElementById("currentPageNumber"); if (pageNumber) pageNumber.textContent = "01";
+    history.replaceState(null, "", "#roleplay");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openEditor() {
+    if (!isOwnerMode()) { notify("CODE013 ถูกล็อกไว้สำหรับ OWNER MODE"); return; }
+    createPanel();
+    const draft = getDraft();
+    setValues(draft?.values ? { ...defaults, ...draft.values } : defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#editor-code013");
+    updatePreview();
+  }
+
+  window.DDS_CODE013_OWNER = Object.freeze({
+    unlock() {
+      try { sessionStorage.setItem(OWNER_SESSION_KEY, "1"); } catch {}
+      updateCardOwnerState();
+      openEditor();
+      return true;
+    },
+    lock() {
+      try { sessionStorage.removeItem(OWNER_SESSION_KEY); } catch {}
+      updateCardOwnerState();
+      if (panel?.classList.contains("is-active")) goBack();
+      return true;
+    },
+    isUnlocked: isOwnerMode
+  });
+
+  function handleHash() {
+    if (location.hash === "#editor-code013") {
+      if (isOwnerMode()) openEditor();
+      else goBack();
+    }
+  }
+
+  function install() {
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      if (installCard() || attempts > 100) window.clearInterval(timer);
+    }, 100);
+    window.addEventListener("resize", () => {
+      const cardFrame = card?.querySelector("[data-code013-card-preview]");
+      if (cardFrame) fitIframe(cardFrame, card?.querySelector(".dds-roleplay-card-preview"), 16);
+      const editorFrame = panel?.querySelector("[data-code013-editor-preview]");
+      if (editorFrame && panel?.classList.contains("is-active")) fitIframe(editorFrame, panel.querySelector(".dds-code013-editor-stage"), 28);
+    });
+    window.addEventListener("hashchange", handleHash);
+    window.setTimeout(handleHash, 300);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();
