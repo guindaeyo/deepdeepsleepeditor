@@ -8655,6 +8655,7 @@ ${stylesheetLinks}
     genres: "Action\nAdventure\nComedy\nSci-Fi\nSuperhero",
     cast: "Chris Pratt, Zoe Saldaña, Dave Bautista, Karen Gillan, Pom Klementieff, Vin Diesel, Bradley Cooper, Will Poulter",
     director: "James Gunn",
+    synopsis: "หลังจากตั้งรกรากอยู่บน Knowhere เหล่าการ์เดียนส์ต้องเผชิญกับอดีตอันเจ็บปวดของร็อคเก็ต เมื่อชีวิตของเขาตกอยู่ในอันตราย ปีเตอร์ ควิลล์จึงต้องรวบรวมทีมอีกครั้งเพื่อออกเดินทางในภารกิจช่วยเพื่อนของพวกเขา ภารกิจที่อาจหมายถึงจุดจบของ Guardians of the Galaxy หากพวกเขาทำไม่สำเร็จ",
     rating: "8.5",
     hero: "https://iili.io/n34giqx.gif",
     poster: "https://i.ebayimg.com/images/g/-nAAAOSwfwpkLJGo/s-l1600.webp",
@@ -8680,7 +8681,6 @@ ${stylesheetLinks}
     quote: "“We'll all fly away together... one last time... into the forever and beautiful sky”"
   });
 
-  const SYNOPSIS = "หลังจากตั้งรกรากอยู่บน Knowhere เหล่าการ์เดียนส์ต้องเผชิญกับอดีตอันเจ็บปวดของร็อคเก็ต เมื่อชีวิตของเขาตกอยู่ในอันตราย ปีเตอร์ ควิลล์จึงต้องรวบรวมทีมอีกครั้งเพื่อออกเดินทางในภารกิจช่วยเพื่อนของพวกเขา ภารกิจที่อาจหมายถึงจุดจบของ Guardians of the Galaxy หากพวกเขาทำไม่สำเร็จ";
 
   const ids = Object.freeze({
     bg: "movieReviewBgColor",
@@ -8706,6 +8706,7 @@ ${stylesheetLinks}
     genres: "movieReviewGenres",
     cast: "movieReviewCast",
     director: "movieReviewDirector",
+    synopsis: "movieReviewSynopsis",
     rating: "movieReviewRating",
     hero: "movieReviewHero",
     poster: "movieReviewPoster",
@@ -8922,7 +8923,7 @@ ${stylesheetLinks}
       return `<div class="ddsh-movie-gallery-item ddsh-movie-g${n}" style="background-position:${x}% ${y}%;"></div>`;
     }).join("");
 
-    return `<div class="ddsh-moviereview" style="--ddsh-movie-bg:${bg};--ddsh-movie-text:${text};--ddsh-movie-title:${titleColor};--ddsh-movie-meta:${meta};--ddsh-movie-line:${rgba(lineColor, values.lineAlpha)};--ddsh-movie-border:${border};--ddsh-movie-genre-bg:${rgba(genreBgColor, values.genreBgAlpha)};--ddsh-movie-accent:${accent};--ddsh-movie-review:${reviewBg};--ddsh-movie-review-text:${reviewTextColor};--ddsh-movie-star:${star};--ddsh-movie-fade:${rgbTuple(fade)};--ddsh-movie-hero:url('${cssUrl(values.hero)}');--ddsh-movie-poster:url('${cssUrl(values.poster)}');--ddsh-movie-gallery-1:url('${cssUrl(values.gallery1)}');--ddsh-movie-gallery-2:url('${cssUrl(values.gallery2)}');--ddsh-movie-gallery-3:url('${cssUrl(values.gallery3)}');--ddsh-movie-gallery-4:url('${cssUrl(values.gallery4)}');--ddsh-movie-gallery-5:url('${cssUrl(values.gallery5)}');--ddsh-movie-gallery-6:url('${cssUrl(values.gallery6)}');"><div class="ddsh-movie-hero"><div class="ddsh-movie-hero-bg"></div><div class="ddsh-movie-heading"><div class="ddsh-movie-title">${h(values.englishTitle)}</div><div class="ddsh-movie-thai">${h(values.thaiTitle)}</div><div class="ddsh-movie-meta">${metaHtml}</div></div></div><div class="ddsh-movie-content"><div class="ddsh-movie-line"></div><div class="ddsh-movie-genres">${genreHtml}</div><div class="ddsh-movie-information"><div class="ddsh-movie-poster-side"><div class="ddsh-movie-poster"></div><div class="ddsh-movie-rating">${ratingHtml}</div></div><div class="ddsh-movie-detail"><div class="ddsh-movie-credit"><span>CAST BY:</span> <b>${h(values.cast)}</b></div><div class="ddsh-movie-credit"><span>DIRECTED BY:</span> <b>${h(values.director)}</b></div><div class="ddsh-movie-synopsis">${h(SYNOPSIS)}</div></div></div><div class="ddsh-movie-section-title"><span>GALLERY</span></div><div class="ddsh-movie-gallery">${gallery}</div><div class="ddsh-movie-section-title ddsh-movie-review-title"><span>REVIEW</span></div><div class="ddsh-movie-review">${reviewHtml}</div><div class="ddsh-movie-quote">${nl2br(values.quote)}</div></div></div><div class="ddshopfz-mmzi1"><span></span></div>`;
+    return `<div class="ddsh-moviereview" style="--ddsh-movie-bg:${bg};--ddsh-movie-text:${text};--ddsh-movie-title:${titleColor};--ddsh-movie-meta:${meta};--ddsh-movie-line:${rgba(lineColor, values.lineAlpha)};--ddsh-movie-border:${border};--ddsh-movie-genre-bg:${rgba(genreBgColor, values.genreBgAlpha)};--ddsh-movie-accent:${accent};--ddsh-movie-review:${reviewBg};--ddsh-movie-review-text:${reviewTextColor};--ddsh-movie-star:${star};--ddsh-movie-fade:${rgbTuple(fade)};--ddsh-movie-hero:url('${cssUrl(values.hero)}');--ddsh-movie-poster:url('${cssUrl(values.poster)}');--ddsh-movie-gallery-1:url('${cssUrl(values.gallery1)}');--ddsh-movie-gallery-2:url('${cssUrl(values.gallery2)}');--ddsh-movie-gallery-3:url('${cssUrl(values.gallery3)}');--ddsh-movie-gallery-4:url('${cssUrl(values.gallery4)}');--ddsh-movie-gallery-5:url('${cssUrl(values.gallery5)}');--ddsh-movie-gallery-6:url('${cssUrl(values.gallery6)}');"><div class="ddsh-movie-hero"><div class="ddsh-movie-hero-bg"></div><div class="ddsh-movie-heading"><div class="ddsh-movie-title">${h(values.englishTitle)}</div><div class="ddsh-movie-thai">${h(values.thaiTitle)}</div><div class="ddsh-movie-meta">${metaHtml}</div></div></div><div class="ddsh-movie-content"><div class="ddsh-movie-line"></div><div class="ddsh-movie-genres">${genreHtml}</div><div class="ddsh-movie-information"><div class="ddsh-movie-poster-side"><div class="ddsh-movie-poster"></div><div class="ddsh-movie-rating">${ratingHtml}</div></div><div class="ddsh-movie-detail"><div class="ddsh-movie-credit"><span>CAST BY:</span> <b>${h(values.cast)}</b></div><div class="ddsh-movie-credit"><span>DIRECTED BY:</span> <b>${h(values.director)}</b></div><div class="ddsh-movie-synopsis">${nl2br(values.synopsis)}</div></div></div><div class="ddsh-movie-section-title"><span>GALLERY</span></div><div class="ddsh-movie-gallery">${gallery}</div><div class="ddsh-movie-section-title ddsh-movie-review-title"><span>REVIEW</span></div><div class="ddsh-movie-review">${reviewHtml}</div><div class="ddsh-movie-quote">${nl2br(values.quote)}</div></div></div><div class="ddshopfz-mmzi1"><span></span></div>`;
   }
 
   function buildCopyCode(values) {
