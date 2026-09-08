@@ -9273,9 +9273,17 @@ ${stylesheetLinks}
 
   const defaults = Object.freeze({
     image1: "",
+    image1X: "50",
+    image1Y: "35",
     image2: "",
+    image2X: "50",
+    image2Y: "50",
     image3: "",
+    image3X: "50",
+    image3Y: "50",
     image4: "",
+    image4X: "50",
+    image4Y: "50",
     dateTime: "",
     category1: "",
     category2: "",
@@ -9684,6 +9692,22 @@ ${stylesheetLinks}
     return `<label class="${className}"><span>${label}</span><input type="${type}" data-food-field="${key}" placeholder="${placeholder}">${helpText}</label>`;
   }
 
+  function createImagePositionControls(label, xKey, yKey, xValue = 50, yValue = 50) {
+    return `<div class="dds-image-position dds-field-full">
+      <div class="dds-image-position-heading"><span>${label}</span><small>ปรับซ้าย–ขวา และขึ้น–ลง</small></div>
+      <label class="dds-position-row"><span>แนวนอน</span><small>ซ้าย</small><input type="range" min="0" max="100" step="1" value="${xValue}" data-food-field="${xKey}"><small>ขวา</small><output data-food-output="${xKey}">${xValue}%</output></label>
+      <label class="dds-position-row"><span>แนวตั้ง</span><small>ขึ้น</small><input type="range" min="0" max="100" step="1" value="${yValue}" data-food-field="${yKey}"><small>ลง</small><output data-food-output="${yKey}">${yValue}%</output></label>
+    </div>`;
+  }
+
+  function updateFoodImagePositionOutputs() {
+    panel?.querySelectorAll("[data-food-output]").forEach((output) => {
+      const key = output.dataset.foodOutput;
+      const input = panel.querySelector(`[data-food-field="${key}"]`);
+      if (input) output.textContent = `${input.value}%`;
+    });
+  }
+
   function createPanel() {
     if (panel) return panel;
     const main = document.querySelector(".dds-main");
@@ -9723,9 +9747,13 @@ ${stylesheetLinks}
               <div class="dds-control-title"><span>01</span><h2>รูปภาพ</h2></div>
               <div class="dds-form-grid">
                 ${createField("รูปขวาใหญ่", "image1", { full: true, type: "url", placeholder: "วางลิงก์รูปขวาใหญ่" })}
+                ${createImagePositionControls("ตำแหน่งรูปขวาใหญ่", "image1X", "image1Y", 50, 35)}
                 ${createField("รูปซ้ายฟิล์มด้านบน", "image2", { full: true, type: "url", placeholder: "วางลิงก์รูปซ้ายด้านบน" })}
+                ${createImagePositionControls("ตำแหน่งรูปซ้ายฟิล์มด้านบน", "image2X", "image2Y", 50, 50)}
                 ${createField("รูปซ้ายฟิล์มด้านล่าง", "image3", { full: true, type: "url", placeholder: "วางลิงก์รูปซ้ายด้านล่าง" })}
+                ${createImagePositionControls("ตำแหน่งรูปซ้ายฟิล์มด้านล่าง", "image3X", "image3Y", 50, 50)}
                 ${createField("รูปโพลารอยด์ล่างสุด", "image4", { full: true, type: "url", placeholder: "วางลิงก์รูปล่างสุด" })}
+                ${createImagePositionControls("ตำแหน่งรูปโพลารอยด์ล่างสุด", "image4X", "image4Y", 50, 50)}
               </div>
             </section>
 
@@ -9805,7 +9833,12 @@ ${stylesheetLinks}
     panel.querySelector("[data-food-delete]")?.addEventListener("click", deleteDraft);
     panel.querySelector("[data-food-copy]")?.addEventListener("click", copyCode);
     panel.querySelector("[data-food-reset]")?.addEventListener("click", resetFields);
-    panel.addEventListener("input", schedulePreview);
+    panel.addEventListener("input", (event) => {
+      if (event.target.matches('[data-food-field="image1X"], [data-food-field="image1Y"], [data-food-field="image2X"], [data-food-field="image2Y"], [data-food-field="image3X"], [data-food-field="image3Y"], [data-food-field="image4X"], [data-food-field="image4Y"]')) {
+        updateFoodImagePositionOutputs();
+      }
+      schedulePreview();
+    });
     panel.addEventListener("change", schedulePreview);
     installFoodReviewBbcode();
     return panel;
@@ -9826,6 +9859,7 @@ ${stylesheetLinks}
       field.value = next[key] ?? defaults[key] ?? "";
     });
     updateFoodReviewWordCounter();
+    updateFoodImagePositionOutputs();
   }
 
   function buildCode(values = getValues(), previewMode = false) {
@@ -9834,7 +9868,7 @@ ${stylesheetLinks}
     const reviewContent = previewMode
       ? foodBbcodeToPreviewHtml(values.reviewText)
       : nl2br(values.reviewText);
-    return `<link href="https://guindaeyo.github.io/css/foodierv-land.css" rel="stylesheet"><div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('${cssUrl(values.image1)}');--fdreview-img1-x:50%;--fdreview-img1-y:35%;--fdreview-img2:url('${cssUrl(values.image2)}');--fdreview-img2-x:50%;--fdreview-img2-y:50%;--fdreview-img3:url('${cssUrl(values.image3)}');--fdreview-img3-x:50%;--fdreview-img3-y:50%;--fdreview-img4:url('${cssUrl(values.image4)}');--fdreview-img4-x:50%;--fdreview-img4-y:50%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>${h(values.dateTime)}</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category1)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category2)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category3)}</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>${h(values.restaurantName)}</h1><div class="fdreview-location">${h(values.location)}</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">${h(values.score)}</span><small>/ ${h(values.scoreMax)}</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="${filled} of 5 stars"><span>${"★".repeat(filled)}</span><span class="fdreview-star-off">${"★".repeat(off)}</span></div><div class="fdreview-rating-text">${h(values.ratingText)}</div></div><div class="fdreview-quote">${nl2br(values.quote)}</div><div class="fdreview-review-text"><p>${reviewContent}</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿${h(values.price)}</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>${h(values.taste)}</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>${nl2br(values.menuAdvice)}</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>${nl2br(values.extraAdvice)}</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>${nl2br(values.verdict)}</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
+    return `<link href="https://guindaeyo.github.io/css/foodierv-land.css" rel="stylesheet"><div class="fdreview-wrap" style="--fdreview-bg:url('https://i.pinimg.com/vwebp/736x/ce/ab/58/ceab58c646655aeddcf6b0d1248c7174.webp');--fdreview-img1:url('${cssUrl(values.image1)}');--fdreview-img1-x:${Math.max(0, Math.min(100, Number(values.image1X) || 0))}%;--fdreview-img1-y:${Math.max(0, Math.min(100, Number(values.image1Y) || 0))}%;--fdreview-img2:url('${cssUrl(values.image2)}');--fdreview-img2-x:${Math.max(0, Math.min(100, Number(values.image2X) || 0))}%;--fdreview-img2-y:${Math.max(0, Math.min(100, Number(values.image2Y) || 0))}%;--fdreview-img3:url('${cssUrl(values.image3)}');--fdreview-img3-x:${Math.max(0, Math.min(100, Number(values.image3X) || 0))}%;--fdreview-img3-y:${Math.max(0, Math.min(100, Number(values.image3Y) || 0))}%;--fdreview-img4:url('${cssUrl(values.image4)}');--fdreview-img4-x:${Math.max(0, Math.min(100, Number(values.image4X) || 0))}%;--fdreview-img4-y:${Math.max(0, Math.min(100, Number(values.image4Y) || 0))}%;--fdreview-accent:#d8a520;--fdreview-text:#292825;--fdreview-soft:#eeece7;"><div class="fdreview-menubar"><div class="fdreview-menubar-left"><span class="fdreview-apple">●</span><b>Food Journal</b><span>File</span><span>Edit</span><span>View</span><span>Review</span><span>Help</span></div><div class="fdreview-menubar-right"><span>⌁</span><span>⌕</span><span>◖</span><span>${h(values.dateTime)}</span></div></div><div class="fdreview-desktop"><div class="fdreview-film fdreview-film-left"><div class="fdreview-film-hole"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img2);background-position:var(--fdreview-img2-x) var(--fdreview-img2-y);"></div><div class="fdreview-film-photo" style="background-image:var(--fdreview-img3);background-position:var(--fdreview-img3-x) var(--fdreview-img3-y);"></div><div class="fdreview-film-hole"></div></div><div class="fdreview-window fdreview-review-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">FOOD REVIEW — DAILY JOURNAL</div><div class="fdreview-window-tools"><span>⌑</span><span>⌕</span><span>↥</span></div></div><div class="fdreview-review-body"><div class="fdreview-sidebar"><div class="fdreview-sidebar-title">Quick Notes</div><div class="fdreview-sidebar-menu fdreview-sidebar-menu-active"><span>▣</span><b>Food Reviews</b><small>119</small></div><div class="fdreview-sidebar-menu"><span>□</span><b>Recently Visited</b><small>16</small></div><div class="fdreview-sidebar-label">Categories</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category1)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category2)}</div><div class="fdreview-tag"><span class="fdreview-tag-dot"></span>${h(values.category3)}</div></div><div class="fdreview-note"><div class="fdreview-note-toolbar"><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><span>▧</span><span>⌕</span></div><div class="fdreview-note-scroll"><div class="fdreview-note-heading"><span>✦</span><strong>— TODAY'S FOOD REVIEW</strong></div><div class="fdreview-title-row"><div><div class="fdreview-eyebrow">RESTAURANT JOURNAL</div><h1>${h(values.restaurantName)}</h1><div class="fdreview-location">${h(values.location)}</div></div><div class="fdreview-score-box"><span class="fdreview-score-number">${h(values.score)}</span><small>/ ${h(values.scoreMax)}</small></div></div><div class="fdreview-rating"><div class="fdreview-stars" aria-label="${filled} of 5 stars"><span>${"★".repeat(filled)}</span><span class="fdreview-star-off">${"★".repeat(off)}</span></div><div class="fdreview-rating-text">${h(values.ratingText)}</div></div><div class="fdreview-quote">${nl2br(values.quote)}</div><div class="fdreview-review-text"><p>${reviewContent}</p></div><div class="fdreview-detail-grid"><div class="fdreview-detail"><span>ราคา</span><strong>฿${h(values.price)}</strong></div><div class="fdreview-detail"><span>รสชาติ</span><strong>${h(values.taste)}</strong></div></div></div></div></div><div class="fdreview-window-bottom"><span>▢</span><span>✎</span><span>Aa</span><span>☷</span><span>▦</span><span>⌁</span><div class="fdreview-search">⌕ Search</div></div></div><div class="fdreview-window fdreview-photo-window"><div class="fdreview-window-head fdreview-photo-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">Photo Booth</div><div></div></div><div class="fdreview-main-photo" style="background-image:var(--fdreview-img1);background-position:var(--fdreview-img1-x) var(--fdreview-img1-y);"></div><div class="fdreview-camera-bottom"><div class="fdreview-camera-icons"><span>▦</span><span>▧</span><span>▣</span></div><div class="fdreview-camera-button"><span>◉</span></div><div class="fdreview-effects">Effects</div></div></div><div class="fdreview-window fdreview-advice-window"><div class="fdreview-window-head"><div class="fdreview-dots"><span class="fdreview-dot-red"></span><span class="fdreview-dot-yellow"></span><span class="fdreview-dot-green"></span></div><div class="fdreview-window-title">คำแนะนำ.txt</div><div class="fdreview-window-tools"><span>⌕</span><span>↥</span></div></div><div class="fdreview-advice-body"><div class="fdreview-advice-section"><span class="fdreview-advice-number">01</span><div><h3>เมนูที่แนะนำ</h3><p>${nl2br(values.menuAdvice)}</p></div></div><div class="fdreview-advice-section"><span class="fdreview-advice-number">02</span><div><h3>คำแนะนำเพิ่มเติม</h3><p>${nl2br(values.extraAdvice)}</p></div></div><div class="fdreview-recommend-box"><span>FINAL VERDICT</span><strong>${nl2br(values.verdict)}</strong></div></div></div><div class="fdreview-polaroid"><div class="fdreview-polaroid-photo" style="background-image:var(--fdreview-img4);background-position:var(--fdreview-img4-x) var(--fdreview-img4-y);"></div><div class="fdreview-polaroid-caption">good food, good mood.</div></div><div class="fdreview-dock"><span>⌘</span><span>◉</span><span>♫</span><span>✉</span><span>⌁</span><span>▧</span><span>☼</span><span>▣</span></div></div></div><div class="fdreview-credit"><span></span></div>`;
   }
 
   function buildPreviewDocument(code) {
