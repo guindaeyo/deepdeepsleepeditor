@@ -8619,6 +8619,451 @@ ${stylesheetLinks}
 })();
 
 
+
+/* =========================================================
+   FOR REVIEW — REVIEW CODE003 / [รีวิวภาพยนตร์] blue hour
+   Added as a separate editor. Existing CODE/COMMISSION logic is untouched.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  const PANEL_NAME = "editor-review003";
+  const CSS_URL = "https://guindaeyo.github.io/deepdshop/ddsh-revmovezi.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&display=swap";
+
+  const officialValues = Object.freeze({
+    bg: "#191722",
+    text: "#e8e1df",
+    titleColor: "#fff4ee",
+    meta: "#e4cbc5",
+    lineColor: "#d99a89",
+    lineAlpha: "40",
+    border: "#c98f9d",
+    genreBgColor: "#71425b",
+    genreBgAlpha: "22",
+    accent: "#d79a89",
+    reviewBg: "#4b3343",
+    reviewTextColor: "#f7eeee",
+    star: "#f6bd52",
+    fade: "#191722",
+    englishTitle: "Guardians of the Galaxy Vol. 3",
+    thaiTitle: "รวมพันธุ์นักสู้พิทักษ์จักรวาล 3",
+    year: "2023",
+    ageRating: "PG-13",
+    duration: "2h 29min",
+    studio: "Marvel Studios",
+    genres: "Action\nAdventure\nComedy\nSci-Fi\nSuperhero",
+    cast: "Chris Pratt, Zoe Saldaña, Dave Bautista, Karen Gillan, Pom Klementieff, Vin Diesel, Bradley Cooper, Will Poulter",
+    director: "James Gunn",
+    rating: "8.5",
+    hero: "https://iili.io/n34giqx.gif",
+    poster: "https://i.ebayimg.com/images/g/-nAAAOSwfwpkLJGo/s-l1600.webp",
+    gallery1: "https://iili.io/n36rBte.jpg",
+    gallery1X: "50",
+    gallery1Y: "50",
+    gallery2: "https://iili.io/n36rqN9.jpg",
+    gallery2X: "50",
+    gallery2Y: "50",
+    gallery3: "https://iili.io/n36r9MG.jpg",
+    gallery3X: "50",
+    gallery3Y: "50",
+    gallery4: "https://iili.io/n36rdF4.jpg",
+    gallery4X: "50",
+    gallery4Y: "50",
+    gallery5: "https://iili.io/n36rHPf.jpg",
+    gallery5X: "50",
+    gallery5Y: "50",
+    gallery6: "https://iili.io/n36gyns.jpg",
+    gallery6X: "50",
+    gallery6Y: "50",
+    review: "ภาคที่สามของ Guardians of the Galaxy เป็นภาคที่รู้สึกว่าครบรสที่สุด ทั้งความตลก ความวุ่นวาย แอ็กชัน และดราม่าที่หนักกว่าสองภาคก่อนอย่างเห็นได้ชัด โดยเฉพาะการพาเราไปรู้จักอดีตของร็อคเก็ตที่ทำให้ตัวละครนี้มีมิติมากขึ้นแบบคนละเรื่องกับที่เคยมองเขาในภาคก่อน ๆ คือไบแอสแหละยอมรับ มันแบบแงแงอะ\n\nจุดที่ชอบที่สุดคือแก่นของเรื่องกลับพูดถึงคำว่าครอบครัวได้ดี เรารู้สึกมันมีทุกความรักอะ ทั้งแบบเพื่อน ครอบครัว ความรักของแม่ คนที่เคารพ หรือแม้แต่เพื่อนร่วมโลกอย่างแก๊งน้องจิ๊บ ๆ อะ มันแบบ ฮือ อุ๊งอิ๊งในใจ ทุกคนในทีมต่างเป็นคนที่เคยสูญเสีย เคยถูกทอดทิ้ง หรือรู้สึกว่าตัวเองไม่มีที่ยืน แต่สุดท้ายพวกเขาก็เลือกที่จะอยู่เคียงข้างกันเอง ทุกคนยอมรับการเป็นตัวเอง ปีเตอร์กลับบ้าน\n\nยิ่งเป็นภาคปิดของทีมชุดนี้ หลายฉากเลยให้ความรู้สึกทั้งอบอุ่นและใจหายไปพร้อมกัน คือน้ำตาร่วงหลายจุดมาก รู้สึกเป็นการปิดไตรภาคได้ดีมาก ๆ ในความรู้สึกส่วนตัว\n\nเฮ้อ รักแก๊งการ์เดียนส์อะ",
+    quote: "“We'll all fly away together... one last time... into the forever and beautiful sky”"
+  });
+
+  const SYNOPSIS = "หลังจากตั้งรกรากอยู่บน Knowhere เหล่าการ์เดียนส์ต้องเผชิญกับอดีตอันเจ็บปวดของร็อคเก็ต เมื่อชีวิตของเขาตกอยู่ในอันตราย ปีเตอร์ ควิลล์จึงต้องรวบรวมทีมอีกครั้งเพื่อออกเดินทางในภารกิจช่วยเพื่อนของพวกเขา ภารกิจที่อาจหมายถึงจุดจบของ Guardians of the Galaxy หากพวกเขาทำไม่สำเร็จ";
+
+  const ids = Object.freeze({
+    bg: "movieReviewBgColor",
+    text: "movieReviewTextColor",
+    titleColor: "movieReviewTitleColor",
+    meta: "movieReviewMetaColor",
+    lineColor: "movieReviewLineColor",
+    lineAlpha: "movieReviewLineAlpha",
+    border: "movieReviewBorderColor",
+    genreBgColor: "movieReviewGenreBgColor",
+    genreBgAlpha: "movieReviewGenreBgAlpha",
+    accent: "movieReviewAccentColor",
+    reviewBg: "movieReviewReviewBgColor",
+    reviewTextColor: "movieReviewReviewTextColor",
+    star: "movieReviewStarColor",
+    fade: "movieReviewFadeColor",
+    englishTitle: "movieReviewEnglishTitle",
+    thaiTitle: "movieReviewThaiTitle",
+    year: "movieReviewYear",
+    ageRating: "movieReviewAgeRating",
+    duration: "movieReviewDuration",
+    studio: "movieReviewStudio",
+    genres: "movieReviewGenres",
+    cast: "movieReviewCast",
+    director: "movieReviewDirector",
+    rating: "movieReviewRating",
+    hero: "movieReviewHero",
+    poster: "movieReviewPoster",
+    gallery1: "movieReviewGallery1",
+    gallery1X: "movieReviewGallery1X",
+    gallery1Y: "movieReviewGallery1Y",
+    gallery2: "movieReviewGallery2",
+    gallery2X: "movieReviewGallery2X",
+    gallery2Y: "movieReviewGallery2Y",
+    gallery3: "movieReviewGallery3",
+    gallery3X: "movieReviewGallery3X",
+    gallery3Y: "movieReviewGallery3Y",
+    gallery4: "movieReviewGallery4",
+    gallery4X: "movieReviewGallery4X",
+    gallery4Y: "movieReviewGallery4Y",
+    gallery5: "movieReviewGallery5",
+    gallery5X: "movieReviewGallery5X",
+    gallery5Y: "movieReviewGallery5Y",
+    gallery6: "movieReviewGallery6",
+    gallery6X: "movieReviewGallery6X",
+    gallery6Y: "movieReviewGallery6Y",
+    review: "movieReviewText",
+    quote: "movieReviewQuote"
+  });
+
+  const colorPairs = [
+    ["movieReviewBgColorPicker", "movieReviewBgColor"],
+    ["movieReviewTextColorPicker", "movieReviewTextColor"],
+    ["movieReviewTitleColorPicker", "movieReviewTitleColor"],
+    ["movieReviewMetaColorPicker", "movieReviewMetaColor"],
+    ["movieReviewLineColorPicker", "movieReviewLineColor"],
+    ["movieReviewBorderColorPicker", "movieReviewBorderColor"],
+    ["movieReviewGenreBgColorPicker", "movieReviewGenreBgColor"],
+    ["movieReviewAccentColorPicker", "movieReviewAccentColor"],
+    ["movieReviewReviewBgColorPicker", "movieReviewReviewBgColor"],
+    ["movieReviewReviewTextColorPicker", "movieReviewReviewTextColor"],
+    ["movieReviewStarColorPicker", "movieReviewStarColor"],
+    ["movieReviewFadeColorPicker", "movieReviewFadeColor"]
+  ];
+
+  let panel = null;
+  let cardIframe = null;
+  let editorIframe = null;
+  let generatedCode = null;
+  let previewRaf = 0;
+
+  function h(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function attr(value) {
+    return h(value).replace(/`/g, "&#096;");
+  }
+
+  function cssUrl(value) {
+    return String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/[\r\n]/g, "");
+  }
+
+  function clamp(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  function normalizeHex(value, fallback) {
+    const text = String(value || "").trim();
+    if (/^#[0-9a-f]{6}$/i.test(text)) return text.toLowerCase();
+    if (/^#[0-9a-f]{3}$/i.test(text)) {
+      return `#${text.slice(1).split("").map((char) => char + char).join("")}`.toLowerCase();
+    }
+    return fallback;
+  }
+
+  function hexToRgb(hex) {
+    const normalized = normalizeHex(hex, "#000000");
+    const value = normalized.slice(1);
+    return [0, 2, 4].map((index) => Number.parseInt(value.slice(index, index + 2), 16));
+  }
+
+  function rgba(hex, alphaPercent) {
+    const [r, g, b] = hexToRgb(hex);
+    const alpha = clamp(alphaPercent, 0, 100, 100) / 100;
+    return `rgba(${r},${g},${b},${alpha.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")})`;
+  }
+
+  function rgbTuple(hex) {
+    return hexToRgb(hex).join(",");
+  }
+
+  function nl2br(value) {
+    return h(value).replace(/\r?\n/g, "<br>");
+  }
+
+  function bbcodeToPreviewHtml(value) {
+    let text = h(value);
+    text = text
+      .replace(/\[img\]([\s\S]*?)\[\/img\]/gi, '<img src="$1" alt="" style="max-width:100%;height:auto;">')
+      .replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\[url=([^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_m, size, content) => {
+        const sizes = { small: ".82em", medium: "1em", large: "1.28em" };
+        return `<span style="font-size:${sizes[size]}">${content}</span>`;
+      })
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1">$2</div>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>")
+      .replace(/\[(quote|code|hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, '<span style="display:inline-block;padding:2px 5px;border:1px solid rgba(255,255,255,.18)">$2</span>')
+      .replace(/\[list(?:=1)?\]/gi, "<div>")
+      .replace(/\[\/list\]/gi, "</div>")
+      .replace(/\[\*\]/g, "<br>• ")
+      .replace(/\[hr\]/gi, "<hr>")
+      .replace(/\r?\n/g, "<br>");
+    return text;
+  }
+
+  function stripBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
+      .replace(/\[video(?:=[^\]]*)?\][\s\S]*?\[\/video\]/gi, " ")
+      .replace(/\[url(?:=[^\]]*)?\]([\s\S]*?)\[\/url\]/gi, " $1 ")
+      .replace(/\[(?:\/?[a-z][a-z0-9_-]*(?:=[^\]]*)?|\*|hr)\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function countWords(value) {
+    const clean = stripBbcodeForWordCount(value);
+    if (!clean) return 0;
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+      for (const segment of segmenter.segment(clean)) {
+        if (segment.isWordLike) count += 1;
+      }
+      return count;
+    }
+    const words = clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g);
+    return words ? words.length : 0;
+  }
+
+  function updateWordCounter() {
+    const textarea = document.getElementById(ids.review);
+    const counter = panel?.querySelector("[data-movie-review-word-counter]");
+    if (!textarea || !counter) return;
+    const count = countWords(textarea.value);
+    const output = counter.querySelector("[data-movie-review-word-count-number]");
+    if (output) output.textContent = count.toLocaleString("th-TH");
+    counter.dataset.empty = count === 0 ? "true" : "false";
+  }
+
+  function readValues() {
+    const values = {};
+    for (const [key, id] of Object.entries(ids)) {
+      const field = document.getElementById(id);
+      values[key] = field?.value ?? "";
+    }
+    return values;
+  }
+
+  function galleryPosition(value) {
+    return clamp(value, 0, 100, 50);
+  }
+
+  function buildMarkup(values, previewMode = false) {
+    const bg = normalizeHex(values.bg, officialValues.bg);
+    const text = normalizeHex(values.text, officialValues.text);
+    const titleColor = normalizeHex(values.titleColor, officialValues.titleColor);
+    const meta = normalizeHex(values.meta, officialValues.meta);
+    const lineColor = normalizeHex(values.lineColor, officialValues.lineColor);
+    const border = normalizeHex(values.border, officialValues.border);
+    const genreBgColor = normalizeHex(values.genreBgColor, officialValues.genreBgColor);
+    const accent = normalizeHex(values.accent, officialValues.accent);
+    const reviewBg = normalizeHex(values.reviewBg, officialValues.reviewBg);
+    const reviewTextColor = normalizeHex(values.reviewTextColor, officialValues.reviewTextColor);
+    const star = normalizeHex(values.star, officialValues.star);
+    const fade = normalizeHex(values.fade, officialValues.fade);
+
+    const metaParts = [];
+    if (String(values.year || "").trim()) metaParts.push(h(values.year));
+    if (String(values.ageRating || "").trim()) metaParts.push(h(values.ageRating));
+    if (String(values.duration || "").trim()) metaParts.push(h(values.duration));
+    if (String(values.studio || "").trim()) metaParts.push(`Studio: ${h(values.studio)}`);
+    const metaHtml = metaParts.join("<span>|</span>");
+
+    const genreHtml = String(values.genres || "")
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) => `<span>${h(item)}</span>`)
+      .join("");
+
+    const reviewHtml = previewMode ? bbcodeToPreviewHtml(values.review) : nl2br(values.review);
+    const ratingHtml = String(values.rating || "").trim()
+      ? `<span class="ddsh-movie-star">★</span><b>${h(values.rating)}</b><span>/10</span>`
+      : `<span class="ddsh-movie-star">★</span><b></b><span>/10</span>`;
+
+    const gallery = Array.from({ length: 6 }, (_, index) => {
+      const n = index + 1;
+      const x = galleryPosition(values[`gallery${n}X`]);
+      const y = galleryPosition(values[`gallery${n}Y`]);
+      return `<div class="ddsh-movie-gallery-item ddsh-movie-g${n}" style="background-position:${x}% ${y}%;"></div>`;
+    }).join("");
+
+    return `<div class="ddsh-moviereview" style="--ddsh-movie-bg:${bg};--ddsh-movie-text:${text};--ddsh-movie-title:${titleColor};--ddsh-movie-meta:${meta};--ddsh-movie-line:${rgba(lineColor, values.lineAlpha)};--ddsh-movie-border:${border};--ddsh-movie-genre-bg:${rgba(genreBgColor, values.genreBgAlpha)};--ddsh-movie-accent:${accent};--ddsh-movie-review:${reviewBg};--ddsh-movie-review-text:${reviewTextColor};--ddsh-movie-star:${star};--ddsh-movie-fade:${rgbTuple(fade)};--ddsh-movie-hero:url('${cssUrl(values.hero)}');--ddsh-movie-poster:url('${cssUrl(values.poster)}');--ddsh-movie-gallery-1:url('${cssUrl(values.gallery1)}');--ddsh-movie-gallery-2:url('${cssUrl(values.gallery2)}');--ddsh-movie-gallery-3:url('${cssUrl(values.gallery3)}');--ddsh-movie-gallery-4:url('${cssUrl(values.gallery4)}');--ddsh-movie-gallery-5:url('${cssUrl(values.gallery5)}');--ddsh-movie-gallery-6:url('${cssUrl(values.gallery6)}');"><div class="ddsh-movie-hero"><div class="ddsh-movie-hero-bg"></div><div class="ddsh-movie-heading"><div class="ddsh-movie-title">${h(values.englishTitle)}</div><div class="ddsh-movie-thai">${h(values.thaiTitle)}</div><div class="ddsh-movie-meta">${metaHtml}</div></div></div><div class="ddsh-movie-content"><div class="ddsh-movie-line"></div><div class="ddsh-movie-genres">${genreHtml}</div><div class="ddsh-movie-information"><div class="ddsh-movie-poster-side"><div class="ddsh-movie-poster"></div><div class="ddsh-movie-rating">${ratingHtml}</div></div><div class="ddsh-movie-detail"><div class="ddsh-movie-credit"><span>CAST BY:</span> <b>${h(values.cast)}</b></div><div class="ddsh-movie-credit"><span>DIRECTED BY:</span> <b>${h(values.director)}</b></div><div class="ddsh-movie-synopsis">${h(SYNOPSIS)}</div></div></div><div class="ddsh-movie-section-title"><span>GALLERY</span></div><div class="ddsh-movie-gallery">${gallery}</div><div class="ddsh-movie-section-title ddsh-movie-review-title"><span>REVIEW</span></div><div class="ddsh-movie-review">${reviewHtml}</div><div class="ddsh-movie-quote">${nl2br(values.quote)}</div></div></div><div class="ddshopfz-mmzi1"><span></span></div>`;
+  }
+
+  function buildCopyCode(values) {
+    return `<link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet">${buildMarkup(values, false)}`;
+  }
+
+  function buildPreviewDocument(markup, mode) {
+    const card = mode === "card";
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;height:${card ? "100%" : "auto"};background:#242424;overflow:hidden}.dds-movie-preview-shell{position:relative;width:100%;${card ? "height:100%;" : "min-height:1px;"}overflow:hidden}.dds-movie-preview-target{position:absolute;left:0;top:0;width:max-content;height:auto;transform-origin:top left;will-change:transform}.dds-movie-preview-target>.ddsh-moviereview{margin:0!important}</style></head><body><div class="dds-movie-preview-shell"><div class="dds-movie-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-movie-preview-shell');const target=document.querySelector('.dds-movie-preview-target');const root=document.querySelector('.ddsh-moviereview');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!root)return;target.style.transform='none';target.style.left='0px';target.style.top='0px';const rect=root.getBoundingClientRect();const w=Math.max(root.scrollWidth,root.offsetWidth,Math.ceil(rect.width),1);const h=Math.max(root.scrollHeight,root.offsetHeight,Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);${card ? "const vh=Math.max(shell.clientHeight,document.documentElement.clientHeight,1);const scale=Math.max(Math.min((vw-24)/w,(vh-24)/h,1),.05);const x=Math.max(12,Math.round((vw-w*scale)/2));const y=Math.max(12,Math.round((vh-h*scale)/2));target.style.left=x+'px';target.style.top=y+'px';target.style.transform='scale('+scale+')';" : "const scale=Math.max(Math.min((vw-28)/w,1),.08);const x=Math.max(14,Math.round((vw-w*scale)/2));target.style.left=x+'px';target.style.top='14px';target.style.transform='scale('+scale+')';const height=Math.ceil(h*scale+28);shell.style.height=height+'px';document.body.style.height=height+'px';document.documentElement.style.height=height+'px';if(window.frameElement)window.frameElement.style.height=Math.max(760,height)+'px';"}if(window.frameElement){window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);if(window.ResizeObserver&&root)new ResizeObserver(fit).observe(root);if(window.MutationObserver&&root)new MutationObserver(fit).observe(root,{childList:true,subtree:true,characterData:true,attributes:true});setTimeout(fit,80);setTimeout(fit,420);window.__ddsFitMovieReview=fit;fit()})();<\/script></body></html>`;
+  }
+
+  function renderIframe(iframe, markup, mode) {
+    if (!iframe) return;
+    const srcdoc = buildPreviewDocument(markup, mode);
+    const key = mode === "card" ? "ddsMovieCardSrcdoc" : "ddsMovieEditorSrcdoc";
+    if (iframe.dataset[key] === srcdoc) {
+      iframe.contentWindow?.__ddsFitMovieReview?.();
+      return;
+    }
+    iframe.dataset[key] = srcdoc;
+    iframe.classList.add("dds-preview-loading");
+    iframe.classList.remove("dds-preview-ready");
+    iframe.srcdoc = srcdoc;
+  }
+
+  function updateOutputs() {
+    panel?.querySelectorAll("[data-movie-output]").forEach((output) => {
+      const field = document.getElementById(output.dataset.movieOutput);
+      if (!field) return;
+      output.textContent = `${field.value}%`;
+    });
+  }
+
+  function updateMovieReview() {
+    if (!panel) return;
+    const values = readValues();
+    if (generatedCode) generatedCode.value = buildCopyCode(values);
+    updateOutputs();
+    updateWordCounter();
+    renderIframe(editorIframe, buildMarkup(values, true), "editor");
+  }
+
+  window.updateMovieReview = updateMovieReview;
+
+  function scheduleUpdate() {
+    cancelAnimationFrame(previewRaf);
+    previewRaf = requestAnimationFrame(updateMovieReview);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+    return Promise.resolve();
+  }
+
+  function openEditor() {
+    document.body.classList.add("dds-editor-mode");
+    document.querySelectorAll("[data-panel]").forEach((candidate) => {
+      candidate.classList.toggle("is-active", candidate === panel);
+    });
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "review";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+    const pageNumber = document.querySelector("#currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "03";
+    history.replaceState(null, "", "#editor-review003");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    requestAnimationFrame(updateMovieReview);
+  }
+
+  function renderOfficialCard() {
+    renderIframe(cardIframe, buildMarkup(officialValues, true), "card");
+  }
+
+  function initializeMovieReview() {
+    if (window.__DDS_MOVIE_REVIEW_003_INSTALLED__) return;
+    panel = document.querySelector(`[data-panel="${PANEL_NAME}"]`);
+    cardIframe = document.querySelector("#reviewCardPreview003");
+    editorIframe = document.querySelector("#movieReviewPreview");
+    generatedCode = document.querySelector("#generatedMovieReviewCode");
+    const editButton = document.querySelector('[data-edit-review="review003"]');
+    const copyButton = document.querySelector("#copyGeneratedMovieReviewCode");
+    if (!panel || !cardIframe || !editorIframe || !generatedCode || !editButton || !copyButton) return;
+    window.__DDS_MOVIE_REVIEW_003_INSTALLED__ = true;
+
+    colorPairs.forEach(([pickerId, textId]) => {
+      const picker = document.getElementById(pickerId);
+      const textInput = document.getElementById(textId);
+      picker?.addEventListener("input", () => {
+        if (!textInput) return;
+        textInput.value = picker.value;
+        textInput.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      textInput?.addEventListener("input", () => {
+        const next = normalizeHex(textInput.value, "");
+        if (picker && next) picker.value = next;
+      });
+    });
+
+    panel.addEventListener("input", scheduleUpdate);
+    panel.addEventListener("change", scheduleUpdate);
+
+    copyButton.addEventListener("click", () => {
+      updateMovieReview();
+      copyText(generatedCode.value)
+        .then(() => window.showToast?.("คัดลอกโคด REVIEW CODE003 แล้ว"))
+        .catch(() => window.showToast?.("คัดลอกโคดไม่สำเร็จ"));
+    });
+
+    editButton.addEventListener("click", openEditor);
+    document.querySelectorAll('[data-page="review"], [data-go="review"]').forEach((button) => {
+      button.addEventListener("click", () => requestAnimationFrame(renderOfficialCard));
+    });
+    window.addEventListener("hashchange", () => {
+      if (window.location.hash === "#editor-review003") openEditor();
+      if (window.location.hash === "#review") renderOfficialCard();
+    });
+
+    renderOfficialCard();
+    updateOutputs();
+    updateMovieReview();
+    if (window.location.hash === "#editor-review003") queueMicrotask(openEditor);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeMovieReview, { once: true });
+  } else {
+    initializeMovieReview();
+  }
+})();
+
+
 /* =========================================================
    LANDON COMMISSION — PASSWORD-GATED EDITOR (TRIAL)
    This is a client-side access gate for the static site.
