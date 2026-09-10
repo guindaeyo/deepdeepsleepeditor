@@ -377,7 +377,7 @@
     tabs.setAttribute("role", "tablist");
     tabs.setAttribute(
       "aria-label",
-      "เลือกดูผลงานคอมมิชชั่นหรือกิจกรรม"
+      "เลือกดูผลงานคอมมิชชั่น กิจกรรม หรือโคดของฉัน"
     );
     tabs.innerHTML = `
       <button
@@ -399,6 +399,16 @@
       >
         <small>02</small>
         <span>ACTIVITY</span>
+      </button>
+      <button
+        class="dds-work-tab"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        data-work-tab="my-own-code"
+      >
+        <small>03</small>
+        <span>MY OWN CODE</span>
       </button>
     `;
 
@@ -451,6 +461,21 @@
     `;
     commissionWorkPanel.after(activityWorkPanel);
 
+    const myOwnCodeWorkPanel = document.createElement("div");
+    myOwnCodeWorkPanel.className = "dds-work-panel";
+    myOwnCodeWorkPanel.dataset.workPanel = "my-own-code";
+    myOwnCodeWorkPanel.hidden = true;
+    myOwnCodeWorkPanel.innerHTML = `
+      <div class="dds-work-section-heading">
+        <div>
+          <p>PERSONAL CODE ARCHIVE</p>
+          <h2>MY OWN CODE</h2>
+        </div>
+      </div>
+      <div class="dds-roleplay-grid dds-commission-grid dds-my-own-code-grid"></div>
+    `;
+    activityWorkPanel.after(myOwnCodeWorkPanel);
+
     tabs.addEventListener("click", (event) => {
       const button = event.target.closest("[data-work-tab]");
 
@@ -502,7 +527,7 @@
 
       .dds-work-tabs {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
         margin: 30px 0 38px;
         padding: 6px;
@@ -672,6 +697,7 @@
 
       @media (max-width: 700px) {
         .dds-work-tabs {
+          grid-template-columns: minmax(0, 1fr);
           margin-top: 22px;
         }
 
@@ -703,6 +729,13 @@
     `;
 
     document.head.appendChild(style);
+  }
+
+
+  function openMyOwnCodeWorkTab() {
+    requestAnimationFrame(() => {
+      document.querySelector('[data-work-tab="my-own-code"]')?.click();
+    });
   }
 
 
@@ -2500,7 +2533,7 @@ ${stylesheetLinks}
     }
 
     const commissionGrid = document.querySelector(
-      ".dds-commission-grid"
+      ".dds-my-own-code-grid"
     );
     const footer = document.querySelector(
       ".dds-footer"
@@ -2659,10 +2692,10 @@ ${stylesheetLinks}
     viewPanel.innerHTML = `
       <div class="dds-commission-view-toolbar">
         <button
-          aria-label="กลับหน้า COMMISSION & SHOWCASE"
+          aria-label="กลับหน้า MY OWN CODE"
           class="dds-back-button"
           data-my-own-code-back
-          title="กลับหน้า COMMISSION & SHOWCASE"
+          title="กลับหน้า MY OWN CODE"
           type="button"
         >
           ←
@@ -2994,6 +3027,7 @@ ${stylesheetLinks}
       }
 
       ensureCardPreview();
+      openMyOwnCodeWorkTab();
     });
 
     document
@@ -3086,8 +3120,8 @@ ${stylesheetLinks}
     }
 
     const commissionGrid = document.querySelector(
-      '[data-work-panel="commission"] .dds-commission-grid'
-    ) || document.querySelector('.dds-commission-grid');
+      '.dds-my-own-code-grid'
+    );
     const footer = document.querySelector('.dds-footer');
 
     if (!commissionGrid || !footer) {
@@ -3245,10 +3279,10 @@ ${stylesheetLinks}
     viewPanel.innerHTML = `
       <div class="dds-commission-view-toolbar">
         <button
-          aria-label="กลับหน้า COMMISSION & SHOWCASE"
+          aria-label="กลับหน้า MY OWN CODE"
           class="dds-back-button"
           data-my-own-code-history-back
-          title="กลับหน้า COMMISSION & SHOWCASE"
+          title="กลับหน้า MY OWN CODE"
           type="button"
         >
           ←
@@ -3515,6 +3549,7 @@ ${stylesheetLinks}
       }
 
       ensureCardPreview();
+      openMyOwnCodeWorkTab();
     });
 
     document
@@ -3566,8 +3601,8 @@ ${stylesheetLinks}
     }
 
     const commissionGrid = document.querySelector(
-      '[data-work-panel="commission"] .dds-commission-grid'
-    ) || document.querySelector('.dds-commission-grid');
+      '.dds-my-own-code-grid'
+    );
     const footer = document.querySelector('.dds-footer');
 
     if (!commissionGrid || !footer) {
@@ -3716,10 +3751,10 @@ ${stylesheetLinks}
     viewPanel.innerHTML = `
       <div class="dds-commission-view-toolbar">
         <button
-          aria-label="กลับหน้า COMMISSION & SHOWCASE"
+          aria-label="กลับหน้า MY OWN CODE"
           class="dds-back-button"
           data-my-own-code-topic-back
-          title="กลับหน้า COMMISSION & SHOWCASE"
+          title="กลับหน้า MY OWN CODE"
           type="button"
         >
           ←
@@ -3986,6 +4021,7 @@ ${stylesheetLinks}
       }
 
       ensureCardPreview();
+      openMyOwnCodeWorkTab();
     });
 
     document
@@ -4071,6 +4107,7 @@ ${stylesheetLinks}
     style.id = 'ddsThreeColumnShowcaseGridStyles';
     style.textContent = `
       [data-work-panel="commission"] > .dds-commission-grid,
+      .dds-my-own-code-grid,
       .dds-activity-grid {
         display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -4080,6 +4117,7 @@ ${stylesheetLinks}
 
       [data-work-panel="commission"] > .dds-commission-grid
         > .dds-commission-card,
+      .dds-my-own-code-grid > .dds-commission-card,
       .dds-activity-grid > .dds-commission-card {
         width: 100% !important;
         min-width: 0 !important;
@@ -4088,6 +4126,7 @@ ${stylesheetLinks}
 
       @media (max-width: 980px) {
         [data-work-panel="commission"] > .dds-commission-grid,
+        .dds-my-own-code-grid,
         .dds-activity-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         }
@@ -4095,6 +4134,7 @@ ${stylesheetLinks}
 
       @media (max-width: 650px) {
         [data-work-panel="commission"] > .dds-commission-grid,
+        .dds-my-own-code-grid,
         .dds-activity-grid {
           grid-template-columns: minmax(0, 1fr) !important;
           gap: 16px !important;
