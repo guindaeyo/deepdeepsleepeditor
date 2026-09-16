@@ -19748,19 +19748,33 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function fitIframe(iframe, stage, padding = 24) {
     if (!iframe || !stage) return;
+
     const m = measureIframe(iframe);
-    const avail = Math.max(1, stage.clientWidth - padding*2);
-    const scale = Math.min(1, avail / m.width);
-    const h = Math.ceil(m.height * scale) + padding*2;
-    stage.style.height = `${h}px`;
-    iframe.style.position = "absolute";
-    iframe.style.left = "50%";
-    iframe.style.top = `${padding}px`;
-    iframe.style.width = `${m.width}px`;
-    iframe.style.height = `${m.height}px`;
-    iframe.style.maxWidth = "none";
-    iframe.style.transform = `translateX(-50%) scale(${scale})`;
-    iframe.style.transformOrigin = "top center";
+
+    /*
+     * EDITOR LIVE PREVIEW:
+     * แสดงโคดตามขนาดจริง ไม่ย่อ scale
+     * ความกว้างจริง 700px และความสูงตามเนื้อหาโคดทั้งหมด
+     * ถ้าจอแคบกว่า 700px ให้เลื่อนแนวนอนแทน
+     */
+    stage.style.setProperty("height", `${m.height + padding * 2}px`, "important");
+    stage.style.setProperty("min-height", `${m.height + padding * 2}px`, "important");
+    stage.style.setProperty("max-height", "none", "important");
+    stage.style.setProperty("overflow-x", "auto", "important");
+    stage.style.setProperty("overflow-y", "hidden", "important");
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", `${padding}px`, "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("min-width", `${m.width}px`, "important");
+    iframe.style.setProperty("max-width", `${m.width}px`, "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("min-height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-height", `${m.height}px`, "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("transform", "translateX(-50%)", "important");
+    iframe.style.setProperty("transform-origin", "top center", "important");
   }
 
   function fitAlanViewIframe(iframe, stage, padding = 36) {

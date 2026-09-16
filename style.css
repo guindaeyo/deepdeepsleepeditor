@@ -9070,3 +9070,29 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   pointer-events: none !important;
   background: transparent !important;
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v101
+   EDITOR LIVE PREVIEW — ACTUAL CODE SIZE
+================================================== */
+.dds-alan-commission-editor .dds-alan-editor-stage {
+  width: 100% !important;
+  min-height: 0 !important;
+  position: relative !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  background:
+    radial-gradient(
+      circle at 50% 22%,
+      rgba(255,255,255,.035),
+      transparent 35%
+    ),
+    #242424 !important;
+}
+
+.dds-alan-commission-editor .dds-alan-editor-stage > iframe {
+  max-width: none !important;
+  margin: 0 !important;
+  transform-origin: top center !important;
+}
