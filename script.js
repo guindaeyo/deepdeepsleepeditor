@@ -19327,7 +19327,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function openEditor() {
+  function openEditorUnlocked() {
     createPanel();
     const draft = getDraft();
     const restored = draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults };
@@ -19363,5 +19363,536 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
+})();
+
+/* =========================================================
+   COMMISSION 003 — ALAN R. CLINTON / PROFILE
+   LOVE WINS ALL
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_COMMISSION_ALAN_PROFILE_INSTALLED__) return;
+  window.__DDS_COMMISSION_ALAN_PROFILE_INSTALLED__ = true;
+
+  const PANEL_NAME = "editor-commission-alan-profile";
+  const VIEW_PANEL_NAME = "view-commission-alan-profile";
+  const DRAFT_KEY = "dds:commission:alan-profile:draft:v1";
+  const ACCESS_HASH = "6923328ae13991e3b46ace7d98b713a9d92ef41065cf10d7d499646bc774f50c";
+  const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked";
+  const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-alanprof.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Rock+Salt&display=swap";
+
+  const defaults = Object.freeze({
+    bg:"#171717", paper:"#ddd6c8", paper2:"#c7bfb0", papertext:"#1e1c1a",
+    white:"#ece7df", pink:"#ea9dbd", small:"rgba(236,231,223,.94)",
+    smallHover:"#ffffff", line:"rgba(240,236,228,.28)", shadow:"rgba(0,0,0,.46)",
+    ripTop:"#e8e0d2", ripBottom:"#cfc4b4", topPaper:"#e8e0d2", leftPaper:"#e8e0d2",
+    grain:"https://iili.io/nnRVMlI.jpg", grainOpacity:25, grainSize:36, grainFineSize:18, grainFineOpacity:42,
+
+    photo1:"https://i.pinimg.com/1200x/a2/dd/fb/a2ddfb3b9a23b64ead4e5e895c2bc5c1.jpg",
+    photo2:"https://i.pinimg.com/736x/23/39/a7/2339a78dd039b68405b878f8f927477c.jpg",
+    photo3:"https://i.pinimg.com/736x/47/c3/a1/47c3a1cb3b90fd21eab949a83b29c3a5.jpg",
+    photo4:"https://i.pinimg.com/736x/87/9d/86/879d860a2a3daf1a98cf2d4e2e46700f.jpg",
+    photo1x:50, photo1y:50, photo1zoom:100,
+    photo2x:50, photo2y:50, photo2zoom:100,
+    photo3x:50, photo3y:50, photo3zoom:100,
+    photo4x:50, photo4y:50, photo4zoom:100,
+
+    topMain:"LOVE WINS ALL", topScript:"somewhere in our memories", topX:0, topY:0,
+    title1:"Alan", title2:"R. Clinton",
+
+    note1Text:"woofwoof", note1Link:"LINK-1", note1x:0, note1y:0,
+    note2Text:"ribbi", note2Link:"LINK-2", note2x:0, note2y:0,
+    note3Text:"discord", note3Link:"LINK-3", note3x:0, note3y:0,
+    note4Text:"autobiography", note4Link:"LINK-4", note4x:0, note4y:0,
+    note5Text:"handsome puppy", note5Link:"LINK-5", note5x:0, note5y:0,
+
+    star1:"✦", star1x:0, star1y:0,
+    star2:"✶", star2x:0, star2y:0,
+
+    cassette:"https://iili.io/nnRQmnj.png", cassetteX:0, cassetteY:0,
+
+    sideScript:"Werewolf", sideScriptX:0, sideScriptY:0,
+    sideCopy:"This space can be used for a short paragraph, quote or description. You can replace every single word here with your own text. The right paper strip is designed to follow the same vertical editorial mood as the sample poster.",
+    sideCopyX:0, sideCopyY:0,
+    sideBottom:"woofwoof", sideBottomX:0, sideBottomY:0
+  });
+
+  let panel = null;
+  let viewPanel = null;
+  let card = null;
+  let modal = null;
+  let previewTimer = 0;
+  let draftTimer = 0;
+
+  const esc = (value) => String(value ?? "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+
+  const attr = esc;
+
+  function rgbaToHex(value, fallback="#ffffff") {
+    const v = String(value || "").trim();
+    if (/^#[0-9a-f]{6}$/i.test(v)) return v;
+    const m = v.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (!m) return fallback;
+    return "#" + [m[1],m[2],m[3]].map(n => Math.max(0,Math.min(255,+n)).toString(16).padStart(2,"0")).join("");
+  }
+
+  function showToast(text) {
+    const toast = document.getElementById("siteToast");
+    const target = document.getElementById("siteToastText");
+    if (target) target.textContent = text;
+    if (!toast) return;
+    toast.classList.add("is-show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => toast.classList.remove("is-show"), 1800);
+  }
+
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map(byte => byte.toString(16).padStart(2,"0"))
+      .join("");
+  }
+
+  function closeAccessModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function createAccessModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <form class="dds-commission-lock-dialog" data-alan-lock-form>
+        <small>CLIENT ACCESS / ALAN R. CLINTON</small>
+        <h2>Protected editor</h2>
+        <p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขงานคอมมิชชั่น</p>
+        <label class="dds-commission-lock-field">
+          <span>รหัสผ่าน</span>
+          <input type="password" autocomplete="current-password" data-alan-password placeholder="กรอกรหัสผ่าน">
+        </label>
+        <p class="dds-commission-lock-error" data-alan-lock-error></p>
+        <div class="dds-commission-lock-actions">
+          <button type="submit">UNLOCK EDITOR</button>
+          <button type="button" data-alan-lock-cancel>CANCEL</button>
+        </div>
+      </form>`;
+    document.body.appendChild(modal);
+
+    modal.querySelector("[data-alan-lock-cancel]")?.addEventListener("click", closeAccessModal);
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeAccessModal();
+    });
+    modal.querySelector("[data-alan-lock-form]")?.addEventListener("submit", async event => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-alan-password]");
+      const error = modal.querySelector("[data-alan-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        const hash = await sha256(input.value);
+        if (hash !== ACCESS_HASH) {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+          return;
+        }
+        sessionStorage.setItem(ACCESS_SESSION_KEY,"1");
+        closeAccessModal();
+        openEditorUnlocked();
+      } catch (err) {
+        console.error(err);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function requestEditorAccess() {
+    if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
+      openEditorUnlocked();
+      return;
+    }
+    const dialog = createAccessModal();
+    const input = dialog.querySelector("[data-alan-password]");
+    const error = dialog.querySelector("[data-alan-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    setTimeout(() => input?.focus(),30);
+  }
+
+  function buildCode(v = defaults, preview = false) {
+    const styleVars = [
+      `--lwa-bg:${v.bg}`, `--lwa-paper:${v.paper}`, `--lwa-paper2:${v.paper2}`,
+      `--lwa-papertext:${v.papertext}`, `--lwa-white:${v.white}`, `--lwa-pink:${v.pink}`,
+      `--lwa-small:${v.small}`, `--lwa-small-hover:${v.smallHover}`,
+      `--lwa-line:${v.line}`, `--lwa-shadow:${v.shadow}`,
+      `--lwa-grain:url('${String(v.grain).replace(/'/g,"%27")}')`,
+      `--lwa-grain-opacity:${(+v.grainOpacity/100).toFixed(2)}`,
+      `--lwa-grain-size:${+v.grainSize}cqw`,
+      `--lwa-grain-fine-size:${+v.grainFineSize}cqw`,
+      `--lwa-grain-fine-opacity:${(+v.grainFineOpacity/100).toFixed(2)}`,
+      `--lwa-rip-top:${v.ripTop}`, `--lwa-rip-bottom:${v.ripBottom}`,
+      `--lwa-top-paper-color:${v.topPaper}`, `--lwa-left-paper-color:${v.leftPaper}`
+    ].join(";");
+
+    const editorCss = `<style>
+.ddsh-commitalan-ref-photo1 img{object-position:${+v.photo1x}% ${+v.photo1y}% !important;scale:${(+v.photo1zoom/100).toFixed(3)} !important}
+.ddsh-commitalan-ref-photo2 img{object-position:${+v.photo2x}% ${+v.photo2y}% !important;scale:${(+v.photo2zoom/100).toFixed(3)} !important}
+.ddsh-commitalan-ref-photo3 img{object-position:${+v.photo3x}% ${+v.photo3y}% !important;scale:${(+v.photo3zoom/100).toFixed(3)} !important}
+.ddsh-commitalan-ref-photo4 img{object-position:${+v.photo4x}% ${+v.photo4y}% !important;scale:${(+v.photo4zoom/100).toFixed(3)} !important}
+.ddsh-commitalan-ref-top{translate:${+v.topX}px ${+v.topY}px !important}
+.ddsh-commitalan-ref-note1{translate:${+v.note1x}px ${+v.note1y}px !important}
+.ddsh-commitalan-ref-note2{translate:${+v.note2x}px ${+v.note2y}px !important}
+.ddsh-commitalan-ref-note3{translate:${+v.note3x}px ${+v.note3y}px !important}
+.ddsh-commitalan-ref-note4{translate:${+v.note4x}px ${+v.note4y}px !important}
+.ddsh-commitalan-ref-note5{translate:${+v.note5x}px ${+v.note5y}px !important}
+.ddsh-commitalan-ref-star1{translate:${+v.star1x}px ${+v.star1y}px !important}
+.ddsh-commitalan-ref-star2{translate:${+v.star2x}px ${+v.star2y}px !important}
+.ddsh-commitalan-ref-cassette{translate:${+v.cassetteX}px ${+v.cassetteY}px !important}
+.ddsh-commitalan-ref-side-script{translate:${+v.sideScriptX}px ${+v.sideScriptY}px !important}
+.ddsh-commitalan-ref-side-copy{translate:${+v.sideCopyX}px ${+v.sideCopyY}px !important}
+.ddsh-commitalan-ref-side-bottom{translate:${+v.sideBottomX}px ${+v.sideBottomY}px !important}
+</style>`;
+
+    return `<link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet">${editorCss}<div class="ddsh-commitalan-ref" style="${styleVars};"><div class="ddsh-commitalan-ref-main"><div class="ddsh-commitalan-ref-photo ddsh-commitalan-ref-photo1"><img src="${attr(v.photo1)}" alt=""></div><div class="ddsh-commitalan-ref-photo ddsh-commitalan-ref-photo2"><img src="${attr(v.photo2)}" alt=""></div><div class="ddsh-commitalan-ref-photo ddsh-commitalan-ref-photo3"><img src="${attr(v.photo3)}" alt=""></div><div class="ddsh-commitalan-ref-photo ddsh-commitalan-ref-photo4"><img src="${attr(v.photo4)}" alt=""></div><div class="ddsh-commitalan-ref-grain"></div><div class="ddsh-commitalan-ref-scratch"></div><div class="ddsh-commitalan-ref-top"><div class="ddsh-commitalan-ref-top-main">${esc(v.topMain)}</div><div class="ddsh-commitalan-ref-top-script">${esc(v.topScript)}</div></div><div class="ddsh-commitalan-ref-title"><span>${esc(v.title1)}</span><span>${esc(v.title2)}</span></div><a href="${attr(v.note1Link)}" target="_blank" class="ddsh-commitalan-ref-note ddsh-commitalan-ref-note1">${esc(v.note1Text)}</a><a href="${attr(v.note2Link)}" target="_blank" class="ddsh-commitalan-ref-note ddsh-commitalan-ref-note2">${esc(v.note2Text)}</a><a href="${attr(v.note3Link)}" target="_blank" class="ddsh-commitalan-ref-note ddsh-commitalan-ref-note3">${esc(v.note3Text)}</a><a href="${attr(v.note4Link)}" target="_blank" class="ddsh-commitalan-ref-note ddsh-commitalan-ref-note4">${esc(v.note4Text)}</a><a href="${attr(v.note5Link)}" target="_blank" class="ddsh-commitalan-ref-note ddsh-commitalan-ref-note5">${esc(v.note5Text)}</a><div class="ddsh-commitalan-ref-star ddsh-commitalan-ref-star1">${esc(v.star1)}</div><div class="ddsh-commitalan-ref-star ddsh-commitalan-ref-star2">${esc(v.star2)}</div><div class="ddsh-commitalan-ref-cassette"><img src="${attr(v.cassette)}" alt=""></div><div class="ddsh-commitalan-ref-rip"></div></div><aside class="ddsh-commitalan-ref-side"><div class="ddsh-commitalan-ref-side-script">${esc(v.sideScript)}</div><div class="ddsh-commitalan-ref-side-copy">${esc(v.sideCopy)}</div><div class="ddsh-commitalan-ref-side-bottom">${esc(v.sideBottom)}</div></aside></div><div class="ddshopfz-ccm01"><span></span></div>`;
+  }
+
+  function iframeDoc(code, blurred = false) {
+    const blurCss = blurred ? `<style>html,body{overflow:hidden!important}.ddsh-commitalan-ref,.ddshopfz-ccm01{filter:blur(16px) saturate(.6);opacity:.72;user-select:none;pointer-events:none}</style>` : "";
+    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${blurCss}</head><body style="margin:0;background:#242424;">${code}</body></html>`;
+  }
+
+  function writeIframe(iframe, code, blurred = false, done) {
+    if (!iframe) return;
+    iframe.onload = () => done?.();
+    iframe.srcdoc = iframeDoc(code, blurred);
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe.contentDocument;
+      const el = doc?.querySelector(".ddsh-commitalan-ref");
+      const credit = doc?.querySelector(".ddshopfz-ccm01");
+      if (el) {
+        const r = el.getBoundingClientRect();
+        const c = credit?.getBoundingClientRect();
+        return {width: Math.ceil(Math.max(el.scrollWidth,r.width,700)), height: Math.ceil(Math.max(el.scrollHeight,r.height) + (c?.height || 28) + 16)};
+      }
+      const body = doc?.body;
+      return {width: Math.max(700,body?.scrollWidth||700),height:Math.max(700,body?.scrollHeight||700)};
+    } catch { return {width:700,height:900}; }
+  }
+
+  function fitIframe(iframe, stage, padding = 24) {
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const avail = Math.max(1, stage.clientWidth - padding*2);
+    const scale = Math.min(1, avail / m.width);
+    const h = Math.ceil(m.height * scale) + padding*2;
+    stage.style.height = `${h}px`;
+    iframe.style.position = "absolute";
+    iframe.style.left = "50%";
+    iframe.style.top = `${padding}px`;
+    iframe.style.width = `${m.width}px`;
+    iframe.style.height = `${m.height}px`;
+    iframe.style.maxWidth = "none";
+    iframe.style.transform = `translateX(-50%) scale(${scale})`;
+    iframe.style.transformOrigin = "top center";
+  }
+
+  function colorField(label,key,value) {
+    const hex = rgbaToHex(value);
+    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-alan-picker="${key}" value="${hex}"><input type="text" data-alan-field="${key}" value="${attr(value)}" spellcheck="false"></div></label>`;
+  }
+  function textField(label,key,value,full=false) {
+    return `<label class="dds-field${full?" dds-field-full":""}"><span>${label}</span><input type="text" data-alan-field="${key}" value="${attr(value)}" spellcheck="false"></label>`;
+  }
+  function areaField(label,key,value) {
+    return `<label class="dds-field dds-field-full"><span>${label}</span><textarea data-alan-field="${key}" rows="4" spellcheck="false">${esc(value)}</textarea></label>`;
+  }
+  function rangeField(label,key,value,min,max,step=1,suffix="") {
+    return `<label class="dds-field"><span>${label}</span><div class="dds-alan-range-row"><input type="range" data-alan-field="${key}" min="${min}" max="${max}" step="${step}" value="${value}"><output data-alan-output="${key}">${value}${suffix}</output></div></label>`;
+  }
+  function xyControls(prefix, x=0,y=0) {
+    return `${rangeField("ซ้าย–ขวา",`${prefix}x`,x,-250,250,1,"px")}${rangeField("ขึ้น–ลง",`${prefix}y`,y,-250,250,1,"px")}`;
+  }
+  function photoSection(n) {
+    return `<section class="dds-control-section"><div class="dds-control-title"><span>0${n+1}</span><h2>รูปที่ ${n}</h2></div><div class="dds-form-grid">${textField("URL รูป",`photo${n}`,defaults[`photo${n}`],true)}${rangeField("ตำแหน่งซ้าย–ขวา",`photo${n}x`,50,0,100,1,"%")}${rangeField("ตำแหน่งขึ้น–ลง",`photo${n}y`,50,0,100,1,"%")}${rangeField("ซูม",`photo${n}zoom`,100,50,220,1,"%")}</div></section>`;
+  }
+  function noteSection(n) {
+    return `<section class="dds-control-section"><div class="dds-control-title"><span>N${n}</span><h2>NOTE ${n}</h2></div><div class="dds-form-grid">${textField("ข้อความ",`note${n}Text`,defaults[`note${n}Text`])}${textField("ลิงก์",`note${n}Link`,defaults[`note${n}Link`],true)}${xyControls(`note${n}`,0,0)}</div></section>`;
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-alan-commission-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `
+      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-back type="button">←</button><div><p class="dds-eyebrow">COMMISSION CODE EDITOR</p><h1>ALAN R. CLINTON</h1><p>โคดประเภทโปรไฟล์ · LOVE WINS ALL</p></div></div>
+      <div class="dds-protected-commission-layout">
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>COMMISSION / ALAN</strong></div><div class="dds-alan-editor-stage"><iframe class="dds-protected-commission-preview-frame dds-alan-editor-preview" data-alan-preview scrolling="no" title="ตัวอย่างโคด Alan"></iframe></div></div>
+        <div class="dds-protected-commission-controls-column">
+          <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-alan-draft-status>ยังไม่มีแบบร่าง</small></div></div>
+          <div class="dds-alan-controls-scroll">
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">
+              ${colorField("พื้นหลัง — --lwa-bg","bg",defaults.bg)}
+              ${colorField("กระดาษหลัก — --lwa-paper","paper",defaults.paper)}
+              ${colorField("กระดาษรอง — --lwa-paper2","paper2",defaults.paper2)}
+              ${colorField("ข้อความบนกระดาษ","papertext",defaults.papertext)}
+              ${colorField("สีขาว","white",defaults.white)}
+              ${colorField("สีชมพู","pink",defaults.pink)}
+              ${colorField("ข้อความเล็ก","small",defaults.small)}
+              ${colorField("ข้อความเล็กตอน hover","smallHover",defaults.smallHover)}
+              ${colorField("เส้น","line",defaults.line)}
+              ${colorField("เงา","shadow",defaults.shadow)}
+              ${colorField("รอยฉีกด้านบน","ripTop",defaults.ripTop)}
+              ${colorField("รอยฉีกด้านล่าง","ripBottom",defaults.ripBottom)}
+              ${colorField("กระดาษหัว","topPaper",defaults.topPaper)}
+              ${colorField("กระดาษฝั่งซ้าย","leftPaper",defaults.leftPaper)}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>พื้นผิว / GRAIN</h2></div><div class="dds-form-grid">
+              ${textField("URL Grain","grain",defaults.grain,true)}
+              ${rangeField("ความเข้ม Grain","grainOpacity",25,0,100,1,"%")}
+              ${rangeField("ขนาด Grain","grainSize",36,5,80,1,"cqw")}
+              ${rangeField("ขนาด Grain ละเอียด","grainFineSize",18,5,60,1,"cqw")}
+              ${rangeField("ความเข้ม Grain ละเอียด","grainFineOpacity",42,0,100,1,"%")}
+            </div></section>
+            ${photoSection(1)}${photoSection(2)}${photoSection(3)}${photoSection(4)}
+            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>หัวด้านบน</h2></div><div class="dds-form-grid">
+              ${textField("ข้อความหลัก","topMain",defaults.topMain,true)}
+              ${textField("ข้อความสคริปต์","topScript",defaults.topScript,true)}
+              ${xyControls("top",0,0)}
+              ${textField("ชื่อบรรทัด 1","title1",defaults.title1)}
+              ${textField("ชื่อบรรทัด 2","title2",defaults.title2)}
+            </div></section>
+            ${noteSection(1)}${noteSection(2)}${noteSection(3)}${noteSection(4)}${noteSection(5)}
+            <section class="dds-control-section"><div class="dds-control-title"><span>13</span><h2>ข้อความฝั่งขวา</h2></div><div class="dds-form-grid">
+              ${textField("SIDE SCRIPT","sideScript",defaults.sideScript,true)}${xyControls("sideScript",0,0)}
+              ${areaField("SIDE COPY","sideCopy",defaults.sideCopy)}${xyControls("sideCopy",0,0)}
+              ${textField("SIDE BOTTOM","sideBottom",defaults.sideBottom,true)}${xyControls("sideBottom",0,0)}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>14</span><h2>เทปคลาสเซ็ท</h2></div><div class="dds-form-grid">
+              ${textField("URL รูปเทป","cassette",defaults.cassette,true)}${xyControls("cassette",0,0)}
+            </div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>15</span><h2>SYMBOL</h2></div><div class="dds-form-grid">
+              ${textField("STAR 1","star1",defaults.star1)}${xyControls("star1",0,0)}
+              ${textField("STAR 2","star2",defaults.star2)}${xyControls("star2",0,0)}
+            </div></section>
+          </div>
+          <section class="dds-control-section dds-copy-section dds-alan-copy-section"><div class="dds-control-title"><span>16</span><h2>คัดลอกโคด</h2></div><p class="dds-copy-description">เครดิตด้านล่างถูกล็อกไว้ ไม่อยู่ในตัวเลือกแก้สี</p><div class="dds-editor-actions"><button class="dds-copy-button" data-alan-copy type="button">COPY CODE <span>↗</span></button><button class="dds-reset-button" data-alan-reset type="button">RESET</button></div></section>
+        </div>
+      </div>`;
+    document.querySelector(".dds-main")?.appendChild(panel);
+    bindPanel();
+    return panel;
+  }
+
+  function createViewPanel() {
+    if (viewPanel?.isConnected) return viewPanel;
+    viewPanel = document.createElement("section");
+    viewPanel.className = "dds-panel dds-commission-view-panel dds-alan-view-panel";
+    viewPanel.dataset.panel = VIEW_PANEL_NAME;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-view-back type="button">←</button></div><div class="dds-alan-view-stage"><iframe data-alan-view-preview scrolling="no" title="พรีวิวงาน Alan แบบเบลอ"></iframe><div class="dds-alan-blur-label"><strong>PREVIEW HIDDEN</strong><span>COMMISSION · ALAN R. CLINTON</span></div></div>`;
+    document.querySelector(".dds-main")?.appendChild(viewPanel);
+    viewPanel.querySelector("[data-alan-view-back]")?.addEventListener("click", goBack);
+    return viewPanel;
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector('[data-panel="commission"] .dds-commission-grid');
+    if (!grid) return false;
+    if (grid.querySelector(".dds-commission-card-alan")) return true;
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-commission-card-alan";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span><div class="dds-alan-card-cover"><span>PREVIEW HIDDEN</span></div></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION 3</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    grid.appendChild(card);
+    card.querySelector("[data-alan-view]")?.addEventListener("click", openView);
+    card.querySelector("[data-alan-edit]")?.addEventListener("click", requestEditorAccess);
+    const iframe = card.querySelector("[data-alan-card-preview]");
+    const stage = card.querySelector(".dds-alan-card-preview");
+    writeIframe(iframe, buildCode(defaults,true), true, () => fitIframe(iframe, stage, 12));
+    return true;
+  }
+
+  function getValues() {
+    const v = {...defaults};
+    panel?.querySelectorAll("[data-alan-field]").forEach(el => {
+      const key = el.dataset.alanField;
+      v[key] = el.type === "range" ? Number(el.value) : el.value;
+    });
+    return v;
+  }
+
+  function setValues(values) {
+    const v = {...defaults,...values};
+    panel?.querySelectorAll("[data-alan-field]").forEach(el => {
+      const key = el.dataset.alanField;
+      if (key in v) el.value = v[key];
+    });
+    panel?.querySelectorAll("[data-alan-picker]").forEach(picker => {
+      const key = picker.dataset.alanPicker;
+      picker.value = rgbaToHex(v[key],picker.value);
+    });
+    syncOutputs();
+  }
+
+  function syncOutputs() {
+    panel?.querySelectorAll("[data-alan-output]").forEach(out => {
+      const key = out.dataset.alanOutput;
+      const input = panel.querySelector(`[data-alan-field="${key}"]`);
+      if (!input) return;
+      let suffix = "";
+      if (/zoom|Opacity|Size|photo\d[xy]/.test(key)) suffix = /Size/.test(key) ? "cqw" : "%";
+      else if (/[xy]$|X$|Y$/.test(key)) suffix = "px";
+      out.textContent = `${input.value}${suffix}`;
+    });
+  }
+
+  function updatePreview() {
+    if (!panel?.classList.contains("is-active")) return;
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      const iframe = panel.querySelector("[data-alan-preview]");
+      const stage = panel.querySelector(".dds-alan-editor-stage");
+      writeIframe(iframe, buildCode(getValues(),true), false, () => fitIframe(iframe,stage,24));
+    }, 45);
+    syncOutputs();
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch { return null; }
+  }
+  function setDraftStatus(savedAt) {
+    const target = panel?.querySelector("[data-alan-draft-status]");
+    if (!target) return;
+    target.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}` : "ยังไม่มีแบบร่าง";
+  }
+  function saveDraft() {
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY,JSON.stringify({values:getValues(),savedAt}));
+      setDraftStatus(savedAt);
+    } catch {}
+  }
+  function scheduleDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft,350);
+  }
+
+  async function copyCode() {
+    const output = buildCode(getValues(),false);
+    try { await navigator.clipboard.writeText(output); }
+    catch {
+      const ta=document.createElement("textarea"); ta.value=output; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
+    }
+    showToast("คัดลอกโคด Alan แล้ว");
+  }
+
+  function bindPanel() {
+    panel.querySelector("[data-alan-back]")?.addEventListener("click",goBack);
+    panel.querySelectorAll("[data-alan-field]").forEach(input => {
+      input.addEventListener("input",() => {
+        const picker = panel.querySelector(`[data-alan-picker="${input.dataset.alanField}"]`);
+        if (picker && /^#[0-9a-f]{6}$/i.test(input.value.trim())) picker.value=input.value.trim();
+        updatePreview(); scheduleDraft();
+      });
+      input.addEventListener("change",() => {updatePreview();scheduleDraft();});
+    });
+    panel.querySelectorAll("[data-alan-picker]").forEach(picker => {
+      picker.addEventListener("input",() => {
+        const field=panel.querySelector(`[data-alan-field="${picker.dataset.alanPicker}"]`);
+        if (field) field.value=picker.value;
+        updatePreview(); scheduleDraft();
+      });
+    });
+    panel.querySelector("[data-alan-copy]")?.addEventListener("click",copyCode);
+    panel.querySelector("[data-alan-reset]")?.addEventListener("click",() => {
+      setValues(defaults); updatePreview(); scheduleDraft(); showToast("รีเซ็ตโคด Alan แล้ว");
+    });
+  }
+
+  function setCommissionTab() {
+    document.querySelectorAll("[data-work-tab]").forEach(btn => {
+      const active=btn.dataset.workTab==="commission";
+      btn.classList.toggle("is-active",active); btn.setAttribute("aria-selected",String(active));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach(p => {
+      const active=p.dataset.workPanel==="commission";
+      p.hidden=!active; p.classList.toggle("is-active",active);
+    });
+  }
+
+  function showPanel(name) {
+    document.body.classList.toggle("dds-editor-mode", name===PANEL_NAME);
+    document.querySelectorAll(".dds-panel").forEach(p => p.classList.toggle("is-active",p.dataset.panel===name));
+    document.querySelectorAll(".dds-nav-button").forEach(btn => btn.classList.toggle("is-active",btn.dataset.page==="commission"));
+    const num=document.getElementById("currentPageNumber"); if(num) num.textContent="04";
+    window.scrollTo({top:0,behavior:"auto"});
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
+    document.documentElement.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
+    showPanel("commission"); setCommissionTab();
+    history.replaceState(null,"","#commission");
+  }
+
+  function openEditor() {
+    createPanel();
+    const draft=getDraft();
+    setValues(draft?.values ? {...defaults,...draft.values} : defaults);
+    setDraftStatus(draft?.savedAt||0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null,"","#editor-commission-alan-profile");
+    updatePreview();
+  }
+
+  function openView() {
+    const p=createViewPanel();
+    showPanel(VIEW_PANEL_NAME);
+    history.replaceState(null,"","#view-commission-alan-profile");
+    const iframe=p.querySelector("[data-alan-view-preview]");
+    const stage=p.querySelector(".dds-alan-view-stage");
+    writeIframe(iframe,buildCode(defaults,true),true,() => fitIframe(iframe,stage,28));
+  }
+
+  function handleHash() {
+    if (location.hash==="#editor-commission-alan-profile") requestEditorAccess();
+    else if (location.hash==="#view-commission-alan-profile") openView();
+  }
+
+  function install() {
+    let attempts=0;
+    const timer=setInterval(() => {
+      attempts++;
+      if (installCard() || attempts>120) clearInterval(timer);
+    },100);
+    window.addEventListener("resize",() => {
+      if (card) fitIframe(card.querySelector("[data-alan-card-preview]"),card.querySelector(".dds-alan-card-preview"),12);
+      if (panel?.classList.contains("is-active")) updatePreview();
+      if (viewPanel?.classList.contains("is-active")) fitIframe(viewPanel.querySelector("[data-alan-view-preview]"),viewPanel.querySelector(".dds-alan-view-stage"),28);
+    });
+    window.addEventListener("hashchange",handleHash);
+    setTimeout(handleHash,250);
+  }
+
+  if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",install,{once:true});
   else install();
 })();

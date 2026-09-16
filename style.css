@@ -8692,3 +8692,152 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
 [data-panel="editor-review003"] .dds-color-grid + .dds-form-grid {
   margin-top: 22px;
 }
+
+/* ==================================================
+   COMMISSION 003 — ALAN R. CLINTON
+================================================== */
+.dds-commission-card-alan .dds-alan-card-preview{
+  position:relative;
+  overflow:hidden;
+  background:#242424;
+}
+.dds-commission-card-alan .dds-alan-card-preview iframe{
+  filter:blur(16px) saturate(.58);
+  opacity:.72;
+}
+.dds-alan-card-cover{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  background:rgba(12,12,12,.20);
+}
+.dds-alan-card-cover span{
+  padding:7px 10px;
+  color:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(15,15,15,.56);
+  font-size:8px;
+  letter-spacing:.16em;
+  backdrop-filter:blur(6px);
+}
+.dds-alan-editor-stage,
+.dds-alan-view-stage{
+  width:100%;
+  min-height:600px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 22%,rgba(255,255,255,.035),transparent 35%),
+    #242424;
+}
+.dds-alan-editor-stage iframe,
+.dds-alan-view-stage iframe{
+  border:0;
+  background:#242424;
+}
+.dds-alan-view-stage{
+  min-height:720px;
+}
+.dds-alan-blur-label{
+  position:absolute;
+  inset:0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  pointer-events:none;
+  color:#fff;
+  text-align:center;
+  background:rgba(12,12,12,.10);
+}
+.dds-alan-blur-label strong{
+  font-size:16px;
+  letter-spacing:.10em;
+}
+.dds-alan-blur-label span{
+  color:rgba(255,255,255,.58);
+  font-size:9px;
+  letter-spacing:.12em;
+}
+.dds-alan-commission-editor .dds-protected-commission-layout{
+  align-items:start;
+}
+.dds-alan-commission-editor .dds-protected-commission-preview-column{
+  position:sticky;
+  top:18px;
+  align-self:start;
+  min-width:0;
+  overflow:hidden;
+}
+.dds-alan-commission-editor .dds-protected-commission-controls-column{
+  min-width:0;
+  position:sticky;
+  top:18px;
+  align-self:start;
+  max-height:calc(100vh - 36px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.dds-alan-controls-scroll{
+  min-height:0;
+  padding-right:8px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(193,23,36,.68) rgba(255,255,255,.045);
+}
+.dds-alan-controls-scroll::-webkit-scrollbar{width:7px}
+.dds-alan-controls-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+.dds-alan-controls-scroll::-webkit-scrollbar-thumb{background:rgba(193,23,36,.65);border-radius:999px}
+.dds-alan-copy-section{
+  flex:0 0 auto;
+  margin-top:12px;
+}
+.dds-alan-range-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 58px;
+  gap:10px;
+  align-items:center;
+}
+.dds-alan-range-row input[type="range"]{
+  width:100%;
+  min-width:0;
+}
+.dds-alan-range-row output{
+  width:58px;
+  color:rgba(255,255,255,.72);
+  font-size:9px;
+  text-align:right;
+}
+@media (min-width:1251px){
+  .dds-alan-commission-editor .dds-protected-commission-layout{
+    grid-template-columns:minmax(0,2.35fr) minmax(450px,520px)!important;
+    gap:clamp(22px,2.4vw,38px);
+  }
+}
+@media (max-width:1250px){
+  .dds-alan-commission-editor .dds-protected-commission-layout{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .dds-alan-commission-editor .dds-protected-commission-preview-column,
+  .dds-alan-commission-editor .dds-protected-commission-controls-column{
+    position:relative;
+    top:auto;
+    max-height:none;
+  }
+  .dds-alan-controls-scroll{
+    overflow:visible;
+    padding-right:0;
+  }
+}
+@media (max-width:700px){
+  .dds-alan-editor-stage,.dds-alan-view-stage{min-height:500px}
+  .dds-alan-range-row{grid-template-columns:minmax(0,1fr) 52px}
+}
