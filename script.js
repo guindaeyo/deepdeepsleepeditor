@@ -19629,18 +19629,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const canvas = stage.querySelector("[data-alan-view-canvas]");
     if (!canvas) return;
 
-    canvas.style.width = `${m.width}px`;
+    /*
+     * ให้แคนวาสกินพื้นที่อย่างน้อยเท่าพื้นที่ VIEW WORK
+     * แล้ววางโคดจริง 1:1 ไว้ตรงกึ่งกลางแคนวาส
+     * ถ้าโคดกว้างกว่าหน้าจอ แคนวาสจะขยายตามโคดและยังเลื่อนแนวนอนได้
+     */
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const canvasWidth = Math.max(m.width, availableWidth);
+
+    canvas.style.position = "relative";
+    canvas.style.width = `${canvasWidth}px`;
     canvas.style.height = `${m.height}px`;
     canvas.style.margin = `${padding}px auto`;
+    canvas.style.flex = "0 0 auto";
 
     iframe.style.position = "absolute";
-    iframe.style.left = "0";
+    iframe.style.left = "50%";
     iframe.style.top = "0";
     iframe.style.width = `${m.width}px`;
     iframe.style.height = `${m.height}px`;
     iframe.style.maxWidth = "none";
-    iframe.style.transform = "none";
-    iframe.style.transformOrigin = "top left";
+    iframe.style.margin = "0";
+    iframe.style.transform = "translateX(-50%)";
+    iframe.style.transformOrigin = "top center";
 
     const fullHeight = m.height + padding * 2;
     stage.style.height = `${fullHeight}px`;

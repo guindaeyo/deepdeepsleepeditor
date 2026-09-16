@@ -8965,3 +8965,31 @@ body.dds-alan-view-mode .dds-alan-blur-label {
 }
 \n\n/* ==================================================\n   ALAN COMMISSION v96 — FULL CODE PREVIEW / ACTUAL-SIZE VIEW\n================================================== */\n.dds-alan-commission-editor .dds-form-grid > .dds-field-full{\n  grid-column:1 / -1 !important;\n  width:100%;\n}\n\nbody.dds-alan-view-mode .dds-alan-view-stage{\n  width:100% !important;\n  max-width:none !important;\n  min-height:0 !important;\n  margin:0 auto !important;\n  display:block !important;\n  position:relative;\n  overflow-x:auto !important;\n  overflow-y:visible !important;\n  background:#242424;\n}\n\nbody.dds-alan-view-mode .dds-alan-view-canvas{\n  position:relative;\n  flex:0 0 auto;\n}\n\nbody.dds-alan-view-mode .dds-alan-view-canvas > iframe{\n  display:block;\n  margin:0 !important;\n  border:0 !important;\n  background:#242424;\n}\n\nbody.dds-alan-view-mode .dds-alan-blur-label{\n  position:absolute;\n  inset:0;\n  min-height:100%;\n}\n\nbody.dds-alan-view-mode .dds-main{\n  overflow:visible !important;\n}\n\nbody.dds-alan-view-mode .dds-alan-view-panel{\n  overflow:visible !important;\n}\n\n.dds-alan-editor-stage{\n  min-height:0 !important;\n}\n
 body.dds-alan-view-mode .dds-alan-view-stage .dds-alan-blur-label{display:none!important;}
+
+
+/* ==================================================
+   ALAN COMMISSION v97 — CENTER ACTUAL-SIZE VIEW WORK
+================================================== */
+body.dds-alan-view-mode .dds-alan-view-stage {
+  width: 100% !important;
+  max-width: none !important;
+  position: relative !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+body.dds-alan-view-mode .dds-alan-view-canvas {
+  position: relative !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  flex: 0 0 auto !important;
+}
+
+body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  transform-origin: top center !important;
+}
