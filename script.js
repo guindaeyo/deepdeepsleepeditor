@@ -19383,7 +19383,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked:v2";
   const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-alanprof.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Rock+Salt&display=swap";
-  const CANVAS_WIDTH = 700;
+  const CANVAS_WIDTH = 1024;
 
   const defaults = Object.freeze({
     bg:"#171717", paper:"#ddd6c8", paper2:"#c7bfb0", papertext:"#1e1c1a",
@@ -19693,7 +19693,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (!doc || !content || !root) {
         return {
           width: CANVAS_WIDTH,
-          height: 1500
+          height: 1453
         };
       }
 
@@ -19741,7 +19741,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     } catch {
       return {
         width: CANVAS_WIDTH,
-        height: 1500
+        height: 1453
       };
     }
   }
@@ -19754,8 +19754,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     /*
      * EDITOR LIVE PREVIEW:
      * แสดงโคดตามขนาดจริง ไม่ย่อ scale
-     * ความกว้างจริง 700px และความสูงตามเนื้อหาโคดทั้งหมด
-     * ถ้าจอแคบกว่า 700px ให้เลื่อนแนวนอนแทน
+     * ความกว้างจริง 1024px ตาม CSS ต้นฉบับ และความสูงตามเนื้อหาโคดทั้งหมด
+     * ถ้าพื้นที่แคบกว่า 1024px ให้เลื่อนแนวนอนแทนโดยไม่บีบโคด
      */
     stage.style.setProperty("height", `${m.height + padding * 2}px`, "important");
     stage.style.setProperty("min-height", `${m.height + padding * 2}px`, "important");

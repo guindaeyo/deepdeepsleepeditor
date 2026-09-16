@@ -9096,3 +9096,20 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   margin: 0 !important;
   transform-origin: top center !important;
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v102
+   NATIVE 1024PX EDITOR PREVIEW
+   CSS source: .ddsh-commitalan-ref { width:min(1024px,100%) }
+================================================== */
+.dds-alan-commission-editor .dds-alan-editor-stage {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+.dds-alan-commission-editor .dds-alan-editor-stage > iframe {
+  width: 1024px !important;
+  min-width: 1024px !important;
+  max-width: 1024px !important;
+}
