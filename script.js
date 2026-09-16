@@ -19378,7 +19378,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-commission-alan-profile";
   const VIEW_PANEL_NAME = "view-commission-alan-profile";
-  const DRAFT_KEY = "dds:commission:alan-profile:draft:v1";
+  const DRAFT_KEY = "dds:commission:alan-profile:draft:v2";
   const ACCESS_HASH = "6923328ae13991e3b46ace7d98b713a9d92ef41065cf10d7d499646bc774f50c";
   const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked";
   const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-alanprof.css";
@@ -19398,10 +19398,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     photo1x:50, photo1y:50, photo1zoom:100,
     photo2x:50, photo2y:50, photo2zoom:100,
     photo3x:50, photo3y:50, photo3zoom:100,
-    photo4x:50, photo4y:50, photo4zoom:100,
+    photo4x:50, photo4y:57, photo4zoom:100,
 
-    topMain:"LOVE WINS ALL", topScript:"somewhere in our memories", topX:0, topY:0,
-    title1:"Alan", title1x:0, title1y:0, title2:"R. Clinton", title2x:0, title2y:0,
+    topMain:"LOVE WINS ALL", topScript:"somewhere in our memories", topX:1, topY:0,
+    title1:"Alan", title1x:0, title1y:-62, title2:"R. Clinton", title2x:0, title2y:-59,
 
     note1Text:"woofwoof", note1Link:"LINK-1", note1x:0, note1y:0,
     note2Text:"ribbi", note2Link:"LINK-2", note2x:0, note2y:0,
@@ -19581,7 +19581,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function writeIframe(iframe, code, blurred = false, done) {
     if (!iframe) return;
-    iframe.onload = () => done?.();
+    iframe.onload = () => {
+      const rerun = () => done?.();
+      rerun();
+      window.setTimeout(rerun, 120);
+      window.setTimeout(rerun, 420);
+      try { iframe.contentDocument?.fonts?.ready?.then(rerun).catch(() => {}); } catch {}
+    };
     iframe.srcdoc = iframeDoc(code, blurred);
   }
 
@@ -19620,17 +19626,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fitAlanViewIframe(iframe, stage, padding = 36) {
     if (!iframe || !stage) return;
     const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
-    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
-    const scale = Math.min(1, availableWidth / m.width, availableHeight / m.height);
+    const canvas = stage.querySelector("[data-alan-view-canvas]");
+    if (!canvas) return;
+
+    canvas.style.width = `${m.width}px`;
+    canvas.style.height = `${m.height}px`;
+    canvas.style.margin = `${padding}px auto`;
+
     iframe.style.position = "absolute";
-    iframe.style.left = "50%";
-    iframe.style.top = "50%";
+    iframe.style.left = "0";
+    iframe.style.top = "0";
     iframe.style.width = `${m.width}px`;
     iframe.style.height = `${m.height}px`;
     iframe.style.maxWidth = "none";
-    iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    iframe.style.transformOrigin = "center center";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "top left";
+
+    const fullHeight = m.height + padding * 2;
+    stage.style.height = `${fullHeight}px`;
+    stage.style.minHeight = `${fullHeight}px`;
   }
 
   function fitCardPreview() {
@@ -19671,7 +19685,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `${rangeField("ซ้าย–ขวา",xKey,x,-250,250,1,"px")}${rangeField("ขึ้น–ลง",yKey,y,-250,250,1,"px")}`;
   }
   function photoSection(n) {
-    return `<section class="dds-control-section"><div class="dds-control-title"><span>0${n+1}</span><h2>รูปที่ ${n}</h2></div><div class="dds-form-grid">${textField("URL รูป",`photo${n}`,defaults[`photo${n}`],true)}${rangeField("ตำแหน่งซ้าย–ขวา",`photo${n}x`,50,0,100,1,"%")}${rangeField("ตำแหน่งขึ้น–ลง",`photo${n}y`,50,0,100,1,"%")}${rangeField("ซูม",`photo${n}zoom`,100,50,220,1,"%")}</div></section>`;
+    return `<section class="dds-control-section"><div class="dds-control-title"><span>0${n+1}</span><h2>รูปที่ ${n}</h2></div><div class="dds-form-grid">${textField("URL รูป",`photo${n}`,defaults[`photo${n}`],true)}${rangeField("ตำแหน่งซ้าย–ขวา",`photo${n}x`,defaults[`photo${n}x`],0,100,1,"%")}${rangeField("ตำแหน่งขึ้น–ลง",`photo${n}y`,defaults[`photo${n}y`],0,100,1,"%")}${rangeField("ซูม",`photo${n}zoom`,defaults[`photo${n}zoom`],50,220,1,"%")}</div></section>`;
   }
   function noteSection(n) {
     return `<section class="dds-control-section"><div class="dds-control-title"><span>N${n}</span><h2>NOTE ${n}</h2></div><div class="dds-form-grid">${textField("ข้อความ",`note${n}Text`,defaults[`note${n}Text`])}${textField("ลิงก์",`note${n}Link`,defaults[`note${n}Link`],true)}${xyControls(`note${n}`,0,0)}</div></section>`;
@@ -19716,11 +19730,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
             <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>หัวด้านบน</h2></div><div class="dds-form-grid">
               ${textField("ข้อความหลัก","topMain",defaults.topMain,true)}
               ${textField("ข้อความสคริปต์","topScript",defaults.topScript,true)}
-              ${xyControls("top",0,0)}
-              ${textField("ชื่อบรรทัด 1","title1",defaults.title1)}
-              ${xyControls("title1",0,0)}
-              ${textField("ชื่อบรรทัด 2","title2",defaults.title2)}
-              ${xyControls("title2",0,0)}
+              ${xyControls("top",defaults.topX,defaults.topY)}
+              ${textField("ชื่อบรรทัด 1","title1",defaults.title1,true)}
+              ${xyControls("title1",defaults.title1x,defaults.title1y)}
+              ${textField("ชื่อบรรทัด 2","title2",defaults.title2,true)}
+              ${xyControls("title2",defaults.title2x,defaults.title2y)}
             </div></section>
             ${noteSection(1)}${noteSection(2)}${noteSection(3)}${noteSection(4)}${noteSection(5)}
             <section class="dds-control-section"><div class="dds-control-title"><span>13</span><h2>ข้อความฝั่งขวา</h2></div><div class="dds-form-grid">
@@ -19749,7 +19763,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-alan-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-view-back type="button">←</button></div><div class="dds-alan-view-stage"><iframe data-alan-view-preview scrolling="no" title="พรีวิวงาน Alan แบบเบลอ"></iframe><div class="dds-alan-blur-label"><strong>PREVIEW HIDDEN</strong><span>COMMISSION · ALAN R. CLINTON</span></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-view-back type="button">←</button></div><div class="dds-alan-view-stage"><div class="dds-alan-view-canvas" data-alan-view-canvas><iframe data-alan-view-preview scrolling="no" title="งานคอมมิชชั่น Alan R. Clinton"></iframe></div></div>`;
     document.querySelector(".dds-main")?.appendChild(viewPanel);
     viewPanel.querySelector("[data-alan-view-back]")?.addEventListener("click", goBack);
     return viewPanel;
@@ -19913,7 +19927,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     history.replaceState(null,"","#view-commission-alan-profile");
     const iframe=p.querySelector("[data-alan-view-preview]");
     const stage=p.querySelector(".dds-alan-view-stage");
-    writeIframe(iframe,buildCode(defaults,true),true,() => fitAlanViewIframe(iframe,stage,36));
+    writeIframe(iframe,buildCode(defaults,false),false,() => fitAlanViewIframe(iframe,stage,36));
   }
 
   function handleHash() {
