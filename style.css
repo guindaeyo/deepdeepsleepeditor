@@ -8993,3 +8993,45 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   transform: translateX(-50%) !important;
   transform-origin: top center !important;
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v98
+   SHOWCASE VISIBLE + VIEW WORK NATURAL CODE SIZE
+================================================== */
+.dds-commission-card-alan .dds-alan-card-preview > iframe {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.dds-commission-card-alan .dds-alan-card-cover {
+  display: none !important;
+}
+
+body.dds-alan-view-mode .dds-alan-view-stage {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  display: block !important;
+  position: relative !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  background: #242424;
+}
+
+body.dds-alan-view-mode .dds-alan-view-canvas {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  margin: 0 !important;
+  max-width: none !important;
+  transform: none !important;
+  transform-origin: top left !important;
+}

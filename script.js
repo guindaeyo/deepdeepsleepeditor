@@ -19630,32 +19630,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!canvas) return;
 
     /*
-     * ให้แคนวาสกินพื้นที่อย่างน้อยเท่าพื้นที่ VIEW WORK
-     * แล้ววางโคดจริง 1:1 ไว้ตรงกึ่งกลางแคนวาส
-     * ถ้าโคดกว้างกว่าหน้าจอ แคนวาสจะขยายตามโคดและยังเลื่อนแนวนอนได้
+     * VIEW WORK ใช้ขนาดจริงตามตัวโคด:
+     * กว้างตามความกว้างจริง / สูงตามความยาวจริง
+     * ไม่บังคับ aspect ratio และไม่ scale โคด
      */
-    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
-    const canvasWidth = Math.max(m.width, availableWidth);
-
     canvas.style.position = "relative";
-    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.width = `${m.width}px`;
     canvas.style.height = `${m.height}px`;
     canvas.style.margin = `${padding}px auto`;
     canvas.style.flex = "0 0 auto";
 
     iframe.style.position = "absolute";
-    iframe.style.left = "50%";
+    iframe.style.left = "0";
     iframe.style.top = "0";
     iframe.style.width = `${m.width}px`;
     iframe.style.height = `${m.height}px`;
     iframe.style.maxWidth = "none";
     iframe.style.margin = "0";
-    iframe.style.transform = "translateX(-50%)";
-    iframe.style.transformOrigin = "top center";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "top left";
 
-    const fullHeight = m.height + padding * 2;
-    stage.style.height = `${fullHeight}px`;
-    stage.style.minHeight = `${fullHeight}px`;
+    stage.style.width = "100%";
+    stage.style.height = `${m.height + padding * 2}px`;
+    stage.style.minHeight = `${m.height + padding * 2}px`;
   }
 
   function fitCardPreview() {
@@ -19787,13 +19784,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (grid.querySelector(".dds-commission-card-alan")) return true;
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-alan";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span><div class="dds-alan-card-cover"><span>PREVIEW HIDDEN</span></div></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-alan-view]")?.addEventListener("click", openView);
     card.querySelector("[data-alan-edit]")?.addEventListener("click", requestEditorAccess);
     const iframe = card.querySelector("[data-alan-card-preview]");
     const stage = card.querySelector(".dds-alan-card-preview");
-    writeIframe(iframe, buildCode(defaults,true), true, fitCardPreview);
+    writeIframe(iframe, buildCode(defaults,true), false, fitCardPreview);
     return true;
   }
 
