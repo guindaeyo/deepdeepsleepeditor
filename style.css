@@ -8889,3 +8889,77 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
     overflow-y:auto;
   }
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v95 — VIEW WORK FULL WIDTH
+================================================== */
+body.dds-alan-view-mode,
+html.dds-alan-view-mode {
+  min-height: 100%;
+}
+
+body.dds-alan-view-mode .dds-app {
+  display: block !important;
+  width: 100% !important;
+  min-height: 100vh;
+}
+
+body.dds-alan-view-mode .dds-sidebar,
+body.dds-alan-view-mode .dds-topbar,
+body.dds-alan-view-mode .dds-footer {
+  display: none !important;
+}
+
+body.dds-alan-view-mode .dds-main {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh;
+  padding: 0 clamp(20px, 4vw, 70px) 50px !important;
+}
+
+body.dds-alan-view-mode .dds-alan-view-panel {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body.dds-alan-view-mode .dds-commission-view-toolbar {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: 22px 0 8px;
+}
+
+body.dds-alan-view-mode .dds-alan-view-stage {
+  width: min(1280px, 100%);
+  min-height: calc(100vh - 110px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #242424;
+}
+
+body.dds-alan-view-mode .dds-alan-view-stage > iframe {
+  margin: 0 !important;
+}
+
+body.dds-alan-view-mode .dds-alan-blur-label {
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  body.dds-alan-view-mode .dds-main {
+    padding: 0 12px 24px !important;
+  }
+
+  body.dds-alan-view-mode .dds-commission-view-toolbar {
+    padding-top: 14px;
+  }
+
+  body.dds-alan-view-mode .dds-alan-view-stage {
+    min-height: calc(100vh - 82px);
+  }
+}

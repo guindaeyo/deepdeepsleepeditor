@@ -19401,7 +19401,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     photo4x:50, photo4y:50, photo4zoom:100,
 
     topMain:"LOVE WINS ALL", topScript:"somewhere in our memories", topX:0, topY:0,
-    title1:"Alan", title2:"R. Clinton",
+    title1:"Alan", title1x:0, title1y:0, title2:"R. Clinton", title2x:0, title2y:0,
 
     note1Text:"woofwoof", note1Link:"LINK-1", note1x:0, note1y:0,
     note2Text:"ribbi", note2Link:"LINK-2", note2x:0, note2y:0,
@@ -19556,6 +19556,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 .ddsh-commitalan-ref-photo3 img{object-position:${+v.photo3x}% ${+v.photo3y}% !important;scale:${(+v.photo3zoom/100).toFixed(3)} !important}
 .ddsh-commitalan-ref-photo4 img{object-position:${+v.photo4x}% ${+v.photo4y}% !important;scale:${(+v.photo4zoom/100).toFixed(3)} !important}
 .ddsh-commitalan-ref-top{translate:${+v.topX}px ${+v.topY}px !important}
+.ddsh-commitalan-ref-title span:nth-child(1){position:relative !important;left:${+v.title1x}px !important;top:${+v.title1y}px !important}
+.ddsh-commitalan-ref-title span:nth-child(2){position:relative !important;left:${+v.title2x}px !important;top:${+v.title2y}px !important}
 .ddsh-commitalan-ref-note1{translate:${+v.note1x}px ${+v.note1y}px !important}
 .ddsh-commitalan-ref-note2{translate:${+v.note2x}px ${+v.note2y}px !important}
 .ddsh-commitalan-ref-note3{translate:${+v.note3x}px ${+v.note3y}px !important}
@@ -19613,6 +19615,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.maxWidth = "none";
     iframe.style.transform = `translateX(-50%) scale(${scale})`;
     iframe.style.transformOrigin = "top center";
+  }
+
+  function fitAlanViewIframe(iframe, stage, padding = 36) {
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
+    const scale = Math.min(1, availableWidth / m.width, availableHeight / m.height);
+    iframe.style.position = "absolute";
+    iframe.style.left = "50%";
+    iframe.style.top = "50%";
+    iframe.style.width = `${m.width}px`;
+    iframe.style.height = `${m.height}px`;
+    iframe.style.maxWidth = "none";
+    iframe.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    iframe.style.transformOrigin = "center center";
   }
 
   function fitCardPreview() {
@@ -19700,7 +19718,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
               ${textField("ข้อความสคริปต์","topScript",defaults.topScript,true)}
               ${xyControls("top",0,0)}
               ${textField("ชื่อบรรทัด 1","title1",defaults.title1)}
+              ${xyControls("title1",0,0)}
               ${textField("ชื่อบรรทัด 2","title2",defaults.title2)}
+              ${xyControls("title2",0,0)}
             </div></section>
             ${noteSection(1)}${noteSection(2)}${noteSection(3)}${noteSection(4)}${noteSection(5)}
             <section class="dds-control-section"><div class="dds-control-title"><span>13</span><h2>ข้อความฝั่งขวา</h2></div><div class="dds-form-grid">
@@ -19862,6 +19882,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function showPanel(name) {
     document.body.classList.toggle("dds-editor-mode", name===PANEL_NAME);
+    document.body.classList.toggle("dds-alan-view-mode", name===VIEW_PANEL_NAME);
+    document.documentElement.classList.toggle("dds-alan-view-mode", name===VIEW_PANEL_NAME);
     document.querySelectorAll(".dds-panel").forEach(p => p.classList.toggle("is-active",p.dataset.panel===name));
     document.querySelectorAll(".dds-nav-button").forEach(btn => btn.classList.toggle("is-active",btn.dataset.page==="commission"));
     const num=document.getElementById("currentPageNumber"); if(num) num.textContent="04";
@@ -19869,8 +19891,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function goBack() {
-    document.body.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
-    document.documentElement.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
+    document.body.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open","dds-alan-view-mode");
+    document.documentElement.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open","dds-alan-view-mode");
     showPanel("commission"); setCommissionTab();
     history.replaceState(null,"","#commission");
   }
@@ -19891,7 +19913,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     history.replaceState(null,"","#view-commission-alan-profile");
     const iframe=p.querySelector("[data-alan-view-preview]");
     const stage=p.querySelector(".dds-alan-view-stage");
-    writeIframe(iframe,buildCode(defaults,true),true,() => fitIframe(iframe,stage,28));
+    writeIframe(iframe,buildCode(defaults,true),true,() => fitAlanViewIframe(iframe,stage,36));
   }
 
   function handleHash() {
@@ -19908,7 +19930,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     window.addEventListener("resize",() => {
       if (card) fitCardPreview();
       if (panel?.classList.contains("is-active")) updatePreview();
-      if (viewPanel?.classList.contains("is-active")) fitIframe(viewPanel.querySelector("[data-alan-view-preview]"),viewPanel.querySelector(".dds-alan-view-stage"),28);
+      if (viewPanel?.classList.contains("is-active")) fitAlanViewIframe(viewPanel.querySelector("[data-alan-view-preview]"),viewPanel.querySelector(".dds-alan-view-stage"),36);
     });
     window.addEventListener("hashchange",handleHash);
     setTimeout(handleHash,250);
