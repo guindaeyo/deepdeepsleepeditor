@@ -19379,8 +19379,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const PANEL_NAME = "editor-commission-alan-profile";
   const VIEW_PANEL_NAME = "view-commission-alan-profile";
   const DRAFT_KEY = "dds:commission:alan-profile:draft:v2";
-  const ACCESS_HASH = "6923328ae13991e3b46ace7d98b713a9d92ef41065cf10d7d499646bc774f50c";
-  const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked";
+  const ACCESS_HASH = "f1406a79197676b72f6e841eaa2b6ad3cd44af061cb53d5df9ec10770c832be7";
+  const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked:v2";
   const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-alanprof.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Rock+Salt&display=swap";
 
@@ -19583,10 +19583,19 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!iframe) return;
     iframe.onload = () => {
       const rerun = () => done?.();
+
       rerun();
-      window.setTimeout(rerun, 120);
-      window.setTimeout(rerun, 420);
-      try { iframe.contentDocument?.fonts?.ready?.then(rerun).catch(() => {}); } catch {}
+      [120, 350, 800, 1500].forEach(delay => window.setTimeout(rerun, delay));
+
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(rerun).catch(() => {});
+        iframe.contentDocument?.querySelectorAll("img").forEach(img => {
+          if (!img.complete) {
+            img.addEventListener("load", rerun, { once:true });
+            img.addEventListener("error", rerun, { once:true });
+          }
+        });
+      } catch {}
     };
     iframe.srcdoc = iframeDoc(code, blurred);
   }
@@ -19594,16 +19603,63 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function measureIframe(iframe) {
     try {
       const doc = iframe.contentDocument;
-      const el = doc?.querySelector(".ddsh-commitalan-ref");
+      const root = doc?.querySelector(".ddsh-commitalan-ref");
       const credit = doc?.querySelector(".ddshopfz-ccm01");
-      if (el) {
-        const r = el.getBoundingClientRect();
-        const c = credit?.getBoundingClientRect();
-        return {width: Math.ceil(Math.max(el.scrollWidth,r.width,700)), height: Math.ceil(Math.max(el.scrollHeight,r.height) + (c?.height || 28) + 16)};
-      }
       const body = doc?.body;
-      return {width: Math.max(700,body?.scrollWidth||700),height:Math.max(700,body?.scrollHeight||700)};
-    } catch { return {width:700,height:900}; }
+      const html = doc?.documentElement;
+
+      if (!doc || !root) {
+        return {
+          width: Math.max(700, body?.scrollWidth || 700, html?.scrollWidth || 700),
+          height: Math.max(1200, body?.scrollHeight || 1200, html?.scrollHeight || 1200)
+        };
+      }
+
+      /*
+       * ตัวโคด Alan มี element ที่วาง absolute/translate และอาจยื่นเกิน parent
+       * จึงวัด visual bounds ของทุกชิ้น เพื่อไม่ให้ช่วงล่างของโคดถูกตัดใน preview
+       */
+      const nodes = [
+        root,
+        ...root.querySelectorAll("*"),
+        ...(credit ? [credit, ...credit.querySelectorAll("*")] : [])
+      ];
+
+      let minLeft = 0;
+      let minTop = 0;
+      let maxRight = 0;
+      let maxBottom = 0;
+
+      nodes.forEach(node => {
+        const rect = node.getBoundingClientRect();
+        if (!rect || (!rect.width && !rect.height)) return;
+        minLeft = Math.min(minLeft, rect.left);
+        minTop = Math.min(minTop, rect.top);
+        maxRight = Math.max(maxRight, rect.right);
+        maxBottom = Math.max(maxBottom, rect.bottom);
+      });
+
+      return {
+        width: Math.ceil(Math.max(
+          700,
+          root.scrollWidth || 0,
+          root.getBoundingClientRect().width || 0,
+          body?.scrollWidth || 0,
+          html?.scrollWidth || 0,
+          maxRight - minLeft
+        )),
+        height: Math.ceil(Math.max(
+          1200,
+          root.scrollHeight || 0,
+          root.getBoundingClientRect().height || 0,
+          body?.scrollHeight || 0,
+          html?.scrollHeight || 0,
+          maxBottom - minTop
+        ) + 16)
+      };
+    } catch {
+      return { width:700, height:1600 };
+    }
   }
 
   function fitIframe(iframe, stage, padding = 24) {
@@ -19659,17 +19715,39 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const iframe = card?.querySelector("[data-alan-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
     if (!iframe || !stage) return;
+
+    /*
+     * ตั้ง measurement canvas ให้สูงพอก่อน เพื่อให้ browser คำนวณ
+     * รูป/กระดาษ/เครดิตด้านล่างครบ แล้วค่อยย่อทั้งก้อนลงช่อง preview
+     */
+    iframe.style.setProperty("width", "900px", "important");
+    iframe.style.setProperty("height", "2400px", "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("transform", "none", "important");
+
     const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - 28);
-    const availableHeight = Math.max(1, stage.clientHeight - 28);
-    const scale = Math.max(0.04, Math.min(1, availableWidth / m.width, availableHeight / m.height));
+    const availableWidth = Math.max(1, stage.clientWidth - 36);
+    const availableHeight = Math.max(1, stage.clientHeight - 36);
+    const scale = Math.max(
+      0.02,
+      Math.min(
+        1,
+        availableWidth / m.width,
+        availableHeight / m.height
+      )
+    );
+
     iframe.style.setProperty("position", "absolute", "important");
     iframe.style.setProperty("left", "50%", "important");
     iframe.style.setProperty("top", "50%", "important");
     iframe.style.setProperty("width", `${m.width}px`, "important");
     iframe.style.setProperty("height", `${m.height}px`, "important");
     iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${scale})`, "important");
+    iframe.style.setProperty(
+      "transform",
+      `translate(-50%, -50%) scale(${scale})`,
+      "important"
+    );
     iframe.style.setProperty("transform-origin", "center center", "important");
   }
 

@@ -9035,3 +9035,19 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   transform: none !important;
   transform-origin: top left !important;
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v99
+   SHOW FULL CODE LENGTH IN CARD PREVIEW
+================================================== */
+.dds-commission-card-alan .dds-alan-card-preview::after {
+  display: none !important;
+  content: none !important;
+}
+
+.dds-commission-card-alan .dds-alan-card-preview > iframe {
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
