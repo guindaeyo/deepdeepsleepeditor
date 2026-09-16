@@ -8841,3 +8841,16 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   .dds-alan-editor-stage,.dds-alan-view-stage{min-height:500px}
   .dds-alan-range-row{grid-template-columns:minmax(0,1fr) 52px}
 }
+/* ALAN COMMISSION v92 — card preview matches every COMMISSION & SHOWCASE card */
+.dds-commission-card-alan > .dds-roleplay-card-preview.dds-alan-card-preview{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:16 / 10 !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+.dds-commission-card-alan .dds-alan-card-preview > iframe{
+  margin:0 !important;
+}
+

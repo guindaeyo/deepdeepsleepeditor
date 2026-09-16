@@ -19509,7 +19509,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         }
         sessionStorage.setItem(ACCESS_SESSION_KEY,"1");
         closeAccessModal();
-        openEditorUnlocked();
+        openEditor();
       } catch (err) {
         console.error(err);
         error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
@@ -19522,7 +19522,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function requestEditorAccess() {
     if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
-      openEditorUnlocked();
+      openEditor();
       return;
     }
     const dialog = createAccessModal();
@@ -19613,6 +19613,24 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.maxWidth = "none";
     iframe.style.transform = `translateX(-50%) scale(${scale})`;
     iframe.style.transformOrigin = "top center";
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-alan-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage) return;
+    const m = measureIframe(iframe);
+    const availableWidth = Math.max(1, stage.clientWidth - 28);
+    const availableHeight = Math.max(1, stage.clientHeight - 28);
+    const scale = Math.max(0.04, Math.min(1, availableWidth / m.width, availableHeight / m.height));
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
   }
 
   function colorField(label,key,value) {
@@ -19721,13 +19739,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (grid.querySelector(".dds-commission-card-alan")) return true;
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-alan";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span><div class="dds-alan-card-cover"><span>PREVIEW HIDDEN</span></div></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION 3</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span><div class="dds-alan-card-cover"><span>PREVIEW HIDDEN</span></div></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-alan-view]")?.addEventListener("click", openView);
     card.querySelector("[data-alan-edit]")?.addEventListener("click", requestEditorAccess);
     const iframe = card.querySelector("[data-alan-card-preview]");
     const stage = card.querySelector(".dds-alan-card-preview");
-    writeIframe(iframe, buildCode(defaults,true), true, () => fitIframe(iframe, stage, 12));
+    writeIframe(iframe, buildCode(defaults,true), true, fitCardPreview);
     return true;
   }
 
@@ -19885,7 +19903,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (installCard() || attempts>120) clearInterval(timer);
     },100);
     window.addEventListener("resize",() => {
-      if (card) fitIframe(card.querySelector("[data-alan-card-preview]"),card.querySelector(".dds-alan-card-preview"),12);
+      if (card) fitCardPreview();
       if (panel?.classList.contains("is-active")) updatePreview();
       if (viewPanel?.classList.contains("is-active")) fitIframe(viewPanel.querySelector("[data-alan-view-preview]"),viewPanel.querySelector(".dds-alan-view-stage"),28);
     });
