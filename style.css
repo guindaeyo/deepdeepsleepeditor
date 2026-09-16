@@ -8854,3 +8854,38 @@ body.dds-commission-editor-mode .dds-protected-commission-editor .dds-editor-hea
   margin:0 !important;
 }
 
+
+
+/* ==================================================
+   ALAN COMMISSION v93
+   - red range controls
+   - taller edit controls
+   - position fields use correct X/Y keys
+================================================== */
+.dds-alan-commission-editor .dds-alan-range-row input[type="range"]{
+  width:100%;
+  min-width:0;
+  accent-color:var(--dds-red-bright,#c11724);
+  cursor:pointer;
+}
+
+.dds-alan-commission-editor .dds-alan-range-row input[type="range"]::-webkit-slider-thumb{
+  cursor:grab;
+}
+
+.dds-alan-commission-editor .dds-alan-range-row input[type="range"]:active::-webkit-slider-thumb{
+  cursor:grabbing;
+}
+
+@media (min-width:1251px){
+  .dds-alan-commission-editor .dds-protected-commission-controls-column{
+    height:1200px;
+    min-height:1200px;
+    max-height:none;
+  }
+
+  .dds-alan-commission-editor .dds-alan-controls-scroll{
+    min-height:0;
+    overflow-y:auto;
+  }
+}

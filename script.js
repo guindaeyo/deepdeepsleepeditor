@@ -19647,7 +19647,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `<label class="dds-field"><span>${label}</span><div class="dds-alan-range-row"><input type="range" data-alan-field="${key}" min="${min}" max="${max}" step="${step}" value="${value}"><output data-alan-output="${key}">${value}${suffix}</output></div></label>`;
   }
   function xyControls(prefix, x=0,y=0) {
-    return `${rangeField("ซ้าย–ขวา",`${prefix}x`,x,-250,250,1,"px")}${rangeField("ขึ้น–ลง",`${prefix}y`,y,-250,250,1,"px")}`;
+    const upperAxisKeys = new Set(["top","cassette","sideScript","sideCopy","sideBottom"]);
+    const xKey = upperAxisKeys.has(prefix) ? `${prefix}X` : `${prefix}x`;
+    const yKey = upperAxisKeys.has(prefix) ? `${prefix}Y` : `${prefix}y`;
+    return `${rangeField("ซ้าย–ขวา",xKey,x,-250,250,1,"px")}${rangeField("ขึ้น–ลง",yKey,y,-250,250,1,"px")}`;
   }
   function photoSection(n) {
     return `<section class="dds-control-section"><div class="dds-control-title"><span>0${n+1}</span><h2>รูปที่ ${n}</h2></div><div class="dds-form-grid">${textField("URL รูป",`photo${n}`,defaults[`photo${n}`],true)}${rangeField("ตำแหน่งซ้าย–ขวา",`photo${n}x`,50,0,100,1,"%")}${rangeField("ตำแหน่งขึ้น–ลง",`photo${n}y`,50,0,100,1,"%")}${rangeField("ซูม",`photo${n}zoom`,100,50,220,1,"%")}</div></section>`;
