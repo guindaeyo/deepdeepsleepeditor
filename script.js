@@ -19887,7 +19887,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel.className = "dds-panel dds-protected-commission-editor dds-alan-commission-editor";
     panel.dataset.panel = PANEL_NAME;
     panel.innerHTML = `
-      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-back type="button">←</button><div><p class="dds-eyebrow">COMMISSION CODE EDITOR</p><h1>ALAN R. CLINTON</h1><p>โคดประเภทโปรไฟล์ · LOVE WINS ALL</p></div></div>
+      <div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-back type="button">←</button><div><p class="dds-eyebrow">COMMISSION CODE EDITOR</p><h1 class="dds-alan-commission-heading"><span>COMMISSION</span><span>— โคดประเภทโปรไฟล์</span></h1><p>โคดประเภทโปรไฟล์ · ผู้จ้างงาน ALAN R. CLINTON</p></div></div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>COMMISSION / ALAN</strong></div><div class="dds-alan-editor-stage"><iframe class="dds-protected-commission-preview-frame dds-alan-editor-preview" data-alan-preview scrolling="no" title="ตัวอย่างโคด Alan"></iframe></div></div>
         <div class="dds-protected-commission-controls-column">
