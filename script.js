@@ -19383,6 +19383,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const ACCESS_SESSION_KEY = "dds:alan-commission-editor:unlocked:v2";
   const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-alanprof.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Rock+Salt&display=swap";
+  const CANVAS_WIDTH = 700;
 
   const defaults = Object.freeze({
     bg:"#171717", paper:"#ddd6c8", paper2:"#c7bfb0", papertext:"#1e1c1a",
@@ -19575,90 +19576,173 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function iframeDoc(code, blurred = false) {
-    const blurCss = blurred ? `<style>html,body{overflow:hidden!important}.ddsh-commitalan-ref,.ddshopfz-ccm01{filter:blur(16px) saturate(.6);opacity:.72;user-select:none;pointer-events:none}</style>` : "";
-    return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${blurCss}</head><body style="margin:0;background:#242424;">${code}</body></html>`;
+    const blurCss = blurred
+      ? `.ddsh-commitalan-ref,.ddshopfz-ccm01{filter:blur(16px) saturate(.6);opacity:.72;user-select:none;pointer-events:none}`
+      : "";
+
+    return `<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html,
+  body {
+    width:${CANVAS_WIDTH}px !important;
+    min-width:${CANVAS_WIDTH}px !important;
+    max-width:${CANVAS_WIDTH}px !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    background:transparent !important;
+  }
+
+  body {
+    position:relative !important;
+  }
+
+  .dds-alan-preview-content {
+    width:${CANVAS_WIDTH}px !important;
+    min-width:${CANVAS_WIDTH}px !important;
+    max-width:${CANVAS_WIDTH}px !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    position:relative !important;
+    overflow:visible !important;
+  }
+
+  .dds-alan-preview-content > .ddsh-commitalan-ref {
+    width:${CANVAS_WIDTH}px !important;
+    min-width:${CANVAS_WIDTH}px !important;
+    max-width:${CANVAS_WIDTH}px !important;
+    margin:0 auto !important;
+  }
+
+  ${blurCss}
+</style>
+</head>
+<body>
+  <div class="dds-alan-preview-content" data-alan-preview-content>${code}</div>
+</body>
+</html>`;
   }
 
   function writeIframe(iframe, code, blurred = false, done) {
     if (!iframe) return;
+
+    /*
+     * ใช้ canvas ความกว้างคงที่แบบเดียวกับ commission Mikael
+     * เพื่อให้ CSS ของ Alan คำนวณความยาวจริงก่อนย่อ preview
+     */
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("height", "2200px", "important");
+    iframe.style.setProperty("min-height", "2200px", "important");
+    iframe.style.setProperty("max-height", "none", "important");
+
     iframe.onload = () => {
       const rerun = () => done?.();
 
       rerun();
-      [120, 350, 800, 1500].forEach(delay => window.setTimeout(rerun, delay));
+      [80, 180, 420, 850, 1500, 2400].forEach(delay => {
+        window.setTimeout(rerun, delay);
+      });
 
       try {
-        iframe.contentDocument?.fonts?.ready?.then(rerun).catch(() => {});
-        iframe.contentDocument?.querySelectorAll("img").forEach(img => {
+        const previewDocument = iframe.contentDocument;
+
+        previewDocument?.fonts?.ready
+          ?.then(rerun)
+          .catch(() => {});
+
+        previewDocument?.querySelectorAll("img").forEach(img => {
           if (!img.complete) {
             img.addEventListener("load", rerun, { once:true });
             img.addEventListener("error", rerun, { once:true });
           }
         });
+
+        if ("ResizeObserver" in window) {
+          const previewContent = previewDocument?.querySelector("[data-alan-preview-content]");
+          if (previewContent) {
+            const observer = new ResizeObserver(rerun);
+            observer.observe(previewContent);
+            window.setTimeout(() => observer.disconnect(), 3200);
+          }
+        }
       } catch {}
     };
+
     iframe.srcdoc = iframeDoc(code, blurred);
   }
 
   function measureIframe(iframe) {
     try {
-      const doc = iframe.contentDocument;
+      const doc = iframe?.contentDocument;
+      const content = doc?.querySelector("[data-alan-preview-content]");
       const root = doc?.querySelector(".ddsh-commitalan-ref");
       const credit = doc?.querySelector(".ddshopfz-ccm01");
-      const body = doc?.body;
-      const html = doc?.documentElement;
 
-      if (!doc || !root) {
+      if (!doc || !content || !root) {
         return {
-          width: Math.max(700, body?.scrollWidth || 700, html?.scrollWidth || 700),
-          height: Math.max(1200, body?.scrollHeight || 1200, html?.scrollHeight || 1200)
+          width: CANVAS_WIDTH,
+          height: 1500
         };
       }
 
-      /*
-       * ตัวโคด Alan มี element ที่วาง absolute/translate และอาจยื่นเกิน parent
-       * จึงวัด visual bounds ของทุกชิ้น เพื่อไม่ให้ช่วงล่างของโคดถูกตัดใน preview
-       */
       const nodes = [
+        content,
         root,
         ...root.querySelectorAll("*"),
         ...(credit ? [credit, ...credit.querySelectorAll("*")] : [])
       ];
 
-      let minLeft = 0;
-      let minTop = 0;
-      let maxRight = 0;
-      let maxBottom = 0;
+      let minTop = Infinity;
+      let maxBottom = -Infinity;
 
       nodes.forEach(node => {
         const rect = node.getBoundingClientRect();
         if (!rect || (!rect.width && !rect.height)) return;
-        minLeft = Math.min(minLeft, rect.left);
+
         minTop = Math.min(minTop, rect.top);
-        maxRight = Math.max(maxRight, rect.right);
         maxBottom = Math.max(maxBottom, rect.bottom);
       });
 
+      const contentRect = content.getBoundingClientRect();
+      const rootRect = root.getBoundingClientRect();
+      const creditRect = credit?.getBoundingClientRect();
+
+      const visualHeight =
+        Number.isFinite(minTop) && Number.isFinite(maxBottom)
+          ? Math.ceil(maxBottom - Math.min(0, minTop))
+          : 0;
+
+      const canvasHeight = Math.max(
+        1,
+        visualHeight,
+        Math.ceil(content.scrollHeight || 0),
+        Math.ceil(contentRect.height || 0),
+        Math.ceil(root.scrollHeight || 0),
+        Math.ceil(rootRect.height || 0),
+        creditRect ? Math.ceil(creditRect.bottom - Math.min(0, minTop)) : 0
+      );
+
       return {
-        width: Math.ceil(Math.max(
-          700,
-          root.scrollWidth || 0,
-          root.getBoundingClientRect().width || 0,
-          body?.scrollWidth || 0,
-          html?.scrollWidth || 0,
-          maxRight - minLeft
-        )),
-        height: Math.ceil(Math.max(
-          1200,
-          root.scrollHeight || 0,
-          root.getBoundingClientRect().height || 0,
-          body?.scrollHeight || 0,
-          html?.scrollHeight || 0,
-          maxBottom - minTop
-        ) + 16)
+        width: CANVAS_WIDTH,
+        height: canvasHeight
       };
     } catch {
-      return { width:700, height:1600 };
+      return {
+        width: CANVAS_WIDTH,
+        height: 1500
+      };
     }
   }
 
@@ -19714,35 +19798,41 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fitCardPreview() {
     const iframe = card?.querySelector("[data-alan-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
-    if (!iframe || !stage) return;
 
-    /*
-     * ตั้ง measurement canvas ให้สูงพอก่อน เพื่อให้ browser คำนวณ
-     * รูป/กระดาษ/เครดิตด้านล่างครบ แล้วค่อยย่อทั้งก้อนลงช่อง preview
-     */
-    iframe.style.setProperty("width", "900px", "important");
-    iframe.style.setProperty("height", "2400px", "important");
-    iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("transform", "none", "important");
+    if (!iframe || !stage || stage.clientWidth < 20 || stage.clientHeight < 20) {
+      return;
+    }
 
-    const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - 36);
-    const availableHeight = Math.max(1, stage.clientHeight - 36);
+    const { width, height } = measureIframe(iframe);
+    const padding = 18;
+
+    const availableWidth = Math.max(
+      1,
+      stage.clientWidth - padding * 2
+    );
+    const availableHeight = Math.max(
+      1,
+      stage.clientHeight - padding * 2
+    );
+
     const scale = Math.max(
-      0.02,
+      0.01,
       Math.min(
         1,
-        availableWidth / m.width,
-        availableHeight / m.height
+        availableWidth / width,
+        availableHeight / height
       )
     );
 
     iframe.style.setProperty("position", "absolute", "important");
     iframe.style.setProperty("left", "50%", "important");
     iframe.style.setProperty("top", "50%", "important");
-    iframe.style.setProperty("width", `${m.width}px`, "important");
-    iframe.style.setProperty("height", `${m.height}px`, "important");
-    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
     iframe.style.setProperty(
       "transform",
       `translate(-50%, -50%) scale(${scale})`,

@@ -9051,3 +9051,22 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   opacity: 1 !important;
   pointer-events: none !important;
 }
+
+
+/* ==================================================
+   ALAN COMMISSION v100
+   CARD PREVIEW — SAME FULL-CANVAS FIT LOGIC AS MIKAEL
+================================================== */
+.dds-commission-card-alan .dds-alan-card-preview {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.dds-commission-card-alan .dds-alan-card-preview > iframe {
+  position: absolute !important;
+  inset: auto !important;
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+}
