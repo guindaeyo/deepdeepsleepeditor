@@ -19838,9 +19838,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       )
     );
 
+    /*
+     * ขยับลงมาเล็กน้อยเพื่อให้ visual center ของโคดอยู่กลางช่อง preview มากขึ้น
+     * เพราะงาน Alan มีน้ำหนักภาพด้านบนมากและพอดูใน card จะเหมือนลอยสูงนิดหนึ่ง
+     */
+    const topOffset = Math.round(Math.max(8, availableHeight * 0.04));
+
     iframe.style.setProperty("position", "absolute", "important");
     iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("top", `calc(50% + ${topOffset}px)`, "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
     iframe.style.setProperty("max-width", `${width}px`, "important");

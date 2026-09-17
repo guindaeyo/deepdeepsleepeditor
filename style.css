@@ -9143,3 +9143,13 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
    ALAN COMMISSION v104
    COPY CODE INLINE STYLE FIX
 ================================================== */
+
+
+/* ==================================================
+   ALAN COMMISSION v105
+   CARD PREVIEW VISUAL CENTER ADJUST
+================================================== */
+.dds-commission-card-alan .dds-alan-card-preview {
+  position: relative !important;
+  overflow: hidden !important;
+}
