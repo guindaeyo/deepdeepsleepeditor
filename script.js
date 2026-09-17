@@ -19327,7 +19327,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function openEditorUnlocked() {
+  function openEditor() {
     createPanel();
     const draft = getDraft();
     const restored = draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults };
