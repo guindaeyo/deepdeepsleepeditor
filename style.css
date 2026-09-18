@@ -9153,3 +9153,211 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   position: relative !important;
   overflow: hidden !important;
 }
+
+
+/* =========================================================
+   DDS CLOUD SAVE / ACCOUNT — TRIAL v107
+   ========================================================= */
+.dds-cloud-account-button {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 12000;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  background: rgba(17,17,17,.94);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: 600 11px/1 "DM Sans","Bai Jamjuree",sans-serif;
+  letter-spacing: .08em;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0,0,0,.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.dds-cloud-account-button i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+  background: #777;
+}
+.dds-cloud-account-button[data-state="online"] i { background: #69ce89; }
+.dds-cloud-account-button[data-state="setup"] i { background: #e3ad55; }
+.dds-cloud-account-button:hover { transform: translateY(-1px); }
+
+.dds-cloud-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 14000;
+  padding: 22px;
+  background: rgba(0,0,0,.68);
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity .18s ease;
+}
+.dds-cloud-modal.is-open { opacity: 1; }
+.dds-cloud-modal[hidden] { display: none !important; }
+
+.dds-cloud-dialog {
+  width: min(520px, 100%);
+  max-height: min(760px, calc(100vh - 44px));
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #171717;
+  color: #eee;
+  box-shadow: 0 28px 80px rgba(0,0,0,.48);
+  font-family: "Bai Jamjuree",sans-serif;
+}
+.dds-cloud-dialog-head {
+  min-height: 124px;
+  padding: 24px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+.dds-cloud-dialog-head small {
+  display: block;
+  margin-bottom: 7px;
+  color: #8d8d8d;
+  font: 600 9px/1 "DM Sans",sans-serif;
+  letter-spacing: .16em;
+}
+.dds-cloud-dialog-head h2 {
+  margin: 0;
+  font: 700 28px/.95 "DM Sans",sans-serif;
+  letter-spacing: -.05em;
+}
+.dds-cloud-dialog-head p {
+  margin: 10px 0 0;
+  color: #a9a9a9;
+  font-size: 12px;
+}
+.dds-cloud-close {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.12);
+  background: transparent;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+.dds-cloud-view {
+  padding: 24px;
+}
+.dds-cloud-view h3 {
+  margin: 0 0 9px;
+  color: #fff;
+  font: 700 14px/1 "DM Sans",sans-serif;
+  letter-spacing: .08em;
+}
+.dds-cloud-view > p {
+  margin: 0 0 20px;
+  color: #aaa;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.dds-cloud-view label {
+  display: block;
+  margin: 0 0 14px;
+}
+.dds-cloud-view label > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #898989;
+  font: 600 9px/1 "DM Sans",sans-serif;
+  letter-spacing: .14em;
+}
+.dds-cloud-view input,
+.dds-cloud-view textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.13);
+  background: #202020;
+  color: #fff;
+  padding: 11px 12px;
+  border-radius: 0;
+  outline: none;
+  font: 400 12px/1.5 "Bai Jamjuree",sans-serif;
+}
+.dds-cloud-view textarea { resize: vertical; min-height: 84px; }
+.dds-cloud-view input:focus,
+.dds-cloud-view textarea:focus { border-color: rgba(220,48,62,.72); }
+
+.dds-cloud-actions,
+.dds-cloud-account-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 18px;
+}
+.dds-cloud-account-actions { grid-template-columns: 1fr; }
+.dds-cloud-view button {
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #222;
+  color: #eee;
+  font: 600 10px/1 "DM Sans","Bai Jamjuree",sans-serif;
+  letter-spacing: .06em;
+  cursor: pointer;
+}
+.dds-cloud-view button:hover:not(:disabled) { background: #2b2b2b; }
+.dds-cloud-view button:disabled { opacity: .42; cursor: not-allowed; }
+.dds-cloud-view .dds-cloud-primary {
+  background: #b31622;
+  border-color: #b31622;
+  color: #fff;
+}
+.dds-cloud-view .dds-cloud-primary:hover:not(:disabled) { background: #c91d2b; }
+.dds-cloud-text-button {
+  width: 100%;
+  margin-top: 10px;
+  background: transparent !important;
+  border-color: transparent !important;
+  color: #888 !important;
+}
+.dds-cloud-email {
+  display: block;
+  padding: 12px 0;
+  color: #fff;
+  font-size: 14px;
+  word-break: break-all;
+}
+.dds-cloud-hint {
+  margin: 16px 0 0 !important;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: #777 !important;
+  font-size: 10px !important;
+}
+.dds-cloud-busy {
+  padding: 10px 24px;
+  background: rgba(177,22,34,.15);
+  border-bottom: 1px solid rgba(177,22,34,.25);
+  color: #efb4ba;
+  font-size: 11px;
+}
+.dds-cloud-dialog.is-busy { pointer-events: none; }
+
+@media (max-width: 700px) {
+  .dds-cloud-account-button {
+    right: 12px;
+    bottom: 12px;
+    min-height: 38px;
+    padding: 0 13px;
+  }
+  .dds-cloud-modal { padding: 10px; }
+  .dds-cloud-dialog { max-height: calc(100vh - 20px); }
+  .dds-cloud-dialog-head,
+  .dds-cloud-view { padding-left: 18px; padding-right: 18px; }
+  .dds-cloud-actions { grid-template-columns: 1fr; }
+}

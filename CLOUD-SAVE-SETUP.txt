@@ -1,0 +1,37 @@
+DEEP DEEP SLEEP EDITOR — CLOUD SAVE TRIAL v107
+================================================
+
+เวอร์ชันนี้ยังใช้ localStorage เดิมได้ 100% แม้ยังไม่ตั้ง Supabase
+
+สิ่งที่เพิ่ม
+- ปุ่ม CLOUD SAVE มุมขวาล่าง
+- สมัครบัญชี / Login ด้วย Email + Password
+- แยกเซฟตาม user_id ไม่ปนกัน
+- เซฟเก่าก่อนมี Account ถูกเก็บเป็น Guest Saves
+- กดนำ Guest Saves เข้า Account ได้โดยไม่ลบของเดิม
+- ตอน Login เซฟใหม่จาก Editor จะ Sync ขึ้น Cloud
+- ไปเครื่องอื่น Login บัญชีเดิมแล้วกด SYNC NOW ได้
+- ก่อนระบบเอา Cloud มาทับ local draft จะสร้าง backup local ไว้
+
+วิธีเปิดใช้งานจริง
+1. สร้าง Supabase Project
+2. เปิด SQL Editor แล้วรันไฟล์ SUPABASE_SETUP.sql
+3. ไปที่ Project Settings / API
+4. คัดลอก Project URL และ anon key / publishable key
+5. วิธีทดลองเร็ว:
+   - เปิดเว็บ
+   - กด CLOUD SAVE
+   - วาง Project URL + Key
+   - กดบันทึก
+6. วิธี Deploy ให้ทุกเครื่องรู้ค่า Supabase อัตโนมัติ:
+   เปิด cloud-config.js แล้วใส่
+     supabaseUrl: "..."
+     supabaseAnonKey: "..."
+   จากนั้น Deploy เว็บใหม่
+
+สำคัญ
+- ห้ามใส่ service_role key ในหน้าเว็บ
+- ใช้ anon key / publishable key เท่านั้น
+- RLS ใน SQL จะบังคับให้แต่ละ Account อ่าน/แก้เฉพาะ row ของตัวเอง
+- เซฟ Guest เดิมจะไม่ถูกลบตอน Import
+- หากยังไม่ตั้ง Supabase ระบบเว็บเดิมยังทำงานเหมือน v106

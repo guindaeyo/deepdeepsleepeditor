@@ -20149,3 +20149,823 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",install,{once:true});
   else install();
 })();
+
+
+
+/* =========================================================
+   DDS CLOUD SAVE / ACCOUNT — TRIAL v107
+   - Guest mode keeps existing localStorage behavior.
+   - Logged-in mode isolates saves per Supabase Auth user.
+   - Existing pre-account saves are preserved as Guest Saves.
+   - Import Guest Saves -> Account without deleting guest data.
+   - Cross-device sync for draft + named save keys.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CLOUD_SAVE_V107__) return;
+  window.__DDS_CLOUD_SAVE_V107__ = true;
+
+  const TABLE = "dds_editor_saves";
+  const CONFIG_KEY = "dds:cloud:config:v1";
+  const GUEST_CACHE_KEY = "dds:cloud:guest-cache:v1";
+  const ACCOUNT_CACHE_PREFIX = "dds:cloud:account-cache:v1:";
+  const ACTIVE_SCOPE_KEY = "dds:cloud:active-scope:v1";
+  const BACKUP_PREFIX = "dds:cloud:backup:v1:";
+  const AUTO_SYNC_KEY = "dds:cloud:auto-sync:v1";
+  const SYNC_DEBOUNCE = 650;
+
+  let client = null;
+  let currentUser = null;
+  let suppressStorageSync = false;
+  let uploadTimer = 0;
+  const pending = new Map();
+  let ui = null;
+  let lastRemoteCount = 0;
+
+  const nativeSetItem = Storage.prototype.setItem;
+  const nativeRemoveItem = Storage.prototype.removeItem;
+
+  function notify(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+    const toast = document.querySelector("#siteToast");
+    const text = document.querySelector("#siteToastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toast.__ddsCloudTimer);
+    toast.__ddsCloudTimer = setTimeout(() => toast.classList.remove("is-visible"), 2600);
+  }
+
+  function safeParse(raw, fallback = null) {
+    try { return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
+  }
+
+  function rawGet(key) {
+    try { return nativeSetItem ? localStorage.getItem(key) : null; }
+    catch { return null; }
+  }
+
+  function rawSet(key, value) {
+    try { nativeSetItem.call(localStorage, key, String(value)); return true; }
+    catch { return false; }
+  }
+
+  function rawRemove(key) {
+    try { nativeRemoveItem.call(localStorage, key); return true; }
+    catch { return false; }
+  }
+
+  function isSyncKey(key) {
+    const k = String(key || "");
+    if (!k || k.startsWith("dds:cloud:")) return false;
+    return (
+      k.startsWith("dds:commission-draft:") ||
+      k.startsWith("dds:commission:alan-profile:draft:") ||
+      k.startsWith("dds:roleplay:") ||
+      k.startsWith("dds:named-local-saves:v1:")
+    );
+  }
+
+  function collectActive() {
+    const out = {};
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (!isSyncKey(key)) continue;
+        const value = localStorage.getItem(key);
+        if (value != null) out[key] = value;
+      }
+    } catch {}
+    return out;
+  }
+
+  function clearActive() {
+    const keys = Object.keys(collectActive());
+    suppressStorageSync = true;
+    try { keys.forEach((key) => rawRemove(key)); }
+    finally { suppressStorageSync = false; }
+  }
+
+  function applyMap(map) {
+    suppressStorageSync = true;
+    try {
+      Object.entries(map || {}).forEach(([key, value]) => {
+        if (isSyncKey(key) && value != null) rawSet(key, value);
+      });
+    } finally {
+      suppressStorageSync = false;
+    }
+  }
+
+  function readMap(key) {
+    const parsed = safeParse(rawGet(key), {});
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  }
+
+  function writeMap(key, map) {
+    rawSet(key, JSON.stringify(map || {}));
+  }
+
+  function guestCache() {
+    return readMap(GUEST_CACHE_KEY);
+  }
+
+  function accountCache(uid) {
+    return readMap(`${ACCOUNT_CACHE_PREFIX}${uid}`);
+  }
+
+  function saveGuestCache(map) {
+    writeMap(GUEST_CACHE_KEY, map);
+  }
+
+  function saveAccountCache(uid, map) {
+    writeMap(`${ACCOUNT_CACHE_PREFIX}${uid}`, map);
+  }
+
+  function getScope() {
+    return rawGet(ACTIVE_SCOPE_KEY) || "guest";
+  }
+
+  function setScope(scope) {
+    rawSet(ACTIVE_SCOPE_KEY, scope || "guest");
+  }
+
+  function snapshotCurrentScope() {
+    const scope = getScope();
+    const map = collectActive();
+    if (scope.startsWith("user:")) {
+      saveAccountCache(scope.slice(5), map);
+    } else {
+      saveGuestCache(map);
+    }
+    return map;
+  }
+
+  function valueSavedAt(raw) {
+    const parsed = safeParse(raw, null);
+    if (!parsed || typeof parsed !== "object") return 0;
+    if (Number.isFinite(Number(parsed.savedAt))) return Number(parsed.savedAt);
+    if (parsed.snapshot && Number.isFinite(Number(parsed.snapshot.savedAt))) return Number(parsed.snapshot.savedAt);
+    if (Array.isArray(parsed.saves)) {
+      return parsed.saves.reduce((max, item) => Math.max(max, Number(item?.savedAt || item?.snapshot?.savedAt || 0)), 0);
+    }
+    return 0;
+  }
+
+  function isNamedLibrary(raw) {
+    const parsed = safeParse(raw, null);
+    return Boolean(parsed && typeof parsed === "object" && Array.isArray(parsed.saves));
+  }
+
+  function mergeNamedLibraries(aRaw, bRaw) {
+    const a = safeParse(aRaw, { version: 1, saves: [] });
+    const b = safeParse(bRaw, { version: 1, saves: [] });
+    const byId = new Map();
+
+    [...(a.saves || []), ...(b.saves || [])].forEach((item) => {
+      if (!item || !item.id) return;
+      const prev = byId.get(item.id);
+      const prevAt = Number(prev?.savedAt || prev?.snapshot?.savedAt || 0);
+      const nextAt = Number(item?.savedAt || item?.snapshot?.savedAt || 0);
+      if (!prev || nextAt >= prevAt) byId.set(item.id, item);
+    });
+
+    return JSON.stringify({
+      version: 1,
+      saves: Array.from(byId.values()).sort((x, y) => Number(y?.savedAt || 0) - Number(x?.savedAt || 0))
+    });
+  }
+
+  function mergeRaw(localRaw, remoteRaw) {
+    if (localRaw == null) return remoteRaw;
+    if (remoteRaw == null) return localRaw;
+    if (localRaw === remoteRaw) return localRaw;
+
+    if (isNamedLibrary(localRaw) && isNamedLibrary(remoteRaw)) {
+      return mergeNamedLibraries(localRaw, remoteRaw);
+    }
+
+    const localAt = valueSavedAt(localRaw);
+    const remoteAt = valueSavedAt(remoteRaw);
+
+    if (localAt && remoteAt) return localAt >= remoteAt ? localRaw : remoteRaw;
+    if (localAt && !remoteAt) return localRaw;
+    if (!localAt && remoteAt) return remoteRaw;
+
+    return remoteRaw;
+  }
+
+  function backupLocal(uid, key, value) {
+    if (value == null) return;
+    const stamp = Date.now();
+    const safeKey = btoa(unescape(encodeURIComponent(key))).replace(/=+$/g, "");
+    rawSet(`${BACKUP_PREFIX}${uid}:${stamp}:${safeKey}`, value);
+  }
+
+  function configFromPage() {
+    const page = window.DDS_CLOUD_CONFIG || {};
+    const local = safeParse(rawGet(CONFIG_KEY), {}) || {};
+    return {
+      supabaseUrl: String(page.supabaseUrl || local.supabaseUrl || "").trim(),
+      supabaseAnonKey: String(page.supabaseAnonKey || local.supabaseAnonKey || "").trim()
+    };
+  }
+
+  function configured() {
+    const cfg = configFromPage();
+    return /^https?:\/\//i.test(cfg.supabaseUrl) && cfg.supabaseAnonKey.length > 20;
+  }
+
+  function saveLocalConfig(url, key) {
+    rawSet(CONFIG_KEY, JSON.stringify({
+      supabaseUrl: String(url || "").trim(),
+      supabaseAnonKey: String(key || "").trim()
+    }));
+  }
+
+  function loadSupabaseLibrary() {
+    if (window.supabase?.createClient) return Promise.resolve(window.supabase);
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-dds-supabase-lib]');
+      if (existing) {
+        existing.addEventListener("load", () => resolve(window.supabase), { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+      script.async = true;
+      script.dataset.ddsSupabaseLib = "1";
+      script.addEventListener("load", () => resolve(window.supabase), { once: true });
+      script.addEventListener("error", reject, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensureClient() {
+    if (client) return client;
+    if (!configured()) return null;
+    const lib = await loadSupabaseLibrary();
+    const cfg = configFromPage();
+    client = lib.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+    return client;
+  }
+
+  async function fetchRemote(uid) {
+    const c = await ensureClient();
+    if (!c || !uid) return {};
+    const { data, error } = await c
+      .from(TABLE)
+      .select("storage_key,storage_value,saved_at,updated_at")
+      .eq("user_id", uid);
+
+    if (error) throw error;
+    lastRemoteCount = data?.length || 0;
+    const out = {};
+    (data || []).forEach((row) => {
+      if (isSyncKey(row.storage_key)) out[row.storage_key] = row.storage_value;
+    });
+    return out;
+  }
+
+  async function upsertRemote(uid, key, value) {
+    const c = await ensureClient();
+    if (!c || !uid || !isSyncKey(key) || value == null) return;
+    const payload = {
+      user_id: uid,
+      storage_key: key,
+      storage_value: value,
+      saved_at: valueSavedAt(value)
+    };
+    const { error } = await c.from(TABLE).upsert(payload, { onConflict: "user_id,storage_key" });
+    if (error) throw error;
+  }
+
+  async function deleteRemote(uid, key) {
+    const c = await ensureClient();
+    if (!c || !uid || !isSyncKey(key)) return;
+    const { error } = await c
+      .from(TABLE)
+      .delete()
+      .eq("user_id", uid)
+      .eq("storage_key", key);
+    if (error) throw error;
+  }
+
+  function queueRemote(key, value) {
+    if (!currentUser || !configured() || !isSyncKey(key)) return;
+    pending.set(key, value);
+    clearTimeout(uploadTimer);
+    uploadTimer = setTimeout(flushPending, SYNC_DEBOUNCE);
+  }
+
+  async function flushPending() {
+    if (!currentUser || !pending.size) return;
+    const items = Array.from(pending.entries());
+    pending.clear();
+    try {
+      for (const [key, value] of items) {
+        if (value == null) await deleteRemote(currentUser.id, key);
+        else await upsertRemote(currentUser.id, key, value);
+      }
+      saveAccountCache(currentUser.id, collectActive());
+      updateUi();
+    } catch (error) {
+      console.error("[DDS Cloud] autosync failed", error);
+      notify("Cloud Sync ยังไม่สำเร็จ — เซฟในเครื่องยังอยู่ครบ");
+    }
+  }
+
+  Storage.prototype.setItem = function(key, value) {
+    const result = nativeSetItem.call(this, key, value);
+    if (
+      this === window.localStorage &&
+      !suppressStorageSync &&
+      isSyncKey(key)
+    ) {
+      if (currentUser) {
+        saveAccountCache(currentUser.id, collectActive());
+        queueRemote(String(key), String(value));
+      } else if (getScope() === "guest") {
+        saveGuestCache(collectActive());
+      }
+    }
+    return result;
+  };
+
+  Storage.prototype.removeItem = function(key) {
+    const wasSync = this === window.localStorage && isSyncKey(key);
+    const result = nativeRemoveItem.call(this, key);
+    if (wasSync && !suppressStorageSync) {
+      if (currentUser) {
+        saveAccountCache(currentUser.id, collectActive());
+        queueRemote(String(key), null);
+      } else if (getScope() === "guest") {
+        saveGuestCache(collectActive());
+      }
+    }
+    return result;
+  };
+
+  async function enterUser(user) {
+    if (!user) return;
+
+    const oldScope = getScope();
+    if (oldScope === "guest") {
+      saveGuestCache(collectActive());
+    } else if (oldScope.startsWith("user:") && oldScope !== `user:${user.id}`) {
+      saveAccountCache(oldScope.slice(5), collectActive());
+    }
+
+    let localUserMap =
+      oldScope === `user:${user.id}`
+        ? collectActive()
+        : accountCache(user.id);
+
+    clearActive();
+
+    const remoteMap = await fetchRemote(user.id);
+    const keys = new Set([...Object.keys(localUserMap), ...Object.keys(remoteMap)]);
+    const merged = {};
+
+    keys.forEach((key) => {
+      const value = mergeRaw(localUserMap[key], remoteMap[key]);
+      if (value != null) merged[key] = value;
+    });
+
+    applyMap(merged);
+    saveAccountCache(user.id, merged);
+    setScope(`user:${user.id}`);
+    currentUser = user;
+
+    // Bring merged result back to cloud if local cache had newer named saves/drafts.
+    for (const [key, value] of Object.entries(merged)) {
+      if (remoteMap[key] !== value) {
+        await upsertRemote(user.id, key, value);
+      }
+    }
+
+    updateUi();
+  }
+
+  async function restoreGuest() {
+    const scope = getScope();
+    if (scope.startsWith("user:")) {
+      saveAccountCache(scope.slice(5), collectActive());
+    }
+    clearActive();
+    applyMap(guestCache());
+    setScope("guest");
+    currentUser = null;
+    updateUi();
+  }
+
+  async function syncNow() {
+    if (!currentUser) return;
+    setBusy(true, "กำลังซิงก์...");
+    try {
+      const localMap = collectActive();
+      const remoteMap = await fetchRemote(currentUser.id);
+      const keys = new Set([...Object.keys(localMap), ...Object.keys(remoteMap)]);
+      const merged = {};
+
+      for (const key of keys) {
+        const next = mergeRaw(localMap[key], remoteMap[key]);
+        if (next == null) continue;
+        merged[key] = next;
+
+        if (localMap[key] !== next && localMap[key] != null) {
+          backupLocal(currentUser.id, key, localMap[key]);
+        }
+      }
+
+      clearActive();
+      applyMap(merged);
+      saveAccountCache(currentUser.id, merged);
+
+      for (const [key, value] of Object.entries(merged)) {
+        if (remoteMap[key] !== value) await upsertRemote(currentUser.id, key, value);
+      }
+
+      notify("ซิงก์ Cloud เรียบร้อยแล้ว");
+    } catch (error) {
+      console.error("[DDS Cloud] sync failed", error);
+      notify("ซิงก์ไม่สำเร็จ แต่เซฟในเครื่องยังไม่หาย");
+    } finally {
+      setBusy(false);
+      updateUi();
+    }
+  }
+
+  async function importGuestToAccount() {
+    if (!currentUser) return;
+    const guest = guestCache();
+    const guestKeys = Object.keys(guest);
+    if (!guestKeys.length) {
+      notify("ไม่พบเซฟเก่าจากเครื่องนี้");
+      return;
+    }
+
+    const ok = window.confirm(
+      `พบเซฟเก่าจากเครื่องนี้ ${guestKeys.length} รายการ\n\n` +
+      "ระบบจะคัดลอกเข้า Account โดยไม่ลบเซฟ Guest เดิม ต้องการดำเนินการหรือไม่?"
+    );
+    if (!ok) return;
+
+    setBusy(true, "กำลังนำเข้าเซฟเก่า...");
+    try {
+      const active = collectActive();
+      const merged = { ...active };
+
+      for (const key of guestKeys) {
+        merged[key] = mergeRaw(active[key], guest[key]);
+      }
+
+      clearActive();
+      applyMap(merged);
+      saveAccountCache(currentUser.id, merged);
+
+      for (const [key, value] of Object.entries(merged)) {
+        await upsertRemote(currentUser.id, key, value);
+      }
+
+      notify("นำเซฟเก่าเข้าบัญชีแล้ว — Guest เดิมยังเก็บไว้อยู่");
+    } catch (error) {
+      console.error("[DDS Cloud] import failed", error);
+      notify("นำเข้าไม่สำเร็จ เซฟเดิมยังอยู่ครบ");
+    } finally {
+      setBusy(false);
+      updateUi();
+    }
+  }
+
+  async function signIn(email, password) {
+    const c = await ensureClient();
+    if (!c) return;
+    setBusy(true, "กำลังเข้าสู่ระบบ...");
+    try {
+      const { data, error } = await c.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (!data.user) throw new Error("ไม่พบข้อมูลผู้ใช้");
+      await enterUser(data.user);
+      notify("เข้าสู่ระบบแล้ว");
+      closeModal();
+    } catch (error) {
+      console.error("[DDS Cloud] sign in failed", error);
+      notify(error?.message || "เข้าสู่ระบบไม่สำเร็จ");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function signUp(email, password) {
+    const c = await ensureClient();
+    if (!c) return;
+    setBusy(true, "กำลังสร้างบัญชี...");
+    try {
+      const { data, error } = await c.auth.signUp({ email, password });
+      if (error) throw error;
+      if (data.session && data.user) {
+        await enterUser(data.user);
+        notify("สร้างบัญชีและเข้าสู่ระบบแล้ว");
+        closeModal();
+      } else {
+        notify("สร้างบัญชีแล้ว กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
+      }
+    } catch (error) {
+      console.error("[DDS Cloud] sign up failed", error);
+      notify(error?.message || "สร้างบัญชีไม่สำเร็จ");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function signOut() {
+    const c = await ensureClient();
+    setBusy(true, "กำลังออกจากระบบ...");
+    try {
+      snapshotCurrentScope();
+      if (c) await c.auth.signOut();
+      await restoreGuest();
+      notify("ออกจากระบบแล้ว — กลับสู่เซฟ Guest ของเครื่องนี้");
+    } catch (error) {
+      console.error("[DDS Cloud] sign out failed", error);
+      notify("ออกจากระบบไม่สำเร็จ");
+    } finally {
+      setBusy(false);
+      updateUi();
+    }
+  }
+
+  function setBusy(active, text = "") {
+    if (!ui) return;
+    ui.modal.classList.toggle("is-busy", Boolean(active));
+    ui.modal.querySelectorAll("button,input").forEach((node) => {
+      if (!node.matches("[data-cloud-close]")) node.disabled = Boolean(active);
+    });
+    const status = ui.modal.querySelector("[data-cloud-busy]");
+    if (status) {
+      status.hidden = !active;
+      status.textContent = text || "กำลังดำเนินการ...";
+    }
+  }
+
+  function countGuest() {
+    return Object.keys(guestCache()).length;
+  }
+
+  function countActive() {
+    return Object.keys(collectActive()).length;
+  }
+
+  function statusText() {
+    if (!configured()) return "ยังไม่ได้เชื่อม Supabase";
+    if (!currentUser) return "Guest Mode · เซฟในเครื่อง";
+    return `Cloud Mode · ${currentUser.email || "Account"}`;
+  }
+
+  function updateUi() {
+    if (!ui) return;
+    ui.button.dataset.state = !configured() ? "setup" : currentUser ? "online" : "guest";
+    ui.button.querySelector("span").textContent = currentUser ? "CLOUD ✓" : "CLOUD SAVE";
+
+    const status = ui.modal.querySelector("[data-cloud-status]");
+    if (status) status.textContent = statusText();
+
+    const setup = ui.modal.querySelector("[data-cloud-view='setup']");
+    const auth = ui.modal.querySelector("[data-cloud-view='auth']");
+    const account = ui.modal.querySelector("[data-cloud-view='account']");
+
+    setup.hidden = configured();
+    auth.hidden = !configured() || Boolean(currentUser);
+    account.hidden = !configured() || !currentUser;
+
+    if (currentUser) {
+      const email = ui.modal.querySelector("[data-cloud-account-email]");
+      const stats = ui.modal.querySelector("[data-cloud-stats]");
+      const guestCount = countGuest();
+      if (email) email.textContent = currentUser.email || currentUser.id;
+      if (stats) {
+        stats.textContent =
+          `เซฟใน Account บนเครื่องนี้ ${countActive()} รายการ · ` +
+          `Cloud ${lastRemoteCount} รายการ · Guest เดิม ${guestCount} รายการ`;
+      }
+      const importBtn = ui.modal.querySelector("[data-cloud-import-guest]");
+      if (importBtn) {
+        importBtn.disabled = guestCount === 0;
+        importBtn.textContent = guestCount
+          ? `นำเซฟเก่าจากเครื่องนี้เข้าบัญชี (${guestCount})`
+          : "ไม่มีเซฟเก่าที่ต้องนำเข้า";
+      }
+    }
+
+    const cfg = configFromPage();
+    const urlInput = ui.modal.querySelector("[data-cloud-config-url]");
+    const keyInput = ui.modal.querySelector("[data-cloud-config-key]");
+    if (urlInput && !urlInput.value) urlInput.value = cfg.supabaseUrl || "";
+    if (keyInput && !keyInput.value) keyInput.value = cfg.supabaseAnonKey || "";
+  }
+
+  function openModal() {
+    if (!ui) return;
+    updateUi();
+    ui.modal.hidden = false;
+    requestAnimationFrame(() => ui.modal.classList.add("is-open"));
+  }
+
+  function closeModal() {
+    if (!ui) return;
+    ui.modal.classList.remove("is-open");
+    setTimeout(() => { if (!ui.modal.classList.contains("is-open")) ui.modal.hidden = true; }, 180);
+  }
+
+  function createUi() {
+    if (document.querySelector("[data-dds-cloud-modal]")) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dds-cloud-account-button";
+    button.innerHTML = `<i></i><span>CLOUD SAVE</span>`;
+    button.setAttribute("aria-label", "Cloud Save / Account");
+
+    const modal = document.createElement("div");
+    modal.className = "dds-cloud-modal";
+    modal.dataset.ddsCloudModal = "1";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="dds-cloud-dialog" role="dialog" aria-modal="true" aria-label="Cloud Save Account">
+        <div class="dds-cloud-dialog-head">
+          <div>
+            <small>DEEP DEEP SLEEP EDITOR</small>
+            <h2>CLOUD SAVE</h2>
+            <p data-cloud-status>Guest Mode · เซฟในเครื่อง</p>
+          </div>
+          <button type="button" class="dds-cloud-close" data-cloud-close aria-label="ปิด">×</button>
+        </div>
+
+        <div class="dds-cloud-busy" data-cloud-busy hidden>กำลังดำเนินการ...</div>
+
+        <section class="dds-cloud-view" data-cloud-view="setup">
+          <h3>เชื่อม SUPABASE</h3>
+          <p>เซฟเดิมในเครื่องจะไม่ถูกลบ การเชื่อมต่อนี้ใช้สำหรับทดลอง Cloud Save เท่านั้น</p>
+          <label>
+            <span>PROJECT URL</span>
+            <input type="url" data-cloud-config-url placeholder="https://xxxx.supabase.co" autocomplete="off">
+          </label>
+          <label>
+            <span>ANON / PUBLISHABLE KEY</span>
+            <textarea data-cloud-config-key rows="4" placeholder="วาง anon key หรือ publishable key"></textarea>
+          </label>
+          <button type="button" class="dds-cloud-primary" data-cloud-save-config>บันทึกการเชื่อมต่อในเครื่องนี้</button>
+          <p class="dds-cloud-hint">ถ้าต้องการให้ทุกเครื่องรู้ค่า Supabase อัตโนมัติ ให้ใส่ค่าเดียวกันในไฟล์ <b>cloud-config.js</b> ก่อน Deploy</p>
+        </section>
+
+        <section class="dds-cloud-view" data-cloud-view="auth" hidden>
+          <h3>ACCOUNT</h3>
+          <p>เข้าสู่ระบบเพื่อเปิดเซฟของคุณจากเครื่องอื่น เซฟ Guest เดิมของเครื่องนี้ยังอยู่เหมือนเดิม</p>
+          <label>
+            <span>EMAIL</span>
+            <input type="email" data-cloud-email autocomplete="email" placeholder="you@example.com">
+          </label>
+          <label>
+            <span>PASSWORD</span>
+            <input type="password" data-cloud-password autocomplete="current-password" placeholder="อย่างน้อย 6 ตัวอักษร">
+          </label>
+          <div class="dds-cloud-actions">
+            <button type="button" class="dds-cloud-primary" data-cloud-login>LOGIN</button>
+            <button type="button" data-cloud-signup>CREATE ACCOUNT</button>
+          </div>
+          <button type="button" class="dds-cloud-text-button" data-cloud-edit-config>แก้การเชื่อมต่อ Supabase</button>
+        </section>
+
+        <section class="dds-cloud-view" data-cloud-view="account" hidden>
+          <h3>YOUR CLOUD</h3>
+          <strong class="dds-cloud-email" data-cloud-account-email></strong>
+          <p data-cloud-stats></p>
+          <div class="dds-cloud-account-actions">
+            <button type="button" class="dds-cloud-primary" data-cloud-sync>SYNC NOW</button>
+            <button type="button" data-cloud-import-guest>นำเซฟเก่าจากเครื่องนี้เข้าบัญชี</button>
+            <button type="button" data-cloud-logout>LOG OUT</button>
+          </div>
+          <p class="dds-cloud-hint">ตอนล็อกอิน เซฟใหม่จาก Editor จะซิงก์ขึ้น Cloud อัตโนมัติ และยังมี cache ของบัญชีนี้ในเครื่องไว้สำรอง</p>
+        </section>
+      </div>
+    `;
+
+    document.body.append(button, modal);
+
+    ui = { button, modal };
+
+    button.addEventListener("click", openModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest("[data-cloud-close]")) closeModal();
+    });
+
+    modal.querySelector("[data-cloud-save-config]")?.addEventListener("click", async () => {
+      const url = modal.querySelector("[data-cloud-config-url]")?.value || "";
+      const key = modal.querySelector("[data-cloud-config-key]")?.value || "";
+      if (!/^https?:\/\//i.test(url.trim()) || key.trim().length < 20) {
+        notify("กรุณาใส่ Project URL และ Key ให้ครบ");
+        return;
+      }
+      saveLocalConfig(url, key);
+      client = null;
+      try {
+        await ensureClient();
+        notify("บันทึกการเชื่อมต่อแล้ว");
+      } catch (error) {
+        console.error(error);
+        notify("โหลด Supabase ไม่สำเร็จ");
+      }
+      updateUi();
+    });
+
+    modal.querySelector("[data-cloud-edit-config]")?.addEventListener("click", () => {
+      rawRemove(CONFIG_KEY);
+      client = null;
+      updateUi();
+    });
+
+    modal.querySelector("[data-cloud-login]")?.addEventListener("click", () => {
+      const email = modal.querySelector("[data-cloud-email]")?.value?.trim() || "";
+      const password = modal.querySelector("[data-cloud-password]")?.value || "";
+      if (!email || !password) return notify("กรอกอีเมลและรหัสผ่านก่อน");
+      signIn(email, password);
+    });
+
+    modal.querySelector("[data-cloud-signup]")?.addEventListener("click", () => {
+      const email = modal.querySelector("[data-cloud-email]")?.value?.trim() || "";
+      const password = modal.querySelector("[data-cloud-password]")?.value || "";
+      if (!email || password.length < 6) return notify("กรอกอีเมลและรหัสผ่านอย่างน้อย 6 ตัว");
+      signUp(email, password);
+    });
+
+    modal.querySelector("[data-cloud-sync]")?.addEventListener("click", syncNow);
+    modal.querySelector("[data-cloud-import-guest]")?.addEventListener("click", importGuestToAccount);
+    modal.querySelector("[data-cloud-logout]")?.addEventListener("click", signOut);
+
+    updateUi();
+  }
+
+  async function initAuth() {
+    // First install: remember all pre-existing saves as Guest Saves.
+    if (!rawGet(GUEST_CACHE_KEY) && getScope() === "guest") {
+      saveGuestCache(collectActive());
+    }
+
+    if (!configured()) {
+      updateUi();
+      return;
+    }
+
+    try {
+      const c = await ensureClient();
+      const { data, error } = await c.auth.getSession();
+      if (error) throw error;
+
+      const user = data?.session?.user || null;
+      if (user) {
+        await enterUser(user);
+      } else if (getScope().startsWith("user:")) {
+        await restoreGuest();
+      }
+
+      c.auth.onAuthStateChange(async (event, session) => {
+        if (event === "SIGNED_IN" && session?.user && currentUser?.id !== session.user.id) {
+          await enterUser(session.user);
+        }
+        if (event === "SIGNED_OUT") {
+          await restoreGuest();
+        }
+      });
+    } catch (error) {
+      console.error("[DDS Cloud] init failed", error);
+      notify("Cloud ยังเชื่อมต่อไม่ได้ — ระบบเซฟในเครื่องยังใช้ได้ตามปกติ");
+    }
+
+    updateUi();
+  }
+
+  function init() {
+    createUi();
+    initAuth();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+
