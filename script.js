@@ -20586,3 +20586,922 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 })();
 
+
+
+
+/* =========================================================
+   DDS ACCOUNT CLOUD — IMPORT ONCE + CLOUD-FIRST v112
+
+   Logged out:
+     Every editor uses its original device localStorage.
+
+   Logged in:
+     Cloud Bridge routes every editor save key to this account's cache.
+     SAVE AS / LOAD / DELETE / drafts therefore work with the account.
+     Changes are mirrored to Supabase automatically.
+
+   Import:
+     Explicitly copies ALL original device saves into the account.
+     Original device saves are never deleted.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_ACCOUNT_CLOUD_V112__) return;
+  window.__DDS_ACCOUNT_CLOUD_V112__ = true;
+
+  const TABLE = "dds_editor_saves";
+  const bridge = window.DDSCloudBridge;
+
+  if (!bridge) {
+    console.error("[DDS Cloud v112] cloud-bridge.js must load before script.js");
+    return;
+  }
+
+  let client = null;
+  let currentUser = null;
+  let ui = null;
+  let syncing = false;
+  let mirrorTimer = 0;
+  const mirrorQueue = new Map();
+
+  function safeParse(raw, fallback = null) {
+    try { return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
+  }
+
+  function namedItems(raw) {
+    const parsed = safeParse(raw, null);
+    return parsed && Array.isArray(parsed.saves) ? parsed.saves : [];
+  }
+
+  function isNamedLibrary(raw) {
+    const parsed = safeParse(raw, null);
+    return Boolean(parsed && typeof parsed === "object" && Array.isArray(parsed.saves));
+  }
+
+  function itemSavedAt(item) {
+    return Number(item?.savedAt || item?.snapshot?.savedAt || 0);
+  }
+
+  function rawSavedAt(raw) {
+    const parsed = safeParse(raw, null);
+    if (!parsed || typeof parsed !== "object") return 0;
+
+    if (Number.isFinite(Number(parsed.savedAt))) {
+      return Number(parsed.savedAt);
+    }
+
+    if (parsed.snapshot && Number.isFinite(Number(parsed.snapshot.savedAt))) {
+      return Number(parsed.snapshot.savedAt);
+    }
+
+    if (Array.isArray(parsed.saves)) {
+      return parsed.saves.reduce(
+        (max, item) => Math.max(max, itemSavedAt(item)),
+        0
+      );
+    }
+
+    return 0;
+  }
+
+  function mergeNamed(aRaw, bRaw) {
+    const byId = new Map();
+
+    [...namedItems(aRaw), ...namedItems(bRaw)].forEach((item) => {
+      if (!item || !item.id) return;
+      const previous = byId.get(item.id);
+
+      if (!previous || itemSavedAt(item) >= itemSavedAt(previous)) {
+        byId.set(item.id, item);
+      }
+    });
+
+    return JSON.stringify({
+      version: 1,
+      saves: Array.from(byId.values()).sort(
+        (a, b) => itemSavedAt(b) - itemSavedAt(a)
+      )
+    });
+  }
+
+  function mergeRaw(accountRaw, incomingRaw) {
+    if (accountRaw == null) return incomingRaw;
+    if (incomingRaw == null) return accountRaw;
+    if (accountRaw === incomingRaw) return accountRaw;
+
+    if (isNamedLibrary(accountRaw) || isNamedLibrary(incomingRaw)) {
+      return mergeNamed(accountRaw, incomingRaw);
+    }
+
+    const accountAt = rawSavedAt(accountRaw);
+    const incomingAt = rawSavedAt(incomingRaw);
+
+    if (accountAt && incomingAt) {
+      return incomingAt > accountAt ? incomingRaw : accountRaw;
+    }
+
+    if (incomingAt && !accountAt) return incomingRaw;
+    if (accountAt && !incomingAt) return accountRaw;
+
+    // Unknown data format: keep existing account data to avoid overwriting it.
+    return accountRaw;
+  }
+
+  function mergeMaps(base, incoming) {
+    const result = { ...(base || {}) };
+
+    Object.entries(incoming || {}).forEach(([key, value]) => {
+      if (!bridge.isEditorKey(key) || value == null) return;
+      result[key] = mergeRaw(result[key], value);
+    });
+
+    return result;
+  }
+
+  function countNamed(map) {
+    return Object.values(map || {}).reduce(
+      (count, raw) => count + namedItems(raw).length,
+      0
+    );
+  }
+
+  function config() {
+    const cfg = window.DDS_CLOUD_CONFIG || {};
+    return {
+      url: String(cfg.supabaseUrl || "").trim(),
+      key: String(cfg.supabaseAnonKey || "").trim()
+    };
+  }
+
+  function configured() {
+    const cfg = config();
+    return /^https?:\/\//i.test(cfg.url) && cfg.key.length > 20;
+  }
+
+  function notify(message) {
+    if (typeof window.showToast === "function") {
+      window.showToast(message);
+      return;
+    }
+
+    const toast = document.querySelector("#siteToast");
+    const text = document.querySelector("#siteToastText");
+
+    if (toast && text) {
+      text.textContent = message;
+      toast.classList.add("is-visible");
+      clearTimeout(toast.__ddsCloudV112Timer);
+      toast.__ddsCloudV112Timer = setTimeout(
+        () => toast.classList.remove("is-visible"),
+        2800
+      );
+      return;
+    }
+
+    window.alert(message);
+  }
+
+  function loadSupabaseLibrary() {
+    if (window.supabase?.createClient) {
+      return Promise.resolve(window.supabase);
+    }
+
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-dds-supabase-v112]");
+
+      if (existing) {
+        existing.addEventListener(
+          "load",
+          () => resolve(window.supabase),
+          { once: true }
+        );
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+      script.async = true;
+      script.dataset.ddsSupabaseV112 = "1";
+      script.addEventListener(
+        "load",
+        () => resolve(window.supabase),
+        { once: true }
+      );
+      script.addEventListener("error", reject, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensureClient() {
+    if (client) return client;
+    if (!configured()) throw new Error("ยังไม่ได้ตั้งค่า Supabase");
+
+    const lib = await loadSupabaseLibrary();
+    const cfg = config();
+
+    client = lib.createClient(cfg.url, cfg.key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+
+    return client;
+  }
+
+  async function fetchCloudMap(userId) {
+    if (!userId) return {};
+
+    const c = await ensureClient();
+    const { data, error } = await c
+      .from(TABLE)
+      .select("storage_key,storage_value,saved_at,updated_at")
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    const out = {};
+
+    (data || []).forEach((row) => {
+      if (!bridge.isEditorKey(row.storage_key)) return;
+      out[row.storage_key] = mergeRaw(
+        out[row.storage_key],
+        row.storage_value
+      );
+    });
+
+    return out;
+  }
+
+  async function upsertCloud(userId, key, value) {
+    if (!userId || !bridge.isEditorKey(key) || value == null) return;
+
+    const c = await ensureClient();
+    const { error } = await c
+      .from(TABLE)
+      .upsert({
+        user_id: userId,
+        storage_key: key,
+        storage_value: String(value),
+        saved_at: rawSavedAt(value)
+      }, {
+        onConflict: "user_id,storage_key"
+      });
+
+    if (error) throw error;
+  }
+
+  async function deleteCloud(userId, key) {
+    if (!userId || !bridge.isEditorKey(key)) return;
+
+    const c = await ensureClient();
+    const { error } = await c
+      .from(TABLE)
+      .delete()
+      .eq("user_id", userId)
+      .eq("storage_key", key);
+
+    if (error) throw error;
+  }
+
+  function queueMirror(detail) {
+    if (!currentUser || !detail || detail.userId !== currentUser.id) return;
+
+    mirrorQueue.set(detail.key, {
+      action: detail.action,
+      value: detail.value
+    });
+
+    clearTimeout(mirrorTimer);
+    mirrorTimer = setTimeout(flushMirrorQueue, 500);
+    updateUi();
+  }
+
+  async function flushMirrorQueue() {
+    if (!currentUser || syncing || !mirrorQueue.size) return;
+
+    syncing = true;
+    const entries = Array.from(mirrorQueue.entries());
+    mirrorQueue.clear();
+
+    try {
+      const completed = [];
+
+      for (const [key, entry] of entries) {
+        if (entry.action === "delete") {
+          await deleteCloud(currentUser.id, key);
+        } else {
+          await upsertCloud(currentUser.id, key, entry.value);
+        }
+        completed.push(key);
+      }
+
+      bridge.clearPending(currentUser.id, completed);
+    } catch (error) {
+      console.error("[DDS Cloud v112] auto mirror failed", error);
+
+      // Keep queued operations in Bridge pending storage.
+      entries.forEach(([key, entry]) => {
+        mirrorQueue.set(key, entry);
+      });
+
+      notify("Cloud ยังซิงก์ไม่สำเร็จ แต่เซฟในบัญชีบนเครื่องนี้ยังอยู่");
+    } finally {
+      syncing = false;
+      updateUi();
+    }
+  }
+
+  async function flushStoredPending() {
+    if (!currentUser) return;
+
+    const stored = bridge.getPending(currentUser.id);
+    const entries = Object.entries(stored);
+
+    if (!entries.length) return;
+
+    syncing = true;
+
+    try {
+      const completed = [];
+
+      for (const [key, entry] of entries) {
+        if (!bridge.isEditorKey(key)) continue;
+
+        if (entry?.action === "delete") {
+          await deleteCloud(currentUser.id, key);
+        } else if (entry?.value != null) {
+          await upsertCloud(currentUser.id, key, entry.value);
+        }
+
+        completed.push(key);
+      }
+
+      bridge.clearPending(currentUser.id, completed);
+    } catch (error) {
+      console.error("[DDS Cloud v112] pending flush failed", error);
+    } finally {
+      syncing = false;
+      updateUi();
+    }
+  }
+
+  function setBusy(active, message = "") {
+    if (!ui) return;
+
+    const busy = ui.modal.querySelector("[data-account-cloud-busy]");
+
+    if (busy) {
+      busy.hidden = !active;
+      busy.textContent = message || "กำลังดำเนินการ...";
+    }
+
+    ui.modal.querySelectorAll("button,input").forEach((node) => {
+      if (!node.matches("[data-account-cloud-close]")) {
+        node.disabled = Boolean(active);
+      }
+    });
+  }
+
+  async function activateAccount(user, cloudMap, shouldReload = true) {
+    currentUser = user;
+
+    const existingCache = bridge.getAccountCache(user.id);
+    const combined = mergeMaps(existingCache, cloudMap);
+
+    bridge.replaceAccountCache(user.id, combined);
+    bridge.activate(user.id, combined);
+
+    if (shouldReload) {
+      sessionStorage.setItem("dds:cloud:v112:just-activated", "1");
+      window.location.reload();
+      return;
+    }
+
+    updateLabels();
+    updateUi(combined);
+  }
+
+  async function signIn(email, password) {
+    setBusy(true, "กำลังเข้าสู่ระบบและโหลด Cloud Saves...");
+
+    try {
+      const c = await ensureClient();
+      const { data, error } = await c.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      const user = data.user || data.session?.user;
+
+      if (!user) throw new Error("ไม่พบข้อมูลบัญชี");
+
+      const cloudMap = await fetchCloudMap(user.id);
+
+      // No device data is imported here.
+      // We only activate the account's own cache/cloud data.
+      await activateAccount(user, cloudMap, true);
+    } catch (error) {
+      console.error("[DDS Cloud v112] sign in failed", error);
+      notify(error?.message || "เข้าสู่ระบบไม่สำเร็จ");
+      setBusy(false);
+    }
+  }
+
+  async function signUp(email, password) {
+    setBusy(true, "กำลังสร้างบัญชี...");
+
+    try {
+      const c = await ensureClient();
+      const { data, error } = await c.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        const cloudMap = await fetchCloudMap(data.user.id);
+        await activateAccount(data.user, cloudMap, true);
+        return;
+      }
+
+      notify("สร้างบัญชีแล้ว กรุณายืนยันอีเมลก่อน Login");
+      setBusy(false);
+    } catch (error) {
+      console.error("[DDS Cloud v112] sign up failed", error);
+      notify(error?.message || "สร้างบัญชีไม่สำเร็จ");
+      setBusy(false);
+    }
+  }
+
+  async function signOut() {
+    setBusy(true, "กำลังออกจากระบบ...");
+
+    try {
+      await flushMirrorQueue();
+      await flushStoredPending();
+
+      const c = await ensureClient();
+      await c.auth.signOut();
+
+      currentUser = null;
+      bridge.deactivate();
+
+      // Device originals were never touched, so reloading returns to them.
+      window.location.reload();
+    } catch (error) {
+      console.error("[DDS Cloud v112] sign out failed", error);
+      notify("ออกจากระบบไม่สำเร็จ");
+      setBusy(false);
+    }
+  }
+
+  async function importDeviceSaves() {
+    if (!currentUser) {
+      notify("กรุณา Login ก่อน");
+      return;
+    }
+
+    const deviceMap = bridge.getDeviceMap();
+    const deviceKeys = Object.keys(deviceMap);
+    const deviceNamed = countNamed(deviceMap);
+
+    if (!deviceKeys.length) {
+      notify("เครื่องนี้ไม่มีเซฟเก่าที่ต้องนำเข้า");
+      return;
+    }
+
+    const ok = window.confirm(
+      `พบข้อมูลจากเครื่องนี้ ${deviceKeys.length} ชุด` +
+      (deviceNamed ? ` · Named Saves ${deviceNamed} ไฟล์` : "") +
+      `\n\nจะคัดลอกและรวมเข้า Account Cloud` +
+      `\nเซฟต้นฉบับในเครื่องนี้จะไม่ถูกลบ` +
+      `\n\nดำเนินการต่อหรือไม่?`
+    );
+
+    if (!ok) return;
+
+    setBusy(true, "กำลังนำเซฟจากเครื่องนี้เข้าบัญชี...");
+
+    try {
+      const remoteMap = await fetchCloudMap(currentUser.id);
+      const currentCache = bridge.getAccountCache(currentUser.id);
+
+      let merged = mergeMaps(remoteMap, currentCache);
+      merged = mergeMaps(merged, deviceMap);
+
+      // Upload full merged account map.
+      for (const [key, value] of Object.entries(merged)) {
+        await upsertCloud(currentUser.id, key, value);
+      }
+
+      bridge.replaceAccountCache(currentUser.id, merged);
+      bridge.activate(currentUser.id, merged);
+
+      notify(
+        `นำเข้าเรียบร้อย` +
+        (deviceNamed ? ` · รวม Named Saves จากเครื่องนี้ ${deviceNamed} ไฟล์` : "") +
+        ` · ของเดิมในเครื่องยังอยู่`
+      );
+
+      // Reload so every editor's list is rebuilt from account cache.
+      sessionStorage.setItem("dds:cloud:v112:just-imported", "1");
+      window.setTimeout(() => window.location.reload(), 450);
+    } catch (error) {
+      console.error("[DDS Cloud v112] import failed", error);
+      notify("นำเข้าไม่สำเร็จ แต่เซฟเดิมในเครื่องไม่ได้ถูกลบ");
+      setBusy(false);
+    }
+  }
+
+  async function refreshCloudIntoAccount({ reloadIfChanged = false } = {}) {
+    if (!currentUser) return false;
+
+    const cloudMap = await fetchCloudMap(currentUser.id);
+    const cache = bridge.getAccountCache(currentUser.id);
+    const merged = mergeMaps(cloudMap, cache);
+
+    const before = JSON.stringify(cache);
+    const after = JSON.stringify(merged);
+    const changed = before !== after;
+
+    bridge.replaceAccountCache(currentUser.id, merged);
+
+    if (changed && reloadIfChanged) {
+      const guard = sessionStorage.getItem("dds:cloud:v112:refresh-reload");
+
+      if (guard !== "1") {
+        sessionStorage.setItem("dds:cloud:v112:refresh-reload", "1");
+        window.location.reload();
+        return true;
+      }
+    }
+
+    updateUi(merged);
+    return changed;
+  }
+
+  function updateLabels() {
+    const loggedIn = Boolean(currentUser && bridge.isActive());
+
+    document
+      .querySelectorAll(".dds-named-save-heading strong")
+      .forEach((node) => {
+        node.textContent = loggedIn
+          ? "ไฟล์ที่บันทึกไว้ในบัญชี"
+          : "ไฟล์ที่บันทึกไว้ในเครื่องนี้";
+      });
+
+    document
+      .querySelectorAll(".dds-draft-manager-copy strong")
+      .forEach((node) => {
+        if (loggedIn && node.textContent.trim() === "บันทึกแบบร่าง") {
+          node.textContent = "บันทึกแบบร่าง · CLOUD";
+        }
+      });
+  }
+
+  function updateUi(map = null) {
+    if (!ui) return;
+
+    const loggedIn = Boolean(currentUser && bridge.isActive());
+    const accountMap = map || (loggedIn
+      ? bridge.getAccountCache(currentUser.id)
+      : {});
+    const deviceMap = bridge.getDeviceMap();
+    const pendingCount = loggedIn
+      ? Object.keys(bridge.getPending(currentUser.id)).length
+      : 0;
+
+    ui.button.dataset.state = loggedIn ? "online" : "guest";
+    ui.button.querySelector("span").textContent = loggedIn
+      ? "ACCOUNT ✓"
+      : "LOGIN";
+
+    const status = ui.modal.querySelector("[data-account-cloud-status]");
+    const auth = ui.modal.querySelector("[data-account-cloud-auth]");
+    const account = ui.modal.querySelector("[data-account-cloud-account]");
+
+    if (status) {
+      status.textContent = loggedIn
+        ? `Cloud Account · ${currentUser.email || "ผู้ใช้"}`
+        : "ยังไม่ได้เข้าสู่ระบบ";
+    }
+
+    auth.hidden = loggedIn;
+    account.hidden = !loggedIn;
+
+    if (loggedIn) {
+      const email = ui.modal.querySelector("[data-account-cloud-email]");
+      const cloudStats = ui.modal.querySelector("[data-account-cloud-stats]");
+      const deviceStats = ui.modal.querySelector("[data-account-device-stats]");
+      const syncState = ui.modal.querySelector("[data-account-sync-state]");
+
+      if (email) {
+        email.textContent = currentUser.email || currentUser.id;
+      }
+
+      if (cloudStats) {
+        cloudStats.textContent =
+          `ในบัญชี ${Object.keys(accountMap).length} ชุด` +
+          (countNamed(accountMap)
+            ? ` · Named Saves ${countNamed(accountMap)} ไฟล์`
+            : "");
+      }
+
+      if (deviceStats) {
+        deviceStats.textContent =
+          `เซฟเก่าบนเครื่องนี้ ${Object.keys(deviceMap).length} ชุด` +
+          (countNamed(deviceMap)
+            ? ` · Named Saves ${countNamed(deviceMap)} ไฟล์`
+            : "");
+      }
+
+      if (syncState) {
+        syncState.textContent = pendingCount
+          ? `รอส่งขึ้น Cloud ${pendingCount} รายการ`
+          : "Cloud พร้อมใช้งาน";
+      }
+
+      const importButton = ui.modal.querySelector("[data-account-import]");
+      if (importButton) {
+        importButton.disabled = Object.keys(deviceMap).length === 0;
+      }
+    }
+
+    updateLabels();
+  }
+
+  function openModal() {
+    updateUi();
+    ui.modal.hidden = false;
+
+    requestAnimationFrame(() => {
+      ui.modal.classList.add("is-open");
+    });
+  }
+
+  function closeModal() {
+    ui.modal.classList.remove("is-open");
+
+    window.setTimeout(() => {
+      if (!ui.modal.classList.contains("is-open")) {
+        ui.modal.hidden = true;
+      }
+    }, 160);
+  }
+
+  function createUi() {
+    if (document.querySelector("[data-dds-account-cloud-v112]")) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dds-account-cloud-trigger";
+    button.innerHTML = `<i></i><span>LOGIN</span>`;
+
+    const modal = document.createElement("div");
+    modal.className = "dds-account-cloud-modal";
+    modal.dataset.ddsAccountCloudV112 = "1";
+    modal.hidden = true;
+
+    modal.innerHTML = `
+      <div class="dds-account-cloud-dialog">
+        <div class="dds-account-cloud-head">
+          <div>
+            <small>DEEP DEEP SLEEP EDITOR</small>
+            <h2>ACCOUNT</h2>
+            <p data-account-cloud-status>ยังไม่ได้เข้าสู่ระบบ</p>
+          </div>
+          <button type="button" data-account-cloud-close aria-label="ปิด">×</button>
+        </div>
+
+        <div class="dds-account-cloud-busy" data-account-cloud-busy hidden></div>
+
+        <section class="dds-account-cloud-info">
+          <strong>CLOUD SAVE</strong>
+          <p>
+            เมื่อ Login แล้ว SAVE AS / LOAD / DELETE และแบบร่างของทุก Editor
+            จะใช้ข้อมูลของบัญชีนี้อัตโนมัติ
+          </p>
+        </section>
+
+        <section class="dds-account-cloud-auth" data-account-cloud-auth>
+          <label>
+            <span>EMAIL</span>
+            <input type="email" data-account-email autocomplete="email">
+          </label>
+          <label>
+            <span>PASSWORD</span>
+            <input type="password" data-account-password autocomplete="current-password">
+          </label>
+          <div class="dds-account-cloud-auth-actions">
+            <button type="button" class="is-primary" data-account-login>LOGIN</button>
+            <button type="button" data-account-signup>CREATE ACCOUNT</button>
+          </div>
+        </section>
+
+        <section class="dds-account-cloud-account" data-account-cloud-account hidden>
+          <strong class="dds-account-cloud-email" data-account-cloud-email></strong>
+
+          <div class="dds-account-cloud-stats">
+            <p data-account-cloud-stats></p>
+            <p data-account-device-stats></p>
+            <p data-account-sync-state></p>
+          </div>
+
+          <button type="button" class="dds-account-import-button" data-account-import>
+            <span>IMPORT SAVES FROM THIS DEVICE</span>
+            <small>
+              คัดลอกเซฟเก่าทั้งหมดจากเครื่องนี้เข้าบัญชี
+              โดยไม่ลบไฟล์ต้นฉบับในเครื่อง
+            </small>
+          </button>
+
+          <p class="dds-account-cloud-note">
+            ถ้ามีเซฟเก่าอยู่อีกเครื่อง ให้ Login บัญชีเดียวกันบนเครื่องนั้น
+            แล้วกด IMPORT เพียงครั้งเดียว เซฟจะถูกรวมไว้ในบัญชีเดียวกัน
+          </p>
+
+          <button type="button" class="dds-account-logout" data-account-logout>
+            LOG OUT
+          </button>
+        </section>
+      </div>
+    `;
+
+    document.body.append(button, modal);
+    ui = { button, modal };
+
+    button.addEventListener("click", openModal);
+
+    modal.addEventListener("click", (event) => {
+      if (
+        event.target === modal ||
+        event.target.closest("[data-account-cloud-close]")
+      ) {
+        closeModal();
+      }
+    });
+
+    modal
+      .querySelector("[data-account-login]")
+      ?.addEventListener("click", () => {
+        const email =
+          modal.querySelector("[data-account-email]")?.value?.trim() || "";
+        const password =
+          modal.querySelector("[data-account-password]")?.value || "";
+
+        if (!email || !password) {
+          notify("กรอก Email และ Password ก่อน");
+          return;
+        }
+
+        signIn(email, password);
+      });
+
+    modal
+      .querySelector("[data-account-signup]")
+      ?.addEventListener("click", () => {
+        const email =
+          modal.querySelector("[data-account-email]")?.value?.trim() || "";
+        const password =
+          modal.querySelector("[data-account-password]")?.value || "";
+
+        if (!email || password.length < 6) {
+          notify("Password ต้องมีอย่างน้อย 6 ตัว");
+          return;
+        }
+
+        signUp(email, password);
+      });
+
+    modal
+      .querySelector("[data-account-import]")
+      ?.addEventListener("click", importDeviceSaves);
+
+    modal
+      .querySelector("[data-account-logout]")
+      ?.addEventListener("click", signOut);
+
+    updateUi();
+  }
+
+  async function initAuth() {
+    if (!configured()) {
+      notify("ยังไม่ได้ตั้งค่า Supabase");
+      return;
+    }
+
+    try {
+      const c = await ensureClient();
+      const { data, error } = await c.auth.getSession();
+
+      if (error) throw error;
+
+      const sessionUser = data?.session?.user || null;
+      const activeId = bridge.getActiveUserId();
+
+      // Session expired / logged out, but bridge still points at old account.
+      if (!sessionUser && activeId) {
+        bridge.deactivate();
+        window.location.reload();
+        return;
+      }
+
+      // Existing auth session but bridge not active yet.
+      if (sessionUser && !activeId) {
+        const cloudMap = await fetchCloudMap(sessionUser.id);
+        await activateAccount(sessionUser, cloudMap, true);
+        return;
+      }
+
+      // Browser has a different active-account cache than Supabase session.
+      if (sessionUser && activeId && sessionUser.id !== activeId) {
+        const cloudMap = await fetchCloudMap(sessionUser.id);
+        await activateAccount(sessionUser, cloudMap, true);
+        return;
+      }
+
+      if (sessionUser && activeId === sessionUser.id) {
+        currentUser = sessionUser;
+
+        await flushStoredPending();
+
+        // Pull new changes from other devices.
+        await refreshCloudIntoAccount({ reloadIfChanged: true });
+      }
+
+      c.auth.onAuthStateChange(async (event, session) => {
+        if (event === "SIGNED_OUT") {
+          currentUser = null;
+
+          if (bridge.isActive()) {
+            bridge.deactivate();
+            window.location.reload();
+          }
+
+          return;
+        }
+
+        if (
+          event === "SIGNED_IN" &&
+          session?.user &&
+          session.user.id !== bridge.getActiveUserId()
+        ) {
+          const cloudMap = await fetchCloudMap(session.user.id);
+          await activateAccount(session.user, cloudMap, true);
+        }
+      });
+    } catch (error) {
+      console.error("[DDS Cloud v112] init failed", error);
+      notify("Cloud เชื่อมต่อไม่ได้ แต่เซฟเดิมบนเครื่องยังไม่ได้ถูกลบ");
+    }
+
+    updateUi();
+  }
+
+  function installLabelObserver() {
+    const observer = new MutationObserver(() => updateLabels());
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  function init() {
+    createUi();
+    installLabelObserver();
+
+    window.addEventListener("dds-cloud-bridge-change", (event) => {
+      queueMirror(event.detail);
+    });
+
+    initAuth();
+
+    if (sessionStorage.getItem("dds:cloud:v112:just-activated") === "1") {
+      sessionStorage.removeItem("dds:cloud:v112:just-activated");
+      notify("เข้าสู่ระบบแล้ว · โหลด Cloud Saves ของบัญชีแล้ว");
+    }
+
+    if (sessionStorage.getItem("dds:cloud:v112:just-imported") === "1") {
+      sessionStorage.removeItem("dds:cloud:v112:just-imported");
+      notify("นำเซฟจากเครื่องนี้เข้าบัญชีเรียบร้อยแล้ว");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+

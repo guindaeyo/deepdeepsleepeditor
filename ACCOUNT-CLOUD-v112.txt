@@ -1,0 +1,47 @@
+DEEP DEEP SLEEP EDITOR — ACCOUNT CLOUD v112
+================================================
+
+ระบบใหม่
+---------
+1) ยังไม่ Login
+   - Editor ใช้เซฟในเครื่องเหมือน v110 เดิมทุกอย่าง
+   - เซฟเก่าในเครื่องไม่ถูกย้าย/ลบ/ทับ
+
+2) Login
+   - Editor ทุกตัวสลับไปใช้เซฟของ Account Cloud อัตโนมัติ
+   - SAVE AS / LOAD / DELETE / Draft ใช้พื้นที่ของบัญชี
+   - การแก้เซฟขณะ Login จะส่งขึ้น Supabase อัตโนมัติ
+
+3) IMPORT SAVES FROM THIS DEVICE
+   - ใช้สำหรับคัดลอกเซฟเก่าของเครื่องนี้เข้าบัญชี
+   - รวม Named Saves ตาม id และเวลาบันทึก
+   - ไม่ลบเซฟต้นฉบับของเครื่อง
+
+ตัวอย่างย้ายหลายเครื่อง
+-----------------------
+เครื่อง A:
+- Login
+- IMPORT SAVES FROM THIS DEVICE
+
+เครื่อง B:
+- Login บัญชีเดียวกัน
+- Cloud Saves จาก A จะขึ้นอัตโนมัติ
+- ถ้า B มีเซฟเก่าเพิ่ม ให้กด IMPORT อีกครั้ง
+
+หลังจาก Import ทุกเครื่องครบ:
+- ไปเครื่องใหม่
+- Login
+- ใช้ SAVE AS / LOAD ของทุกโคดได้เลย ไม่ต้องกด Download/Sync
+
+ความปลอดภัย
+------------
+- Device saves เดิมแยกจาก Account cache
+- Login ไม่เขียนทับ local save เดิมของเครื่อง
+- Logout จะกลับมาเห็น local save เดิมของเครื่อง
+- ปุ่ม RECOVERY / EXPORT JSON จาก v110 ยังอยู่
+- มี pending queue ถ้า Cloud ส่งไม่สำเร็จชั่วคราว
+
+Supabase
+--------
+ใช้ Project URL / Publishable Key ใน cloud-config.js แล้ว
+ถ้าเคยรัน SUPABASE_SETUP.sql ของรุ่นก่อนสำเร็จ ไม่ต้องรันซ้ำ
