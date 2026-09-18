@@ -9572,66 +9572,57 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   MIKAEL HISTORY FREE — EDITOR v116
-   ========================================================= */
-.dds-mikael-history-editor .dds-editor-heading h1 {
+   MIKAEL HISTORY FREE COMMISSION — v117 EDITOR ONLY
+   Scope: .dds-mhp-editor / .ddsh-commtmklpfofile
+========================================================= */
+.dds-mhp-editor .dds-mhp-editor-heading {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: .08em;
+  gap: .04em;
 }
-.dds-mikael-history-editor .dds-mikaelhist-head-main {
+.dds-mhp-editor .dds-mhp-editor-heading > span {
   display: block;
 }
-.dds-mikael-history-editor .dds-mikaelhist-head-sub {
-  display: block;
+.dds-mhp-editor .dds-mhp-editor-heading > span:last-child {
   margin-top: .08em;
   font-family: "Bai Jamjuree", sans-serif !important;
   font-size: .54em;
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 1.14;
   letter-spacing: -.025em;
 }
 
+.dds-mhp-editor .dds-mhp-range-field {
+  grid-column: 1 / -1;
+}
+.dds-mhp-editor .dds-mhp-range-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 64px;
+  gap: 12px;
+  align-items: center;
+}
+.dds-mhp-editor .dds-mhp-range-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--dds-red-bright,#c11724);
+}
+.dds-mhp-editor .dds-mhp-range-row output {
+  min-width: 0;
+  color: rgba(255,255,255,.66);
+  font-size: 10px;
+  text-align: right;
+}
+
 @media (min-width:1251px) {
-  .dds-mikael-history-editor .dds-protected-commission-controls-column {
+  .dds-mhp-editor .dds-mhp-controls-column {
     height: 1500px !important;
     min-height: 1500px !important;
     max-height: none !important;
+    position: relative !important;
+    top: auto !important;
   }
-  .dds-mikael-history-editor .dds-controls-scroll,
-  .dds-mikael-history-editor .dds-mikael-history-controls-scroll {
+  .dds-mhp-editor .dds-mhp-controls-scroll {
     min-height: 0 !important;
     overflow-y: auto !important;
   }
-}
-
-/* main ink also controls barcode and solid redaction bars */
-.ddsh-commtmklpfofile {
-  --ddsh-commtmklpfo-stamp: #b00000;
-  --ddsh-commtmklpfo-photo-zoom: 1;
-}
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-barcode {
-  color: var(--ddsh-commtmklpfo-ink) !important;
-  filter: none !important;
-}
-.ddsh-commtmklpfofile .ddsh-blackline,
-.ddsh-commtmklpfofile .ddsh-mini-redact,
-.ddsh-commtmklpfofile .ddsh-redact,
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-inline-redaction span,
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-classified-note b,
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-bottomredact i {
-  background: var(--ddsh-commtmklpfo-ink) !important;
-}
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-redstamp,
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-footerstamp {
-  color: var(--ddsh-commtmklpfo-stamp) !important;
-  border-color: var(--ddsh-commtmklpfo-stamp) !important;
-}
-
-/* photo zoom; keeps original x/y vars */
-.ddsh-commtmklpfofile .ddsh-commtmklpfo-photo::before {
-  transform: translate(var(--ddsh-commtmklpfo-photo-x,0px), var(--ddsh-commtmklpfo-photo-y,0px))
-             scale(var(--ddsh-commtmklpfo-photo-zoom,1)) !important;
-  transform-origin: center center !important;
 }
