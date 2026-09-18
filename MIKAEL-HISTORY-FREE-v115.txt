@@ -1,0 +1,22 @@
+MIKAEL F. KAISER — FREE HISTORY COMMISSION v115
+
+เพิ่มการ์ด COMMISSION:
+- โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)
+- ผู้จ้าง MIKAEL F. KAISER
+- พรีวิว COMMISSION & SHOWCASE เบลอ
+- VIEW WORK disabled
+- EDIT CODE ใช้รหัส 1212312120
+
+Editor แก้ได้:
+- สีพื้นหลัง
+- สีหลักดำทั้งหมดด้วยช่องเดียว
+- รูปหลัก 1 รูป
+- เลข 0529-26 แบบ 4 หลัก + 2 หลัก และผูกหลายตำแหน่ง
+- CASE NO. EPD-69-0913 เฉพาะ 69 / 0913
+- FULL NAME (THAI), ALIASES, FACECLAIM, BIRTHPLACE, DATE OF BIRTH, SPECIES, LEVEL, MBTI, EDUCATION, OCCUPATION, NOTE
+- REFERENCE EPD-0529 เฉพาะเลข 0529
+- DATE 05/29/2026
+- HISTORY / PERSONALITY
+- RELATIONSHIPS เริ่ม 1 คน เพิ่มได้สูงสุด 10 คน พร้อม NAME / RELATIONSHIP
+
+Cloud Save v114 ยังอยู่ครบ และ editor ใหม่ใช้ key ที่รองรับ Cloud Bridge อยู่แล้ว
