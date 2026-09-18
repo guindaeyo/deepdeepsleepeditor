@@ -9695,3 +9695,39 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+
+/* =========================================================
+   HANS x2 + RORAIMA — FAST PREVIEW / NATURAL VIEW v129
+   Scope ONLY these three commission works.
+========================================================= */
+
+/* Card previews remain hidden until real dimensions exist. */
+.dds-hans-roleplay-commission-card [data-hans-card-preview],
+.dds-roraima-house-commission-card [data-rora-card-preview] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity .12s ease !important;
+}
+.dds-hans-roleplay-commission-card [data-hans-card-preview][data-hans-preview-ready="1"],
+.dds-roraima-house-commission-card [data-rora-card-preview][data-rora-preview-ready="1"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* VIEW WORK: holder must not be squeezed by flex/max-width rules. */
+.dds-hans-view-stage,
+.dds-rora-view-stage {
+  overflow: auto !important;
+}
+.dds-hans-view-holder,
+.dds-rora-view-holder {
+  flex: 0 0 auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+.dds-hans-view-holder > iframe,
+.dds-rora-view-holder > iframe {
+  max-width: none !important;
+  flex: none !important;
+}

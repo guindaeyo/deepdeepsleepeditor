@@ -14993,34 +14993,81 @@ ${stylesheetLinks}
     }
   }
 
+  function warmHansPreviewAssets() {
+    [STYLESHEET_URL, FONT_STYLESHEET_URL].forEach((url) => {
+      if (!url || document.head.querySelector(`link[data-dds-hans-warm="${url}"]`)) return;
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "style";
+      link.href = url;
+      link.dataset.ddsHansWarm = url;
+      document.head.appendChild(link);
+    });
+
+    [defaults.headImage, defaults.boxImage, BARCODE_URL].forEach((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+    });
+  }
+
   function writeIframe(iframe, code, fit) {
     if (!iframe) return;
     iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("height", "1200px", "important");
-    iframe.onload = () => {
-      fit?.();
-      setTimeout(() => fit?.(), 90);
-      setTimeout(() => fit?.(), 280);
-      setTimeout(() => fit?.(), 750);
+
+    const refit = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => fit?.()));
     };
+
+    iframe.onload = () => {
+      refit();
+      [60, 160, 320, 650, 1100, 1800].forEach((delay) => {
+        window.setTimeout(refit, delay);
+      });
+
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => {
+          refit();
+          window.setTimeout(refit, 120);
+        });
+      } catch {}
+    };
+
     iframe.srcdoc = previewDocument(code);
   }
 
   function fitHolder(stage, holder, iframe) {
-    if (!stage || !holder || !iframe) return;
+    if (!stage || !holder || !iframe) return false;
+    if (stage.clientWidth < 40) return false;
+
     const { width, height } = measureIframe(iframe);
-    const available = Math.max(260, stage.clientWidth - 48);
-    const scale = Math.min(1, available / width);
-    holder.style.width = `${Math.ceil(width * scale)}px`;
-    holder.style.height = `${Math.ceil(height * scale)}px`;
+    const available = Math.max(1, stage.clientWidth - 48);
+    const scale = Math.max(0.05, Math.min(1, available / width));
+
+    holder.style.setProperty("width", `${Math.ceil(width * scale)}px`, "important");
+    holder.style.setProperty("height", `${Math.ceil(height * scale)}px`, "important");
+    holder.style.setProperty("flex", "0 0 auto", "important");
+    holder.style.setProperty("max-width", "none", "important");
+    holder.style.setProperty("margin", "0 auto", "important");
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("top", "0", "important");
+    iframe.style.setProperty("left", "0", "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
-    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
     iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
     iframe.style.setProperty("transform", `scale(${scale})`, "important");
     iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    return true;
   }
 
   function fitEditorPreview() {
@@ -15036,23 +15083,38 @@ ${stylesheetLinks}
   function fitCardPreview() {
     const iframe = card?.querySelector("[data-hans-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
-    if (!iframe || !stage) return;
+    if (!iframe || !stage || stage.clientWidth < 40 || stage.clientHeight < 40) return false;
+
+    const root = iframe.contentDocument?.querySelector(".dds-hans-preview-root");
+    if (!root) return false;
 
     const { width, height } = measureIframe(iframe);
     const padding = 18;
     const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
     const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
-    const scale = Math.min(1, availableWidth / width, availableHeight / height);
-    const safeScale = Math.max(0.05, scale);
+    const scale = Math.max(0.05, Math.min(1, availableWidth / width, availableHeight / height));
 
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
+    const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - scaledHeight) / 2);
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", `${left}px`, "important");
+    iframe.style.setProperty("top", `${top}px`, "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
-    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
     iframe.style.setProperty("height", `${height}px`, "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "50%", "important");
-    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${safeScale})`, "important");
-    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.dataset.hansPreviewReady = "1";
+    return true;
   }
 
   function showToast(message) {
@@ -15286,6 +15348,15 @@ ${stylesheetLinks}
     viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-hans-view-back]")?.addEventListener("click", goBack);
+
+    const viewStage = viewPanel.querySelector("[data-hans-view-stage]");
+    if ("ResizeObserver" in window && viewStage) {
+      const observer = new ResizeObserver(() => {
+        requestAnimationFrame(() => fitViewPreview());
+      });
+      observer.observe(viewStage);
+    }
+
     return viewPanel;
   }
 
@@ -15296,6 +15367,10 @@ ${stylesheetLinks}
     showPanel(VIEW_PANEL_NAME);
     history.replaceState(null, "", "#commission-hans-roleplay-view");
     writeIframe(target.querySelector("[data-hans-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+
+    [0, 50, 140, 300, 650, 1200].forEach((delay) => {
+      window.setTimeout(() => fitViewPreview(), delay);
+    });
   }
 
   function openEditor() {
@@ -15321,25 +15396,41 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);
 
     const cardPreview = card.querySelector("[data-hans-card-preview]");
+    const cardStage = cardPreview?.closest(".dds-roleplay-card-preview");
+
+    warmHansPreviewAssets();
+
+    if (cardPreview) {
+      cardPreview.style.setProperty("visibility", "hidden", "important");
+      cardPreview.style.setProperty("opacity", "0", "important");
+    }
+
     const renderCard = () => {
       if (cardRendered || !cardPreview) return;
       cardRendered = true;
       writeIframe(cardPreview, OFFICIAL_CODE, fitCardPreview);
     };
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        renderCard();
-      }, { rootMargin: "420px 0px" });
-      observer.observe(card);
-    } else renderCard();
+
+    // Render immediately instead of waiting for lazy intersection.
+    renderCard();
+
+    if ("ResizeObserver" in window && cardStage) {
+      const observer = new ResizeObserver(() => {
+        requestAnimationFrame(() => fitCardPreview());
+      });
+      observer.observe(cardStage);
+    }
+
+    [0, 80, 220, 520, 1000, 1800].forEach((delay) => {
+      window.setTimeout(() => fitCardPreview(), delay);
+    });
+
     return true;
   }
 
@@ -15752,34 +15843,81 @@ ${stylesheetLinks}
     }
   }
 
+  function warmHansPreviewAssets() {
+    [STYLESHEET_URL, FONT_STYLESHEET_URL].forEach((url) => {
+      if (!url || document.head.querySelector(`link[data-dds-hans-warm="${url}"]`)) return;
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "style";
+      link.href = url;
+      link.dataset.ddsHansWarm = url;
+      document.head.appendChild(link);
+    });
+
+    [defaults.headImage, defaults.boxImage, BARCODE_URL].forEach((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+    });
+  }
+
   function writeIframe(iframe, code, fit) {
     if (!iframe) return;
     iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("height", "1200px", "important");
-    iframe.onload = () => {
-      fit?.();
-      setTimeout(() => fit?.(), 90);
-      setTimeout(() => fit?.(), 280);
-      setTimeout(() => fit?.(), 750);
+
+    const refit = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => fit?.()));
     };
+
+    iframe.onload = () => {
+      refit();
+      [60, 160, 320, 650, 1100, 1800].forEach((delay) => {
+        window.setTimeout(refit, delay);
+      });
+
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => {
+          refit();
+          window.setTimeout(refit, 120);
+        });
+      } catch {}
+    };
+
     iframe.srcdoc = previewDocument(code);
   }
 
   function fitHolder(stage, holder, iframe) {
-    if (!stage || !holder || !iframe) return;
+    if (!stage || !holder || !iframe) return false;
+    if (stage.clientWidth < 40) return false;
+
     const { width, height } = measureIframe(iframe);
-    const available = Math.max(260, stage.clientWidth - 48);
-    const scale = Math.min(1, available / width);
-    holder.style.width = `${Math.ceil(width * scale)}px`;
-    holder.style.height = `${Math.ceil(height * scale)}px`;
+    const available = Math.max(1, stage.clientWidth - 48);
+    const scale = Math.max(0.05, Math.min(1, available / width));
+
+    holder.style.setProperty("width", `${Math.ceil(width * scale)}px`, "important");
+    holder.style.setProperty("height", `${Math.ceil(height * scale)}px`, "important");
+    holder.style.setProperty("flex", "0 0 auto", "important");
+    holder.style.setProperty("max-width", "none", "important");
+    holder.style.setProperty("margin", "0 auto", "important");
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("top", "0", "important");
+    iframe.style.setProperty("left", "0", "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
-    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
     iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
     iframe.style.setProperty("transform", `scale(${scale})`, "important");
     iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    return true;
   }
 
   function fitEditorPreview() {
@@ -15795,23 +15933,38 @@ ${stylesheetLinks}
   function fitCardPreview() {
     const iframe = card?.querySelector("[data-hans-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
-    if (!iframe || !stage) return;
+    if (!iframe || !stage || stage.clientWidth < 40 || stage.clientHeight < 40) return false;
+
+    const root = iframe.contentDocument?.querySelector(".dds-hans-preview-root");
+    if (!root) return false;
 
     const { width, height } = measureIframe(iframe);
     const padding = 18;
     const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
     const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
-    const scale = Math.min(1, availableWidth / width, availableHeight / height);
-    const safeScale = Math.max(0.05, scale);
+    const scale = Math.max(0.05, Math.min(1, availableWidth / width, availableHeight / height));
 
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
+    const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - scaledHeight) / 2);
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", `${left}px`, "important");
+    iframe.style.setProperty("top", `${top}px`, "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
-    iframe.style.setProperty("max-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
     iframe.style.setProperty("height", `${height}px`, "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "50%", "important");
-    iframe.style.setProperty("transform", `translate(-50%, -50%) scale(${safeScale})`, "important");
-    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.dataset.hansPreviewReady = "1";
+    return true;
   }
 
   function showToast(message) {
@@ -16040,6 +16193,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-hans-view-back type="button">←</button></div><div class="dds-hans-view-stage" data-hans-view-stage><div class="dds-hans-view-holder" data-hans-view-holder><iframe class="dds-editor-preview-frame dds-hans-view-frame" data-hans-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทโรลเพลย์ Hans X. Frost"></iframe></div></div>`;
     footer.before(viewPanel);
     viewPanel.querySelector("[data-hans-view-back]")?.addEventListener("click", goBack);
+
+    const viewStage = viewPanel.querySelector("[data-hans-view-stage]");
+    if ("ResizeObserver" in window && viewStage) {
+      const observer = new ResizeObserver(() => {
+        requestAnimationFrame(() => fitViewPreview());
+      });
+      observer.observe(viewStage);
+    }
+
     return viewPanel;
   }
 
@@ -16050,6 +16212,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     showPanel(VIEW_PANEL_NAME);
     history.replaceState(null, "", "#commission-hans-solo-roleplay-view");
     writeIframe(target.querySelector("[data-hans-view-preview]"), OFFICIAL_CODE, fitViewPreview);
+
+    [0, 50, 140, 300, 650, 1200].forEach((delay) => {
+      window.setTimeout(() => fitViewPreview(), delay);
+    });
   }
 
   function openEditor() {
@@ -16130,25 +16296,41 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card dds-hans-solo-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", () => openModal());
 
     const cardPreview = card.querySelector("[data-hans-card-preview]");
+    const cardStage = cardPreview?.closest(".dds-roleplay-card-preview");
+
+    warmHansPreviewAssets();
+
+    if (cardPreview) {
+      cardPreview.style.setProperty("visibility", "hidden", "important");
+      cardPreview.style.setProperty("opacity", "0", "important");
+    }
+
     const renderCard = () => {
       if (cardRendered || !cardPreview) return;
       cardRendered = true;
       writeIframe(cardPreview, OFFICIAL_CODE, fitCardPreview);
     };
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        renderCard();
-      }, { rootMargin: "420px 0px" });
-      observer.observe(card);
-    } else renderCard();
+
+    // Render immediately instead of waiting for lazy intersection.
+    renderCard();
+
+    if ("ResizeObserver" in window && cardStage) {
+      const observer = new ResizeObserver(() => {
+        requestAnimationFrame(() => fitCardPreview());
+      });
+      observer.observe(cardStage);
+    }
+
+    [0, 80, 220, 520, 1000, 1800].forEach((delay) => {
+      window.setTimeout(() => fitCardPreview(), delay);
+    });
+
     return true;
   }
 
@@ -16293,27 +16475,157 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return `<link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet">${buildCode(values).replace(/^<link[^>]+>\s*<link[^>]+>\s*<link[^>]+>\s*<link[^>]+>/i,"")}`;
   }
 
+  function warmRoraPreviewAssets() {
+    [CSS_URL, FONT_URL].forEach((url) => {
+      if (!url || document.head.querySelector(`link[data-dds-rora-warm="${url}"]`)) return;
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "style";
+      link.href = url;
+      link.dataset.ddsRoraWarm = url;
+      document.head.appendChild(link);
+    });
+
+    [
+      defaults.houseImage,
+      defaults.garageImage,
+      defaults.treeImage,
+      defaults.ivyImage,
+      defaults.peachImage,
+      defaults.woodImage,
+      defaults.bentleyImage,
+      defaults.astonImage
+    ].forEach((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+    });
+  }
+
   function previewDocument(code, canvasWidth = CANVAS_WIDTH) {
     return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;min-height:100%;background:#242424;overflow:hidden}.dds-rora-preview-shell{width:${canvasWidth}px;min-width:${canvasWidth}px;max-width:${canvasWidth}px;margin:0 auto;padding:26px 0;display:flex;flex-direction:column;align-items:center;box-sizing:border-box}.dds-rora-preview-shell>.ddsh-roraima,.dds-rora-preview-shell>.ddshopfz-credit{flex:0 0 auto;max-width:none}</style></head><body><div class="dds-rora-preview-shell">${code}</div></body></html>`;
   }
 
   function writeIframe(iframe, code, afterLoad, canvasWidth = CANVAS_WIDTH) {
-    if(!iframe)return;
-    iframe.onload=()=>{ setTimeout(()=>afterLoad?.(),40); setTimeout(()=>afterLoad?.(),250); try{iframe.contentDocument?.fonts?.ready?.then(()=>afterLoad?.())}catch{} };
-    iframe.srcdoc=previewDocument(code, canvasWidth);
+    if (!iframe) return;
+
+    const refit = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => afterLoad?.()));
+    };
+
+    iframe.onload = () => {
+      refit();
+      [60, 180, 360, 700, 1200, 1900].forEach((delay) => {
+        window.setTimeout(refit, delay);
+      });
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(() => {
+          refit();
+          window.setTimeout(refit, 120);
+        });
+      } catch {}
+    };
+
+    iframe.srcdoc = previewDocument(code, canvasWidth);
   }
-  function shellMetrics(iframe) { const doc=iframe?.contentDocument; const shell=doc?.querySelector(".dds-rora-preview-shell"); if(!doc||!shell)return null; return {width:Math.max(CANVAS_WIDTH,shell.scrollWidth),height:Math.max(1,shell.scrollHeight)}; }
-  function fitFrame(iframe, stage, holder, mode="fit") {
-    if(!iframe||!stage||!holder)return;
-    const m=shellMetrics(iframe); if(!m)return;
-    const sw=Math.max(1,stage.clientWidth-28), sh=Math.max(1,stage.clientHeight-28);
-    const scale=mode==="width"?Math.min(1,sw/m.width):Math.min(1,sw/m.width,sh/m.height);
-    iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.left="0"; iframe.style.top="0"; iframe.style.transform=`scale(${scale})`; iframe.style.transformOrigin="top left";
-    holder.style.width=`${m.width*scale}px`; holder.style.height=`${m.height*scale}px`; holder.style.margin="auto";
+
+  function shellMetrics(iframe) {
+    const doc = iframe?.contentDocument;
+    const shell = doc?.querySelector(".dds-rora-preview-shell");
+    if (!doc || !shell) return null;
+    const rect = shell.getBoundingClientRect();
+    return {
+      width: Math.max(1, Math.ceil(rect.width || 0), shell.offsetWidth || 0, shell.scrollWidth || 0),
+      height: Math.max(1, Math.ceil(rect.height || 0), shell.offsetHeight || 0, shell.scrollHeight || 0)
+    };
   }
-  function fitCardPreview(){ const iframe=card?.querySelector("[data-rora-card-preview]"); const stage=card?.querySelector(".dds-roleplay-card-preview"); if(!iframe||!stage)return; const m=shellMetrics(iframe); if(!m)return; const scale=Math.min(stage.clientWidth/m.width,stage.clientHeight/m.height); iframe.style.position="absolute"; iframe.style.left="50%"; iframe.style.top="50%"; iframe.style.width=`${m.width}px`; iframe.style.height=`${m.height}px`; iframe.style.transform=`translate(-50%,-50%) scale(${scale})`; iframe.style.transformOrigin="center center"; }
-  function fitEditorPreview(){ fitFrame(panel?.querySelector("[data-rora-preview]"),panel?.querySelector("[data-rora-preview-stage]"),panel?.querySelector("[data-rora-preview-holder]"),"width"); }
-  function fitViewPreview(){ fitFrame(viewPanel?.querySelector("[data-rora-view-preview]"),viewPanel?.querySelector("[data-rora-view-stage]"),viewPanel?.querySelector("[data-rora-view-holder]"),"width"); }
+
+  function fitFrame(iframe, stage, holder, mode = "fit") {
+    if (!iframe || !stage || !holder || stage.clientWidth < 40) return false;
+    const m = shellMetrics(iframe);
+    if (!m) return false;
+
+    const availableWidth = Math.max(1, stage.clientWidth - 40);
+    const availableHeight = Math.max(1, stage.clientHeight - 40);
+    const scale = mode === "width"
+      ? Math.max(0.05, Math.min(1, availableWidth / m.width))
+      : Math.max(0.05, Math.min(1, availableWidth / m.width, availableHeight / m.height));
+
+    holder.style.setProperty("width", `${Math.ceil(m.width * scale)}px`, "important");
+    holder.style.setProperty("height", `${Math.ceil(m.height * scale)}px`, "important");
+    holder.style.setProperty("max-width", "none", "important");
+    holder.style.setProperty("flex", "0 0 auto", "important");
+    holder.style.setProperty("margin", "0 auto", "important");
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("min-width", `${m.width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("min-height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-height", `${m.height}px`, "important");
+    iframe.style.setProperty("left", "0", "important");
+    iframe.style.setProperty("top", "0", "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    return true;
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-rora-card-preview]");
+    const stage = card?.querySelector(".dds-roleplay-card-preview");
+    if (!iframe || !stage || stage.clientWidth < 40 || stage.clientHeight < 40) return false;
+
+    const m = shellMetrics(iframe);
+    if (!m) return false;
+
+    const padding = 18;
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
+    const scale = Math.max(0.01, Math.min(1, availableWidth / m.width, availableHeight / m.height));
+
+    const scaledWidth = m.width * scale;
+    const scaledHeight = m.height * scale;
+    const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - scaledHeight) / 2);
+
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", `${left}px`, "important");
+    iframe.style.setProperty("top", `${top}px`, "important");
+    iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("min-width", `${m.width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("height", `${m.height}px`, "important");
+    iframe.style.setProperty("min-height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-height", `${m.height}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.dataset.roraPreviewReady = "1";
+    return true;
+  }
+
+  function fitEditorPreview() {
+    fitFrame(
+      panel?.querySelector("[data-rora-preview]"),
+      panel?.querySelector("[data-rora-preview-stage]"),
+      panel?.querySelector("[data-rora-preview-holder]"),
+      "width"
+    );
+  }
+
+  function fitViewPreview() {
+    fitFrame(
+      viewPanel?.querySelector("[data-rora-view-preview]"),
+      viewPanel?.querySelector("[data-rora-view-stage]"),
+      viewPanel?.querySelector("[data-rora-view-holder]"),
+      "width"
+    );
+  }
 
   function schedulePreview(){ clearTimeout(previewTimer); previewTimer=setTimeout(updatePreview,45); }
   function updatePreview(){ if(!panel)return; syncPickers(); updateRangeOutputs(); writeIframe(panel.querySelector("[data-rora-preview]"),fullCode(getValues()),fitEditorPreview); }
@@ -16352,15 +16664,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return panel;
   }
 
-  function createViewPanel(){ if(viewPanel?.isConnected)return viewPanel; const footer=document.querySelector(".dds-footer"); if(!footer)return null; viewPanel=document.createElement("section"); viewPanel.className="dds-panel dds-commission-view-panel dds-rora-view-panel"; viewPanel.dataset.panel=VIEW_PANEL_NAME; viewPanel.innerHTML=`<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-view-back type="button">←</button></div><div class="dds-rora-view-stage" data-rora-view-stage><div class="dds-rora-view-holder" data-rora-view-holder><iframe class="dds-editor-preview-frame dds-rora-view-frame" data-rora-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทกระทู้บ้าน RORAIMA"></iframe></div></div>`; footer.before(viewPanel); viewPanel.querySelector("[data-rora-view-back]")?.addEventListener("click",goBack); return viewPanel; }
-  function openView(){const target=createViewPanel();if(!target)return;enableEditorMode();showPanel(VIEW_PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-view");writeIframe(target.querySelector("[data-rora-view-preview]"),OFFICIAL_CODE,fitViewPreview,VIEW_CANVAS_WIDTH)}
+  function createViewPanel(){ if(viewPanel?.isConnected)return viewPanel; const footer=document.querySelector(".dds-footer"); if(!footer)return null; viewPanel=document.createElement("section"); viewPanel.className="dds-panel dds-commission-view-panel dds-rora-view-panel"; viewPanel.dataset.panel=VIEW_PANEL_NAME; viewPanel.innerHTML=`<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION & SHOWCASE" class="dds-back-button" data-rora-view-back type="button">←</button></div><div class="dds-rora-view-stage" data-rora-view-stage><div class="dds-rora-view-holder" data-rora-view-holder><iframe class="dds-editor-preview-frame dds-rora-view-frame" data-rora-view-preview scrolling="no" title="งานคอมมิชชั่นโคดประเภทกระทู้บ้าน RORAIMA"></iframe></div></div>`; footer.before(viewPanel); viewPanel.querySelector("[data-rora-view-back]")?.addEventListener("click",goBack); const viewStage=viewPanel.querySelector("[data-rora-view-stage]"); if("ResizeObserver" in window&&viewStage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitViewPreview()));observer.observe(viewStage)} return viewPanel; }
+  function openView(){const target=createViewPanel();if(!target)return;enableEditorMode();showPanel(VIEW_PANEL_NAME);history.replaceState(null,"","#commission-roraima-house-view");writeIframe(target.querySelector("[data-rora-view-preview]"),OFFICIAL_CODE,fitViewPreview,VIEW_CANVAS_WIDTH);[0,60,160,340,700,1300].forEach(delay=>window.setTimeout(()=>fitViewPreview(),delay))}
   function openEditor(){const editor=createPanel();if(!editor)return;enableEditorMode();const draft=getDraft();setValues(draft?.values?{...defaults,...draft.values}:defaults);setDraftStatus(draft?.savedAt||0);showPanel(PANEL_NAME);history.replaceState(null,"","#commission-pinewoods7-house-editor");updatePreview()}
 
   function closeModal(){if(!modal)return;modal.hidden=true;document.body.classList.remove("dds-modal-open")}
   function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
   function openModal(){const lock=createModal();lock.hidden=false;document.body.classList.add("dds-modal-open");const input=lock.querySelector("[data-rora-lock-input]"),error=lock.querySelector("[data-rora-lock-error]");if(input)input.value="";if(error)error.textContent="";requestAnimationFrame(()=>input?.focus())}
 
-  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};if("IntersectionObserver" in window){const obs=new IntersectionObserver(entries=>{if(!entries.some(e=>e.isIntersecting))return;obs.disconnect();render()},{rootMargin:"420px 0px"});obs.observe(card)}else render();return true}
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const stage=frame?.closest(".dds-roleplay-card-preview");warmRoraPreviewAssets();if(frame){frame.style.setProperty("visibility","hidden","important");frame.style.setProperty("opacity","0","important")}const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};render();if("ResizeObserver" in window&&stage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitCardPreview()));observer.observe(stage)}[0,100,260,600,1100,1900].forEach(delay=>window.setTimeout(()=>fitCardPreview(),delay));return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
@@ -17117,7 +17429,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!iframe?.isConnected) return;
 
     const stage = iframe.closest(".dds-roleplay-card-preview");
-    if (!stage || stage.clientWidth < 20 || stage.clientHeight < 20) return;
+    if (!stage || stage.clientWidth < 40 || stage.clientHeight < 40) return;
 
     const metrics = measurePreview(iframe);
     if (!metrics) return;
@@ -17127,31 +17439,32 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
     const scale = Math.max(
       0.01,
-      Math.min(
-        1,
-        availableWidth / metrics.width,
-        availableHeight / metrics.height
-      )
+      Math.min(1, availableWidth / metrics.width, availableHeight / metrics.height)
     );
+
+    const scaledWidth = metrics.width * scale;
+    const scaledHeight = metrics.height * scale;
+    const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - scaledHeight) / 2);
 
     iframe.style.setProperty("position", "absolute", "important");
     iframe.style.setProperty("width", `${metrics.width}px`, "important");
     iframe.style.setProperty("min-width", `${metrics.width}px`, "important");
-    iframe.style.setProperty("max-width", `${metrics.width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
     iframe.style.setProperty("height", `${metrics.height}px`, "important");
     iframe.style.setProperty("min-height", `${metrics.height}px`, "important");
     iframe.style.setProperty("max-height", `${metrics.height}px`, "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", "50%", "important");
-    iframe.style.setProperty(
-      "transform",
-      `translate(-50%, -50%) scale(${scale})`,
-      "important"
-    );
-    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("left", `${left}px`, "important");
+    iframe.style.setProperty("top", `${top}px`, "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
     iframe.style.setProperty("margin", "0", "important");
     iframe.style.setProperty("border", "0", "important");
-    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+
+    if (iframe.matches("[data-hans-card-preview]")) iframe.dataset.hansPreviewReady = "1";
+    if (iframe.matches("[data-rora-card-preview]")) iframe.dataset.roraPreviewReady = "1";
   }
 
   function scheduleFit(iframe) {
@@ -17185,6 +17498,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         iframe.contentDocument?.fonts?.ready?.then(() => scheduleFit(iframe));
       } catch {}
     });
+
+    const stage = iframe.closest(".dds-roleplay-card-preview");
+    if ("ResizeObserver" in window && stage) {
+      const observer = new ResizeObserver(() => scheduleFit(iframe));
+      observer.observe(stage);
+    }
 
     // The iframe may already be loaded by the commission installer.
     scheduleFit(iframe);
