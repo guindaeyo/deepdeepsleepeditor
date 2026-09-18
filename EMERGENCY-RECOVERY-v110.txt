@@ -1,0 +1,25 @@
+DEEP DEEP SLEEP — EMERGENCY RECOVERY v110
+
+IMPORTANT
+1. Deploy v110 to the SAME production domain/origin where the old saves lived.
+2. Do NOT clear browser site data.
+3. Open RECOVERY.
+4. FIRST click EXPORT ALL LOCAL DATA (.JSON).
+5. Keep the downloaded JSON somewhere safe.
+6. Check counts, especially NAMED SAVES FOUND.
+7. Only then click RECOVER FOUND SAVES.
+8. Refresh once and inspect every editor.
+
+v110 is based on v106 (before Cloud Save).
+It performs NO automatic cloud sync/migration.
+It does not clear localStorage on load.
+
+It scans:
+- active dds-code-draft-v3:* drafts
+- commission drafts
+- roleplay drafts
+- named local save libraries
+- dds:cloud:guest-cache:v1
+- dds:cloud:account-cache:v1:*
+- dds:cloud:backup:v1:*
+- dds:cloud:recovery-vault:v109

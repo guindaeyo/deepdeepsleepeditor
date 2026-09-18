@@ -20149,3 +20149,440 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",install,{once:true});
   else install();
 })();
+
+
+
+/* =========================================================
+   DDS EMERGENCY LOCAL RECOVERY — v110
+   IMPORTANT:
+   - READ ONLY on page load.
+   - Does not clear, sync, migrate, or overwrite anything automatically.
+   - Recovery writes happen only after explicit button confirmation.
+   ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_EMERGENCY_RECOVERY_V110__) return;
+  window.__DDS_EMERGENCY_RECOVERY_V110__ = true;
+
+  const KNOWN_SAVE_PREFIXES = [
+    "dds-code-draft-v3:",
+    "dds:commission-draft:",
+    "dds:commission:alan-profile:draft:",
+    "dds:roleplay:",
+    "dds:named-local-saves:v1:"
+  ];
+
+  const CACHE_KEYS = {
+    guest: "dds:cloud:guest-cache:v1",
+    accountPrefix: "dds:cloud:account-cache:v1:",
+    backupPrefix: "dds:cloud:backup:v1:",
+    recoveryVault: "dds:cloud:recovery-vault:v109"
+  };
+
+  function safeParse(raw, fallback = null) {
+    try { return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
+  }
+
+  function isEditorSaveKey(key) {
+    const k = String(key || "");
+    return KNOWN_SAVE_PREFIXES.some((prefix) => k.startsWith(prefix));
+  }
+
+  function readAllStorage(storage) {
+    const out = {};
+    try {
+      for (let i = 0; i < storage.length; i += 1) {
+        const key = storage.key(i);
+        if (key == null) continue;
+        out[key] = storage.getItem(key);
+      }
+    } catch {}
+    return out;
+  }
+
+  function namedSaveCount(raw) {
+    const parsed = safeParse(raw, null);
+    return parsed && Array.isArray(parsed.saves) ? parsed.saves.length : 0;
+  }
+
+  function namedSaveItems(raw) {
+    const parsed = safeParse(raw, null);
+    return parsed && Array.isArray(parsed.saves) ? parsed.saves : [];
+  }
+
+  function savedAtOf(item) {
+    return Number(item?.savedAt || item?.snapshot?.savedAt || 0);
+  }
+
+  function mergeNamedRaw(aRaw, bRaw) {
+    const a = namedSaveItems(aRaw);
+    const b = namedSaveItems(bRaw);
+    const byId = new Map();
+
+    [...a, ...b].forEach((item) => {
+      if (!item || !item.id) return;
+      const prev = byId.get(item.id);
+      if (!prev || savedAtOf(item) >= savedAtOf(prev)) byId.set(item.id, item);
+    });
+
+    return JSON.stringify({
+      version: 1,
+      saves: Array.from(byId.values()).sort((x, y) => savedAtOf(y) - savedAtOf(x))
+    });
+  }
+
+  function rawSavedAt(raw) {
+    const parsed = safeParse(raw, null);
+    if (!parsed || typeof parsed !== "object") return 0;
+    if (Number.isFinite(Number(parsed.savedAt))) return Number(parsed.savedAt);
+    if (parsed.snapshot && Number.isFinite(Number(parsed.snapshot.savedAt))) {
+      return Number(parsed.snapshot.savedAt);
+    }
+    if (Array.isArray(parsed.saves)) {
+      return parsed.saves.reduce((m, x) => Math.max(m, savedAtOf(x)), 0);
+    }
+    return 0;
+  }
+
+  function mergeRaw(aRaw, bRaw) {
+    if (aRaw == null) return bRaw;
+    if (bRaw == null) return aRaw;
+    if (aRaw === bRaw) return aRaw;
+
+    if (namedSaveCount(aRaw) || namedSaveCount(bRaw)) {
+      return mergeNamedRaw(aRaw, bRaw);
+    }
+
+    const aAt = rawSavedAt(aRaw);
+    const bAt = rawSavedAt(bRaw);
+
+    if (aAt && bAt) return aAt >= bAt ? aRaw : bRaw;
+    if (aAt && !bAt) return aRaw;
+    if (!aAt && bAt) return bRaw;
+
+    // Unknown format: keep currently active/local value when possible.
+    return aRaw;
+  }
+
+  function mergeMap(target, source) {
+    Object.entries(source || {}).forEach(([key, value]) => {
+      if (!isEditorSaveKey(key) || value == null) return;
+      target[key] = mergeRaw(target[key], value);
+    });
+    return target;
+  }
+
+  function decodeBackupKey(encoded) {
+    try {
+      const padded = encoded + "=".repeat((4 - encoded.length % 4) % 4);
+      return decodeURIComponent(escape(atob(padded)));
+    } catch {
+      return "";
+    }
+  }
+
+  function collectRecoverable() {
+    const all = readAllStorage(localStorage);
+    const merged = {};
+    const sources = {
+      active: {},
+      guest: {},
+      accounts: {},
+      backups: {},
+      vault: {}
+    };
+
+    // 1) Active editor save keys
+    Object.entries(all).forEach(([key, value]) => {
+      if (isEditorSaveKey(key)) {
+        sources.active[key] = value;
+        mergeMap(merged, { [key]: value });
+      }
+    });
+
+    // 2) Guest cache
+    const guest = safeParse(all[CACHE_KEYS.guest], {}) || {};
+    if (guest && typeof guest === "object" && !Array.isArray(guest)) {
+      Object.entries(guest).forEach(([key, value]) => {
+        if (isEditorSaveKey(key)) sources.guest[key] = value;
+      });
+      mergeMap(merged, sources.guest);
+    }
+
+    // 3) Account caches
+    Object.entries(all).forEach(([storageKey, raw]) => {
+      if (!storageKey.startsWith(CACHE_KEYS.accountPrefix)) return;
+      const accountId = storageKey.slice(CACHE_KEYS.accountPrefix.length) || "unknown";
+      const parsed = safeParse(raw, {}) || {};
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return;
+      sources.accounts[accountId] = {};
+      Object.entries(parsed).forEach(([key, value]) => {
+        if (isEditorSaveKey(key)) sources.accounts[accountId][key] = value;
+      });
+      mergeMap(merged, sources.accounts[accountId]);
+    });
+
+    // 4) v108 backup keys
+    Object.entries(all).forEach(([storageKey, raw]) => {
+      if (!storageKey.startsWith(CACHE_KEYS.backupPrefix)) return;
+      const encoded = storageKey.split(":").pop();
+      const decoded = decodeBackupKey(encoded || "");
+      if (!decoded || !isEditorSaveKey(decoded)) return;
+      sources.backups[decoded] = mergeRaw(sources.backups[decoded], raw);
+    });
+    mergeMap(merged, sources.backups);
+
+    // 5) v109 recovery vault (current + previous)
+    const vault = safeParse(all[CACHE_KEYS.recoveryVault], null);
+    const vaultMaps = [];
+    if (vault?.active && typeof vault.active === "object") vaultMaps.push(vault.active);
+    if (vault?.previous?.active && typeof vault.previous.active === "object") {
+      vaultMaps.push(vault.previous.active);
+    }
+    vaultMaps.forEach((map) => {
+      Object.entries(map).forEach(([key, value]) => {
+        if (isEditorSaveKey(key)) sources.vault[key] = mergeRaw(sources.vault[key], value);
+      });
+    });
+    mergeMap(merged, sources.vault);
+
+    return { all, merged, sources };
+  }
+
+  function summary() {
+    const { all, merged, sources } = collectRecoverable();
+    const activeNamed = Object.values(sources.active).reduce((n, raw) => n + namedSaveCount(raw), 0);
+    const recoverNamed = Object.values(merged).reduce((n, raw) => n + namedSaveCount(raw), 0);
+    const editorKeys = Object.keys(merged).length;
+
+    return {
+      totalLocalKeys: Object.keys(all).length,
+      activeEditorKeys: Object.keys(sources.active).length,
+      recoverableEditorKeys: editorKeys,
+      activeNamed,
+      recoverNamed,
+      guestKeys: Object.keys(sources.guest).length,
+      accountCaches: Object.keys(sources.accounts).length,
+      backupKeys: Object.keys(sources.backups).length,
+      vaultKeys: Object.keys(sources.vault).length
+    };
+  }
+
+  function downloadJson(filename, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportEverything() {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      origin: location.origin,
+      href: location.href,
+      localStorage: readAllStorage(localStorage),
+      sessionStorage: readAllStorage(sessionStorage),
+      recoveryScan: collectRecoverable()
+    };
+    downloadJson(`dds-emergency-backup-${Date.now()}.json`, payload);
+  }
+
+  function recoverIntoActive() {
+    const scan = collectRecoverable();
+    const keys = Object.keys(scan.merged);
+    const named = Object.values(scan.merged).reduce((n, raw) => n + namedSaveCount(raw), 0);
+
+    if (!keys.length) {
+      alert("ยังไม่พบข้อมูลที่กู้ได้ใน localStorage ของโดเมนนี้");
+      return;
+    }
+
+    const ok = confirm(
+      `พบข้อมูลสำหรับกู้ ${keys.length} ชุด` +
+      (named ? ` และ Named Saves รวม ${named} ไฟล์` : "") +
+      `\n\nระบบจะ MERGE กลับเข้า localStorage โดยไม่ลบคีย์อื่น\nต้องการดำเนินการไหม?`
+    );
+    if (!ok) return;
+
+    // Safety snapshot before explicit recovery write.
+    const pre = {
+      savedAt: Date.now(),
+      localStorage: readAllStorage(localStorage)
+    };
+    localStorage.setItem(
+      `dds:emergency:pre-recover-backup:v110:${Date.now()}`,
+      JSON.stringify(pre)
+    );
+
+    Object.entries(scan.merged).forEach(([key, value]) => {
+      const existing = localStorage.getItem(key);
+      localStorage.setItem(key, mergeRaw(existing, value));
+    });
+
+    alert(
+      `กู้ข้อมูลกลับแล้ว ${keys.length} ชุด` +
+      (named ? ` / Named Saves ${named} ไฟล์` : "") +
+      `\n\nให้ Refresh หน้าเว็บ 1 ครั้ง แล้วเข้า Editor ตรวจรายการเซฟ`
+    );
+
+    render();
+  }
+
+  function importBackupFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(String(reader.result || "{}"));
+        const candidate = payload?.localStorage || payload;
+        if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+          throw new Error("รูปแบบไฟล์ไม่ถูกต้อง");
+        }
+
+        const restore = {};
+        Object.entries(candidate).forEach(([key, value]) => {
+          if (isEditorSaveKey(key) && value != null) restore[key] = String(value);
+        });
+
+        const nested = payload?.recoveryScan?.merged;
+        if (nested && typeof nested === "object") mergeMap(restore, nested);
+
+        const count = Object.keys(restore).length;
+        const named = Object.values(restore).reduce((n, raw) => n + namedSaveCount(raw), 0);
+
+        if (!count) {
+          alert("ไฟล์นี้ไม่มี Editor saves ที่ระบบรู้จัก");
+          return;
+        }
+
+        if (!confirm(
+          `พบข้อมูลในไฟล์ ${count} ชุด` +
+          (named ? ` / Named Saves ${named} ไฟล์` : "") +
+          `\n\nจะ MERGE เข้ากับข้อมูลปัจจุบันโดยไม่ลบของเดิม ดำเนินการไหม?`
+        )) return;
+
+        Object.entries(restore).forEach(([key, value]) => {
+          const existing = localStorage.getItem(key);
+          localStorage.setItem(key, mergeRaw(existing, value));
+        });
+
+        alert("Import เสร็จแล้ว ให้ Refresh หน้าเว็บ 1 ครั้ง");
+        render();
+      } catch (error) {
+        alert(`อ่านไฟล์ไม่ได้: ${error.message || error}`);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function buildUi() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dds-emergency-recovery-trigger";
+    button.textContent = "RECOVERY";
+    button.setAttribute("aria-label", "Emergency Recovery");
+
+    const modal = document.createElement("div");
+    modal.className = "dds-emergency-recovery-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="dds-emergency-recovery-dialog">
+        <div class="dds-emergency-recovery-head">
+          <div>
+            <small>EMERGENCY MODE v110</small>
+            <h2>LOCAL SAVE RECOVERY</h2>
+            <p>หน้านี้จะไม่เขียน/ลบข้อมูลเองจนกว่าคุณจะกดปุ่มกู้โดยตรง</p>
+          </div>
+          <button type="button" data-er-close>×</button>
+        </div>
+
+        <div class="dds-emergency-recovery-stats" data-er-stats></div>
+
+        <div class="dds-emergency-recovery-warning">
+          <strong>ทำ EXPORT ก่อนทุกครั้ง</strong>
+          <p>ดาวน์โหลดสำเนา localStorage ทั้งหมดออกจาก browser ก่อนกู้ เพื่อไม่ให้ข้อมูลที่ยังเหลือสูญหายเพิ่ม</p>
+        </div>
+
+        <div class="dds-emergency-recovery-actions">
+          <button type="button" class="is-primary" data-er-export>1. EXPORT ALL LOCAL DATA (.JSON)</button>
+          <button type="button" data-er-recover>2. RECOVER FOUND SAVES</button>
+          <label class="dds-emergency-import">
+            <span>IMPORT BACKUP JSON</span>
+            <input type="file" accept=".json,application/json" data-er-import>
+          </label>
+        </div>
+
+        <div class="dds-emergency-recovery-detail" data-er-detail></div>
+      </div>
+    `;
+
+    document.body.append(button, modal);
+
+    button.addEventListener("click", () => {
+      render();
+      modal.hidden = false;
+      requestAnimationFrame(() => modal.classList.add("is-open"));
+    });
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest("[data-er-close]")) {
+        modal.classList.remove("is-open");
+        setTimeout(() => {
+          if (!modal.classList.contains("is-open")) modal.hidden = true;
+        }, 150);
+      }
+    });
+
+    modal.querySelector("[data-er-export]")?.addEventListener("click", exportEverything);
+    modal.querySelector("[data-er-recover]")?.addEventListener("click", recoverIntoActive);
+    modal.querySelector("[data-er-import]")?.addEventListener("change", (event) => {
+      importBackupFile(event.target.files?.[0] || null);
+      event.target.value = "";
+    });
+
+    window.__DDS_EMERGENCY_RECOVERY_UI__ = { button, modal };
+  }
+
+  function render() {
+    const ui = window.__DDS_EMERGENCY_RECOVERY_UI__;
+    if (!ui) return;
+
+    const s = summary();
+    const stats = ui.modal.querySelector("[data-er-stats]");
+    const detail = ui.modal.querySelector("[data-er-detail]");
+
+    stats.innerHTML = `
+      <div><span>LOCAL STORAGE KEYS</span><strong>${s.totalLocalKeys}</strong></div>
+      <div><span>ACTIVE EDITOR KEYS</span><strong>${s.activeEditorKeys}</strong></div>
+      <div><span>RECOVERABLE KEYS</span><strong>${s.recoverableEditorKeys}</strong></div>
+      <div><span>NAMED SAVES FOUND</span><strong>${s.recoverNamed}</strong></div>
+    `;
+
+    detail.innerHTML = `
+      <p>Guest cache: <b>${s.guestKeys}</b> ชุด</p>
+      <p>Account caches: <b>${s.accountCaches}</b></p>
+      <p>v108 backup: <b>${s.backupKeys}</b> ชุด</p>
+      <p>v109 recovery vault: <b>${s.vaultKeys}</b> ชุด</p>
+      <p>Named Saves ที่ active อยู่ตอนนี้: <b>${s.activeNamed}</b> ไฟล์</p>
+    `;
+  }
+
+  function init() {
+    buildUi();
+    render();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+
