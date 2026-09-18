@@ -1,5 +1,5 @@
 /* =========================================================
-   DDS CLOUD BRIDGE — v112
+   DDS CLOUD BRIDGE — v113
    Loaded before script.js.
    Logged out  -> editor localStorage keys use this device as usual.
    Logged in   -> editor localStorage keys are transparently routed to
@@ -34,6 +34,7 @@
   let activeUserId = "";
   let accountCache = {};
   let pending = {};
+  let persistTimer = 0;
 
   function safeParse(raw, fallback) {
     try { return raw ? JSON.parse(raw) : fallback; }
@@ -93,14 +94,26 @@
     }
   }
 
-  function persistCache() {
+  function persistStateNow() {
     if (!activeUserId) return;
+    clearTimeout(persistTimer);
+    persistTimer = 0;
     rawSet(cacheKey(activeUserId), JSON.stringify(accountCache));
+    rawSet(pendingKey(activeUserId), JSON.stringify(pending));
+  }
+
+  function schedulePersist() {
+    if (!activeUserId) return;
+    clearTimeout(persistTimer);
+    persistTimer = setTimeout(persistStateNow, 120);
+  }
+
+  function persistCache() {
+    schedulePersist();
   }
 
   function persistPending() {
-    if (!activeUserId) return;
-    rawSet(pendingKey(activeUserId), JSON.stringify(pending));
+    schedulePersist();
   }
 
   function dispatchChange(key, value, action) {
@@ -278,8 +291,11 @@
     return native.removeItem.call(this, key);
   };
 
+  window.addEventListener("pagehide", persistStateNow);
+  window.addEventListener("beforeunload", persistStateNow);
+
   window.DDSCloudBridge = {
-    version: 112,
+    version: 113,
     prefixes: [...PREFIXES],
     isEditorKey,
     isActive: () => Boolean(activeUserId),
