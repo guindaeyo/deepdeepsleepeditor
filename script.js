@@ -19813,8 +19813,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const iframe = card?.querySelector("[data-alan-card-preview]");
     const stage = iframe?.closest(".dds-roleplay-card-preview");
 
+    /*
+     * AUTO CENTER v128:
+     * ถ้า commission panel ยังซ่อนอยู่ stage จะมีขนาด 0
+     * จึงยังไม่แสดง iframe และรอ ResizeObserver ตอน panel เปิด
+     */
     if (!iframe || !stage || stage.clientWidth < 20 || stage.clientHeight < 20) {
-      return;
+      return false;
+    }
+
+    const previewRoot = iframe.contentDocument?.querySelector(".ddsh-commitalan-ref");
+    if (!previewRoot) {
+      return false;
     }
 
     const { width, height } = measureIframe(iframe);
@@ -19832,12 +19842,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       )
     );
 
-    /*
-     * CENTER FIX v127
-     * ไม่ใช้ translate(-50%,-50%) แล้ว เพราะ iframe ขนาดใหญ่ที่ถูก scale
-     * มีโอกาสเลื่อน visual box ผิดตำแหน่งใน card
-     * คำนวณขนาดหลัง scale แล้ววาง left/top ตรงกลางเป็น pixel แทน
-     */
     const scaledWidth = width * scale;
     const scaledHeight = height * scale;
     const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
@@ -19856,6 +19860,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.setProperty("margin", "0", "important");
     iframe.style.setProperty("transform", `scale(${scale})`, "important");
     iframe.style.setProperty("transform-origin", "top left", "important");
+
+    /*
+     * ซ่อนตอนยังวัดไม่ได้ และค่อย fade in หลังอยู่ตรงกลางแล้ว
+     * จึงไม่เห็นอาการค้างซ้ายบนระหว่างเปิด tab ครั้งแรก
+     */
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.dataset.alanCardReady = "1";
+    return true;
   }
 
   function colorField(label,key,value) {
@@ -19969,13 +19982,50 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (grid.querySelector(".dds-commission-card-alan")) return true;
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-alan";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-alan-view]")?.addEventListener("click", openView);
     card.querySelector("[data-alan-edit]")?.addEventListener("click", requestEditorAccess);
     const iframe = card.querySelector("[data-alan-card-preview]");
     const stage = card.querySelector(".dds-alan-card-preview");
+
+    /*
+     * ป้องกันภาพเด้งไปมุมซ้ายบนก่อน panel พร้อม
+     */
+    iframe.style.setProperty("visibility", "hidden", "important");
+    iframe.style.setProperty("opacity", "0", "important");
+
     writeIframe(iframe, buildCode(defaults,true), false, fitCardPreview);
+
+    /*
+     * จุดสำคัญของ v128:
+     * การ์ดถูกสร้างตอน COMMISSION tab อาจยัง display:none อยู่
+     * พอเปิด tab ขนาด stage เปลี่ยนจาก 0 -> ขนาดจริง
+     * ResizeObserver จะ fit ให้อัตโนมัติทันที ไม่ต้อง Refresh
+     */
+    if ("ResizeObserver" in window && stage) {
+      const alanCardResizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => fitCardPreview());
+      });
+      alanCardResizeObserver.observe(stage);
+    }
+
+    if ("IntersectionObserver" in window && stage) {
+      const alanCardIntersectionObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          requestAnimationFrame(() => fitCardPreview());
+        }
+      }, { threshold: 0.01 });
+      alanCardIntersectionObserver.observe(stage);
+    }
+
+    /*
+     * รองรับกรณี CSS/tab animation เพิ่งเปลี่ยนเสร็จ
+     */
+    [0, 60, 140, 300, 700, 1400].forEach(delay => {
+      window.setTimeout(() => fitCardPreview(), delay);
+    });
+
     return true;
   }
 
@@ -20129,6 +20179,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function install() {
+    document.addEventListener("click", event => {
+      const tab = event.target.closest?.("[data-work-tab]");
+      if (!tab || tab.dataset.workTab !== "commission") return;
+      [0, 50, 150, 320].forEach(delay => {
+        window.setTimeout(() => fitCardPreview(), delay);
+      });
+    });
+
     let attempts=0;
     const timer=setInterval(() => {
       attempts++;
