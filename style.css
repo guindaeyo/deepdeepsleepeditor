@@ -9396,3 +9396,176 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   MIKAEL HISTORY FREE COMMISSION — v115
+========================================================= */
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview > iframe {
+  position: absolute !important;
+  inset: auto !important;
+  max-width: none !important;
+  filter: blur(12px) grayscale(.18) saturate(.72) !important;
+  opacity: .72 !important;
+  pointer-events: none !important;
+}
+.dds-commission-card-mikael-history-free .dds-mhp-view-disabled,
+.dds-commission-card-mikael-history-free .dds-mhp-view-disabled:hover {
+  opacity: .30 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+.dds-mhp-editor .dds-protected-commission-layout {
+  align-items: start;
+}
+.dds-mhp-editor .dds-protected-commission-preview-column {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  min-width: 0;
+  overflow: hidden;
+}
+.dds-mhp-editor .dds-mhp-preview-stage {
+  min-height: 520px;
+  overflow: hidden;
+}
+.dds-mhp-editor .dds-mhp-preview-frame {
+  width: 1280px !important;
+  min-width: 1280px !important;
+  max-width: 1280px !important;
+  max-height: none !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.dds-mhp-editor .dds-mhp-controls-column {
+  min-width: 0;
+  height: min(1180px, calc(100vh - 36px));
+  min-height: 760px;
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dds-mhp-editor .dds-mhp-controls-scroll {
+  min-height: 0;
+  padding-right: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(193,23,36,.68) rgba(255,255,255,.045);
+}
+.dds-mhp-editor .dds-mhp-controls-scroll::-webkit-scrollbar { width: 7px; }
+.dds-mhp-editor .dds-mhp-controls-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
+.dds-mhp-editor .dds-mhp-controls-scroll::-webkit-scrollbar-thumb { background: rgba(193,23,36,.65); border-radius: 999px; }
+.dds-mhp-editor .dds-mhp-draft {
+  display: block;
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+.dds-mhp-editor .dds-mhp-draft > div:first-child {
+  margin-bottom: 12px;
+}
+.dds-mhp-editor .dds-named-save-library {
+  margin-top: 12px;
+}
+.dds-mhp-editor .dds-control-section {
+  flex: 0 0 auto;
+}
+.dds-mhp-editor .dds-copy-section {
+  flex: 0 0 auto;
+  margin-top: 12px;
+}
+.dds-mhp-editor input[type="number"],
+.dds-mhp-editor select {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  color: var(--dds-white);
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 0;
+  background: rgba(255,255,255,.025);
+  font-size: 12px;
+}
+.dds-mhp-relation-count {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.dds-mhp-relation-count-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.dds-mhp-relation-count-actions button {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.78);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.dds-mhp-relations-editor-list {
+  display: grid;
+  gap: 10px;
+}
+.dds-mhp-relation-editor {
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.018);
+}
+.dds-mhp-relation-editor[hidden] { display: none !important; }
+.dds-mhp-relation-editor-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.dds-mhp-relation-editor-head strong {
+  color: var(--dds-red-bright,#c11724);
+  font-family: var(--dds-font-serif);
+  font-size: 20px;
+}
+.dds-mhp-relation-editor-head span {
+  color: rgba(255,255,255,.42);
+  font-size: 9px;
+  letter-spacing: .11em;
+}
+@media (min-width: 1251px) {
+  .dds-mhp-editor .dds-protected-commission-layout {
+    grid-template-columns: minmax(0,2.15fr) minmax(450px,520px) !important;
+    gap: clamp(22px,2.4vw,38px);
+  }
+}
+@media (max-width: 1250px) {
+  .dds-mhp-editor .dds-protected-commission-layout {
+    grid-template-columns: minmax(0,1fr) !important;
+  }
+  .dds-mhp-editor .dds-protected-commission-preview-column,
+  .dds-mhp-editor .dds-mhp-controls-column {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+  }
+  .dds-mhp-editor .dds-mhp-controls-scroll {
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+@media (max-width: 700px) {
+  .dds-mhp-relation-count {
+    grid-template-columns: 1fr;
+  }
+}
+

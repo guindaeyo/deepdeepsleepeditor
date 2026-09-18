@@ -20863,8 +20863,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           </button>
 
           <p class="dds-account-cloud-note">
-            ถ้ามีเซฟเก่าอยู่อีกเครื่อง ให้ Login บัญชีเดียวกันบนเครื่องนั้น
-            แล้วกด IMPORT เพียงครั้งเดียว เซฟจะถูกรวมไว้ในบัญชีเดียวกัน
+            ถ้ามีเซฟเก่าอยู่อีกเครื่อง ให้ Login บัญชี แล้วกด IMPORT เพียงครั้งเดียว
+            เซฟจะถูกรวมไว้ในบัญชีเดียวกัน
           </p>
 
           <button type="button" class="dds-account-logout" data-account-logout>
@@ -21030,5 +21030,561 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   } else {
     init();
   }
+})();
+
+/* =========================================================
+   MIKAEL F. KAISER — FREE HISTORY COMMISSION v115
+   โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)
+   Preview blurred / View Work disabled / Editor password protected
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_MIKAEL_HISTORY_FREE_V115__) return;
+  window.__DDS_MIKAEL_HISTORY_FREE_V115__ = true;
+
+  const PANEL_NAME = "editor-commission-mikael-history-free";
+  const DRAFT_KEY = "dds:commission-draft:mikael-history-free:v1";
+  const ACCESS_HASH = "16b9a68a6c78d451171471393f392f98b568f598d7ecd7aa991c55343307fd42";
+  const ACCESS_SESSION_KEY = "dds:mikael-history-free:unlocked:v1";
+  const CSS_URL = "https://guindaeyo.github.io/commisdeepdcsh/comm-mmklpfofile.css";
+  const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&display=swap";
+  const CANVAS_WIDTH = 1280;
+  const MAX_RELATIONS = 10;
+
+  const defaults = Object.freeze({
+    paperColor: "#e7e5df",
+    mainColor: "#151515",
+    photo: "https://i.pinimg.com/736x/71/6d/72/716d7208f194a85cea475285dde2e370.jpg",
+    record4: "0529",
+    record2: "26",
+    caseYear: "69",
+    caseNo: "0913",
+    fullName: "แฟรงคลิน โดมินิก บลัดเวิร์ธ",
+    aliases: "Nickname / Alias",
+    faceclaim: "Faceclaim Name",
+    birthplace: "Seoul, South Korea",
+    dateOfBirth: "07 MAY 1995",
+    species: "Vampire",
+    level: "LEVEL 00",
+    mbti: "XXXX",
+    education: "University / Faculty / Major",
+    occupation: "Occupation / Position",
+    note: "ไม่บอกอะ ลองเดาดู",
+    reference4: "0529",
+    reportDate: "05/29/2026",
+    history: "แฟรงคลินเกิดมาในตระกูลแชโบลที่มั่งคั่งของเกาหลี เติบโตท่ามกลางความสะดวกสบาย และการตามใจจากครอบครัว ทำให้เขาเป็นคนค่อนข้างเอาแต่ใจเล็กน้อย เขาย้ายไปศึกษาต่อที่สหรัฐอเมริกา และใช้ชีวิตอยู่ในสังคมชนชั้นสูง แต่เขากลับพบรักกับเพื่อนร่วมชั้นสมัยมัธยมปลายที่เกาหลีและพยายามฝ่าฟันอุปสรรคความรักจนได้อาศัยอยู่ด้วยกัน\n\nโชคชะตาของแฟรงคลินเปลี่ยนไปตลอดกาลเมื่อเขาย้ายเข้าไปอยู่ในแมนชั่นหรูแห่งหนึ่ง โดยไม่เคยรู้มาก่อนว่าชายหนุ่มข้างห้องที่สนิทกันคือแวมไพร์ คืนนั้นแฟรงคลินได้ยินเสียงทะเลาะกันอย่างรุนแรงดังมาจากห้องข้าง ๆ จนพื้นสั่นสะเทือน ความหงุดหงิด และรำคาญทำให้เขาตัดสินใจจะเข้าไปห้ามปราม แต่กลับต้องเผชิญกับการโจมตีอย่างไม่ตั้งใจจากสิ่งที่เรียกกันว่านักล่าแวมไพร์\n\nเพื่อนข้างห้องที่เป็นแวมไพร์รู้สึกผิดอย่างยิ่งที่แฟรงคลินต้องพลอยเดือดร้อน จึงตัดสินใจเปลี่ยนแฟรงคลินให้กลายเป็นแวมไพร์เพื่อรักษาชีวิต และแนะนำให้เขาย้ายไปอาศัยอยู่ที่หมู่บ้านเอลิเชียน ซึ่งเป็นหมู่บ้านที่รวมตัวของสิ่งมีชีวิตเหนือธรรมชาติเพื่อปรับตัวเข้ากับชีวิตอมตะที่ไม่อาจหวนกลับไปเป็นเหมือนเดิมได้อีก และต้องจากคนรักของตนไปตลอดกาล เพราะไม่อยากให้อีกฝ่ายทนอยู่กับตนเองที่ไม่มีวันกลับไปเป็นเช่นเดิมได้อีก\n\nแฟรงคลินตัดสินใจแยกทางกับคนรัก และมายังที่หมู่บ้านเอลิเชียนตามคำแนะนำของทวดที่เจอกันแบบงง ๆ แม้ยังมีความเย่อหยิ่ง ไม่ยอมให้ใครเข้าถึงตัวง่าย ๆ แต่แฟรงคลินก็กำลังเรียนรู้ที่จะใช้ชีวิตใหม่ในฐานะแวมไพร์ ทั้งในด้านพลังพิเศษ ความหิวกระหายอยู่เสมอ",
+    personality: "แฟรงคลินเป็นชายหนุ่มรูปร่างสูงสง่า หน้าตาดี ทว่ากลับมีแววตาคม และท่าทีที่มักนิ่งเฉย ทำให้ผู้คนรอบตัวรู้สึกว่าเขาเป็นคนหยิ่งยโส ไม่ชอบเข้าหาใครก่อน เขาเป็นคนหัวขบถ มีความเชื่อมั่นในตัวเองสูงจนบางครั้งอาจถูกมองว่าหยิ่งหรือเข้าถึงยาก แต่หากได้รู้จักตัวตนของเขาจริง ๆ จะพบว่าเขามีมุมที่อ่อนโยน และจริงใจอยู่มากกว่าที่ใครหลายคนคิด หรือเปล่า?",
+    relationCount: 1,
+    relName1: "Firstname Lastname", relType1: "ทาส",
+    relName2: "", relType2: "",
+    relName3: "", relType3: "",
+    relName4: "", relType4: "",
+    relName5: "", relType5: "",
+    relName6: "", relType6: "",
+    relName7: "", relType7: "",
+    relName8: "", relType8: "",
+    relName9: "", relType9: "",
+    relName10: "", relType10: ""
+  });
+
+  let panel = null;
+  let card = null;
+  let modal = null;
+  let previewTimer = 0;
+  let draftTimer = 0;
+
+  const esc = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  const attr = esc;
+
+  function multiline(value) {
+    return esc(value).replace(/\r\n?/g, "\n").replace(/\n/g, "<br>");
+  }
+
+  function digits(value, length, fallback = "") {
+    const clean = String(value ?? "").replace(/\D/g, "").slice(0, length);
+    return clean || fallback;
+  }
+
+  function relationCount(v) {
+    return Math.max(1, Math.min(MAX_RELATIONS, Number(v.relationCount) || 1));
+  }
+
+  function recordCode(v) {
+    return `${digits(v.record4,4,"0529")}-${digits(v.record2,2,"26")}`;
+  }
+
+  function hexToRgba(value, alpha, fallback = "#151515") {
+    let hex = String(value || "").trim();
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) hex = fallback;
+    const n = parseInt(hex.slice(1), 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function styleVars(v) {
+    const main = /^#[0-9a-f]{6}$/i.test(String(v.mainColor || "")) ? v.mainColor : defaults.mainColor;
+    const paper = /^#[0-9a-f]{6}$/i.test(String(v.paperColor || "")) ? v.paperColor : defaults.paperColor;
+    const safePhoto = String(v.photo || defaults.photo).replace(/'/g, "%27");
+    return [
+      "--ddsh-commtmklpfo-layout-width:1280px",
+      `--ddsh-commtmklpfo-paper:${paper}`,
+      `--ddsh-commtmklpfo-ink:${main}`,
+      `--ddsh-commtmklpfo-muted:${hexToRgba(main,.68)}`,
+      `--ddsh-commtmklpfo-line:${hexToRgba(main,.74)}`,
+      `--ddsh-commtmklpfo-light:${hexToRgba(main,.32)}`,
+      "--ddsh-commtmklpfo-red:#b00000",
+      "--ddsh-commtmklpfo-logo:url('https://iili.io/nxjgK22.png')",
+      `--ddsh-commtmklpfo-photo:url('${safePhoto}')`,
+      "--ddsh-commtmklpfo-photo-x:0px",
+      "--ddsh-commtmklpfo-photo-y:0px",
+      "--ddsh-commtmklpfo-redstamp-x:0px",
+      "--ddsh-commtmklpfo-redstamp-y:0px"
+    ].join(";");
+  }
+
+  function relationsHtml(v) {
+    const count = relationCount(v);
+    return Array.from({ length: count }, (_, index) => {
+      const n = index + 1;
+      const no = String(n).padStart(2, "0");
+      const name = esc(v[`relName${n}`] || "Firstname Lastname");
+      const type = esc(v[`relType${n}`] || "—");
+      return `<div class="ddsh-commtmklpfo-relation"><div class="ddsh-commtmklpfo-rel-no">${no}</div><div class="ddsh-commtmklpfo-rel-name"><span>NAME</span><strong>${name}</strong></div><div class="ddsh-commtmklpfo-rel-type"><span>RELATIONSHIP</span><strong>${type}</strong></div></div>`;
+    }).join("");
+  }
+
+  function buildCode(v = defaults) {
+    return `<link href="https://guindaeyo.github.io/commisdeepdcsh/comm-mmklpfofile.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&display=swap" rel="stylesheet"><div class="ddsh-commtmklpfofile" style="${styleVars(v)}"><div class="ddsh-commtmklpfo-paperfx"></div><div class="ddsh-commtmklpfo-content"><header class="ddsh-commtmklpfo-header"><div class="ddsh-commtmklpfo-dept"><div class="ddsh-commtmklpfo-police-logo"></div><div class="ddsh-commtmklpfo-depttext"><span>ELYSIAN POLICE DEPARTMENT</span><strong>RECORDS & INVESTIGATION DIVISION</strong><small>CONFIDENTIAL PERSONNEL ARCHIVE</small></div></div><div class="ddsh-commtmklpfo-title"><h1>CASE FILE</h1><span>OFFICIAL PERSONNEL RECORD</span></div><div class="ddsh-commtmklpfo-number"><div class="ddsh-commtmklpfo-numbertop"><span>CASE NO.</span><strong>EPD-${digits(v.caseYear,2,"69")}-${digits(v.caseNo,4,"0913")}</strong></div><div class="ddsh-commtmklpfo-barcode"></div><div class="ddsh-commtmklpfo-barcode-number">8 920176 ${digits(v.record4,4,"0529")}${digits(v.record2,2,"26")}</div><small>RESTRICTED DATABASE RECORD</small></div></header><div class="ddsh-commtmklpfo-heavyline"></div><section class="ddsh-commtmklpfo-main"><div class="ddsh-commtmklpfo-photos"><div class="ddsh-commtmklpfo-photo"><div class="ddsh-commtmklpfo-height"><span>190</span><span>180</span><span>170</span><span>160</span><span>150</span></div><div class="ddsh-commtmklpfo-photo-id"><strong>EPD</strong><span>SUBJECT VIEW</span><b>${recordCode(v)}</b></div></div></div><div class="ddsh-commtmklpfo-identification"><div class="ddsh-commtmklpfo-blocktitle"><span>SUBJECT IDENTIFICATION</span><b>FILE: ACTIVE</b></div><div class="ddsh-commtmklpfo-name"><span>FULL NAME (THAI)</span><strong>${esc(v.fullName)}</strong><small>LEGAL IDENTITY CONFIRMED</small></div><div class="ddsh-commtmklpfo-info"><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">ALIASES</span><span class="ddsh-commtmklpfo-value">${esc(v.aliases)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">FACECLAIM</span><span class="ddsh-commtmklpfo-value">${esc(v.faceclaim)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">BIRTHPLACE</span><span class="ddsh-commtmklpfo-value">${esc(v.birthplace)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">DATE OF BIRTH</span><span class="ddsh-commtmklpfo-value">${esc(v.dateOfBirth)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">SPECIES</span><span class="ddsh-commtmklpfo-value">${esc(v.species)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">LEVEL</span><span class="ddsh-commtmklpfo-value">${esc(v.level)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">AGE</span><span class="ddsh-commtmklpfo-value">00 YEARS</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">MBTI</span><span class="ddsh-commtmklpfo-value">${esc(v.mbti)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">EDUCATION</span><span class="ddsh-commtmklpfo-value">${esc(v.education)}</span></div><div class="ddsh-commtmklpfo-row"><span class="ddsh-commtmklpfo-label">OCCUPATION</span><span class="ddsh-commtmklpfo-value">${esc(v.occupation)}</span></div></div><div class="ddsh-commtmklpfo-subject-note"><div class="ddsh-commtmklpfo-subject-note-head"><span>NOTE</span><b>SUBJECT REMARK</b></div><p>${multiline(v.note)}</p></div></div><aside class="ddsh-commtmklpfo-side"><div class="ddsh-commtmklpfo-sidebox"><span>CASE STATUS</span><strong>ACTIVE FILE</strong><small>RECORD UNDER REVIEW</small></div><div class="ddsh-commtmklpfo-sidebox"><span>SECURITY LEVEL</span><strong>CLASSIFIED</strong><small>AUTHORIZED PERSONNEL ONLY</small></div><div class="ddsh-commtmklpfo-sidebox"><span>DATABASE STATUS</span><strong>VERIFIED</strong><small>LAST UPDATE: 05/29/2026</small></div><div class="ddsh-commtmklpfo-sidebox"><span>REFERENCE</span><strong>EPD-${digits(v.reference4,4,"0529")}</strong><small><span class="ddsh-redact ddsh-redact-long">REDACTED DATA</span></small></div><div class="ddsh-commtmklpfo-redstamp"><strong>ARCHIVED</strong><span>PERSONAL RECORD</span></div></aside></section><div class="ddsh-commtmklpfo-photo-caption"><span>SUBJECT IMAGE / IDENTIFICATION RECORD NO. EPD-${recordCode(v)}</span><span>IMAGE SOURCE: <b class="ddsh-mini-redact"></b></span></div><section class="ddsh-commtmklpfo-chargebox"><div class="ddsh-commtmklpfo-charge-title">FILE INFORMATION</div><div class="ddsh-commtmklpfo-charge-grid"><div><span>RECORD TYPE</span><strong>PERSONAL HISTORY</strong></div><div><span>DOCUMENT STATUS</span><strong>COMPLETE RECORD</strong></div><div><span>ACCESS LEVEL</span><strong>CONFIDENTIAL</strong></div><div><span>FILE OWNER</span><strong class="ddsh-blackline"></strong></div></div></section><section class="ddsh-commtmklpfo-section"><div class="ddsh-commtmklpfo-sectionhead"><strong>01</strong><div><span>BACKGROUND RECORD</span><h2>HISTORY</h2></div><small>SUBJECT HISTORY</small></div><div class="ddsh-commtmklpfo-text"><div class="ddsh-commtmklpfo-recordline"><span>REPORTING OFFICER:</span><b class="ddsh-blackline ddsh-blackline-md"></b><span>DATE:</span><strong>${esc(v.reportDate)}</strong></div><p>${multiline(v.history)}</p><div class="ddsh-commtmklpfo-inline-redaction"><span></span><span></span><span class="short"></span></div></div></section><section class="ddsh-commtmklpfo-section"><div class="ddsh-commtmklpfo-sectionhead"><strong>02</strong><div><span>BEHAVIORAL PROFILE</span><h2>PERSONALITY</h2></div><small>PERSONALITY REPORT</small></div><div class="ddsh-commtmklpfo-text"><div class="ddsh-commtmklpfo-recordline"><span>ASSESSMENT:</span><strong>OBSERVATIONAL PROFILE</strong><span>STATUS:</span><strong>VERIFIED</strong></div><p>${multiline(v.personality)}</p><p>Additional behavioral notes: <span class="ddsh-redact ddsh-redact-md">REDACTED</span> pending further departmental assessment.</p><div class="ddsh-commtmklpfo-classified-note"><span>CLASSIFIED NOTE</span><div><b></b><b></b><b class="half"></b></div></div></div></section><section class="ddsh-commtmklpfo-section"><div class="ddsh-commtmklpfo-sectionhead"><strong>03</strong><div><span>ASSOCIATED PERSONS</span><h2>RELATIONSHIPS</h2></div><small>RELATIONSHIP RECORD</small></div><div class="ddsh-commtmklpfo-relations">${relationsHtml(v)}</div></section><div class="ddsh-commtmklpfo-bottom"><div class="ddsh-commtmklpfo-custody"><strong>CONFIDENTIAL</strong><span>AUTHORIZED PERSONNEL ONLY</span></div><div class="ddsh-commtmklpfo-bottomredact"><span>ADDITIONAL NOTES / REDACTIONS</span><div><i></i><i></i><i class="short"></i></div></div></div><div class="ddsh-commtmklpfo-footer"><div><span>CLASSIFICATION</span><strong>CONFIDENTIAL — PERSONAL RECORD</strong></div><div class="ddsh-commtmklpfo-footer-code">EPD / RECORDS DIVISION / ${recordCode(v)}</div><div class="ddsh-commtmklpfo-footerstamp">NOT FOR PUBLIC RELEASE</div></div></div></div><div class="ddshcr-ccmmkl1"><span></span></div>`;
+  }
+
+  function iframeDoc(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;background:transparent!important}.dds-mhp-preview-content{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;position:relative!important}.dds-mhp-preview-content>.ddsh-commtmklpfofile{width:${CANVAS_WIDTH}px!important;min-width:${CANVAS_WIDTH}px!important;max-width:${CANVAS_WIDTH}px!important;margin:0!important}</style></head><body><div class="dds-mhp-preview-content" data-mhp-preview-content>${code}</div></body></html>`;
+  }
+
+  function measureIframe(iframe) {
+    try {
+      const doc = iframe?.contentDocument;
+      const content = doc?.querySelector("[data-mhp-preview-content]");
+      const root = doc?.querySelector(".ddsh-commtmklpfofile");
+      const credit = doc?.querySelector(".ddshcr-ccmmkl1");
+      if (!content || !root) return { width: CANVAS_WIDTH, height: 2200 };
+      const c = content.getBoundingClientRect();
+      const r = root.getBoundingClientRect();
+      const cr = credit?.getBoundingClientRect();
+      return {
+        width: CANVAS_WIDTH,
+        height: Math.max(
+          1,
+          Math.ceil(content.scrollHeight || 0),
+          Math.ceil(root.scrollHeight || 0),
+          Math.ceil(c.height || 0),
+          Math.ceil(r.height || 0),
+          cr ? Math.ceil(cr.bottom - Math.min(0, c.top)) : 0
+        )
+      };
+    } catch {
+      return { width: CANVAS_WIDTH, height: 2200 };
+    }
+  }
+
+  function writeIframe(iframe, code, done) {
+    if (!iframe) return;
+    iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+    iframe.style.setProperty("height", "2600px", "important");
+    iframe.onload = () => {
+      const rerun = () => done?.();
+      rerun();
+      [100, 280, 700, 1400].forEach(delay => window.setTimeout(rerun, delay));
+      try {
+        iframe.contentDocument?.fonts?.ready?.then(rerun).catch(() => {});
+      } catch {}
+    };
+    iframe.srcdoc = iframeDoc(code);
+  }
+
+  function fitCardPreview() {
+    const iframe = card?.querySelector("[data-mhp-card-preview]");
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    if (!iframe || !stage || stage.clientWidth < 20 || stage.clientHeight < 20) return;
+    const { width, height } = measureIframe(iframe);
+    const padding = 18;
+    const scale = Math.max(.01, Math.min(
+      1,
+      (stage.clientWidth - padding * 2) / width,
+      (stage.clientHeight - padding * 2) / height
+    ));
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", "50%", "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `translate(-50%,-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "center center", "important");
+  }
+
+  function fitEditorPreview() {
+    const iframe = panel?.querySelector("[data-mhp-preview]");
+    const stage = panel?.querySelector("[data-mhp-preview-stage]");
+    if (!iframe || !stage || stage.clientWidth < 20) return;
+    const { width, height } = measureIframe(iframe);
+    const padding = 18;
+    const scale = Math.max(.01, Math.min(1, (stage.clientWidth - padding * 2) / width));
+    stage.style.setProperty("height", `${Math.ceil(height * scale) + padding * 2}px`, "important");
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("left", "50%", "important");
+    iframe.style.setProperty("top", `${padding}px`, "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", `${height}px`, "important");
+    iframe.style.setProperty("transform", `translateX(-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top center", "important");
+  }
+
+  function showToast(text) {
+    const toast = document.getElementById("siteToast");
+    const target = document.getElementById("siteToastText");
+    if (target) target.textContent = text;
+    if (!toast) return;
+    toast.classList.add("is-show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => toast.classList.remove("is-show"), 1900);
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value));
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2,"0")).join("");
+  }
+
+  function closeAccessModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function createAccessModal() {
+    if (modal?.isConnected) return modal;
+    modal = document.createElement("div");
+    modal.className = "dds-commission-lock-modal";
+    modal.hidden = true;
+    modal.innerHTML = `<form class="dds-commission-lock-dialog" data-mhp-lock-form><small>CLIENT ACCESS / MIKAEL F. KAISER</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อเปิดหน้าแก้ไขโคดประเภทประวัติ</p><label class="dds-commission-lock-field"><span>รหัสผ่าน</span><input type="password" autocomplete="current-password" data-mhp-password placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-mhp-lock-error></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK EDITOR</button><button type="button" data-mhp-lock-cancel>CANCEL</button></div></form>`;
+    document.body.appendChild(modal);
+    modal.querySelector("[data-mhp-lock-cancel]")?.addEventListener("click", closeAccessModal);
+    modal.addEventListener("click", event => { if (event.target === modal) closeAccessModal(); });
+    modal.querySelector("[data-mhp-lock-form]")?.addEventListener("submit", async event => {
+      event.preventDefault();
+      const input = modal.querySelector("[data-mhp-password]");
+      const error = modal.querySelector("[data-mhp-lock-error]");
+      const submit = modal.querySelector('button[type="submit"]');
+      if (!input || !error || !submit) return;
+      submit.disabled = true;
+      error.textContent = "กำลังตรวจสอบ...";
+      try {
+        const hash = await sha256(input.value);
+        if (hash !== ACCESS_HASH) {
+          error.textContent = "รหัสผ่านไม่ถูกต้อง";
+          input.select();
+          return;
+        }
+        sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
+        closeAccessModal();
+        openEditor();
+      } catch (err) {
+        console.error(err);
+        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    return modal;
+  }
+
+  function requestEditorAccess() {
+    if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") {
+      openEditor();
+      return;
+    }
+    const dialog = createAccessModal();
+    const input = dialog.querySelector("[data-mhp-password]");
+    const error = dialog.querySelector("[data-mhp-lock-error]");
+    if (input) input.value = "";
+    if (error) error.textContent = "";
+    dialog.hidden = false;
+    document.body.style.overflow = "hidden";
+    setTimeout(() => input?.focus(), 30);
+  }
+
+  function field(label, key, value, full = false, extra = "") {
+    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${label}</span><input type="text" name="mhp-${key}" data-mhp-field="${key}" value="${attr(value)}" ${extra}></label>`;
+  }
+
+  function area(label, key, value, rows = 5) {
+    return `<label class="dds-field dds-field-full"><span>${label}</span><textarea name="mhp-${key}" data-mhp-field="${key}" rows="${rows}">${esc(value)}</textarea></label>`;
+  }
+
+  function colorField(label, key, value) {
+    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-mhp-color="${key}" value="${attr(value)}"><input type="text" name="mhp-${key}" data-mhp-field="${key}" value="${attr(value)}"></div></label>`;
+  }
+
+  function relationEditorRows() {
+    return Array.from({ length: MAX_RELATIONS }, (_, index) => {
+      const n = index + 1;
+      const no = String(n).padStart(2, "0");
+      return `<div class="dds-mhp-relation-editor" data-mhp-relation-row="${n}"${n > 1 ? " hidden" : ""}><div class="dds-mhp-relation-editor-head"><strong>${no}</strong><span>RELATIONSHIP</span></div><div class="dds-form-grid">${field("NAME",`relName${n}`,defaults[`relName${n}`] || "",true)}${field("RELATIONSHIP",`relType${n}`,defaults[`relType${n}`] || "",true)}</div></div>`;
+    }).join("");
+  }
+
+  function createPanel() {
+    if (panel?.isConnected) return panel;
+    panel = document.createElement("section");
+    panel.className = "dds-panel dds-protected-commission-editor dds-mhp-editor";
+    panel.dataset.panel = PANEL_NAME;
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-mhp-back type="button">←</button><div><p class="dds-eyebrow">COMMISSION CODE EDITOR</p><h1>COMMISSION — โคดประเภทประวัติ</h1><p>ทุกคนใช้ได้ฟรี · ผู้จ้าง MIKAEL F. KAISER</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>MIKAEL HISTORY / FREE</strong></div><div class="dds-protected-commission-preview-stage dds-mhp-preview-stage" data-mhp-preview-stage><iframe class="dds-protected-commission-preview-frame dds-mhp-preview-frame" data-mhp-preview scrolling="no" title="พรีวิวโคดประวัติ Mikael"></iframe></div></div><div class="dds-protected-commission-controls-column dds-mhp-controls-column"><div class="dds-protected-commission-draft dds-mhp-draft"><div><strong>บันทึกแบบร่าง</strong><small data-mhp-draft-status>ยังไม่มีแบบร่าง</small></div></div><div class="dds-protected-commission-scroll dds-mhp-controls-scroll"><section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("สีพื้นหลัง","paperColor",defaults.paperColor)}${colorField("สีหลักทั้งหมด","mainColor",defaults.mainColor)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field("URL รูปหลัก","photo",defaults.photo,true)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>เลขแฟ้ม</h2></div><div class="dds-form-grid">${field("0529 · เลข 4 ตัว","record4",defaults.record4,false,'inputmode="numeric" maxlength="4"')}${field("26 · เลข 2 ตัว","record2",defaults.record2,false,'inputmode="numeric" maxlength="2"')}${field("CASE NO. · 69","caseYear",defaults.caseYear,false,'inputmode="numeric" maxlength="2"')}${field("CASE NO. · 0913","caseNo",defaults.caseNo,false,'inputmode="numeric" maxlength="4"')}${field("REFERENCE EPD- · 0529","reference4",defaults.reference4,false,'inputmode="numeric" maxlength="4"')}${field("DATE","reportDate",defaults.reportDate)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>SUBJECT IDENTIFICATION</h2></div><div class="dds-form-grid">${field("FULL NAME (THAI)","fullName",defaults.fullName,true)}${field("ALIASES","aliases",defaults.aliases)}${field("FACECLAIM","faceclaim",defaults.faceclaim)}${field("BIRTHPLACE","birthplace",defaults.birthplace)}${field("DATE OF BIRTH","dateOfBirth",defaults.dateOfBirth)}${field("SPECIES","species",defaults.species)}${field("LEVEL","level",defaults.level)}${field("MBTI","mbti",defaults.mbti)}${field("EDUCATION","education",defaults.education,true)}${field("OCCUPATION","occupation",defaults.occupation,true)}${area("NOTE","note",defaults.note,3)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>HISTORY / PERSONALITY</h2></div><div class="dds-form-grid">${area("HISTORY","history",defaults.history,12)}${area("PERSONALITY","personality",defaults.personality,8)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>RELATIONSHIPS</h2></div><div class="dds-mhp-relation-count"><label class="dds-field"><span>จำนวนคนที่ต้องการแสดง</span><input type="number" name="mhp-relationCount" data-mhp-field="relationCount" min="1" max="${MAX_RELATIONS}" value="1"></label><div class="dds-mhp-relation-count-actions"><button type="button" data-mhp-relation-minus>− REMOVE</button><button type="button" data-mhp-relation-plus>+ ADD</button></div></div><div class="dds-mhp-relations-editor-list">${relationEditorRows()}</div></section></div><section class="dds-control-section dds-copy-section dds-mhp-copy-section"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><div class="dds-editor-actions"><button class="dds-copy-button" data-mhp-copy type="button">COPY CODE <span>↗</span></button><button class="dds-reset-button" data-mhp-reset type="button">RESET</button></div></section></div></div>`;
+    document.querySelector(".dds-main")?.appendChild(panel);
+    bindPanel();
+    return panel;
+  }
+
+  function installCard() {
+    if (card?.isConnected) return true;
+    const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector('[data-panel="commission"] .dds-commission-grid');
+    if (!grid) return false;
+    const existing = grid.querySelector(".dds-commission-card-mikael-history-free");
+    if (existing) { card = existing; return true; }
+    card = document.createElement("article");
+    card.className = "dds-roleplay-card dds-commission-card dds-commission-card-mikael-history-free";
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-mhp-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-mhp-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นประวัติ Mikael"></iframe><span class="dds-roleplay-preview-badge">PREVIEW</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit dds-mhp-view-disabled" type="button" disabled aria-disabled="true">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-mhp-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    const alanCard = grid.querySelector(".dds-commission-card-alan");
+    if (alanCard?.parentElement === grid) alanCard.insertAdjacentElement("afterend", card);
+    else grid.appendChild(card);
+    card.querySelector("[data-mhp-edit]")?.addEventListener("click", requestEditorAccess);
+    const iframe = card.querySelector("[data-mhp-card-preview]");
+    writeIframe(iframe, buildCode(defaults), fitCardPreview);
+    return true;
+  }
+
+  function getValues() {
+    const v = { ...defaults };
+    panel?.querySelectorAll("[data-mhp-field]").forEach(input => {
+      const key = input.dataset.mhpField;
+      v[key] = key === "relationCount" ? relationCount({ relationCount: input.value }) : input.value;
+    });
+    return v;
+  }
+
+  function syncRelationRows() {
+    if (!panel) return;
+    const countInput = panel.querySelector('[data-mhp-field="relationCount"]');
+    const count = relationCount({ relationCount: countInput?.value });
+    if (countInput) countInput.value = String(count);
+    panel.querySelectorAll("[data-mhp-relation-row]").forEach(row => {
+      row.hidden = Number(row.dataset.mhpRelationRow) > count;
+    });
+  }
+
+  function setValues(values) {
+    const v = { ...defaults, ...(values || {}) };
+    panel?.querySelectorAll("[data-mhp-field]").forEach(input => {
+      const key = input.dataset.mhpField;
+      if (key in v) input.value = v[key];
+    });
+    panel?.querySelectorAll("[data-mhp-color]").forEach(picker => {
+      const key = picker.dataset.mhpColor;
+      const value = String(v[key] || "");
+      if (/^#[0-9a-f]{6}$/i.test(value)) picker.value = value;
+    });
+    syncRelationRows();
+  }
+
+  function updatePreview() {
+    if (!panel?.classList.contains("is-active")) return;
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      const iframe = panel.querySelector("[data-mhp-preview]");
+      writeIframe(iframe, buildCode(getValues()), fitEditorPreview);
+    }, 90);
+  }
+
+  function getDraft() {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }
+    catch { return null; }
+  }
+
+  function setDraftStatus(savedAt) {
+    const target = panel?.querySelector("[data-mhp-draft-status]");
+    if (!target) return;
+    target.textContent = savedAt ? `บันทึกล่าสุด ${new Date(savedAt).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}` : "ยังไม่มีแบบร่าง";
+  }
+
+  function saveDraft() {
+    if (!panel) return;
+    const savedAt = Date.now();
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ values: getValues(), savedAt }));
+      setDraftStatus(savedAt);
+    } catch {}
+  }
+
+  function scheduleDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 420);
+  }
+
+  function sanitizeNumericInput(input) {
+    const key = input?.dataset?.mhpField;
+    const limits = { record4:4, record2:2, caseYear:2, caseNo:4, reference4:4 };
+    const limit = limits[key];
+    if (!limit) return;
+    input.value = input.value.replace(/\D/g, "").slice(0, limit);
+  }
+
+  async function copyCode() {
+    const output = buildCode(getValues());
+    try { await navigator.clipboard.writeText(output); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = output;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    showToast("คัดลอกโคดประวัติ Mikael แล้ว");
+  }
+
+  function bindPanel() {
+    panel.querySelector("[data-mhp-back]")?.addEventListener("click", goBack);
+    panel.querySelectorAll("[data-mhp-field]").forEach(input => {
+      const onChange = () => {
+        sanitizeNumericInput(input);
+        if (input.dataset.mhpField === "relationCount") syncRelationRows();
+        const picker = panel.querySelector(`[data-mhp-color="${input.dataset.mhpField}"]`);
+        if (picker && /^#[0-9a-f]{6}$/i.test(input.value.trim())) picker.value = input.value.trim();
+        updatePreview();
+        scheduleDraft();
+      };
+      input.addEventListener("input", onChange);
+      input.addEventListener("change", onChange);
+    });
+    panel.querySelectorAll("[data-mhp-color]").forEach(picker => {
+      picker.addEventListener("input", () => {
+        const input = panel.querySelector(`[data-mhp-field="${picker.dataset.mhpColor}"]`);
+        if (input) input.value = picker.value;
+        updatePreview();
+        scheduleDraft();
+      });
+    });
+    const bumpRelation = delta => {
+      const input = panel.querySelector('[data-mhp-field="relationCount"]');
+      if (!input) return;
+      input.value = String(Math.max(1, Math.min(MAX_RELATIONS, Number(input.value || 1) + delta)));
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+    };
+    panel.querySelector("[data-mhp-relation-minus]")?.addEventListener("click", () => bumpRelation(-1));
+    panel.querySelector("[data-mhp-relation-plus]")?.addEventListener("click", () => bumpRelation(1));
+    panel.querySelector("[data-mhp-copy]")?.addEventListener("click", copyCode);
+    panel.querySelector("[data-mhp-reset]")?.addEventListener("click", () => {
+      setValues(defaults);
+      updatePreview();
+      scheduleDraft();
+      showToast("รีเซ็ตโคดประวัติ Mikael แล้ว");
+    });
+  }
+
+  function setCommissionTab() {
+    document.querySelectorAll("[data-work-tab]").forEach(btn => {
+      const active = btn.dataset.workTab === "commission";
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll("[data-work-panel]").forEach(p => {
+      const active = p.dataset.workPanel === "commission";
+      p.hidden = !active;
+      p.classList.toggle("is-active", active);
+    });
+  }
+
+  function showPanel(name) {
+    const editing = name === PANEL_NAME;
+    document.body.classList.toggle("dds-editor-mode", editing);
+    document.body.classList.toggle("dds-commission-editor-mode", editing);
+    document.documentElement.classList.toggle("dds-editor-mode", editing);
+    document.documentElement.classList.toggle("dds-commission-editor-mode", editing);
+    document.querySelectorAll(".dds-panel").forEach(p => p.classList.toggle("is-active", p.dataset.panel === name));
+    document.querySelectorAll(".dds-nav-button").forEach(btn => btn.classList.toggle("is-active", btn.dataset.page === "commission"));
+    const number = document.getElementById("currentPageNumber");
+    if (number) number.textContent = "04";
+    window.scrollTo({ top:0, left:0, behavior:"auto" });
+  }
+
+  function goBack() {
+    document.body.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
+    document.documentElement.classList.remove("dds-editor-mode","dds-commission-editor-mode","dds-modal-open");
+    showPanel("commission");
+    setCommissionTab();
+    history.replaceState(null, "", "#commission");
+  }
+
+  function openEditor() {
+    createPanel();
+    const draft = getDraft();
+    setValues(draft?.values ? { ...defaults, ...draft.values } : defaults);
+    setDraftStatus(draft?.savedAt || 0);
+    showPanel(PANEL_NAME);
+    history.replaceState(null, "", "#editor-commission-mikael-history-free");
+    syncRelationRows();
+    updatePreview();
+  }
+
+  function handleHash() {
+    if (location.hash === "#editor-commission-mikael-history-free") requestEditorAccess();
+  }
+
+  function install() {
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      const grid = document.querySelector('[data-work-panel="commission"] .dds-commission-grid') || document.querySelector('[data-panel="commission"] .dds-commission-grid');
+      const alanReady = !grid || Boolean(grid.querySelector(".dds-commission-card-alan"));
+      if ((alanReady && installCard()) || attempts > 40) {
+        if (!card) installCard();
+        clearInterval(timer);
+      }
+    }, 100);
+    window.addEventListener("resize", () => {
+      if (card) fitCardPreview();
+      if (panel?.classList.contains("is-active")) fitEditorPreview();
+    });
+    document.querySelectorAll('[data-page="commission"], [data-go="commission"], [data-work-tab="commission"]').forEach(button => {
+      button.addEventListener("click", () => {
+        window.setTimeout(fitCardPreview, 80);
+        window.setTimeout(fitCardPreview, 260);
+      });
+    });
+    window.addEventListener("hashchange", () => {
+      handleHash();
+      if (location.hash === "#commission") {
+        window.setTimeout(fitCardPreview, 100);
+      }
+    });
+    setTimeout(handleHash, 260);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once:true });
+  else install();
 })();
 
