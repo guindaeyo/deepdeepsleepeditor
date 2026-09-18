@@ -9663,3 +9663,20 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   border:0 !important;
   background:transparent !important;
 }
+
+
+/* =========================================================
+   ALAN COMMISSION — CARD CENTER FIX v127
+   Only COMMISSION & SHOWCASE Alan preview.
+========================================================= */
+.dds-commission-card-alan .dds-alan-card-preview {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.dds-commission-card-alan .dds-alan-card-preview > iframe {
+  position: absolute !important;
+  margin: 0 !important;
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}

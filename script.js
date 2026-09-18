@@ -19820,14 +19820,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const { width, height } = measureIframe(iframe);
     const padding = 18;
 
-    const availableWidth = Math.max(
-      1,
-      stage.clientWidth - padding * 2
-    );
-    const availableHeight = Math.max(
-      1,
-      stage.clientHeight - padding * 2
-    );
+    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+    const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
 
     const scale = Math.max(
       0.01,
@@ -19839,26 +19833,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     );
 
     /*
-     * ขยับลงมาเล็กน้อยเพื่อให้ visual center ของโคดอยู่กลางช่อง preview มากขึ้น
-     * เพราะงาน Alan มีน้ำหนักภาพด้านบนมากและพอดูใน card จะเหมือนลอยสูงนิดหนึ่ง
+     * CENTER FIX v127
+     * ไม่ใช้ translate(-50%,-50%) แล้ว เพราะ iframe ขนาดใหญ่ที่ถูก scale
+     * มีโอกาสเลื่อน visual box ผิดตำแหน่งใน card
+     * คำนวณขนาดหลัง scale แล้ววาง left/top ตรงกลางเป็น pixel แทน
      */
-    const topOffset = Math.round(Math.max(8, availableHeight * 0.04));
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
+    const left = Math.max(0, (stage.clientWidth - scaledWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - scaledHeight) / 2);
 
     iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", `calc(50% + ${topOffset}px)`, "important");
+    iframe.style.setProperty("inset", "auto", "important");
+    iframe.style.setProperty("left", `${left}px`, "important");
+    iframe.style.setProperty("top", `${top}px`, "important");
     iframe.style.setProperty("width", `${width}px`, "important");
     iframe.style.setProperty("min-width", `${width}px`, "important");
     iframe.style.setProperty("max-width", `${width}px`, "important");
     iframe.style.setProperty("height", `${height}px`, "important");
     iframe.style.setProperty("min-height", `${height}px`, "important");
     iframe.style.setProperty("max-height", `${height}px`, "important");
-    iframe.style.setProperty(
-      "transform",
-      `translate(-50%, -50%) scale(${scale})`,
-      "important"
-    );
-    iframe.style.setProperty("transform-origin", "center center", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
   }
 
   function colorField(label,key,value) {
