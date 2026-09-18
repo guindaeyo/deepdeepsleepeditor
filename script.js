@@ -20153,18 +20153,17 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   DDS CLOUD SAVE / ACCOUNT — TRIAL v107
-   - Guest mode keeps existing localStorage behavior.
-   - Logged-in mode isolates saves per Supabase Auth user.
-   - Existing pre-account saves are preserved as Guest Saves.
-   - Import Guest Saves -> Account without deleting guest data.
-   - Cross-device sync for draft + named save keys.
+   DDS CLOUD SAVE / ACCOUNT — RECOVERY SAFE v109
+   - NEVER clears active editor saves during login/sync.
+   - Scans old editor keys including dds-code-draft-v3:.
+   - Keeps a rolling recovery vault before every cloud action.
+   - Can recover from Guest cache, current Account cache, and backups.
    ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CLOUD_SAVE_V107__) return;
-  window.__DDS_CLOUD_SAVE_V107__ = true;
+  if (window.__DDS_CLOUD_SAVE_V109__) return;
+  window.__DDS_CLOUD_SAVE_V109__ = true;
 
   const TABLE = "dds_editor_saves";
   const CONFIG_KEY = "dds:cloud:config:v1";
@@ -20172,16 +20171,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const ACCOUNT_CACHE_PREFIX = "dds:cloud:account-cache:v1:";
   const ACTIVE_SCOPE_KEY = "dds:cloud:active-scope:v1";
   const BACKUP_PREFIX = "dds:cloud:backup:v1:";
-  const AUTO_SYNC_KEY = "dds:cloud:auto-sync:v1";
-  const SYNC_DEBOUNCE = 650;
+  const RECOVERY_VAULT_KEY = "dds:cloud:recovery-vault:v109";
+  const SYNC_DEBOUNCE = 700;
 
   let client = null;
   let currentUser = null;
-  let suppressStorageSync = false;
   let uploadTimer = 0;
-  const pending = new Map();
   let ui = null;
   let lastRemoteCount = 0;
+  const pending = new Map();
 
   const nativeSetItem = Storage.prototype.setItem;
   const nativeRemoveItem = Storage.prototype.removeItem;
@@ -20197,7 +20195,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     text.textContent = message;
     toast.classList.add("is-visible");
     clearTimeout(toast.__ddsCloudTimer);
-    toast.__ddsCloudTimer = setTimeout(() => toast.classList.remove("is-visible"), 2600);
+    toast.__ddsCloudTimer = setTimeout(() => toast.classList.remove("is-visible"), 2800);
   }
 
   function safeParse(raw, fallback = null) {
@@ -20206,7 +20204,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function rawGet(key) {
-    try { return nativeSetItem ? localStorage.getItem(key) : null; }
+    try { return localStorage.getItem(key); }
     catch { return null; }
   }
 
@@ -20220,10 +20218,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     catch { return false; }
   }
 
-  function isSyncKey(key) {
+  function isEditorSaveKey(key) {
     const k = String(key || "");
     if (!k || k.startsWith("dds:cloud:")) return false;
     return (
+      k.startsWith("dds-code-draft-v3:") ||
       k.startsWith("dds:commission-draft:") ||
       k.startsWith("dds:commission:alan-profile:draft:") ||
       k.startsWith("dds:roleplay:") ||
@@ -20236,30 +20235,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     try {
       for (let i = 0; i < localStorage.length; i += 1) {
         const key = localStorage.key(i);
-        if (!isSyncKey(key)) continue;
+        if (!isEditorSaveKey(key)) continue;
         const value = localStorage.getItem(key);
         if (value != null) out[key] = value;
       }
     } catch {}
     return out;
-  }
-
-  function clearActive() {
-    const keys = Object.keys(collectActive());
-    suppressStorageSync = true;
-    try { keys.forEach((key) => rawRemove(key)); }
-    finally { suppressStorageSync = false; }
-  }
-
-  function applyMap(map) {
-    suppressStorageSync = true;
-    try {
-      Object.entries(map || {}).forEach(([key, value]) => {
-        if (isSyncKey(key) && value != null) rawSet(key, value);
-      });
-    } finally {
-      suppressStorageSync = false;
-    }
   }
 
   function readMap(key) {
@@ -20276,7 +20257,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function accountCache(uid) {
-    return readMap(`${ACCOUNT_CACHE_PREFIX}${uid}`);
+    return uid ? readMap(`${ACCOUNT_CACHE_PREFIX}${uid}`) : {};
   }
 
   function saveGuestCache(map) {
@@ -20284,26 +20265,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function saveAccountCache(uid, map) {
-    writeMap(`${ACCOUNT_CACHE_PREFIX}${uid}`, map);
+    if (uid) writeMap(`${ACCOUNT_CACHE_PREFIX}${uid}`, map);
   }
 
-  function getScope() {
-    return rawGet(ACTIVE_SCOPE_KEY) || "guest";
-  }
-
-  function setScope(scope) {
-    rawSet(ACTIVE_SCOPE_KEY, scope || "guest");
-  }
-
-  function snapshotCurrentScope() {
-    const scope = getScope();
-    const map = collectActive();
-    if (scope.startsWith("user:")) {
-      saveAccountCache(scope.slice(5), map);
-    } else {
-      saveGuestCache(map);
-    }
-    return map;
+  function captureRecoveryVault(reason = "snapshot") {
+    const active = collectActive();
+    const previous = safeParse(rawGet(RECOVERY_VAULT_KEY), null);
+    const payload = {
+      version: 109,
+      capturedAt: Date.now(),
+      reason,
+      active,
+      previous: previous && previous.active ? {
+        capturedAt: previous.capturedAt || 0,
+        reason: previous.reason || "",
+        active: previous.active
+      } : null
+    };
+    rawSet(RECOVERY_VAULT_KEY, JSON.stringify(payload));
+    return active;
   }
 
   function valueSavedAt(raw) {
@@ -20312,7 +20292,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (Number.isFinite(Number(parsed.savedAt))) return Number(parsed.savedAt);
     if (parsed.snapshot && Number.isFinite(Number(parsed.snapshot.savedAt))) return Number(parsed.snapshot.savedAt);
     if (Array.isArray(parsed.saves)) {
-      return parsed.saves.reduce((max, item) => Math.max(max, Number(item?.savedAt || item?.snapshot?.savedAt || 0)), 0);
+      return parsed.saves.reduce(
+        (max, item) => Math.max(max, Number(item?.savedAt || item?.snapshot?.savedAt || 0)),
+        0
+      );
     }
     return 0;
   }
@@ -20323,8 +20306,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function mergeNamedLibraries(aRaw, bRaw) {
-    const a = safeParse(aRaw, { version: 1, saves: [] });
-    const b = safeParse(bRaw, { version: 1, saves: [] });
+    const a = safeParse(aRaw, { version: 1, saves: [] }) || { version: 1, saves: [] };
+    const b = safeParse(bRaw, { version: 1, saves: [] }) || { version: 1, saves: [] };
     const byId = new Map();
 
     [...(a.saves || []), ...(b.saves || [])].forEach((item) => {
@@ -20337,34 +20320,102 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     return JSON.stringify({
       version: 1,
-      saves: Array.from(byId.values()).sort((x, y) => Number(y?.savedAt || 0) - Number(x?.savedAt || 0))
+      saves: Array.from(byId.values()).sort(
+        (x, y) => Number(y?.savedAt || 0) - Number(x?.savedAt || 0)
+      )
     });
   }
 
-  function mergeRaw(localRaw, remoteRaw) {
-    if (localRaw == null) return remoteRaw;
-    if (remoteRaw == null) return localRaw;
-    if (localRaw === remoteRaw) return localRaw;
+  function mergeRaw(aRaw, bRaw) {
+    if (aRaw == null) return bRaw;
+    if (bRaw == null) return aRaw;
+    if (aRaw === bRaw) return aRaw;
 
-    if (isNamedLibrary(localRaw) && isNamedLibrary(remoteRaw)) {
-      return mergeNamedLibraries(localRaw, remoteRaw);
+    if (isNamedLibrary(aRaw) && isNamedLibrary(bRaw)) {
+      return mergeNamedLibraries(aRaw, bRaw);
     }
 
-    const localAt = valueSavedAt(localRaw);
-    const remoteAt = valueSavedAt(remoteRaw);
+    const aAt = valueSavedAt(aRaw);
+    const bAt = valueSavedAt(bRaw);
 
-    if (localAt && remoteAt) return localAt >= remoteAt ? localRaw : remoteRaw;
-    if (localAt && !remoteAt) return localRaw;
-    if (!localAt && remoteAt) return remoteRaw;
+    if (aAt && bAt) return aAt >= bAt ? aRaw : bRaw;
+    if (aAt && !bAt) return aRaw;
+    if (!aAt && bAt) return bRaw;
 
-    return remoteRaw;
+    // If timestamps do not exist, keep local/current value.
+    return aRaw;
   }
 
-  function backupLocal(uid, key, value) {
-    if (value == null) return;
-    const stamp = Date.now();
-    const safeKey = btoa(unescape(encodeURIComponent(key))).replace(/=+$/g, "");
-    rawSet(`${BACKUP_PREFIX}${uid}:${stamp}:${safeKey}`, value);
+  function mergeMaps(...maps) {
+    const result = {};
+    maps.filter(Boolean).forEach((map) => {
+      Object.entries(map).forEach(([key, value]) => {
+        if (!isEditorSaveKey(key) || value == null) return;
+        result[key] = mergeRaw(result[key], value);
+      });
+    });
+    return result;
+  }
+
+  function applyMapNonDestructive(map) {
+    Object.entries(map || {}).forEach(([key, value]) => {
+      if (!isEditorSaveKey(key) || value == null) return;
+      const current = rawGet(key);
+      const merged = mergeRaw(current, value);
+      if (merged != null) rawSet(key, merged);
+    });
+  }
+
+  function countNamedFiles(map) {
+    let files = 0;
+    Object.entries(map || {}).forEach(([key, raw]) => {
+      if (!key.startsWith("dds:named-local-saves:v1:")) return;
+      const parsed = safeParse(raw, null);
+      if (parsed && Array.isArray(parsed.saves)) files += parsed.saves.length;
+    });
+    return files;
+  }
+
+  function backupSourcesForUser(uid) {
+    const out = {};
+    try {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(BACKUP_PREFIX)) continue;
+        if (uid && !key.startsWith(`${BACKUP_PREFIX}${uid}:`)) continue;
+
+        const encoded = key.split(":").pop();
+        if (!encoded) continue;
+        try {
+          const padded = encoded + "=".repeat((4 - encoded.length % 4) % 4);
+          const storageKey = decodeURIComponent(escape(atob(padded)));
+          const value = localStorage.getItem(key);
+          if (isEditorSaveKey(storageKey) && value != null) {
+            out[storageKey] = mergeRaw(out[storageKey], value);
+          }
+        } catch {}
+      }
+    } catch {}
+    return out;
+  }
+
+  function recoveryVaultMap() {
+    const vault = safeParse(rawGet(RECOVERY_VAULT_KEY), null);
+    const current = vault?.active && typeof vault.active === "object" ? vault.active : {};
+    const previous = vault?.previous?.active && typeof vault.previous.active === "object"
+      ? vault.previous.active
+      : {};
+    return mergeMaps(previous, current);
+  }
+
+  function allRecoverable(uid) {
+    return mergeMaps(
+      guestCache(),
+      accountCache(uid),
+      backupSourcesForUser(uid),
+      recoveryVaultMap(),
+      collectActive()
+    );
   }
 
   function configFromPage() {
@@ -20381,22 +20432,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return /^https?:\/\//i.test(cfg.supabaseUrl) && cfg.supabaseAnonKey.length > 20;
   }
 
-  function saveLocalConfig(url, key) {
-    rawSet(CONFIG_KEY, JSON.stringify({
-      supabaseUrl: String(url || "").trim(),
-      supabaseAnonKey: String(key || "").trim()
-    }));
-  }
-
   function loadSupabaseLibrary() {
     if (window.supabase?.createClient) return Promise.resolve(window.supabase);
     return new Promise((resolve, reject) => {
-      const existing = document.querySelector('script[data-dds-supabase-lib]');
+      const existing = document.querySelector("script[data-dds-supabase-lib]");
       if (existing) {
         existing.addEventListener("load", () => resolve(window.supabase), { once: true });
         existing.addEventListener("error", reject, { once: true });
         return;
       }
+
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
       script.async = true;
@@ -20432,40 +20477,44 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     if (error) throw error;
     lastRemoteCount = data?.length || 0;
+
     const out = {};
     (data || []).forEach((row) => {
-      if (isSyncKey(row.storage_key)) out[row.storage_key] = row.storage_value;
+      if (isEditorSaveKey(row.storage_key)) {
+        out[row.storage_key] = mergeRaw(out[row.storage_key], row.storage_value);
+      }
     });
     return out;
   }
 
   async function upsertRemote(uid, key, value) {
     const c = await ensureClient();
-    if (!c || !uid || !isSyncKey(key) || value == null) return;
-    const payload = {
+    if (!c || !uid || !isEditorSaveKey(key) || value == null) return;
+    const { error } = await c.from(TABLE).upsert({
       user_id: uid,
       storage_key: key,
       storage_value: value,
       saved_at: valueSavedAt(value)
-    };
-    const { error } = await c.from(TABLE).upsert(payload, { onConflict: "user_id,storage_key" });
+    }, { onConflict: "user_id,storage_key" });
+
     if (error) throw error;
   }
 
   async function deleteRemote(uid, key) {
     const c = await ensureClient();
-    if (!c || !uid || !isSyncKey(key)) return;
+    if (!c || !uid || !isEditorSaveKey(key)) return;
     const { error } = await c
       .from(TABLE)
       .delete()
       .eq("user_id", uid)
       .eq("storage_key", key);
+
     if (error) throw error;
   }
 
   function queueRemote(key, value) {
-    if (!currentUser || !configured() || !isSyncKey(key)) return;
-    pending.set(key, value);
+    if (!currentUser || !configured() || !isEditorSaveKey(key)) return;
+    pending.set(String(key), value == null ? null : String(value));
     clearTimeout(uploadTimer);
     uploadTimer = setTimeout(flushPending, SYNC_DEBOUNCE);
   }
@@ -20474,7 +20523,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!currentUser || !pending.size) return;
     const items = Array.from(pending.entries());
     pending.clear();
+
     try {
+      captureRecoveryVault("before-autosync");
       for (const [key, value] of items) {
         if (value == null) await deleteRemote(currentUser.id, key);
         else await upsertRemote(currentUser.id, key, value);
@@ -20482,168 +20533,161 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       saveAccountCache(currentUser.id, collectActive());
       updateUi();
     } catch (error) {
-      console.error("[DDS Cloud] autosync failed", error);
-      notify("Cloud Sync ยังไม่สำเร็จ — เซฟในเครื่องยังอยู่ครบ");
+      console.error("[DDS Cloud v109] autosync failed", error);
+      notify("Cloud Sync ไม่สำเร็จ — ข้อมูลในเครื่องยังไม่ถูกล้าง");
     }
   }
 
   Storage.prototype.setItem = function(key, value) {
     const result = nativeSetItem.call(this, key, value);
-    if (
-      this === window.localStorage &&
-      !suppressStorageSync &&
-      isSyncKey(key)
-    ) {
+
+    if (this === window.localStorage && isEditorSaveKey(key)) {
+      captureRecoveryVault("editor-save");
+
       if (currentUser) {
         saveAccountCache(currentUser.id, collectActive());
-        queueRemote(String(key), String(value));
-      } else if (getScope() === "guest") {
-        saveGuestCache(collectActive());
+        queueRemote(key, value);
+      } else {
+        saveGuestCache(mergeMaps(guestCache(), collectActive()));
       }
+      updateUi();
     }
     return result;
   };
 
   Storage.prototype.removeItem = function(key) {
-    const wasSync = this === window.localStorage && isSyncKey(key);
+    const isEditor = this === window.localStorage && isEditorSaveKey(key);
+
+    if (isEditor) captureRecoveryVault("before-editor-delete");
     const result = nativeRemoveItem.call(this, key);
-    if (wasSync && !suppressStorageSync) {
+
+    if (isEditor) {
       if (currentUser) {
         saveAccountCache(currentUser.id, collectActive());
-        queueRemote(String(key), null);
-      } else if (getScope() === "guest") {
-        saveGuestCache(collectActive());
+        queueRemote(key, null);
+      } else {
+        // Do not remove from Guest cache automatically; keep it recoverable.
+        saveGuestCache(mergeMaps(guestCache(), collectActive()));
       }
+      updateUi();
     }
     return result;
   };
 
   async function enterUser(user) {
     if (!user) return;
+    captureRecoveryVault("before-login-scope");
 
-    const oldScope = getScope();
-    if (oldScope === "guest") {
-      saveGuestCache(collectActive());
-    } else if (oldScope.startsWith("user:") && oldScope !== `user:${user.id}`) {
-      saveAccountCache(oldScope.slice(5), collectActive());
+    const activeBefore = collectActive();
+    const guestBefore = guestCache();
+
+    // Preserve old device saves as guest recovery material.
+    if (Object.keys(activeBefore).length) {
+      saveGuestCache(mergeMaps(guestBefore, activeBefore));
     }
 
-    let localUserMap =
-      oldScope === `user:${user.id}`
-        ? collectActive()
-        : accountCache(user.id);
+    const localAccount = accountCache(user.id);
+    let remote = {};
+    try {
+      remote = await fetchRemote(user.id);
+    } catch (error) {
+      console.error("[DDS Cloud v109] remote fetch during login failed", error);
+    }
 
-    clearActive();
+    const merged = mergeMaps(activeBefore, localAccount, remote);
+    applyMapNonDestructive(merged);
 
-    const remoteMap = await fetchRemote(user.id);
-    const keys = new Set([...Object.keys(localUserMap), ...Object.keys(remoteMap)]);
-    const merged = {};
-
-    keys.forEach((key) => {
-      const value = mergeRaw(localUserMap[key], remoteMap[key]);
-      if (value != null) merged[key] = value;
-    });
-
-    applyMap(merged);
-    saveAccountCache(user.id, merged);
-    setScope(`user:${user.id}`);
     currentUser = user;
+    rawSet(ACTIVE_SCOPE_KEY, `user:${user.id}`);
+    saveAccountCache(user.id, collectActive());
 
-    // Bring merged result back to cloud if local cache had newer named saves/drafts.
-    for (const [key, value] of Object.entries(merged)) {
-      if (remoteMap[key] !== value) {
+    // Upload only after local data is safely preserved.
+    for (const [key, value] of Object.entries(collectActive())) {
+      try {
         await upsertRemote(user.id, key, value);
+      } catch (error) {
+        console.error("[DDS Cloud v109] initial upload failed", key, error);
       }
     }
 
-    updateUi();
-  }
-
-  async function restoreGuest() {
-    const scope = getScope();
-    if (scope.startsWith("user:")) {
-      saveAccountCache(scope.slice(5), collectActive());
-    }
-    clearActive();
-    applyMap(guestCache());
-    setScope("guest");
-    currentUser = null;
     updateUi();
   }
 
   async function syncNow() {
     if (!currentUser) return;
-    setBusy(true, "กำลังซิงก์...");
+    setBusy(true, "กำลังซิงก์แบบไม่ล้างข้อมูล...");
+
     try {
-      const localMap = collectActive();
-      const remoteMap = await fetchRemote(currentUser.id);
-      const keys = new Set([...Object.keys(localMap), ...Object.keys(remoteMap)]);
-      const merged = {};
+      captureRecoveryVault("before-manual-sync");
 
-      for (const key of keys) {
-        const next = mergeRaw(localMap[key], remoteMap[key]);
-        if (next == null) continue;
-        merged[key] = next;
+      const local = collectActive();
+      const account = accountCache(currentUser.id);
+      const recoverable = allRecoverable(currentUser.id);
+      const remote = await fetchRemote(currentUser.id);
 
-        if (localMap[key] !== next && localMap[key] != null) {
-          backupLocal(currentUser.id, key, localMap[key]);
-        }
+      const merged = mergeMaps(local, account, recoverable, remote);
+
+      // Critical v109 behavior: NEVER clear localStorage before applying merge.
+      applyMapNonDestructive(merged);
+      const finalMap = collectActive();
+      saveAccountCache(currentUser.id, finalMap);
+
+      for (const [key, value] of Object.entries(finalMap)) {
+        await upsertRemote(currentUser.id, key, value);
       }
 
-      clearActive();
-      applyMap(merged);
-      saveAccountCache(currentUser.id, merged);
-
-      for (const [key, value] of Object.entries(merged)) {
-        if (remoteMap[key] !== value) await upsertRemote(currentUser.id, key, value);
-      }
-
-      notify("ซิงก์ Cloud เรียบร้อยแล้ว");
+      notify("ซิงก์เรียบร้อย — ไม่มีการล้างเซฟในเครื่อง");
     } catch (error) {
-      console.error("[DDS Cloud] sync failed", error);
-      notify("ซิงก์ไม่สำเร็จ แต่เซฟในเครื่องยังไม่หาย");
+      console.error("[DDS Cloud v109] sync failed", error);
+      notify("ซิงก์ไม่สำเร็จ แต่ v109 ไม่ได้ล้างเซฟในเครื่อง");
     } finally {
       setBusy(false);
       updateUi();
     }
   }
 
-  async function importGuestToAccount() {
-    if (!currentUser) return;
-    const guest = guestCache();
-    const guestKeys = Object.keys(guest);
-    if (!guestKeys.length) {
-      notify("ไม่พบเซฟเก่าจากเครื่องนี้");
+  async function recoverSaves() {
+    const uid = currentUser?.id || null;
+    const recoverable = allRecoverable(uid);
+    const bucketCount = Object.keys(recoverable).length;
+    const namedCount = countNamedFiles(recoverable);
+
+    if (!bucketCount) {
+      notify("ยังไม่พบข้อมูลที่กู้ได้ใน origin นี้");
       return;
     }
 
-    const ok = window.confirm(
-      `พบเซฟเก่าจากเครื่องนี้ ${guestKeys.length} รายการ\n\n` +
-      "ระบบจะคัดลอกเข้า Account โดยไม่ลบเซฟ Guest เดิม ต้องการดำเนินการหรือไม่?"
-    );
-    if (!ok) return;
+    const message =
+      `พบข้อมูลที่กู้ได้ ${bucketCount} ชุด` +
+      (namedCount ? ` · Named Saves ${namedCount} ไฟล์` : "") +
+      `\n\nระบบจะนำกลับเข้า Editor โดยไม่ลบข้อมูลเดิม ต้องการกู้ตอนนี้ไหม?`;
 
-    setBusy(true, "กำลังนำเข้าเซฟเก่า...");
+    if (!window.confirm(message)) return;
+
+    setBusy(true, "กำลังกู้เซฟ...");
     try {
-      const active = collectActive();
-      const merged = { ...active };
+      captureRecoveryVault("before-recovery");
+      applyMapNonDestructive(recoverable);
 
-      for (const key of guestKeys) {
-        merged[key] = mergeRaw(active[key], guest[key]);
+      const finalMap = collectActive();
+
+      if (currentUser) {
+        saveAccountCache(currentUser.id, finalMap);
+        for (const [key, value] of Object.entries(finalMap)) {
+          await upsertRemote(currentUser.id, key, value);
+        }
+      } else {
+        saveGuestCache(mergeMaps(guestCache(), finalMap));
       }
 
-      clearActive();
-      applyMap(merged);
-      saveAccountCache(currentUser.id, merged);
-
-      for (const [key, value] of Object.entries(merged)) {
-        await upsertRemote(currentUser.id, key, value);
-      }
-
-      notify("นำเซฟเก่าเข้าบัญชีแล้ว — Guest เดิมยังเก็บไว้อยู่");
+      notify(
+        namedCount
+          ? `กู้เซฟกลับแล้ว ${namedCount} ไฟล์ — รีเฟรชหน้า Editor 1 ครั้ง`
+          : "กู้ข้อมูลกลับแล้ว — รีเฟรชหน้า Editor 1 ครั้ง"
+      );
     } catch (error) {
-      console.error("[DDS Cloud] import failed", error);
-      notify("นำเข้าไม่สำเร็จ เซฟเดิมยังอยู่ครบ");
+      console.error("[DDS Cloud v109] recovery failed", error);
+      notify("กู้ไม่สำเร็จ แต่ข้อมูลต้นฉบับใน Recovery ยังไม่ถูกลบ");
     } finally {
       setBusy(false);
       updateUi();
@@ -20653,16 +20697,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   async function signIn(email, password) {
     const c = await ensureClient();
     if (!c) return;
+
     setBusy(true, "กำลังเข้าสู่ระบบ...");
     try {
+      captureRecoveryVault("before-sign-in");
       const { data, error } = await c.auth.signInWithPassword({ email, password });
       if (error) throw error;
       if (!data.user) throw new Error("ไม่พบข้อมูลผู้ใช้");
       await enterUser(data.user);
-      notify("เข้าสู่ระบบแล้ว");
+      notify("เข้าสู่ระบบแล้ว — เซฟในเครื่องไม่ได้ถูกล้าง");
       closeModal();
     } catch (error) {
-      console.error("[DDS Cloud] sign in failed", error);
+      console.error("[DDS Cloud v109] sign in failed", error);
       notify(error?.message || "เข้าสู่ระบบไม่สำเร็จ");
     } finally {
       setBusy(false);
@@ -20672,19 +20718,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   async function signUp(email, password) {
     const c = await ensureClient();
     if (!c) return;
+
     setBusy(true, "กำลังสร้างบัญชี...");
     try {
+      captureRecoveryVault("before-sign-up");
       const { data, error } = await c.auth.signUp({ email, password });
       if (error) throw error;
+
       if (data.session && data.user) {
         await enterUser(data.user);
-        notify("สร้างบัญชีและเข้าสู่ระบบแล้ว");
+        notify("สร้างบัญชีแล้ว — เซฟในเครื่องยังอยู่");
         closeModal();
       } else {
-        notify("สร้างบัญชีแล้ว กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
+        notify("สร้างบัญชีแล้ว กรุณายืนยันอีเมลก่อน Login");
       }
     } catch (error) {
-      console.error("[DDS Cloud] sign up failed", error);
+      console.error("[DDS Cloud v109] sign up failed", error);
       notify(error?.message || "สร้างบัญชีไม่สำเร็จ");
     } finally {
       setBusy(false);
@@ -20694,13 +20743,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   async function signOut() {
     const c = await ensureClient();
     setBusy(true, "กำลังออกจากระบบ...");
+
     try {
-      snapshotCurrentScope();
+      captureRecoveryVault("before-sign-out");
+      if (currentUser) saveAccountCache(currentUser.id, collectActive());
       if (c) await c.auth.signOut();
-      await restoreGuest();
-      notify("ออกจากระบบแล้ว — กลับสู่เซฟ Guest ของเครื่องนี้");
+
+      currentUser = null;
+      rawSet(ACTIVE_SCOPE_KEY, "guest");
+
+      // Do NOT clear account saves from current origin.
+      // Merge Guest cache in so nothing disappears after logout.
+      applyMapNonDestructive(guestCache());
+
+      notify("ออกจากระบบแล้ว — v109 ไม่ล้างเซฟในเครื่อง");
     } catch (error) {
-      console.error("[DDS Cloud] sign out failed", error);
+      console.error("[DDS Cloud v109] sign out failed", error);
       notify("ออกจากระบบไม่สำเร็จ");
     } finally {
       setBusy(false);
@@ -20711,7 +20769,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function setBusy(active, text = "") {
     if (!ui) return;
     ui.modal.classList.toggle("is-busy", Boolean(active));
-    ui.modal.querySelectorAll("button,input").forEach((node) => {
+    ui.modal.querySelectorAll("button,input,textarea").forEach((node) => {
       if (!node.matches("[data-cloud-close]")) node.disabled = Boolean(active);
     });
     const status = ui.modal.querySelector("[data-cloud-busy]");
@@ -20721,60 +20779,72 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }
 
-  function countGuest() {
-    return Object.keys(guestCache()).length;
-  }
-
-  function countActive() {
-    return Object.keys(collectActive()).length;
-  }
-
-  function statusText() {
-    if (!configured()) return "ยังไม่ได้เชื่อม Supabase";
-    if (!currentUser) return "Guest Mode · เซฟในเครื่อง";
-    return `Cloud Mode · ${currentUser.email || "Account"}`;
+  function recoveryStats() {
+    const map = allRecoverable(currentUser?.id || null);
+    return {
+      buckets: Object.keys(map).length,
+      named: countNamedFiles(map)
+    };
   }
 
   function updateUi() {
     if (!ui) return;
-    ui.button.dataset.state = !configured() ? "setup" : currentUser ? "online" : "guest";
-    ui.button.querySelector("span").textContent = currentUser ? "CLOUD ✓" : "CLOUD SAVE";
+
+    ui.button.dataset.state = !configured()
+      ? "setup"
+      : currentUser
+        ? "online"
+        : "guest";
+
+    ui.button.querySelector("span").textContent = currentUser
+      ? "CLOUD ✓"
+      : "CLOUD SAVE";
 
     const status = ui.modal.querySelector("[data-cloud-status]");
-    if (status) status.textContent = statusText();
+    if (status) {
+      status.textContent = currentUser
+        ? `Cloud Mode · ${currentUser.email || "Account"}`
+        : configured()
+          ? "Guest Mode · เซฟในเครื่อง"
+          : "ยังไม่ได้เชื่อม Supabase";
+    }
 
-    const setup = ui.modal.querySelector("[data-cloud-view='setup']");
     const auth = ui.modal.querySelector("[data-cloud-view='auth']");
     const account = ui.modal.querySelector("[data-cloud-view='account']");
 
-    setup.hidden = configured();
     auth.hidden = !configured() || Boolean(currentUser);
     account.hidden = !configured() || !currentUser;
 
-    if (currentUser) {
-      const email = ui.modal.querySelector("[data-cloud-account-email]");
-      const stats = ui.modal.querySelector("[data-cloud-stats]");
-      const guestCount = countGuest();
-      if (email) email.textContent = currentUser.email || currentUser.id;
-      if (stats) {
-        stats.textContent =
-          `เซฟใน Account บนเครื่องนี้ ${countActive()} รายการ · ` +
-          `Cloud ${lastRemoteCount} รายการ · Guest เดิม ${guestCount} รายการ`;
-      }
-      const importBtn = ui.modal.querySelector("[data-cloud-import-guest]");
-      if (importBtn) {
-        importBtn.disabled = guestCount === 0;
-        importBtn.textContent = guestCount
-          ? `นำเซฟเก่าจากเครื่องนี้เข้าบัญชี (${guestCount})`
-          : "ไม่มีเซฟเก่าที่ต้องนำเข้า";
-      }
+    const activeMap = collectActive();
+    const stats = recoveryStats();
+
+    const recoveryText = ui.modal.querySelector("[data-cloud-recovery-stats]");
+    if (recoveryText) {
+      recoveryText.textContent =
+        `ตรวจพบสำหรับกู้คืน ${stats.buckets} ชุด` +
+        (stats.named ? ` · Named Saves ${stats.named} ไฟล์` : "");
     }
 
-    const cfg = configFromPage();
-    const urlInput = ui.modal.querySelector("[data-cloud-config-url]");
-    const keyInput = ui.modal.querySelector("[data-cloud-config-key]");
-    if (urlInput && !urlInput.value) urlInput.value = cfg.supabaseUrl || "";
-    if (keyInput && !keyInput.value) keyInput.value = cfg.supabaseAnonKey || "";
+    const recoveryButton = ui.modal.querySelector("[data-cloud-recover]");
+    if (recoveryButton) {
+      recoveryButton.disabled = stats.buckets === 0;
+      recoveryButton.textContent = stats.named
+        ? `RECOVER SAVES (${stats.named})`
+        : stats.buckets
+          ? `RECOVER SAVES (${stats.buckets})`
+          : "ยังไม่พบข้อมูลสำหรับกู้";
+    }
+
+    if (currentUser) {
+      const email = ui.modal.querySelector("[data-cloud-account-email]");
+      const accountStats = ui.modal.querySelector("[data-cloud-stats]");
+      if (email) email.textContent = currentUser.email || currentUser.id;
+      if (accountStats) {
+        accountStats.textContent =
+          `เซฟที่กำลังใช้อยู่ ${Object.keys(activeMap).length} ชุด · ` +
+          `Cloud ${lastRemoteCount} ชุด`;
+      }
+    }
   }
 
   function openModal() {
@@ -20787,7 +20857,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function closeModal() {
     if (!ui) return;
     ui.modal.classList.remove("is-open");
-    setTimeout(() => { if (!ui.modal.classList.contains("is-open")) ui.modal.hidden = true; }, 180);
+    setTimeout(() => {
+      if (!ui.modal.classList.contains("is-open")) ui.modal.hidden = true;
+    }, 180);
   }
 
   function createUi() {
@@ -20803,37 +20875,37 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     modal.className = "dds-cloud-modal";
     modal.dataset.ddsCloudModal = "1";
     modal.hidden = true;
+
     modal.innerHTML = `
       <div class="dds-cloud-dialog" role="dialog" aria-modal="true" aria-label="Cloud Save Account">
         <div class="dds-cloud-dialog-head">
           <div>
             <small>DEEP DEEP SLEEP EDITOR</small>
             <h2>CLOUD SAVE</h2>
-            <p data-cloud-status>Guest Mode · เซฟในเครื่อง</p>
+            <p data-cloud-status>กำลังตรวจสอบ...</p>
           </div>
           <button type="button" class="dds-cloud-close" data-cloud-close aria-label="ปิด">×</button>
         </div>
 
         <div class="dds-cloud-busy" data-cloud-busy hidden>กำลังดำเนินการ...</div>
 
-        <section class="dds-cloud-view" data-cloud-view="setup">
-          <h3>เชื่อม SUPABASE</h3>
-          <p>เซฟเดิมในเครื่องจะไม่ถูกลบ การเชื่อมต่อนี้ใช้สำหรับทดลอง Cloud Save เท่านั้น</p>
-          <label>
-            <span>PROJECT URL</span>
-            <input type="url" data-cloud-config-url placeholder="https://xxxx.supabase.co" autocomplete="off">
-          </label>
-          <label>
-            <span>ANON / PUBLISHABLE KEY</span>
-            <textarea data-cloud-config-key rows="4" placeholder="วาง anon key หรือ publishable key"></textarea>
-          </label>
-          <button type="button" class="dds-cloud-primary" data-cloud-save-config>บันทึกการเชื่อมต่อในเครื่องนี้</button>
-          <p class="dds-cloud-hint">ถ้าต้องการให้ทุกเครื่องรู้ค่า Supabase อัตโนมัติ ให้ใส่ค่าเดียวกันในไฟล์ <b>cloud-config.js</b> ก่อน Deploy</p>
+        <section class="dds-cloud-recovery-panel">
+          <div>
+            <small>RECOVERY MODE v109</small>
+            <strong>กู้เซฟในเครื่องก่อน</strong>
+            <p data-cloud-recovery-stats>กำลังสแกน...</p>
+          </div>
+          <button type="button" class="dds-cloud-recover-button" data-cloud-recover>
+            RECOVER SAVES
+          </button>
+          <p class="dds-cloud-recovery-note">
+            ปุ่มนี้รวมข้อมูลจาก Local, Guest cache, Account cache และ Backup โดยไม่ลบต้นฉบับ
+          </p>
         </section>
 
-        <section class="dds-cloud-view" data-cloud-view="auth" hidden>
+        <section class="dds-cloud-view" data-cloud-view="auth">
           <h3>ACCOUNT</h3>
-          <p>เข้าสู่ระบบเพื่อเปิดเซฟของคุณจากเครื่องอื่น เซฟ Guest เดิมของเครื่องนี้ยังอยู่เหมือนเดิม</p>
+          <p>v109 จะไม่ล้างเซฟในเครื่องตอน Login หรือ Sync</p>
           <label>
             <span>EMAIL</span>
             <input type="email" data-cloud-email autocomplete="email" placeholder="you@example.com">
@@ -20846,7 +20918,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
             <button type="button" class="dds-cloud-primary" data-cloud-login>LOGIN</button>
             <button type="button" data-cloud-signup>CREATE ACCOUNT</button>
           </div>
-          <button type="button" class="dds-cloud-text-button" data-cloud-edit-config>แก้การเชื่อมต่อ Supabase</button>
         </section>
 
         <section class="dds-cloud-view" data-cloud-view="account" hidden>
@@ -20854,47 +20925,24 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           <strong class="dds-cloud-email" data-cloud-account-email></strong>
           <p data-cloud-stats></p>
           <div class="dds-cloud-account-actions">
-            <button type="button" class="dds-cloud-primary" data-cloud-sync>SYNC NOW</button>
-            <button type="button" data-cloud-import-guest>นำเซฟเก่าจากเครื่องนี้เข้าบัญชี</button>
+            <button type="button" class="dds-cloud-primary" data-cloud-sync>SYNC NOW — SAFE</button>
             <button type="button" data-cloud-logout>LOG OUT</button>
           </div>
-          <p class="dds-cloud-hint">ตอนล็อกอิน เซฟใหม่จาก Editor จะซิงก์ขึ้น Cloud อัตโนมัติ และยังมี cache ของบัญชีนี้ในเครื่องไว้สำรอง</p>
+          <p class="dds-cloud-hint">
+            v109 ใช้ merge แบบไม่ล้าง localStorage ก่อน จึงไม่ควรทำให้เซฟหายแบบ v108
+          </p>
         </section>
       </div>
     `;
 
     document.body.append(button, modal);
-
     ui = { button, modal };
 
     button.addEventListener("click", openModal);
     modal.addEventListener("click", (event) => {
-      if (event.target === modal || event.target.closest("[data-cloud-close]")) closeModal();
-    });
-
-    modal.querySelector("[data-cloud-save-config]")?.addEventListener("click", async () => {
-      const url = modal.querySelector("[data-cloud-config-url]")?.value || "";
-      const key = modal.querySelector("[data-cloud-config-key]")?.value || "";
-      if (!/^https?:\/\//i.test(url.trim()) || key.trim().length < 20) {
-        notify("กรุณาใส่ Project URL และ Key ให้ครบ");
-        return;
+      if (event.target === modal || event.target.closest("[data-cloud-close]")) {
+        closeModal();
       }
-      saveLocalConfig(url, key);
-      client = null;
-      try {
-        await ensureClient();
-        notify("บันทึกการเชื่อมต่อแล้ว");
-      } catch (error) {
-        console.error(error);
-        notify("โหลด Supabase ไม่สำเร็จ");
-      }
-      updateUi();
-    });
-
-    modal.querySelector("[data-cloud-edit-config]")?.addEventListener("click", () => {
-      rawRemove(CONFIG_KEY);
-      client = null;
-      updateUi();
     });
 
     modal.querySelector("[data-cloud-login]")?.addEventListener("click", () => {
@@ -20907,21 +20955,26 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     modal.querySelector("[data-cloud-signup]")?.addEventListener("click", () => {
       const email = modal.querySelector("[data-cloud-email]")?.value?.trim() || "";
       const password = modal.querySelector("[data-cloud-password]")?.value || "";
-      if (!email || password.length < 6) return notify("กรอกอีเมลและรหัสผ่านอย่างน้อย 6 ตัว");
+      if (!email || password.length < 6) {
+        return notify("กรอกอีเมลและรหัสผ่านอย่างน้อย 6 ตัว");
+      }
       signUp(email, password);
     });
 
     modal.querySelector("[data-cloud-sync]")?.addEventListener("click", syncNow);
-    modal.querySelector("[data-cloud-import-guest]")?.addEventListener("click", importGuestToAccount);
+    modal.querySelector("[data-cloud-recover]")?.addEventListener("click", recoverSaves);
     modal.querySelector("[data-cloud-logout]")?.addEventListener("click", signOut);
 
     updateUi();
   }
 
   async function initAuth() {
-    // First install: remember all pre-existing saves as Guest Saves.
-    if (!rawGet(GUEST_CACHE_KEY) && getScope() === "guest") {
-      saveGuestCache(collectActive());
+    // Capture whatever is still present immediately on v109 load.
+    captureRecoveryVault("v109-initial-load");
+
+    const initialActive = collectActive();
+    if (Object.keys(initialActive).length) {
+      saveGuestCache(mergeMaps(guestCache(), initialActive));
     }
 
     if (!configured()) {
@@ -20937,8 +20990,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const user = data?.session?.user || null;
       if (user) {
         await enterUser(user);
-      } else if (getScope().startsWith("user:")) {
-        await restoreGuest();
       }
 
       c.auth.onAuthStateChange(async (event, session) => {
@@ -20946,12 +20997,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           await enterUser(session.user);
         }
         if (event === "SIGNED_OUT") {
-          await restoreGuest();
+          currentUser = null;
+          rawSet(ACTIVE_SCOPE_KEY, "guest");
+          updateUi();
         }
       });
     } catch (error) {
-      console.error("[DDS Cloud] init failed", error);
-      notify("Cloud ยังเชื่อมต่อไม่ได้ — ระบบเซฟในเครื่องยังใช้ได้ตามปกติ");
+      console.error("[DDS Cloud v109] init failed", error);
+      notify("Cloud เชื่อมต่อไม่ได้ แต่เซฟในเครื่องจะไม่ถูกล้าง");
     }
 
     updateUi();

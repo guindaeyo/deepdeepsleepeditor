@@ -9361,3 +9361,50 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   .dds-cloud-view { padding-left: 18px; padding-right: 18px; }
   .dds-cloud-actions { grid-template-columns: 1fr; }
 }
+
+
+/* =========================================================
+   DDS CLOUD RECOVERY MODE — v109
+   ========================================================= */
+.dds-cloud-recovery-panel {
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  background: rgba(193,23,36,.075);
+}
+.dds-cloud-recovery-panel small {
+  display: block;
+  margin-bottom: 7px;
+  color: #d66d76;
+  font: 700 9px/1 "DM Sans",sans-serif;
+  letter-spacing: .15em;
+}
+.dds-cloud-recovery-panel strong {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+}
+.dds-cloud-recovery-panel p {
+  margin: 7px 0 0;
+  color: #999;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.dds-cloud-recover-button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 14px;
+  border: 1px solid #c11724 !important;
+  background: #c11724 !important;
+  color: #fff !important;
+  font: 700 10px/1 "DM Sans","Bai Jamjuree",sans-serif !important;
+  letter-spacing: .08em;
+}
+.dds-cloud-recover-button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.dds-cloud-recovery-note {
+  font-size: 10px !important;
+  color: #777 !important;
+}
