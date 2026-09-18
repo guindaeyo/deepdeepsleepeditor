@@ -9569,3 +9569,69 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   }
 }
 
+
+
+/* =========================================================
+   MIKAEL HISTORY FREE — EDITOR v116
+   ========================================================= */
+.dds-mikael-history-editor .dds-editor-heading h1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .08em;
+}
+.dds-mikael-history-editor .dds-mikaelhist-head-main {
+  display: block;
+}
+.dds-mikael-history-editor .dds-mikaelhist-head-sub {
+  display: block;
+  margin-top: .08em;
+  font-family: "Bai Jamjuree", sans-serif !important;
+  font-size: .54em;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+@media (min-width:1251px) {
+  .dds-mikael-history-editor .dds-protected-commission-controls-column {
+    height: 1500px !important;
+    min-height: 1500px !important;
+    max-height: none !important;
+  }
+  .dds-mikael-history-editor .dds-controls-scroll,
+  .dds-mikael-history-editor .dds-mikael-history-controls-scroll {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* main ink also controls barcode and solid redaction bars */
+.ddsh-commtmklpfofile {
+  --ddsh-commtmklpfo-stamp: #b00000;
+  --ddsh-commtmklpfo-photo-zoom: 1;
+}
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-barcode {
+  color: var(--ddsh-commtmklpfo-ink) !important;
+  filter: none !important;
+}
+.ddsh-commtmklpfofile .ddsh-blackline,
+.ddsh-commtmklpfofile .ddsh-mini-redact,
+.ddsh-commtmklpfofile .ddsh-redact,
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-inline-redaction span,
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-classified-note b,
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-bottomredact i {
+  background: var(--ddsh-commtmklpfo-ink) !important;
+}
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-redstamp,
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-footerstamp {
+  color: var(--ddsh-commtmklpfo-stamp) !important;
+  border-color: var(--ddsh-commtmklpfo-stamp) !important;
+}
+
+/* photo zoom; keeps original x/y vars */
+.ddsh-commtmklpfofile .ddsh-commtmklpfo-photo::before {
+  transform: translate(var(--ddsh-commtmklpfo-photo-x,0px), var(--ddsh-commtmklpfo-photo-y,0px))
+             scale(var(--ddsh-commtmklpfo-photo-zoom,1)) !important;
+  transform-origin: center center !important;
+}
