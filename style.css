@@ -9734,13 +9734,10 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   CODE005 — CARD CENTER FIX v130
+   CODE005 — STABLE CENTER FIX v131
    Scope ONLY #roleplayCardPreview005
 ========================================================= */
 #roleplayCardPreview005 {
   margin: 0 !important;
   pointer-events: none !important;
-}
-#roleplayCardPreview005.dds-preview-ready {
-  opacity: 1 !important;
 }

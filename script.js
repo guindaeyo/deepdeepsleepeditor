@@ -22051,19 +22051,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   CODE005 — THIS HITS LIKE COMA / CARD CENTER FIX v130
+   CODE005 — THIS HITS LIKE COMA / STABLE CENTER FIX v131
    Scope ONLY: #roleplayCardPreview005
+
+   IMPORTANT:
+   - ไม่แก้ width / height / scale / transform ของพรีวิว
+   - ใช้ขนาดที่ระบบเดิม render เสร็จแล้ว
+   - ขยับเฉพาะ left/top เพื่อให้ visual box อยู่กลางช่อง
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE005_CARD_CENTER_V130__) return;
-  window.__DDS_CODE005_CARD_CENTER_V130__ = true;
+  if (window.__DDS_CODE005_CARD_CENTER_V131__) return;
+  window.__DDS_CODE005_CARD_CENTER_V131__ = true;
 
   const IFRAME_ID = "roleplayCardPreview005";
   let applying = false;
-  let styleObserver = null;
   let stageObserver = null;
+  let iframeObserver = null;
+  let installedIframe = null;
 
   function getTargets() {
     const iframe = document.getElementById(IFRAME_ID);
@@ -22077,50 +22083,48 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const { iframe, stage } = getTargets();
     if (!iframe || !stage) return false;
     if (stage.clientWidth < 20 || stage.clientHeight < 20) return false;
-    if (!iframe.contentDocument?.body) return false;
 
-    const naturalWidth = Math.max(
-      1,
-      iframe.offsetWidth || 0,
-      parseFloat(getComputedStyle(iframe).width) || 0
-    );
-
-    const naturalHeight = Math.max(
-      1,
-      iframe.offsetHeight || 0,
-      parseFloat(getComputedStyle(iframe).height) || 0
-    );
+    const stageRect = stage.getBoundingClientRect();
+    const frameRect = iframe.getBoundingClientRect();
 
     /*
-     * ใช้ขนาดที่ browser render จริงหลังระบบหลัก scale เสร็จ
-     * แล้วดึงเฉพาะอัตรา scale ออกมา ไม่เอา translate เดิมมาด้วย
+     * ถ้ายังเป็น loading / iframe ยังไม่มีขนาดจริง ให้รอก่อน
      */
-    const rect = iframe.getBoundingClientRect();
-    let scaleX = rect.width / naturalWidth;
-    let scaleY = rect.height / naturalHeight;
+    if (frameRect.width < 10 || frameRect.height < 10) return false;
 
-    if (!Number.isFinite(scaleX) || scaleX <= 0) scaleX = 1;
-    if (!Number.isFinite(scaleY) || scaleY <= 0) scaleY = scaleX;
+    const dx =
+      (stageRect.left + stageRect.width / 2) -
+      (frameRect.left + frameRect.width / 2);
 
-    const scale = Math.max(0.01, Math.min(scaleX, scaleY));
-    const visualWidth = naturalWidth * scale;
-    const visualHeight = naturalHeight * scale;
+    const dy =
+      (stageRect.top + stageRect.height / 2) -
+      (frameRect.top + frameRect.height / 2);
 
-    const left = Math.max(0, (stage.clientWidth - visualWidth) / 2);
-    const top = Math.max(0, (stage.clientHeight - visualHeight) / 2);
+    /*
+     * ใกล้กลางแล้วไม่ต้องเขียน style ซ้ำ
+     */
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return true;
+
+    const computed = getComputedStyle(iframe);
+    let currentLeft = parseFloat(computed.left);
+    let currentTop = parseFloat(computed.top);
+
+    if (!Number.isFinite(currentLeft)) currentLeft = iframe.offsetLeft || 0;
+    if (!Number.isFinite(currentTop)) currentTop = iframe.offsetTop || 0;
 
     applying = true;
     try {
       stage.style.setProperty("position", "relative", "important");
       stage.style.setProperty("overflow", "hidden", "important");
 
+      /*
+       * สำคัญ: ขยับแค่ตำแหน่ง
+       * ไม่แตะ transform / scale / width / height เดิมเลย
+       */
       iframe.style.setProperty("position", "absolute", "important");
-      iframe.style.setProperty("inset", "auto", "important");
-      iframe.style.setProperty("left", `${left}px`, "important");
-      iframe.style.setProperty("top", `${top}px`, "important");
+      iframe.style.setProperty("left", `${currentLeft + dx}px`, "important");
+      iframe.style.setProperty("top", `${currentTop + dy}px`, "important");
       iframe.style.setProperty("margin", "0", "important");
-      iframe.style.setProperty("transform", `scale(${scale})`, "important");
-      iframe.style.setProperty("transform-origin", "top left", "important");
     } finally {
       applying = false;
     }
@@ -22129,7 +22133,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function scheduleCenter() {
-    [0, 40, 100, 220, 450, 800, 1400, 2400].forEach((delay) => {
+    [0, 50, 120, 250, 500, 900, 1500].forEach((delay) => {
       window.setTimeout(() => {
         requestAnimationFrame(() => centerPreview());
       }, delay);
@@ -22139,6 +22143,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function install() {
     const { iframe, stage } = getTargets();
     if (!iframe || !stage) return false;
+
+    if (installedIframe === iframe) {
+      scheduleCenter();
+      return true;
+    }
+
+    installedIframe = iframe;
 
     iframe.addEventListener("load", scheduleCenter);
 
@@ -22151,16 +22162,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
 
     /*
-     * ระบบพรีวิวหลักอาจแก้ style ของ iframe หลังโหลด CSS/รูป
-     * จึงจับเฉพาะ style ของ CODE005 แล้วจัดกลางซ้ำ
+     * ระบบหลักอาจปรับ transform/ขนาดหลัง CSS หรือรูปโหลด
+     * ถ้ามีการเปลี่ยน style ให้จัด "ตำแหน่ง" ใหม่เท่านั้น
      */
-    styleObserver?.disconnect();
-    styleObserver = new MutationObserver((records) => {
+    iframeObserver?.disconnect();
+    iframeObserver = new MutationObserver((records) => {
       if (applying) return;
       if (!records.some((record) => record.attributeName === "style")) return;
       requestAnimationFrame(() => centerPreview());
     });
-    styleObserver.observe(iframe, {
+    iframeObserver.observe(iframe, {
       attributes: true,
       attributeFilter: ["style"]
     });
@@ -22190,14 +22201,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.addEventListener("resize", () => {
     requestAnimationFrame(() => centerPreview());
   });
-
-  /*
-   * เมื่อเปิด FOR ROLEPLAY จากเมนู ให้จัดกลางอีกครั้งหลัง panel แสดงจริง
-   */
-  document.addEventListener("click", (event) => {
-    const target = event.target.closest?.('[data-page="roleplay"], [data-go="roleplay"]');
-    if (!target) return;
-    scheduleCenter();
-  });
 })();
+
 
