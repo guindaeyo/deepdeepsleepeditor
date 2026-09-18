@@ -9626,3 +9626,32 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
     overflow-y: auto !important;
   }
 }
+
+
+/* =========================================================
+   MIKAEL HISTORY FREE — PUBLIC SHOWCASE v118
+   Only this free commission card.
+========================================================= */
+.dds-commission-card-mikael-history-free .dds-roleplay-card-preview,
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview {
+  overflow: hidden !important;
+}
+.dds-commission-card-mikael-history-free .dds-roleplay-card-preview iframe,
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview iframe {
+  filter: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.dds-commission-card-mikael-history-free .dds-roleplay-card-preview::before,
+.dds-commission-card-mikael-history-free .dds-roleplay-card-preview::after,
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview::before,
+.dds-commission-card-mikael-history-free .dds-mhp-card-preview::after {
+  content: none !important;
+  display: none !important;
+}
+.dds-commission-card-mikael-history-free [data-mhp-view],
+.dds-commission-card-mikael-history-free [data-mhp-edit] {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
