@@ -22047,3 +22047,157 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   else install();
 })();
 
+
+
+
+/* =========================================================
+   CODE005 — THIS HITS LIKE COMA / CARD CENTER FIX v130
+   Scope ONLY: #roleplayCardPreview005
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE005_CARD_CENTER_V130__) return;
+  window.__DDS_CODE005_CARD_CENTER_V130__ = true;
+
+  const IFRAME_ID = "roleplayCardPreview005";
+  let applying = false;
+  let styleObserver = null;
+  let stageObserver = null;
+
+  function getTargets() {
+    const iframe = document.getElementById(IFRAME_ID);
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+    return { iframe, stage };
+  }
+
+  function centerPreview() {
+    if (applying) return false;
+
+    const { iframe, stage } = getTargets();
+    if (!iframe || !stage) return false;
+    if (stage.clientWidth < 20 || stage.clientHeight < 20) return false;
+    if (!iframe.contentDocument?.body) return false;
+
+    const naturalWidth = Math.max(
+      1,
+      iframe.offsetWidth || 0,
+      parseFloat(getComputedStyle(iframe).width) || 0
+    );
+
+    const naturalHeight = Math.max(
+      1,
+      iframe.offsetHeight || 0,
+      parseFloat(getComputedStyle(iframe).height) || 0
+    );
+
+    /*
+     * ใช้ขนาดที่ browser render จริงหลังระบบหลัก scale เสร็จ
+     * แล้วดึงเฉพาะอัตรา scale ออกมา ไม่เอา translate เดิมมาด้วย
+     */
+    const rect = iframe.getBoundingClientRect();
+    let scaleX = rect.width / naturalWidth;
+    let scaleY = rect.height / naturalHeight;
+
+    if (!Number.isFinite(scaleX) || scaleX <= 0) scaleX = 1;
+    if (!Number.isFinite(scaleY) || scaleY <= 0) scaleY = scaleX;
+
+    const scale = Math.max(0.01, Math.min(scaleX, scaleY));
+    const visualWidth = naturalWidth * scale;
+    const visualHeight = naturalHeight * scale;
+
+    const left = Math.max(0, (stage.clientWidth - visualWidth) / 2);
+    const top = Math.max(0, (stage.clientHeight - visualHeight) / 2);
+
+    applying = true;
+    try {
+      stage.style.setProperty("position", "relative", "important");
+      stage.style.setProperty("overflow", "hidden", "important");
+
+      iframe.style.setProperty("position", "absolute", "important");
+      iframe.style.setProperty("inset", "auto", "important");
+      iframe.style.setProperty("left", `${left}px`, "important");
+      iframe.style.setProperty("top", `${top}px`, "important");
+      iframe.style.setProperty("margin", "0", "important");
+      iframe.style.setProperty("transform", `scale(${scale})`, "important");
+      iframe.style.setProperty("transform-origin", "top left", "important");
+    } finally {
+      applying = false;
+    }
+
+    return true;
+  }
+
+  function scheduleCenter() {
+    [0, 40, 100, 220, 450, 800, 1400, 2400].forEach((delay) => {
+      window.setTimeout(() => {
+        requestAnimationFrame(() => centerPreview());
+      }, delay);
+    });
+  }
+
+  function install() {
+    const { iframe, stage } = getTargets();
+    if (!iframe || !stage) return false;
+
+    iframe.addEventListener("load", scheduleCenter);
+
+    if ("ResizeObserver" in window) {
+      stageObserver?.disconnect();
+      stageObserver = new ResizeObserver(() => {
+        requestAnimationFrame(() => centerPreview());
+      });
+      stageObserver.observe(stage);
+    }
+
+    /*
+     * ระบบพรีวิวหลักอาจแก้ style ของ iframe หลังโหลด CSS/รูป
+     * จึงจับเฉพาะ style ของ CODE005 แล้วจัดกลางซ้ำ
+     */
+    styleObserver?.disconnect();
+    styleObserver = new MutationObserver((records) => {
+      if (applying) return;
+      if (!records.some((record) => record.attributeName === "style")) return;
+      requestAnimationFrame(() => centerPreview());
+    });
+    styleObserver.observe(iframe, {
+      attributes: true,
+      attributeFilter: ["style"]
+    });
+
+    scheduleCenter();
+    return true;
+  }
+
+  function boot() {
+    if (install()) return;
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      if (install() || attempts > 100) {
+        window.clearInterval(timer);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+
+  window.addEventListener("resize", () => {
+    requestAnimationFrame(() => centerPreview());
+  });
+
+  /*
+   * เมื่อเปิด FOR ROLEPLAY จากเมนู ให้จัดกลางอีกครั้งหลัง panel แสดงจริง
+   */
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest?.('[data-page="roleplay"], [data-go="roleplay"]');
+    if (!target) return;
+    scheduleCenter();
+  });
+})();
+
