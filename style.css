@@ -9741,3 +9741,73 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   margin: 0 !important;
   pointer-events: none !important;
 }
+
+
+/* =========================================================
+   CODE014 — www.s$sLuv.c0m v132
+========================================================= */
+.dds-roleplay-card-code014 .dds-roleplay-card-preview-code014{
+  position:relative;
+  overflow:hidden;
+  background:#222;
+}
+.dds-roleplay-card-code014 .dds-code014-card-preview-frame{
+  filter:blur(12px) saturate(.72) !important;
+  opacity:.8 !important;
+  pointer-events:none !important;
+}
+.dds-code014-editor-stage{
+  width:100%;
+  height:auto;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+  background:#202020;
+}
+.dds-code014-editor-preview{
+  position:absolute !important;
+  left:50% !important;
+  top:28px !important;
+  margin:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  transform-origin:top center !important;
+}
+.dds-code014-editor .dds-protected-commission-preview-column{
+  align-self:start;
+  position:relative;
+  top:auto;
+}
+.dds-code014-editor .dds-protected-commission-controls-column{
+  height:var(--dds-code014-editor-height,1500px);
+  min-height:1100px;
+  max-height:none;
+  align-self:start;
+}
+.dds-code014-controls-scroll{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-right:4px;
+}
+.dds-code014-controls-scroll .dds-control-section{flex:0 0 auto}
+.dds-code014-editor .dds-code014-roleplay-field textarea{
+  min-height:360px;
+  resize:vertical;
+  font-family:"Bai Jamjuree",sans-serif;
+  font-size:15px !important;
+  line-height:1.75;
+}
+.dds-code014-editor .dds-code014-bbcode-toolbar{margin-top:8px}
+.dds-code014-editor .dds-protected-commission-copy-actions [data-code014-copy]{
+  width:100%;
+  text-align:left;
+  color:#fff;
+  border-color:rgba(193,23,36,.72);
+  background:linear-gradient(135deg,#b0121d,#720810);
+}
+@media(max-width:1250px){
+  .dds-code014-editor .dds-protected-commission-preview-column{position:relative;top:auto}
+  .dds-code014-editor .dds-protected-commission-controls-column{height:auto;min-height:0}
+  .dds-code014-controls-scroll{overflow:visible}
+}
