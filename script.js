@@ -22217,7 +22217,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.__DDS_CODE014_SSSLUV_INSTALLED__ = true;
 
   const PANEL_NAME = "editor-code014";
-  const DRAFT_KEY = "dds:roleplay:code014:draft:v1";
+  const DRAFT_KEY = "dds:roleplay:code014:draft:v2";
   const ACCESS_HASH = "944c0533242b363788a46eae05b982069f17724030ca780af603d478b4d461e9";
   const ACCESS_SESSION_KEY = "dds:code014:sssluv:unlocked:v1";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css";
@@ -22264,6 +22264,51 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     line2: "Please use me like a drug. 🩸💫",
     roleplay: "คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊",
     noteText: "⪩ ⪨ ꠹ ⋆˚꩜｡ ~ ม่ายบอกหรอกน้า ~ ｡꩜˚⋆"
+  });
+
+  /*
+   * v135: หน้า Editor เริ่มว่างสำหรับผู้ใช้กรอกเอง
+   * คงเฉพาะสี + ค่าตำแหน่งกลาง/ซูมมาตรฐานไว้เป็น guideline
+   * OFFICIAL_CODE / card preview ยังใช้ defaults ตัวอย่างเดิมด้านบน
+   */
+  const editorDefaults = Object.freeze({
+    bg: defaults.bg,
+    window: defaults.window,
+    bar: defaults.bar,
+    border: defaults.border,
+    text: defaults.text,
+    subtext: defaults.subtext,
+    pink: defaults.pink,
+    pinkLight: defaults.pinkLight,
+    tabActive: defaults.tabActive,
+    input: defaults.input,
+    note: defaults.note,
+    dot1: defaults.dot1,
+    dot2: defaults.dot2,
+    dot3: defaults.dot3,
+
+    profileImage: "",
+    profileX: 50,
+    profileY: 50,
+    profileZoom: 100,
+    pngImage: "",
+
+    firstName: "",
+    lastName: "",
+    firstX: 0,
+    firstY: 0,
+    lastX: 0,
+    lastY: 0,
+    titleGroupX: 0,
+    titleGroupY: 0,
+
+    blogName: "",
+    location: "",
+    date: "",
+    line1: "",
+    line2: "",
+    roleplay: "",
+    noteText: ""
   });
 
   let card = null;
@@ -22366,14 +22411,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const groupY = clamp(v.titleGroupY, -220, 220, 0);
     const roleplay = roleToHtml(v.roleplay, previewMode);
 
-    const positionCss = `<style data-code014-position>
-.ddsh-sssluv-photo{overflow:hidden!important}.ddsh-sssluv-photo img{object-position:${profileX}% ${profileY}%!important;scale:${(profileZoom/100).toFixed(3)}!important;transform-origin:center center!important}
-.ddsh-sssluv-title{translate:${groupX}px ${groupY}px!important}
-.ddsh-sssluv-name-first{position:relative!important;left:${firstX}px!important;top:${firstY}px!important}
-.ddsh-sssluv-name-last{position:relative!important;left:${lastX}px!important;top:${lastY}px!important}
-</style>`;
-
-    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><link rel="stylesheet" href="${ICON_URL}">${positionCss}<div class="ddsh-sssluv" style="--ddsh-sssluv-bg:${validHex(v.bg,defaults.bg)};--ddsh-sssluv-window:${validHex(v.window,defaults.window)};--ddsh-sssluv-bar:${validHex(v.bar,defaults.bar)};--ddsh-sssluv-border:${validHex(v.border,defaults.border)};--ddsh-sssluv-text:${validHex(v.text,defaults.text)};--ddsh-sssluv-subtext:${validHex(v.subtext,defaults.subtext)};--ddsh-sssluv-pink:${validHex(v.pink,defaults.pink)};--ddsh-sssluv-pink-light:${validHex(v.pinkLight,defaults.pinkLight)};--ddsh-sssluv-tab-active:${validHex(v.tabActive,defaults.tabActive)};--ddsh-sssluv-input:${validHex(v.input,defaults.input)};--ddsh-sssluv-note:${validHex(v.note,defaults.note)};--ddsh-sssluv-dot-1:${validHex(v.dot1,defaults.dot1)};--ddsh-sssluv-dot-2:${validHex(v.dot2,defaults.dot2)};--ddsh-sssluv-dot-3:${validHex(v.dot3,defaults.dot3)};"><div class="ddsh-sssluv-profile"><div class="ddsh-sssluv-browserbar"><div class="ddsh-sssluv-browserdots"><i></i><i></i><i></i></div></div><div class="ddsh-sssluv-profilebody"><div class="ddsh-sssluv-photo"><img src="${h(v.profileImage)}" alt=""></div><div class="ddsh-sssluv-profileinfo"><div class="ddsh-sssluv-titlearea"><i class="bi bi-heart-fill ddsh-sssluv-tinyheart"></i><div class="ddsh-sssluv-title"><span class="ddsh-sssluv-name-first">${h(v.firstName)}</span><br><span class="ddsh-sssluv-name-last">${h(v.lastName)}</span></div><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-one"></i><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-two"></i><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-three"></i></div><div class="ddsh-sssluv-field ddsh-sssluv-field-wide"><div class="ddsh-sssluv-label">Blog Name</div><div class="ddsh-sssluv-input">${plainUrlText(v.blogName)}</div></div><div class="ddsh-sssluv-minirow"><div class="ddsh-sssluv-field"><div class="ddsh-sssluv-label">Location</div><div class="ddsh-sssluv-input ddsh-sssluv-select"><span>${h(v.location)}</span><i class="bi bi-geo-alt-fill"></i></div></div><div class="ddsh-sssluv-field"><div class="ddsh-sssluv-label">Date</div><div class="ddsh-sssluv-input ddsh-sssluv-birthday">${h(v.date)}</div></div></div></div></div></div><div class="ddsh-sssluv-main"><div class="ddsh-sssluv-tabs"><div class="ddsh-sssluv-tab ddsh-sssluv-tab-active">Tasks</div><div class="ddsh-sssluv-tab">Events</div><div class="ddsh-sssluv-tab">Table</div><div class="ddsh-sssluv-tab">Dash</div><div class="ddsh-sssluv-expand"><i class="bi bi-arrows-angle-expand"></i></div></div><div class="ddsh-sssluv-content"><div class="ddsh-sssluv-heading"><div class="ddsh-sssluv-frontimg"><img src="${h(v.pngImage)}" alt=""></div><div class="ddsh-sssluv-headtext"><div class="ddsh-sssluv-bigline">${h(v.line1)}</div><div class="ddsh-sssluv-smallline">${h(v.line2)}</div></div></div><div class="ddsh-sssluv-rpbox"><div class="ddsh-sssluv-rptext">${roleplay}</div></div><div class="ddsh-sssluv-plus"><i class="bi bi-plus-lg"></i></div></div></div><div class="ddsh-sssluv-note"><div class="ddsh-sssluv-notehead"><i class="bi bi-heart"></i><span>NOTE</span></div><div class="ddsh-sssluv-notetext">${h(v.noteText)}</div></div></div><div class="ddshcr-ssluv0"><span></span></div>`;
+    return `<link href="${STYLESHEET_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><link rel="stylesheet" href="${ICON_URL}"><div class="ddsh-sssluv" style="--ddsh-sssluv-bg:${validHex(v.bg,defaults.bg)};--ddsh-sssluv-window:${validHex(v.window,defaults.window)};--ddsh-sssluv-bar:${validHex(v.bar,defaults.bar)};--ddsh-sssluv-border:${validHex(v.border,defaults.border)};--ddsh-sssluv-text:${validHex(v.text,defaults.text)};--ddsh-sssluv-subtext:${validHex(v.subtext,defaults.subtext)};--ddsh-sssluv-pink:${validHex(v.pink,defaults.pink)};--ddsh-sssluv-pink-light:${validHex(v.pinkLight,defaults.pinkLight)};--ddsh-sssluv-tab-active:${validHex(v.tabActive,defaults.tabActive)};--ddsh-sssluv-input:${validHex(v.input,defaults.input)};--ddsh-sssluv-note:${validHex(v.note,defaults.note)};--ddsh-sssluv-dot-1:${validHex(v.dot1,defaults.dot1)};--ddsh-sssluv-dot-2:${validHex(v.dot2,defaults.dot2)};--ddsh-sssluv-dot-3:${validHex(v.dot3,defaults.dot3)};"><div class="ddsh-sssluv-profile"><div class="ddsh-sssluv-browserbar"><div class="ddsh-sssluv-browserdots"><i></i><i></i><i></i></div></div><div class="ddsh-sssluv-profilebody"><div class="ddsh-sssluv-photo" style="overflow:hidden!important"><img src="${h(v.profileImage)}" alt="" style="object-position:${profileX}% ${profileY}%!important;scale:${(profileZoom/100).toFixed(3)}!important;transform-origin:center center!important"></div><div class="ddsh-sssluv-profileinfo"><div class="ddsh-sssluv-titlearea"><i class="bi bi-heart-fill ddsh-sssluv-tinyheart"></i><div class="ddsh-sssluv-title" style="position:relative!important;left:${groupX}px!important;top:${groupY}px!important"><span class="ddsh-sssluv-name-first" style="position:relative!important;left:${firstX}px!important;top:${firstY}px!important">${h(v.firstName)}</span><br><span class="ddsh-sssluv-name-last" style="position:relative!important;left:${lastX}px!important;top:${lastY}px!important">${h(v.lastName)}</span></div><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-one"></i><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-two"></i><i class="bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-three"></i></div><div class="ddsh-sssluv-field ddsh-sssluv-field-wide"><div class="ddsh-sssluv-label">Blog Name</div><div class="ddsh-sssluv-input">${plainUrlText(v.blogName)}</div></div><div class="ddsh-sssluv-minirow"><div class="ddsh-sssluv-field"><div class="ddsh-sssluv-label">Location</div><div class="ddsh-sssluv-input ddsh-sssluv-select"><span>${h(v.location)}</span><i class="bi bi-geo-alt-fill"></i></div></div><div class="ddsh-sssluv-field"><div class="ddsh-sssluv-label">Date</div><div class="ddsh-sssluv-input ddsh-sssluv-birthday">${h(v.date)}</div></div></div></div></div></div><div class="ddsh-sssluv-main"><div class="ddsh-sssluv-tabs"><div class="ddsh-sssluv-tab ddsh-sssluv-tab-active">Tasks</div><div class="ddsh-sssluv-tab">Events</div><div class="ddsh-sssluv-tab">Table</div><div class="ddsh-sssluv-tab">Dash</div><div class="ddsh-sssluv-expand"><i class="bi bi-arrows-angle-expand"></i></div></div><div class="ddsh-sssluv-content"><div class="ddsh-sssluv-heading"><div class="ddsh-sssluv-frontimg"><img src="${h(v.pngImage)}" alt=""></div><div class="ddsh-sssluv-headtext"><div class="ddsh-sssluv-bigline">${h(v.line1)}</div><div class="ddsh-sssluv-smallline">${h(v.line2)}</div></div></div><div class="ddsh-sssluv-rpbox"><div class="ddsh-sssluv-rptext">${roleplay}</div></div><div class="ddsh-sssluv-plus"><i class="bi bi-plus-lg"></i></div></div></div><div class="ddsh-sssluv-note"><div class="ddsh-sssluv-notehead"><i class="bi bi-heart"></i><span>NOTE</span></div><div class="ddsh-sssluv-notetext">${h(v.noteText)}</div></div></div><div class="ddshcr-ssluv0"><span></span></div>`;
   }
 
   const OFFICIAL_CODE = buildCode(defaults, false);
@@ -22500,22 +22538,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel = document.createElement("section");
     panel.className = "dds-panel dds-protected-commission-editor dds-code014-editor";
     panel.dataset.panel = PANEL_NAME;
-    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code014-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>www.s$sLuv.c0m</h1><p>CODE014 · protected editor</p></div></div>
+    panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code014-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>www.s$sLuv.c0m</h1><p>Please use me like a drug.</p></div></div>
       <div class="dds-protected-commission-layout">
         <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE014</strong></div><div class="dds-code014-editor-stage"><iframe class="dds-protected-commission-preview-frame dds-code014-editor-preview" data-code014-editor-preview scrolling="no" title="ตัวอย่าง CODE014"></iframe></div></div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-code014-draft-status>ยังไม่มีแบบร่าง</small></div></div>
           <div class="dds-protected-commission-scroll dds-code014-controls-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("พื้นหลัง","bg",defaults.bg)}${colorField("แถบบน","bar",defaults.bar)}${colorField("เส้น / ขอบ","border",defaults.border)}${colorField("ข้อความหลัก","text",defaults.text)}${colorField("ข้อความรอง","subtext",defaults.subtext)}${colorField("สีชมพูหลัก","pink",defaults.pink)}${colorField("สีชมพูอ่อน","pinkLight",defaults.pinkLight)}${colorField("แท็บ Active","tabActive",defaults.tabActive)}${colorField("ช่อง Input","input",defaults.input)}${colorField("พื้น Note","note",defaults.note)}${colorField("จุด 1","dot1",defaults.dot1)}${colorField("จุด 2","dot2",defaults.dot2)}${colorField("จุด 3","dot3",defaults.dot3)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">${textField("ชื่อ","firstName",defaults.firstName)}${textField("นามสกุล","lastName",defaults.lastName)}</div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งชื่อและนามสกุล</span><small>ขยับแยกแต่ละบรรทัด หรือขยับชื่อ + นามสกุลพร้อมกัน</small></div>${rangeRow("ชื่อ · ซ้ายขวา","firstX",defaults.firstX,-180,180,"ซ้าย","ขวา")}${rangeRow("ชื่อ · บนล่าง","firstY",defaults.firstY,-180,180,"บน","ล่าง")}${rangeRow("นามสกุล · ซ้ายขวา","lastX",defaults.lastX,-180,180,"ซ้าย","ขวา")}${rangeRow("นามสกุล · บนล่าง","lastY",defaults.lastY,-180,180,"บน","ล่าง")}${rangeRow("ชื่อ + นามสกุล · ซ้ายขวา","titleGroupX",defaults.titleGroupX,-220,220,"ซ้าย","ขวา")}${rangeRow("ชื่อ + นามสกุล · บนล่าง","titleGroupY",defaults.titleGroupY,-220,220,"บน","ล่าง")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${textField("Blog Name","blogName",defaults.blogName,true)}${textField("Location","location",defaults.location)}${textField("Date","date",defaults.date)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปโปรไฟล์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูปหลัก</span><input type="url" data-code014-field="profileImage" data-dds-field-key="code014-profileImage" value="${h(defaults.profileImage)}"></label></div><div class="dds-image-position">${rangeRow("แนวนอน","profileX",defaults.profileX,0,100,"ซ้าย","ขวา","%")}${rangeRow("แนวตั้ง","profileY",defaults.profileY,0,100,"บน","ล่าง","%")}${rangeRow("ซูมรูป","profileZoom",defaults.profileZoom,50,200,"ออก","เข้า","%")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>รูป PNG / รูปประกอบ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป PNG / รูปหน้าหัวข้อความ</span><input type="url" data-code014-field="pngImage" data-dds-field-key="code014-pngImage" value="${h(defaults.pngImage)}"></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หัวข้อความ</h2></div><div class="dds-form-grid">${textField("ข้อความ 1","line1",defaults.line1,true)}${textField("ข้อความ 2","line2",defaults.line2,true)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code014-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea data-code014-field="roleplay" data-dds-field-key="code014-roleplay" rows="18">${h(defaults.roleplay)}</textarea><div class="dds-word-counter" data-code014-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code014-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>08</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความ NOTE</span><textarea data-code014-field="noteText" data-dds-field-key="code014-noteText" rows="4">${h(defaults.noteText)}</textarea></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("พื้นหลัง","bg",editorDefaults.bg)}${colorField("แถบบน","bar",editorDefaults.bar)}${colorField("เส้น / ขอบ","border",editorDefaults.border)}${colorField("ข้อความหลัก","text",editorDefaults.text)}${colorField("ข้อความรอง","subtext",editorDefaults.subtext)}${colorField("สีชมพูหลัก","pink",editorDefaults.pink)}${colorField("สีชมพูอ่อน","pinkLight",editorDefaults.pinkLight)}${colorField("แท็บ Active","tabActive",editorDefaults.tabActive)}${colorField("ช่อง Input","input",editorDefaults.input)}${colorField("พื้น Note","note",editorDefaults.note)}${colorField("จุด 1","dot1",editorDefaults.dot1)}${colorField("จุด 2","dot2",editorDefaults.dot2)}${colorField("จุด 3","dot3",editorDefaults.dot3)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">${textField("ชื่อ","firstName",editorDefaults.firstName)}${textField("นามสกุล","lastName",editorDefaults.lastName)}</div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งชื่อและนามสกุล</span><small>ขยับแยกแต่ละบรรทัด หรือขยับชื่อ + นามสกุลพร้อมกัน</small></div>${rangeRow("ชื่อ · ซ้ายขวา","firstX",editorDefaults.firstX,-180,180,"ซ้าย","ขวา")}${rangeRow("ชื่อ · บนล่าง","firstY",editorDefaults.firstY,-180,180,"บน","ล่าง")}${rangeRow("นามสกุล · ซ้ายขวา","lastX",editorDefaults.lastX,-180,180,"ซ้าย","ขวา")}${rangeRow("นามสกุล · บนล่าง","lastY",editorDefaults.lastY,-180,180,"บน","ล่าง")}${rangeRow("ชื่อ + นามสกุล · ซ้ายขวา","titleGroupX",editorDefaults.titleGroupX,-220,220,"ซ้าย","ขวา")}${rangeRow("ชื่อ + นามสกุล · บนล่าง","titleGroupY",editorDefaults.titleGroupY,-220,220,"บน","ล่าง")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${textField("Blog Name","blogName",editorDefaults.blogName,true)}${textField("Location","location",editorDefaults.location)}${textField("Date","date",editorDefaults.date)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปโปรไฟล์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูปหลัก</span><input type="url" data-code014-field="profileImage" data-dds-field-key="code014-profileImage" value="${h(editorDefaults.profileImage)}"></label></div><div class="dds-image-position">${rangeRow("แนวนอน","profileX",editorDefaults.profileX,0,100,"ซ้าย","ขวา","%")}${rangeRow("แนวตั้ง","profileY",editorDefaults.profileY,0,100,"บน","ล่าง","%")}${rangeRow("ซูมรูป","profileZoom",editorDefaults.profileZoom,50,200,"ออก","เข้า","%")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>รูป PNG / รูปประกอบ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป PNG / รูปหน้าหัวข้อความ</span><input type="url" data-code014-field="pngImage" data-dds-field-key="code014-pngImage" value="${h(editorDefaults.pngImage)}"></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หัวข้อความ</h2></div><div class="dds-form-grid">${textField("ข้อความ 1","line1",editorDefaults.line1,true)}${textField("ข้อความ 2","line2",editorDefaults.line2,true)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code014-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea data-code014-field="roleplay" data-dds-field-key="code014-roleplay" rows="18">${h(editorDefaults.roleplay)}</textarea><div class="dds-word-counter" data-code014-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code014-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>08</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความ NOTE</span><textarea data-code014-field="noteText" data-dds-field-key="code014-noteText" rows="4">${h(editorDefaults.noteText)}</textarea></label></div></section>
           </div>
-          <section class="dds-protected-commission-copy"><div class="dds-control-title"><span>09</span><h2>คัดลอกโคด</h2></div><p>คัดลอก CODE014 พร้อมสี รูป ตำแหน่ง และซูมทั้งหมดไปใช้งานได้ทันที</p><div class="dds-protected-commission-copy-actions"><button type="button" data-code014-copy>COPY CODE <span>↗</span></button><button type="button" data-code014-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy"><div class="dds-control-title"><span>09</span><h2>คัดลอกโคด</h2></div><p>คัดลอก CODE014 พร้อมสี รูป ตำแหน่ง และซูม โดยตำแหน่งชื่อจะติดไปกับโค้ดจริง</p><div class="dds-protected-commission-copy-actions"><button type="button" data-code014-copy>COPY CODE <span>↗</span></button><button type="button" data-code014-reset>RESET</button></div></section>
         </div>
       </div>`;
     const main = document.querySelector(".dds-main");
@@ -22526,7 +22564,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function getValues() {
-    const values = { ...defaults };
+    const values = { ...editorDefaults };
     panel?.querySelectorAll("[data-code014-field]").forEach((field) => {
       const key = field.dataset.code014Field;
       if (!key) return;
@@ -22700,7 +22738,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     toolbar?.querySelectorAll("[data-code014-bbcode]").forEach((button) => button.addEventListener("click", () => applyBbcode(textarea, button.dataset.code014Bbcode, toolbar)));
     toolbar?.querySelector("[data-code014-bbcode-color]")?.addEventListener("change", () => applyBbcode(textarea, "color", toolbar));
     panel.querySelector("[data-code014-copy]")?.addEventListener("click", copyCode);
-    panel.querySelector("[data-code014-reset]")?.addEventListener("click", () => { setValues(defaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE014 แล้ว"); });
+    panel.querySelector("[data-code014-reset]")?.addEventListener("click", () => { setValues(editorDefaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE014 แล้ว"); });
   }
 
   function createLockModal() {
@@ -22806,7 +22844,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function openEditor() {
     createPanel();
     const draft = getDraft();
-    setValues(draft?.values ? { ...defaults, ...draft.values } : { ...defaults });
+    setValues(draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults });
     setDraftStatus(draft?.savedAt || 0);
     showPanel(PANEL_NAME);
     history.replaceState(null, "", "#editor-code014");
