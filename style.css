@@ -9779,8 +9779,8 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   top:auto;
 }
 .dds-code014-editor .dds-protected-commission-controls-column{
-  height:var(--dds-code014-editor-height,1500px);
-  min-height:1100px;
+  height:var(--dds-code014-editor-height,auto);
+  min-height:0;
   max-height:none;
   align-self:start;
 }
@@ -9810,4 +9810,19 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   .dds-code014-editor .dds-protected-commission-preview-column{position:relative;top:auto}
   .dds-code014-editor .dds-protected-commission-controls-column{height:auto;min-height:0}
   .dds-code014-controls-scroll{overflow:visible}
+}
+
+
+/* =========================================================
+   CODE014 — COPY SECTION BOTTOM ALIGN v134
+   Scope ONLY CODE014 editor.
+========================================================= */
+@media (min-width:1251px){
+  .dds-code014-editor .dds-protected-commission-controls-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+  }
+  .dds-code014-editor .dds-protected-commission-copy{
+    align-self:end !important;
+  }
 }

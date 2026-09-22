@@ -22247,9 +22247,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     profileZoom: 100,
 
     pngImage: "https://i.pinimg.com/736x/b1/62/99/b16299abee915ce7f20f0133d427daaf.jpg",
-    pngX: 50,
-    pngY: 50,
-    pngZoom: 100,
 
     firstName: "Franklin D.",
     lastName: "Bloodworth",
@@ -22361,9 +22358,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const profileX = clamp(v.profileX, 0, 100, defaults.profileX);
     const profileY = clamp(v.profileY, 0, 100, defaults.profileY);
     const profileZoom = clamp(v.profileZoom, 50, 200, defaults.profileZoom);
-    const pngX = clamp(v.pngX, 0, 100, defaults.pngX);
-    const pngY = clamp(v.pngY, 0, 100, defaults.pngY);
-    const pngZoom = clamp(v.pngZoom, 50, 200, defaults.pngZoom);
     const firstX = clamp(v.firstX, -180, 180, 0);
     const firstY = clamp(v.firstY, -180, 180, 0);
     const lastX = clamp(v.lastX, -180, 180, 0);
@@ -22374,8 +22368,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     const positionCss = `<style data-code014-position>
 .ddsh-sssluv-photo{overflow:hidden!important}.ddsh-sssluv-photo img{object-position:${profileX}% ${profileY}%!important;scale:${(profileZoom/100).toFixed(3)}!important;transform-origin:center center!important}
-.ddsh-sssluv-frontimg{overflow:hidden!important}.ddsh-sssluv-frontimg img{object-position:${pngX}% ${pngY}%!important;scale:${(pngZoom/100).toFixed(3)}!important;transform-origin:center center!important}
-.ddsh-sssluv-titlearea{translate:${groupX}px ${groupY}px!important}
+.ddsh-sssluv-title{translate:${groupX}px ${groupY}px!important}
 .ddsh-sssluv-name-first{position:relative!important;left:${firstX}px!important;top:${firstY}px!important}
 .ddsh-sssluv-name-last{position:relative!important;left:${lastX}px!important;top:${lastY}px!important}
 </style>`;
@@ -22458,7 +22451,24 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const previewColumn = stage.closest(".dds-protected-commission-preview-column");
     const previewTop = previewColumn?.querySelector(".dds-editor-preview-top");
     const totalHeight = stageHeight + (previewTop?.offsetHeight || 0);
-    if (panel && totalHeight > 0) panel.style.setProperty("--dds-code014-editor-height", `${Math.max(1500,totalHeight)}px`);
+
+    /*
+     * v134:
+     * ให้ขอบล่างของกล่อง 09 / COPY CODE จบตรงกับขอบล่างพรีวิวจริง
+     * ไม่บังคับขั้นต่ำ 1500px เพราะจะทำให้ฝั่งขวายาวเกินพรีวิว
+     */
+    requestAnimationFrame(() => {
+      const previewHeight = Math.ceil(
+        previewColumn?.getBoundingClientRect().height || totalHeight || 0
+      );
+
+      if (panel && previewHeight > 0) {
+        panel.style.setProperty(
+          "--dds-code014-editor-height",
+          `${previewHeight}px`
+        );
+      }
+    });
   }
 
   function colorField(label, key, value) {
@@ -22496,11 +22506,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-code014-draft-status>ยังไม่มีแบบร่าง</small></div></div>
           <div class="dds-protected-commission-scroll dds-code014-controls-scroll">
-            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("พื้นหลัง","bg",defaults.bg)}${colorField("พื้นหน้าต่าง","window",defaults.window)}${colorField("แถบบน","bar",defaults.bar)}${colorField("เส้น / ขอบ","border",defaults.border)}${colorField("ข้อความหลัก","text",defaults.text)}${colorField("ข้อความรอง","subtext",defaults.subtext)}${colorField("สีชมพูหลัก","pink",defaults.pink)}${colorField("สีชมพูอ่อน","pinkLight",defaults.pinkLight)}${colorField("แท็บ Active","tabActive",defaults.tabActive)}${colorField("ช่อง Input","input",defaults.input)}${colorField("พื้น Note","note",defaults.note)}${colorField("จุด 1","dot1",defaults.dot1)}${colorField("จุด 2","dot2",defaults.dot2)}${colorField("จุด 3","dot3",defaults.dot3)}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">${textField("ชื่อ","firstName",defaults.firstName)}${textField("นามสกุล","lastName",defaults.lastName)}</div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งชื่อแยกบรรทัด</span><small>ปรับแต่ละบรรทัดและทั้งก้อน</small></div>${rangeRow("ชื่อ · ซ้ายขวา","firstX",defaults.firstX,-180,180,"ซ้าย","ขวา")}${rangeRow("ชื่อ · บนล่าง","firstY",defaults.firstY,-180,180,"บน","ล่าง")}${rangeRow("นามสกุล · ซ้ายขวา","lastX",defaults.lastX,-180,180,"ซ้าย","ขวา")}${rangeRow("นามสกุล · บนล่าง","lastY",defaults.lastY,-180,180,"บน","ล่าง")}${rangeRow("ทั้งก้อน · ซ้ายขวา","titleGroupX",defaults.titleGroupX,-220,220,"ซ้าย","ขวา")}${rangeRow("ทั้งก้อน · บนล่าง","titleGroupY",defaults.titleGroupY,-220,220,"บน","ล่าง")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${colorField("พื้นหลัง","bg",defaults.bg)}${colorField("แถบบน","bar",defaults.bar)}${colorField("เส้น / ขอบ","border",defaults.border)}${colorField("ข้อความหลัก","text",defaults.text)}${colorField("ข้อความรอง","subtext",defaults.subtext)}${colorField("สีชมพูหลัก","pink",defaults.pink)}${colorField("สีชมพูอ่อน","pinkLight",defaults.pinkLight)}${colorField("แท็บ Active","tabActive",defaults.tabActive)}${colorField("ช่อง Input","input",defaults.input)}${colorField("พื้น Note","note",defaults.note)}${colorField("จุด 1","dot1",defaults.dot1)}${colorField("จุด 2","dot2",defaults.dot2)}${colorField("จุด 3","dot3",defaults.dot3)}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ</h2></div><div class="dds-form-grid">${textField("ชื่อ","firstName",defaults.firstName)}${textField("นามสกุล","lastName",defaults.lastName)}</div><div class="dds-image-position"><div class="dds-image-position-heading"><span>ตำแหน่งชื่อและนามสกุล</span><small>ขยับแยกแต่ละบรรทัด หรือขยับชื่อ + นามสกุลพร้อมกัน</small></div>${rangeRow("ชื่อ · ซ้ายขวา","firstX",defaults.firstX,-180,180,"ซ้าย","ขวา")}${rangeRow("ชื่อ · บนล่าง","firstY",defaults.firstY,-180,180,"บน","ล่าง")}${rangeRow("นามสกุล · ซ้ายขวา","lastX",defaults.lastX,-180,180,"ซ้าย","ขวา")}${rangeRow("นามสกุล · บนล่าง","lastY",defaults.lastY,-180,180,"บน","ล่าง")}${rangeRow("ชื่อ + นามสกุล · ซ้ายขวา","titleGroupX",defaults.titleGroupX,-220,220,"ซ้าย","ขวา")}${rangeRow("ชื่อ + นามสกุล · บนล่าง","titleGroupY",defaults.titleGroupY,-220,220,"บน","ล่าง")}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ข้อมูลโปรไฟล์</h2></div><div class="dds-form-grid">${textField("Blog Name","blogName",defaults.blogName,true)}${textField("Location","location",defaults.location)}${textField("Date","date",defaults.date)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปโปรไฟล์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูปหลัก</span><input type="url" data-code014-field="profileImage" data-dds-field-key="code014-profileImage" value="${h(defaults.profileImage)}"></label></div><div class="dds-image-position">${rangeRow("แนวนอน","profileX",defaults.profileX,0,100,"ซ้าย","ขวา","%")}${rangeRow("แนวตั้ง","profileY",defaults.profileY,0,100,"บน","ล่าง","%")}${rangeRow("ซูมรูป","profileZoom",defaults.profileZoom,50,200,"ออก","เข้า","%")}</div></section>
-            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>รูป PNG / รูปประกอบ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป PNG / รูปหน้าหัวข้อความ</span><input type="url" data-code014-field="pngImage" data-dds-field-key="code014-pngImage" value="${h(defaults.pngImage)}"></label></div><div class="dds-image-position">${rangeRow("แนวนอน","pngX",defaults.pngX,0,100,"ซ้าย","ขวา","%")}${rangeRow("แนวตั้ง","pngY",defaults.pngY,0,100,"บน","ล่าง","%")}${rangeRow("ซูมรูป","pngZoom",defaults.pngZoom,50,200,"ออก","เข้า","%")}</div></section>
+            <section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>รูป PNG / รูปประกอบ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ลิงก์รูป PNG / รูปหน้าหัวข้อความ</span><input type="url" data-code014-field="pngImage" data-dds-field-key="code014-pngImage" value="${h(defaults.pngImage)}"></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>หัวข้อความ</h2></div><div class="dds-form-grid">${textField("ข้อความ 1","line1",defaults.line1,true)}${textField("ข้อความ 2","line2",defaults.line2,true)}</div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code014-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea data-code014-field="roleplay" data-dds-field-key="code014-roleplay" rows="18">${h(defaults.roleplay)}</textarea><div class="dds-word-counter" data-code014-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code014-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>08</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความ NOTE</span><textarea data-code014-field="noteText" data-dds-field-key="code014-noteText" rows="4">${h(defaults.noteText)}</textarea></label></div></section>
