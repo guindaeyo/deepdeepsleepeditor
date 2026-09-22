@@ -9752,8 +9752,8 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   background:#222;
 }
 .dds-roleplay-card-code014 .dds-code014-card-preview-frame{
-  filter:blur(12px) saturate(.72) !important;
-  opacity:.8 !important;
+  filter:none !important;
+  opacity:1 !important;
   pointer-events:none !important;
 }
 .dds-code014-editor-stage{

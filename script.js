@@ -22218,8 +22218,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   const PANEL_NAME = "editor-code014";
   const DRAFT_KEY = "dds:roleplay:code014:draft:v2";
-  const ACCESS_HASH = "944c0533242b363788a46eae05b982069f17724030ca780af603d478b4d461e9";
-  const ACCESS_SESSION_KEY = "dds:code014:sssluv:unlocked:v1";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=DotGothic16&display=swap";
   const ICON_URL = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css";
@@ -22313,7 +22311,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   let card = null;
   let panel = null;
-  let lockModal = null;
   let previewTimer = 0;
   let draftTimer = 0;
   let cardRendered = false;
@@ -22353,10 +22350,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }
 
-  async function sha256(value) {
-    const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(value || "")));
-    return Array.from(new Uint8Array(buffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  }
 
   function plainUrlText(value) {
     return h(value || "").replace(/:\/\//g, ":&#8203;//");
@@ -22415,6 +22408,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   const OFFICIAL_CODE = buildCode(defaults, false);
+  const CARD_PREVIEW_CODE = "<link href=\"https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css\" rel=\"stylesheet\"><link href=\"https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=DotGothic16&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css\"><div class=\"ddsh-sssluv\" style=\"--ddsh-sssluv-bg:#ffffff;--ddsh-sssluv-window:#ffffff;--ddsh-sssluv-bar:#f3f1f1;--ddsh-sssluv-border:#8f8583;--ddsh-sssluv-text:#5a4644;--ddsh-sssluv-subtext:#705c58;--ddsh-sssluv-pink:#efb5d0;--ddsh-sssluv-pink-light:#f9d7e7;--ddsh-sssluv-tab-active:#ffffff;--ddsh-sssluv-input:#faeff6;--ddsh-sssluv-note:#fff7fb;--ddsh-sssluv-dot-1:#79625d;--ddsh-sssluv-dot-2:#ffffff;--ddsh-sssluv-dot-3:#fff5fa;\"><div class=\"ddsh-sssluv-profile\"><div class=\"ddsh-sssluv-browserbar\"><div class=\"ddsh-sssluv-browserdots\"><i></i><i></i><i></i></div></div><div class=\"ddsh-sssluv-profilebody\"><div class=\"ddsh-sssluv-photo\" style=\"overflow:hidden!important\"><img src=\"https://i.pinimg.com/1200x/43/05/35/4305356aff40a8bdf9230ae9f1b6e140.jpg\" alt=\"\" style=\"object-position:50% 50%!important;scale:1.100!important;transform-origin:center center!important\"></div><div class=\"ddsh-sssluv-profileinfo\"><div class=\"ddsh-sssluv-titlearea\"><i class=\"bi bi-heart-fill ddsh-sssluv-tinyheart\"></i><div class=\"ddsh-sssluv-title\" style=\"position:relative!important;left:-4px!important;top:10px!important\"><span class=\"ddsh-sssluv-name-first\" style=\"position:relative!important;left:0px!important;top:20px!important\">Franklin D.</span><br><span class=\"ddsh-sssluv-name-last\" style=\"position:relative!important;left:46px!important;top:-20px!important\">Bloodworth</span></div><i class=\"bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-one\"></i><i class=\"bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-two\"></i><i class=\"bi bi-stars ddsh-sssluv-sparkle ddsh-sssluv-sparkle-three\"></i></div><div class=\"ddsh-sssluv-field ddsh-sssluv-field-wide\"><div class=\"ddsh-sssluv-label\">Blog Name</div><div class=\"ddsh-sssluv-input\">https:&#8203;//Babyboo.bo0lvu.com</div></div><div class=\"ddsh-sssluv-minirow\"><div class=\"ddsh-sssluv-field\"><div class=\"ddsh-sssluv-label\">Location</div><div class=\"ddsh-sssluv-input ddsh-sssluv-select\"><span>เมเปิดโร้ด 5</span><i class=\"bi bi-geo-alt-fill\"></i></div></div><div class=\"ddsh-sssluv-field\"><div class=\"ddsh-sssluv-label\">Date</div><div class=\"ddsh-sssluv-input ddsh-sssluv-birthday\">today</div></div></div></div></div></div><div class=\"ddsh-sssluv-main\"><div class=\"ddsh-sssluv-tabs\"><div class=\"ddsh-sssluv-tab ddsh-sssluv-tab-active\">Tasks</div><div class=\"ddsh-sssluv-tab\">Events</div><div class=\"ddsh-sssluv-tab\">Table</div><div class=\"ddsh-sssluv-tab\">Dash</div><div class=\"ddsh-sssluv-expand\"><i class=\"bi bi-arrows-angle-expand\"></i></div></div><div class=\"ddsh-sssluv-content\"><div class=\"ddsh-sssluv-heading\"><div class=\"ddsh-sssluv-frontimg\"><img src=\"https://i.pinimg.com/736x/b1/62/99/b16299abee915ce7f20f0133d427daaf.jpg\" alt=\"\"></div><div class=\"ddsh-sssluv-headtext\"><div class=\"ddsh-sssluv-bigline\">I Love My Sweet✩Star</div><div class=\"ddsh-sssluv-smallline\">Please use me like a drug. </div></div></div><div class=\"ddsh-sssluv-rpbox\"><div class=\"ddsh-sssluv-rptext\">คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊</div></div><div class=\"ddsh-sssluv-plus\"><i class=\"bi bi-plus-lg\"></i></div></div></div><div class=\"ddsh-sssluv-note\"><div class=\"ddsh-sssluv-notehead\"><i class=\"bi bi-heart\"></i><span>NOTE</span></div><div class=\"ddsh-sssluv-notetext\">⪩ ⪨ ꠹ ⋆˚꩜｡ ~ ม่ายบอกหรอกน้า ~ ｡꩜˚⋆</div></div></div><div class=\"ddshcr-ssluv0\"><span></span></div>";
 
   function previewDocument(code) {
     return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-code014-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code014-preview-root">${code}</div></body></html>`;
@@ -22741,51 +22735,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel.querySelector("[data-code014-reset]")?.addEventListener("click", () => { setValues(editorDefaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE014 แล้ว"); });
   }
 
-  function createLockModal() {
-    if (lockModal?.isConnected) return lockModal;
-    lockModal = document.createElement("div");
-    lockModal.className = "dds-commission-lock-modal";
-    lockModal.hidden = true;
-    lockModal.innerHTML = `<form class="dds-commission-lock-dialog" data-code014-lock-form><small>CODE014 / www.s$sLuv.c0m</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อเปิดหน้าแก้ไข CODE014</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-code014-password placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-code014-lock-error></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-code014-lock-cancel>CANCEL</button></div></form>`;
-    document.body.appendChild(lockModal);
-    lockModal.querySelector("[data-code014-lock-cancel]")?.addEventListener("click", closeLockModal);
-    lockModal.addEventListener("click", (event) => { if (event.target === lockModal) closeLockModal(); });
-    lockModal.querySelector("[data-code014-lock-form]")?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const input = lockModal.querySelector("[data-code014-password]");
-      const error = lockModal.querySelector("[data-code014-lock-error]");
-      const submit = lockModal.querySelector('button[type="submit"]');
-      if (!input || !error || !submit) return;
-      submit.disabled = true; error.textContent = "กำลังตรวจสอบ...";
-      try {
-        if (await sha256(input.value || "") === ACCESS_HASH) {
-          sessionStorage.setItem(ACCESS_SESSION_KEY, "1");
-          error.textContent = ""; closeLockModal(); openEditor();
-        } else {
-          error.textContent = "รหัสผ่านไม่ถูกต้อง"; input.select();
-        }
-      } catch {
-        error.textContent = "ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่";
-      } finally { submit.disabled = false; }
-    });
-    return lockModal;
-  }
-
-  function closeLockModal() {
-    if (!lockModal) return;
-    lockModal.hidden = true;
-    lockModal.classList.remove("is-open");
-  }
-
-  function requestEditorAccess() {
-    if (sessionStorage.getItem(ACCESS_SESSION_KEY) === "1") { openEditor(); return; }
-    const modal = createLockModal();
-    modal.hidden = false;
-    requestAnimationFrame(() => modal.classList.add("is-open"));
-    const input = modal.querySelector("[data-code014-password]");
-    if (input) { input.value = ""; setTimeout(() => input.focus(), 40); }
-  }
-
   function installCard() {
     if (card?.isConnected) return true;
     const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
@@ -22799,13 +22748,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     card.className = "dds-roleplay-card dds-roleplay-card-code014";
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE014</span><h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2><button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     code13.insertAdjacentElement("afterend", card);
-    card.querySelector("[data-code014-edit]")?.addEventListener("click", requestEditorAccess);
+    card.querySelector("[data-code014-edit]")?.addEventListener("click", openEditor);
 
     const iframe = card.querySelector("[data-code014-card-preview]");
     const render = () => {
       if (cardRendered || !iframe) return;
       cardRendered = true;
-      writeIframe(iframe, OFFICIAL_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
+      writeIframe(iframe, CARD_PREVIEW_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
     };
     render();
     if ("ResizeObserver" in window) {
@@ -22852,11 +22801,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function handleHash() {
-    if (location.hash === "#editor-code014" && !panel?.classList.contains("is-active")) requestEditorAccess();
+    if (location.hash === "#editor-code014" && !panel?.classList.contains("is-active")) openEditor();
   }
 
   function install() {
-    createLockModal();
     let attempts = 0;
     const timer = setInterval(() => {
       attempts += 1;
