@@ -22589,16 +22589,37 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
 
-  function countWords(value) {
-    const clean = String(value || "")
-      .replace(/\[[^\]]*\]/g, " ")
-      .replace(/<[^>]*>/g, " ")
-      .replace(/https?:\/\/\S+/g, " ")
+  function removeBbcodeForWordCount(value) {
+    return String(value || "")
+      .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
+      .replace(/\[video(?:=[^\]]*)?\][\s\S]*?\[\/video\]/gi, " ")
+      .replace(/\[url(?:=[^\]]*)?\]([\s\S]*?)\[\/url\]/gi, " $1 ")
+      .replace(/\[(?:\/?[a-z][a-z0-9_-]*(?:=[^\]]*)?|\*|hr)\]/gi, " ")
+      .replace(/(?:https?:\/\/|www\.)\S+/gi, " ")
+      .replace(/\s+/g, " ")
       .trim();
+  }
+
+  function countWords(value) {
+    const clean = removeBbcodeForWordCount(value);
     if (!clean) return 0;
-    const thai = clean.match(/[\u0E00-\u0E7F]+/g) || [];
-    const nonThai = clean.replace(/[\u0E00-\u0E7F]+/g, " ").match(/[A-Za-z0-9À-ž]+(?:['’\-][A-Za-z0-9À-ž]+)*/g) || [];
-    return thai.length + nonThai.length;
+
+    if (typeof Intl?.Segmenter === "function") {
+      const segmenter = new Intl.Segmenter("th", { granularity: "word" });
+      let count = 0;
+
+      for (const segment of segmenter.segment(clean)) {
+        if (segment.isWordLike) count += 1;
+      }
+
+      return count;
+    }
+
+    const words = clean.match(
+      /[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g
+    );
+
+    return words ? words.length : 0;
   }
 
   function updateWordCounter() {
