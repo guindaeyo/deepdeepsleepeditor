@@ -29,7 +29,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260924-code014-fixed-v171" rel="stylesheet"/>
+<link href="./style.css?v=20260924-code014-fixed-v172" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5668,16 +5668,18 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script src="./script.js?v=20260924-code014-fixed-v171"></script>
-<script id="dds-code014-fixed-v171">
+<script src="./script.js?v=20260924-code014-fixed-v172"></script>
+<script id="dds-code014-fixed-v172">
+/* CODE014 FIXED MODULE v172 — self-contained helpers + tested editor route */
+
 /* CODE014 FIXED MODULE v171 — isolated after all site scripts */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE014_FIXED_V171_INSTALLED__) return;
-  window.__DDS_CODE014_FIXED_V171_INSTALLED__ = true;
+  if (window.__DDS_CODE014_FIXED_V172_INSTALLED__) return;
+  window.__DDS_CODE014_FIXED_V172_INSTALLED__ = true;
 
-  const PANEL_NAME = "editor-code014-fixed-v171";
+  const PANEL_NAME = "editor-code014-fixed-v172";
   const DRAFT_KEY = "dds:roleplay:code014:draft:v2";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=DotGothic16&display=swap";
@@ -5981,6 +5983,18 @@ You were mine forever</textarea>
     );
     iframe.style.setProperty("overflow", "hidden", "important");
     iframe.style.setProperty("pointer-events", "none", "important");
+  }
+
+  function colorField(label, key, value) {
+    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-code014-color-picker="${key}" data-dds-no-save value="${value}"><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}" spellcheck="false"></div></label>`;
+  }
+
+  function textField(label, key, value, full = false) {
+    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${label}</span><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${h(value)}"></label>`;
+  }
+
+  function rangeRow(label, key, value, min, max, left, right, unit = "px") {
+    return `<label class="dds-position-row"><span>${label}</span><small>${left}</small><input type="range" min="${min}" max="${max}" step="1" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}"><small>${right}</small><output data-code014-output="${key}">${value}${unit}</output></label>`;
   }
 
   function toolbarMarkup() {
@@ -6449,7 +6463,7 @@ You were mine forever</textarea>
     history.replaceState(
       null,
       "",
-      "#editor-code014-fixed-v171"
+      "#editor-code014-fixed-v172"
     );
 
     window.scrollTo(0, 0);
@@ -6461,19 +6475,44 @@ You were mine forever</textarea>
     });
   }
 
-  window.__ddsOpenCode014FixedV171 =
+  window.__ddsOpenCode014FixedV172 =
     () => openEditor();
 
   function handleHash() {
-    if (location.hash === "#editor-code014-fixed-v171" && !panel?.classList.contains("is-active")) openEditor();
+    if (location.hash === "#editor-code014-fixed-v172" && !panel?.classList.contains("is-active")) openEditor();
   }
 
   function install() {
     /*
-     * Runs after every other site script.
-     * So this is the LAST owner touching the CODE014 edit button.
+     * Bind EDIT CODE first. Card preview/order maintenance must never
+     * be able to prevent the editor route from installing.
      */
-    installCard();
+    if (window.__DDS_CODE014_FIXED_CLICK_V172__ !== true) {
+      window.__DDS_CODE014_FIXED_CLICK_V172__ = true;
+
+      window.addEventListener(
+        "click",
+        (event) => {
+          const button = event.target?.closest?.(
+            ".dds-roleplay-card-code014 [data-code014-edit]"
+          );
+
+          if (!button) return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          openEditor();
+        },
+        true
+      );
+    }
+
+    try {
+      installCard();
+    } catch (error) {
+      console.error("[CODE014 v172] card setup failed", error);
+    }
 
     let attempts = 0;
 
@@ -6481,7 +6520,11 @@ You were mine forever</textarea>
       window.setInterval(() => {
         attempts += 1;
 
-        installCard();
+        try {
+          installCard();
+        } catch (error) {
+          console.error("[CODE014 v172] card retry failed", error);
+        }
 
         const grid =
           document.querySelector(
@@ -6510,29 +6553,6 @@ You were mine forever</textarea>
         }
       }, 100);
 
-    /*
-     * Window capture fallback.
-     * Even if a future render replaces the button,
-     * CODE014 still opens.
-     */
-    window.addEventListener(
-      "click",
-      (event) => {
-        const button =
-          event.target?.closest?.(
-            ".dds-roleplay-card-code014 [data-code014-edit]"
-          );
-
-        if (!button) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-
-        openEditor();
-      },
-      true
-    );
 
     window.addEventListener(
       "resize",
@@ -6590,6 +6610,7 @@ You were mine forever</textarea>
     install();
   }
 })();
+
 </script>
 
 

@@ -11124,6 +11124,10 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 }
 
 /* v171 fixed editor is still a CODE014 editor. */
-[data-panel="editor-code014-fixed-v171"].dds-code014-editor{
+[data-panel="editor-code014-fixed-v172"].dds-code014-editor{
   width:100%;
 }
+
+
+/* CODE014 v172 panel compatibility */
+[data-panel="editor-code014-fixed-v172"].dds-code014-editor{width:100%;}
