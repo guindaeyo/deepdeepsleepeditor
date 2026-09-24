@@ -24052,3 +24052,355 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 
+
+
+
+/* =========================================================
+   CODE009 — HIGHER THAN HEAVEN / CARD FIT WHOLE v158
+   Scope ONLY: #roleplayCardPreview009 in CATEGORY 01 / FOR ROLEPLAY
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE009_CARD_FIT_WHOLE_V158__) return;
+  window.__DDS_CODE009_CARD_FIT_WHOLE_V158__ = true;
+
+  const IFRAME_ID = "roleplayCardPreview009";
+  const PROBE_WIDTH = 1200;
+  const states = new WeakMap();
+
+  function getState(iframe) {
+    let state = states.get(iframe);
+
+    if (!state) {
+      state = {
+        applying: false,
+        naturalWidth: 0,
+        timer: 0,
+        images: new WeakSet(),
+        observer: null
+      };
+
+      states.set(iframe, state);
+    }
+
+    return state;
+  }
+
+  function getParts(iframe) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body) return null;
+
+    const target =
+      doc.querySelector(".dds-preview-target") ||
+      doc.querySelector(".dds-preview-shell") ||
+      doc.body;
+
+    let root = null;
+
+    if (target !== doc.body) {
+      root = Array.from(target.children).find((element) => {
+        if (!(element instanceof doc.defaultView.HTMLElement)) return false;
+        if (element.tagName === "STYLE") return false;
+
+        const cls = String(element.className || "").toLowerCase();
+        return !cls.includes("credit");
+      });
+    }
+
+    root =
+      root ||
+      doc.querySelector(".dds-preview-target > *:not(style)") ||
+      doc.body.firstElementChild ||
+      doc.body;
+
+    return { doc, target, root };
+  }
+
+  function detectNaturalWidth(parts) {
+    const { doc, target, root } = parts;
+
+    target.style.setProperty("width", `${PROBE_WIDTH}px`, "important");
+    target.style.setProperty("min-width", `${PROBE_WIDTH}px`, "important");
+    target.style.setProperty("max-width", `${PROBE_WIDTH}px`, "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("zoom", "1", "important");
+
+    void root.offsetWidth;
+
+    const style = doc.defaultView.getComputedStyle(root);
+    const rect = root.getBoundingClientRect();
+
+    const computedWidth = Number.parseFloat(style.width) || 0;
+
+    const maxWidth =
+      style.maxWidth && style.maxWidth !== "none"
+        ? Number.parseFloat(style.maxWidth) || 0
+        : 0;
+
+    let width = Math.max(
+      computedWidth,
+      Math.ceil(rect.width || 0),
+      root.offsetWidth || 0,
+      root.scrollWidth || 0
+    );
+
+    if (maxWidth > 200 && maxWidth < PROBE_WIDTH) {
+      width = Math.min(width, maxWidth);
+    }
+
+    if (
+      !Number.isFinite(width) ||
+      width < 200 ||
+      width >= PROBE_WIDTH - 2
+    ) {
+      return 0;
+    }
+
+    return Math.ceil(width);
+  }
+
+  function measureVisibleHeight(parts, naturalWidth) {
+    const { doc, target, root } = parts;
+
+    target.style.setProperty("width", `${naturalWidth}px`, "important");
+    target.style.setProperty("min-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("max-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("zoom", "1", "important");
+
+    doc.documentElement.style.setProperty("overflow", "visible", "important");
+    doc.body.style.setProperty("overflow", "visible", "important");
+
+    void root.offsetHeight;
+
+    const elements = [
+      root,
+      ...Array.from(root.querySelectorAll("*"))
+    ];
+
+    let minTop = Infinity;
+    let maxBottom = -Infinity;
+
+    elements.forEach((element) => {
+      if (!(element instanceof doc.defaultView.HTMLElement)) return;
+
+      const style = doc.defaultView.getComputedStyle(element);
+
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const rect = element.getBoundingClientRect();
+
+      if (
+        rect.width <= 0.5 ||
+        rect.height <= 0.5 ||
+        !Number.isFinite(rect.top) ||
+        !Number.isFinite(rect.bottom)
+      ) {
+        return;
+      }
+
+      minTop = Math.min(minTop, rect.top);
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    });
+
+    if (
+      !Number.isFinite(minTop) ||
+      !Number.isFinite(maxBottom) ||
+      maxBottom <= minTop
+    ) {
+      const rect = root.getBoundingClientRect();
+      minTop = rect.top;
+      maxBottom = rect.bottom;
+    }
+
+    return Math.max(
+      1,
+      Math.ceil(maxBottom - minTop + 8)
+    );
+  }
+
+  function watchAssets(iframe, parts) {
+    const state = getState(iframe);
+
+    parts.doc.querySelectorAll("img").forEach((img) => {
+      if (state.images.has(img)) return;
+
+      state.images.add(img);
+
+      img.addEventListener(
+        "load",
+        () => schedule(iframe),
+        { once: true }
+      );
+
+      img.addEventListener(
+        "error",
+        () => schedule(iframe),
+        { once: true }
+      );
+    });
+
+    try {
+      parts.doc.fonts?.ready?.then(() => schedule(iframe));
+    } catch {}
+  }
+
+  function fit(iframe = document.getElementById(IFRAME_ID)) {
+    if (!iframe) return false;
+
+    const state = getState(iframe);
+    if (state.applying) return false;
+
+    const stage = iframe.closest(".dds-roleplay-card-preview");
+    const parts = getParts(iframe);
+
+    if (!stage || !parts) return false;
+    if (stage.clientWidth < 40 || stage.clientHeight < 40) return false;
+
+    state.applying = true;
+
+    try {
+      if (!state.naturalWidth) {
+        state.naturalWidth = detectNaturalWidth(parts);
+
+        if (!state.naturalWidth) {
+          return false;
+        }
+      }
+
+      const width = state.naturalWidth;
+      const height = measureVisibleHeight(parts, width);
+
+      const padding = 16;
+      const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
+      const availableHeight = Math.max(1, stage.clientHeight - padding * 2);
+
+      const scale = Math.max(
+        0.01,
+        Math.min(
+          1,
+          availableWidth / width,
+          availableHeight / height
+        )
+      );
+
+      const visualWidth = width * scale;
+      const visualHeight = height * scale;
+
+      const left = Math.max(
+        0,
+        (stage.clientWidth - visualWidth) / 2
+      );
+
+      const top = Math.max(
+        0,
+        (stage.clientHeight - visualHeight) / 2
+      );
+
+      stage.style.setProperty("position", "relative", "important");
+      stage.style.setProperty("overflow", "hidden", "important");
+
+      iframe.style.setProperty("position", "absolute", "important");
+      iframe.style.setProperty("inset", "auto", "important");
+      iframe.style.setProperty("left", `${left}px`, "important");
+      iframe.style.setProperty("top", `${top}px`, "important");
+      iframe.style.setProperty("width", `${width}px`, "important");
+      iframe.style.setProperty("min-width", `${width}px`, "important");
+      iframe.style.setProperty("max-width", `${width}px`, "important");
+      iframe.style.setProperty("height", `${height}px`, "important");
+      iframe.style.setProperty("min-height", `${height}px`, "important");
+      iframe.style.setProperty("max-height", `${height}px`, "important");
+      iframe.style.setProperty("margin", "0", "important");
+      iframe.style.setProperty("transform", `scale(${scale})`, "important");
+      iframe.style.setProperty("transform-origin", "top left", "important");
+      iframe.style.setProperty("visibility", "visible", "important");
+      iframe.style.setProperty("opacity", "1", "important");
+      iframe.style.setProperty("pointer-events", "none", "important");
+
+      iframe.dataset.ddsCode009WholeReady = "1";
+
+      watchAssets(iframe, parts);
+
+      return true;
+    } finally {
+      state.applying = false;
+    }
+  }
+
+  function schedule(
+    iframe = document.getElementById(IFRAME_ID)
+  ) {
+    if (!iframe) return;
+
+    const state = getState(iframe);
+    clearTimeout(state.timer);
+
+    const run = () => requestAnimationFrame(() => fit(iframe));
+
+    state.timer = window.setTimeout(run, 0);
+
+    [80, 220, 500, 900].forEach((delay) => {
+      window.setTimeout(run, delay);
+    });
+  }
+
+  function bind() {
+    const iframe = document.getElementById(IFRAME_ID);
+
+    if (!iframe) return false;
+
+    if (iframe.dataset.ddsCode009WholeBound === "1") {
+      schedule(iframe);
+      return true;
+    }
+
+    iframe.dataset.ddsCode009WholeBound = "1";
+
+    iframe.addEventListener("load", () => schedule(iframe));
+
+    if ("ResizeObserver" in window) {
+      const stage = iframe.closest(".dds-roleplay-card-preview");
+
+      if (stage) {
+        getState(iframe).observer =
+          new ResizeObserver(() => schedule(iframe));
+
+        getState(iframe).observer.observe(stage);
+      }
+    }
+
+    schedule(iframe);
+    return true;
+  }
+
+  function boot() {
+    if (bind()) return;
+
+    let attempts = 0;
+
+    const timer = window.setInterval(() => {
+      attempts += 1;
+
+      if (bind() || attempts > 40) {
+        window.clearInterval(timer);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once: true }
+    );
+  } else {
+    boot();
+  }
+})();
+
