@@ -29,7 +29,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260924-code014-scroll-draft-v164" rel="stylesheet"/>
+<link href="./style.css?v=20260924-code014-commission-v165" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5648,56 +5648,13 @@ You were mine forever</textarea>
 })();
 </script>
 
-<!-- CODE014 reliable editor route v163 -->
-<script id="dds-code014-route-v163">
-(() => {
-  "use strict";
 
-  if (window.__DDS_CODE014_ROUTE_V163__) return;
-  window.__DDS_CODE014_ROUTE_V163__ = true;
 
-  /*
-   * ลง listener ก่อน core script:
-   * ถ้าคลิก CODE014 จะกัน handler รุ่นเก่าไว้ก่อน
-   * แล้วส่งตรงเข้า rescue editor v163
-   */
-  document.addEventListener(
-    "click",
-    (event) => {
-      const button =
-        event.target?.closest?.(
-          ".dds-roleplay-card-code014 [data-code014-edit]"
-        );
-
-      if (!button) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-
-      if (
-        typeof window.__ddsOpenCode014Rescue === "function"
-      ) {
-        window.__ddsOpenCode014Rescue();
-      } else {
-        window.__DDS_CODE014_PENDING_OPEN_V163__ = true;
-
-        history.replaceState(
-          null,
-          "",
-          "#editor-code014"
-        );
-      }
-    },
-    true
-  );
-})();
-</script>
-
+<script src="./code014.js?v=20260924-code014-sole-v165"></script>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script src="./script.js?v=20260924-code014-scroll-draft-v164"></script>
+<script src="./script.js?v=20260924-code014-commission-v165"></script>
 
 
 
