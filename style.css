@@ -10348,183 +10348,59 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   }
 }
 
-
 /* =========================================================
-   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v155
+   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v157 LIGHT
 ========================================================= */
-
-/* Shared red scrollbar theme */
-.dds-editor-preview-column,
-.dds-protected-commission-preview-column,
-.dds-editor-preview-column > [class*="preview-stage"],
-.dds-editor-preview-column > [class*="editor-stage"],
-.dds-protected-commission-preview-column > [class*="preview-stage"],
-.dds-protected-commission-preview-column > [class*="editor-stage"]{
-  scrollbar-width:thin;
-  scrollbar-color:#c11724 #090909;
-}
-
-.dds-editor-preview-column::-webkit-scrollbar,
-.dds-protected-commission-preview-column::-webkit-scrollbar,
-.dds-editor-preview-column > [class*="preview-stage"]::-webkit-scrollbar,
-.dds-editor-preview-column > [class*="editor-stage"]::-webkit-scrollbar,
-.dds-protected-commission-preview-column > [class*="preview-stage"]::-webkit-scrollbar,
-.dds-protected-commission-preview-column > [class*="editor-stage"]::-webkit-scrollbar{
-  width:7px;
-  height:7px;
-}
-
-.dds-editor-preview-column::-webkit-scrollbar-track,
-.dds-protected-commission-preview-column::-webkit-scrollbar-track,
-.dds-editor-preview-column > [class*="preview-stage"]::-webkit-scrollbar-track,
-.dds-editor-preview-column > [class*="editor-stage"]::-webkit-scrollbar-track,
-.dds-protected-commission-preview-column > [class*="preview-stage"]::-webkit-scrollbar-track,
-.dds-protected-commission-preview-column > [class*="editor-stage"]::-webkit-scrollbar-track{
-  background:#090909;
-}
-
-.dds-editor-preview-column::-webkit-scrollbar-thumb,
-.dds-protected-commission-preview-column::-webkit-scrollbar-thumb,
-.dds-editor-preview-column > [class*="preview-stage"]::-webkit-scrollbar-thumb,
-.dds-editor-preview-column > [class*="editor-stage"]::-webkit-scrollbar-thumb,
-.dds-protected-commission-preview-column > [class*="preview-stage"]::-webkit-scrollbar-thumb,
-.dds-protected-commission-preview-column > [class*="editor-stage"]::-webkit-scrollbar-thumb{
-  background:#c11724;
-  border-radius:999px;
-}
-
-.dds-editor-preview-column::-webkit-scrollbar-thumb:hover,
-.dds-protected-commission-preview-column::-webkit-scrollbar-thumb:hover,
-.dds-editor-preview-column > [class*="preview-stage"]::-webkit-scrollbar-thumb:hover,
-.dds-editor-preview-column > [class*="editor-stage"]::-webkit-scrollbar-thumb:hover,
-.dds-protected-commission-preview-column > [class*="preview-stage"]::-webkit-scrollbar-thumb:hover,
-.dds-protected-commission-preview-column > [class*="editor-stage"]::-webkit-scrollbar-thumb:hover{
-  background:#df2632;
-}
-
-.dds-editor-preview-column::-webkit-scrollbar-corner,
-.dds-protected-commission-preview-column::-webkit-scrollbar-corner,
-.dds-editor-preview-column > [class*="preview-stage"]::-webkit-scrollbar-corner,
-.dds-editor-preview-column > [class*="editor-stage"]::-webkit-scrollbar-corner,
-.dds-protected-commission-preview-column > [class*="preview-stage"]::-webkit-scrollbar-corner,
-.dds-protected-commission-preview-column > [class*="editor-stage"]::-webkit-scrollbar-corner{
-  background:#090909;
-}
-
 @media (min-width:1251px){
-
-  /*
-   * ทุก preview column เป็น grid 2 แถว:
-   * header + preview area
-   * ตัว column เองไม่ scroll จึงไม่มี scrollbar ซ้อน
-   */
-  .dds-panel.is-active .dds-editor-layout > .dds-editor-preview-column,
-  .dds-panel.is-active .dds-protected-commission-layout > .dds-protected-commission-preview-column{
-    display:grid !important;
-    grid-template-rows:auto minmax(0,1fr) !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    overflow:hidden !important;
-    scrollbar-width:none !important;
-  }
-
-  .dds-panel.is-active .dds-editor-layout > .dds-editor-preview-column::-webkit-scrollbar,
-  .dds-panel.is-active .dds-protected-commission-layout > .dds-protected-commission-preview-column::-webkit-scrollbar{
-    width:0 !important;
-    height:0 !important;
-    display:none !important;
-  }
-
-  .dds-panel.is-active .dds-editor-preview-column > .dds-editor-preview-top,
-  .dds-panel.is-active .dds-protected-commission-preview-column > .dds-editor-preview-top{
-    grid-row:1;
-    min-height:42px;
-    position:relative !important;
-    top:auto !important;
-    z-index:8;
-  }
-
-  /*
-   * Legacy roleplay iframe อยู่ตรงใต้ header:
-   * iframe คงเต็มพื้นที่ และ shell ข้างในเป็น scrollbar เพียงอันเดียว
-   */
-  .dds-panel.is-active
-  .dds-editor-preview-column > iframe.dds-editor-preview-frame{
-    grid-row:2;
-    width:100% !important;
-    min-width:100% !important;
-    max-width:100% !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    margin:0 !important;
+  .dds-panel.is-active .dds-editor-preview-column,
+  .dds-panel.is-active .dds-protected-commission-preview-column{
     overflow:hidden !important;
   }
 
-  /*
-   * Editor ที่มี preview stage:
-   * stage เป็น scrollbar owner เพียงอันเดียว
-   */
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe),
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top){
-    grid-row:2;
-    width:100% !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    box-sizing:border-box;
-    overflow:auto !important;
+  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"],
+  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
     overscroll-behavior:contain;
     scrollbar-width:thin !important;
     scrollbar-color:#c11724 #090909 !important;
   }
 
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe)::-webkit-scrollbar,
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top)::-webkit-scrollbar{
+  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar,
+  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar{
     width:7px !important;
     height:7px !important;
   }
 
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe)::-webkit-scrollbar-track,
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top)::-webkit-scrollbar-track{
+  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar-track,
+  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar-track{
     background:#090909 !important;
   }
 
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe)::-webkit-scrollbar-thumb,
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top)::-webkit-scrollbar-thumb{
+  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar-thumb,
+  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar-thumb{
     background:#c11724 !important;
     border-radius:999px !important;
   }
 
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe)::-webkit-scrollbar-thumb:hover,
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top)::-webkit-scrollbar-thumb:hover{
-    background:#df2632 !important;
+  .dds-code014-editor .dds-code014-editor-stage{
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    position:relative !important;
   }
 
-  .dds-panel.is-active
-  .dds-editor-preview-column > :not(.dds-editor-preview-top):not(iframe)::-webkit-scrollbar-corner,
-  .dds-panel.is-active
-  .dds-protected-commission-preview-column > :not(.dds-editor-preview-top)::-webkit-scrollbar-corner{
-    background:#090909 !important;
+  .dds-code014-editor .dds-code014-editor-stage::after{
+    content:"";
+    display:block;
+    width:1px;
+    height:var(--dds-code014-scroll-height,1px);
+    pointer-events:none;
   }
 
-  /*
-   * Override patches รายตัวเก่าที่เคยทำให้ outer column scroll
-   * ให้ใช้กติกากลาง v155 แทน
-   */
-  [data-panel="editor-code009"] .dds-editor-preview-column,
-  [data-panel="editor-code010"] .dds-editor-preview-column{
+  .dds-code014-editor .dds-code014-editor-preview{
     overflow:hidden !important;
   }
 }

@@ -29,7 +29,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260924-code005-real-fit-v156" rel="stylesheet"/>
+<link href="./style.css?v=20260924-hotfix-v157" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5895,7 +5895,7 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script src="./script.js?v=20260924-code005-real-fit-v156"></script>
+<script src="./script.js?v=20260924-hotfix-v157"></script>
 
 <!-- CODE005 / CODE006 cold-start prewarm v152 -->
 <script id="dds-code005006-prewarm-v152">
@@ -6275,20 +6275,24 @@ You were mine forever</textarea>
       .ddsCode005006Warm = "1";
   }
 
+  function scheduleWarm() {
+    const run = () => warmBoth();
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(run, { timeout: 2200 });
+    } else {
+      window.setTimeout(run, 1200);
+    }
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      () => {
-        /*
-         * ให้ main card preview installer ได้เริ่มสร้าง card ก่อน
-         * แต่ warmOne จะรอ card จริงอีกชั้นอยู่แล้ว
-         */
-        window.setTimeout(warmBoth, 0);
-      },
+      scheduleWarm,
       { once: true }
     );
   } else {
-    window.setTimeout(warmBoth, 0);
+    scheduleWarm();
   }
 })();
 </script>

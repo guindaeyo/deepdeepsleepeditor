@@ -19359,7 +19359,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (existing) { card = existing; updateCardState(); return true; }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code013";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     grid.appendChild(card);
     card.querySelector("[data-code013-edit]")?.addEventListener("click", openEditor);
     updateCardState();
@@ -19369,14 +19369,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       cardRendered = true;
       writeIframe(iframe, OFFICIAL_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
     };
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        render();
-      }, { rootMargin: "420px 0px" });
-      observer.observe(card);
-    } else render();
+    render();
     return true;
   }
 
@@ -22733,55 +22726,44 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function sizeEditorPreviewActual(iframe, stage, padding = 28) {
-    if (!iframe || !stage || stage.clientWidth < 20) return;
+    if (!iframe || !stage) return;
+
     const m = measureIframe(iframe);
     const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
     const scale = Math.min(1, availableWidth / m.width);
-    const stageHeight = Math.ceil(m.height * scale) + padding * 2;
-    stage.style.setProperty("height", `${stageHeight}px`, "important");
-    stage.style.setProperty("min-height", `${stageHeight}px`, "important");
+    const renderedHeight = Math.ceil(m.height * scale);
+
+    /*
+     * v157:
+     * stage เป็น scrollbar แนวตั้งเพียงอันเดียว
+     * ไม่ขยาย stage ตามความยาวโค้ด และไม่มี scroll แนวนอน
+     */
+    stage.style.setProperty("height", "100%", "important");
+    stage.style.setProperty("min-height", "0", "important");
+    stage.style.setProperty("max-height", "100%", "important");
+    stage.style.setProperty("overflow-y", "auto", "important");
+    stage.style.setProperty("overflow-x", "hidden", "important");
+    stage.style.setProperty(
+      "--dds-code014-scroll-height",
+      `${renderedHeight + padding * 2}px`
+    );
+
     iframe.style.setProperty("position", "absolute", "important");
     iframe.style.setProperty("left", "50%", "important");
     iframe.style.setProperty("top", `${padding}px`, "important");
     iframe.style.setProperty("width", `${m.width}px`, "important");
+    iframe.style.setProperty("min-width", `${m.width}px`, "important");
+    iframe.style.setProperty("max-width", `${m.width}px`, "important");
     iframe.style.setProperty("height", `${m.height}px`, "important");
-    iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("transform", `translateX(-50%) scale(${scale})`, "important");
+    iframe.style.setProperty("min-height", `${m.height}px`, "important");
+    iframe.style.setProperty("max-height", `${m.height}px`, "important");
+    iframe.style.setProperty(
+      "transform",
+      `translateX(-50%) scale(${scale})`,
+      "important"
+    );
     iframe.style.setProperty("transform-origin", "top center", "important");
-
-    const previewColumn = stage.closest(".dds-protected-commission-preview-column");
-    const previewTop = previewColumn?.querySelector(".dds-editor-preview-top");
-    const totalHeight = stageHeight + (previewTop?.offsetHeight || 0);
-
-    /*
-     * v134:
-     * ให้ขอบล่างของกล่อง 09 / COPY CODE จบตรงกับขอบล่างพรีวิวจริง
-     * ไม่บังคับขั้นต่ำ 1500px เพราะจะทำให้ฝั่งขวายาวเกินพรีวิว
-     */
-    requestAnimationFrame(() => {
-      const previewHeight = Math.ceil(
-        previewColumn?.getBoundingClientRect().height || totalHeight || 0
-      );
-
-      if (panel && previewHeight > 0) {
-        panel.style.setProperty(
-          "--dds-code014-editor-height",
-          `${previewHeight}px`
-        );
-      }
-    });
-  }
-
-  function colorField(label, key, value) {
-    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-code014-color-picker="${key}" data-dds-no-save value="${value}"><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}" spellcheck="false"></div></label>`;
-  }
-
-  function textField(label, key, value, full = false) {
-    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${label}</span><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${h(value)}"></label>`;
-  }
-
-  function rangeRow(label, key, value, min, max, left, right, unit = "px") {
-    return `<label class="dds-position-row"><span>${label}</span><small>${left}</small><input type="range" min="${min}" max="${max}" step="1" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}"><small>${right}</small><output data-code014-output="${key}">${value}${unit}</output></label>`;
+    iframe.style.setProperty("overflow", "hidden", "important");
   }
 
   function toolbarMarkup() {
@@ -22961,7 +22943,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const iframe = panel.querySelector("[data-code014-editor-preview]");
       const stage = panel.querySelector(".dds-code014-editor-stage");
       writeIframe(iframe, buildCode(getValues(), true), () => sizeEditorPreviewActual(iframe, stage, 28));
-    }, 45);
+    }, 20);
     syncOutputs();
     updateWordCounter();
   }
@@ -23915,25 +23897,20 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v155
-   Scope: Editor preview only
-   - Legacy direct iframe -> inner preview shell owns scroll
-   - Stage/Protected editors -> preview stage owns scroll
-   - All duplicate html/body/outer scrollbars hidden
+   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v157 LIGHT
+   ทำงานเฉพาะ Editor ที่กำลังเปิดอยู่ ไม่ scan iframe ทั้งเว็บ
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_EDITOR_SINGLE_SCROLL_V155__) return;
-  window.__DDS_EDITOR_SINGLE_SCROLL_V155__ = true;
+  if (window.__DDS_EDITOR_SINGLE_SCROLL_V157__) return;
+  window.__DDS_EDITOR_SINGLE_SCROLL_V157__ = true;
 
-  const STYLE_ID = "ddsEditorSingleScrollV155";
+  const STYLE_ID = "ddsEditorSingleScrollV157";
 
   function isEditorPanel(panel) {
     if (!panel?.classList?.contains("dds-panel")) return false;
-
     const name = String(panel.dataset?.panel || "");
-
     return (
       name.startsWith("editor-") ||
       name.startsWith("protected-commission") ||
@@ -23941,326 +23918,137 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     );
   }
 
-  function isEditorPreviewIframe(iframe) {
+  function injectRedScroll(iframe) {
     const panel = iframe?.closest(".dds-panel");
-    if (!isEditorPanel(panel)) return false;
-
-    return Boolean(
-      iframe.closest(
-        ".dds-editor-preview-column, .dds-protected-commission-preview-column"
-      )
-    );
-  }
-
-  function injectLegacyShellScrollbar(iframe, doc) {
-    const shell =
-      doc.querySelector(".dds-preview-shell") ||
-      doc.querySelector(".dds-lwl-preview-shell");
-
-    if (!shell) {
-      if (!doc.getElementById(STYLE_ID)) {
-        const style = doc.createElement("style");
-        style.id = STYLE_ID;
-        style.textContent = `
-          html{
-            width:100%!important;
-            height:100%!important;
-            overflow:hidden!important;
-          }
-
-          body{
-            width:100%!important;
-            height:100%!important;
-            min-height:100%!important;
-            overflow:auto!important;
-            scrollbar-width:thin!important;
-            scrollbar-color:#c11724 #090909!important;
-          }
-
-          body::-webkit-scrollbar{
-            width:7px;
-            height:7px;
-          }
-
-          body::-webkit-scrollbar-track{
-            background:#090909;
-          }
-
-          body::-webkit-scrollbar-thumb{
-            background:#c11724;
-            border-radius:999px;
-          }
-
-          body::-webkit-scrollbar-thumb:hover{
-            background:#df2632;
-          }
-
-          body::-webkit-scrollbar-corner{
-            background:#090909;
-          }
-        `;
-        doc.head?.appendChild(style);
-      }
-
-      return;
-    }
-
-    if (!doc.getElementById(STYLE_ID)) {
-      const style = doc.createElement("style");
-      style.id = STYLE_ID;
-      style.textContent = `
-        html,
-        body{
-          width:100%!important;
-          height:100%!important;
-          min-height:100%!important;
-          overflow:hidden!important;
-          scrollbar-width:none!important;
-        }
-
-        html::-webkit-scrollbar,
-        body::-webkit-scrollbar{
-          width:0!important;
-          height:0!important;
-          display:none!important;
-        }
-
-        .dds-preview-shell,
-        .dds-lwl-preview-shell{
-          width:100%!important;
-          height:100%!important;
-          min-height:100%!important;
-          max-height:100%!important;
-          box-sizing:border-box!important;
-          overflow:auto!important;
-          scrollbar-width:thin!important;
-          scrollbar-color:#c11724 #090909!important;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar,
-        .dds-lwl-preview-shell::-webkit-scrollbar{
-          width:7px;
-          height:7px;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar-track,
-        .dds-lwl-preview-shell::-webkit-scrollbar-track{
-          background:#090909;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar-thumb,
-        .dds-lwl-preview-shell::-webkit-scrollbar-thumb{
-          background:#c11724;
-          border-radius:999px;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar-thumb:hover,
-        .dds-lwl-preview-shell::-webkit-scrollbar-thumb:hover{
-          background:#df2632;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar-corner,
-        .dds-lwl-preview-shell::-webkit-scrollbar-corner{
-          background:#090909;
-        }
-      `;
-      doc.head?.appendChild(style);
-    }
-
-    doc.documentElement.style.setProperty(
-      "overflow",
-      "hidden",
-      "important"
-    );
-
-    doc.body.style.setProperty(
-      "overflow",
-      "hidden",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "overflow",
-      "auto",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "scrollbar-width",
-      "thin",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "scrollbar-color",
-      "#c11724 #090909",
-      "important"
-    );
-  }
-
-  function injectNoInnerScrollbar(iframe, doc) {
-    if (!doc.getElementById(STYLE_ID)) {
-      const style = doc.createElement("style");
-      style.id = STYLE_ID;
-      style.textContent = `
-        html,
-        body{
-          overflow:hidden!important;
-          scrollbar-width:none!important;
-        }
-
-        html::-webkit-scrollbar,
-        body::-webkit-scrollbar{
-          width:0!important;
-          height:0!important;
-          display:none!important;
-        }
-
-        .dds-preview-shell,
-        .dds-lwl-preview-shell{
-          overflow:visible!important;
-          scrollbar-width:none!important;
-        }
-
-        .dds-preview-shell::-webkit-scrollbar,
-        .dds-lwl-preview-shell::-webkit-scrollbar{
-          width:0!important;
-          height:0!important;
-          display:none!important;
-        }
-      `;
-      doc.head?.appendChild(style);
-    }
-
-    doc.documentElement.style.setProperty(
-      "overflow",
-      "hidden",
-      "important"
-    );
-
-    doc.body.style.setProperty(
-      "overflow",
-      "hidden",
-      "important"
-    );
-  }
-
-  function applyToIframe(iframe) {
-    if (!isEditorPreviewIframe(iframe)) return false;
+    if (!panel?.classList.contains("is-active") || !isEditorPanel(panel)) return;
 
     const doc = iframe.contentDocument;
-    if (!doc?.body) return false;
+    if (!doc?.body) return;
 
     const column = iframe.closest(
       ".dds-editor-preview-column, .dds-protected-commission-preview-column"
     );
+    if (!column) return;
 
-    if (!column) return false;
-
-    const isLegacyDirect =
+    const directLegacy =
       column.classList.contains("dds-editor-preview-column") &&
       iframe.parentElement === column;
 
-    if (isLegacyDirect) {
-      injectLegacyShellScrollbar(iframe, doc);
+    const shell =
+      doc.querySelector(".dds-preview-shell") ||
+      doc.querySelector(".dds-lwl-preview-shell");
+
+    if (!doc.getElementById(STYLE_ID)) {
+      const style = doc.createElement("style");
+      style.id = STYLE_ID;
+
+      style.textContent = directLegacy
+        ? `
+          html,body{
+            width:100%!important;
+            height:100%!important;
+            min-height:100%!important;
+            overflow:hidden!important;
+            scrollbar-width:none!important;
+          }
+          html::-webkit-scrollbar,
+          body::-webkit-scrollbar{
+            width:0!important;height:0!important;display:none!important;
+          }
+          .dds-preview-shell,
+          .dds-lwl-preview-shell{
+            height:100%!important;
+            min-height:100%!important;
+            max-height:100%!important;
+            overflow-y:auto!important;
+            overflow-x:hidden!important;
+            scrollbar-width:thin!important;
+            scrollbar-color:#c11724 #090909!important;
+          }
+          .dds-preview-shell::-webkit-scrollbar,
+          .dds-lwl-preview-shell::-webkit-scrollbar{
+            width:7px;height:7px;
+          }
+          .dds-preview-shell::-webkit-scrollbar-track,
+          .dds-lwl-preview-shell::-webkit-scrollbar-track{
+            background:#090909;
+          }
+          .dds-preview-shell::-webkit-scrollbar-thumb,
+          .dds-lwl-preview-shell::-webkit-scrollbar-thumb{
+            background:#c11724;border-radius:999px;
+          }
+        `
+        : `
+          html,body{
+            overflow:hidden!important;
+            scrollbar-width:none!important;
+          }
+          html::-webkit-scrollbar,
+          body::-webkit-scrollbar{
+            width:0!important;height:0!important;display:none!important;
+          }
+        `;
+
+      doc.head?.appendChild(style);
+    }
+
+    if (directLegacy && shell) {
+      doc.documentElement.style.setProperty("overflow", "hidden", "important");
+      doc.body.style.setProperty("overflow", "hidden", "important");
+      shell.style.setProperty("overflow-y", "auto", "important");
+      shell.style.setProperty("overflow-x", "hidden", "important");
+      shell.style.setProperty("scrollbar-width", "thin", "important");
+      shell.style.setProperty("scrollbar-color", "#c11724 #090909", "important");
     } else {
-      /*
-       * Stage-based / protected editor:
-       * scrollbar owner is outside iframe, so inner doc must never scroll.
-       */
-      injectNoInnerScrollbar(iframe, doc);
+      doc.documentElement.style.setProperty("overflow", "hidden", "important");
+      doc.body.style.setProperty("overflow", "hidden", "important");
     }
-
-    iframe.dataset.ddsSingleScrollReady = "1";
-    return true;
   }
 
-  function schedule(iframe) {
-    [0, 30, 90, 180, 360, 700].forEach((delay) => {
-      window.setTimeout(() => {
-        requestAnimationFrame(() => applyToIframe(iframe));
-      }, delay);
+  function bindActivePanel(panel) {
+    if (!panel?.classList.contains("is-active") || !isEditorPanel(panel)) return;
+
+    panel.querySelectorAll(
+      ".dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe"
+    ).forEach((iframe) => {
+      if (iframe.dataset.ddsSingleScrollV157 !== "1") {
+        iframe.dataset.ddsSingleScrollV157 = "1";
+        iframe.addEventListener("load", () => {
+          requestAnimationFrame(() => injectRedScroll(iframe));
+        });
+      }
+
+      requestAnimationFrame(() => injectRedScroll(iframe));
     });
-  }
-
-  function bindIframe(iframe) {
-    if (!isEditorPreviewIframe(iframe)) return;
-    if (iframe.dataset.ddsSingleScrollBound === "1") {
-      schedule(iframe);
-      return;
-    }
-
-    iframe.dataset.ddsSingleScrollBound = "1";
-
-    iframe.addEventListener(
-      "load",
-      () => schedule(iframe)
-    );
-
-    const srcObserver =
-      new MutationObserver((records) => {
-        if (
-          records.some(
-            (record) =>
-              record.attributeName === "srcdoc"
-          )
-        ) {
-          schedule(iframe);
-        }
-      });
-
-    srcObserver.observe(iframe, {
-      attributes:true,
-      attributeFilter:["srcdoc"]
-    });
-
-    schedule(iframe);
-  }
-
-  function scan(root = document) {
-    root
-      .querySelectorAll?.(
-        ".dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe"
-      )
-      .forEach(bindIframe);
   }
 
   function boot() {
-    scan();
+    const panels = Array.from(document.querySelectorAll(".dds-panel"))
+      .filter(isEditorPanel);
 
-    const observer =
-      new MutationObserver((records) => {
-        records.forEach((record) => {
-          record.addedNodes.forEach((node) => {
-            if (!(node instanceof Element)) return;
-
-            if (
-              node.matches?.(
-                ".dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe"
-              )
-            ) {
-              bindIframe(node);
-            }
-
-            scan(node);
-          });
-        });
+    panels.forEach((panel) => {
+      const observer = new MutationObserver(() => {
+        if (panel.classList.contains("is-active")) {
+          bindActivePanel(panel);
+        }
       });
 
-    observer.observe(document.body, {
-      childList:true,
-      subtree:true
+      observer.observe(panel, {
+        attributes:true,
+        attributeFilter:["class"]
+      });
+
+      if (panel.classList.contains("is-active")) {
+        bindActivePanel(panel);
+      }
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      boot,
-      { once:true }
-    );
+    document.addEventListener("DOMContentLoaded", boot, { once:true });
   } else {
     boot();
   }
 })();
+
 
