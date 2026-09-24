@@ -11015,3 +11015,64 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 [data-code014-draft-status]::after{
   font-weight:400 !important;
 }
+
+
+/* =========================================================
+   ALL CODE EDITORS — DRAFT EXACT TYPOGRAPHY v170
+   บันทึกแบบร่าง = white / bold
+    ( บันทึกล่าสุด เวลา )  = grey / normal
+========================================================= */
+
+/* reset parent weight */
+.dds-draft-manager,
+.dds-draft-manager-copy,
+.dds-protected-commission-draft,
+.dds-protected-commission-draft > div:first-child{
+  font-weight:400 !important;
+}
+
+/* only the title is bold + white */
+.dds-draft-manager-copy > strong,
+.dds-protected-commission-draft > div:first-child > strong{
+  color:#ffffff !important;
+  font-weight:700 !important;
+}
+
+/* remove the old parenthesis from title */
+.dds-draft-manager-copy > strong::after,
+.dds-protected-commission-draft > div:first-child > strong::after{
+  content:" " !important;
+  color:#ffffff !important;
+  font-weight:400 !important;
+}
+
+/* status text is always grey + normal */
+.dds-draft-status,
+.dds-draft-manager-copy .dds-draft-status,
+.dds-protected-commission-draft small,
+.dds-protected-commission-draft > div:first-child > small,
+[data-draft-status],
+[data-code013-draft-status],
+[data-code014-draft-status]{
+  color:#7d7d7d !important;
+  font-weight:400 !important;
+}
+
+/* exact spaced parentheses:  ( text )  */
+.dds-draft-manager-copy .dds-draft-status::before,
+.dds-protected-commission-draft > div:first-child > small::before,
+[data-code013-draft-status]::before,
+[data-code014-draft-status]::before{
+  content:"( " !important;
+  color:#7d7d7d !important;
+  font-weight:400 !important;
+}
+
+.dds-draft-manager-copy .dds-draft-status::after,
+.dds-protected-commission-draft > div:first-child > small::after,
+[data-code013-draft-status]::after,
+[data-code014-draft-status]::after{
+  content:" )" !important;
+  color:#7d7d7d !important;
+  font-weight:400 !important;
+}

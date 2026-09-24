@@ -29,7 +29,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260924-code014-precore-v169" rel="stylesheet"/>
+<link href="./style.css?v=20260924-code014-canonical-v170" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5662,18 +5662,67 @@ You were mine forever</textarea>
 
 
 
-<script id="dds-code014-precore-v169">
+<script id="dds-code014-click-bridge-v170">
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE014_CLICK_BRIDGE_V170__) return;
+  window.__DDS_CODE014_CLICK_BRIDGE_V170__ = true;
+
+  window.addEventListener(
+    "click",
+    (event) => {
+      const button =
+        event.target?.closest?.(
+          ".dds-roleplay-card-code014 [data-code014-edit]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      if (
+        typeof window.__ddsOpenCode014V170 === "function"
+      ) {
+        window.__ddsOpenCode014V170();
+        return;
+      }
+
+      /*
+       * If the large CODE014 module has not finished yet,
+       * remember the click and open as soon as it becomes available.
+       */
+      window.__DDS_CODE014_PENDING_OPEN_V170__ = true;
+    },
+    true
+  );
+})();
+</script>
+
+<script id="dds-code014-precore-v170">
 /* =========================================================
    CODE014 — www.s$sLuv.c0m
-   PRE-CORE SOLE OWNER v169
+   CANONICAL SOLE OWNER v170
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE014_PRECORE_V169_INSTALLED__) return;
+  if (window.__DDS_CODE014_CANONICAL_V170_INSTALLED__) return;
+  window.__DDS_CODE014_CANONICAL_V170_INSTALLED__ = true;
+
+  /*
+   * Block every older CODE014 installer we have used.
+   * Most importantly, __DDS_CODE014_SSSLUV_INSTALLED__
+   * is the guard used by the old/core CODE014 module.
+   */
+  window.__DDS_CODE014_SSSLUV_INSTALLED__ = true;
+  window.__DDS_CODE014_SSSLUV_RESCUE_V163__ = true;
+  window.__DDS_CODE014_LOCAL_V168_INSTALLED__ = true;
   window.__DDS_CODE014_PRECORE_V169_INSTALLED__ = true;
 
-  const PANEL_NAME = "editor-code014-v169";
+  const PANEL_NAME = "editor-code014";
   const DRAFT_KEY = "dds:roleplay:code014:draft:v2";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=DotGothic16&display=swap";
@@ -6088,6 +6137,25 @@ You were mine forever</textarea>
 
   function createPanel() {
     if (panel?.isConnected) return panel;
+
+    const existingPanel =
+      document.querySelector(
+        '[data-panel="editor-code014"]'
+      );
+
+    if (existingPanel) {
+      panel = existingPanel;
+
+      if (
+        panel.dataset.code014CanonicalBound !== "1"
+      ) {
+        panel.dataset.code014CanonicalBound = "1";
+        bindPanel();
+      }
+
+      return panel;
+    }
+
     panel = document.createElement("section");
     panel.className = "dds-panel dds-protected-commission-editor dds-code014-editor";
     panel.dataset.panel = PANEL_NAME;
@@ -6111,8 +6179,15 @@ You were mine forever</textarea>
       </div>`;
     const main = document.querySelector(".dds-main");
     const footer = document.querySelector(".dds-footer");
-    if (footer?.parentElement === main) main.insertBefore(panel, footer); else main?.appendChild(panel);
+    if (footer?.parentElement === main) {
+      main.insertBefore(panel, footer);
+    } else {
+      main?.appendChild(panel);
+    }
+
+    panel.dataset.code014CanonicalBound = "1";
     bindPanel();
+
     return panel;
   }
 
@@ -6291,6 +6366,14 @@ You were mine forever</textarea>
   }
 
   function bindPanel() {
+    if (!panel) return;
+
+    if (panel.dataset.code014EventsBound === "1") {
+      return;
+    }
+
+    panel.dataset.code014EventsBound = "1";
+
     panel.querySelector("[data-code014-back]")?.addEventListener("click", goBack);
     panel.querySelectorAll("[data-code014-field]").forEach((input) => {
       input.addEventListener("input", () => {
@@ -6333,7 +6416,7 @@ You were mine forever</textarea>
     const run = (event) => {
       event?.preventDefault?.();
       event?.stopPropagation?.();
-      window.__ddsOpenCode014V169?.();
+      window.__ddsOpenCode014V170?.();
     };
 
     /*
@@ -6490,7 +6573,9 @@ You were mine forever</textarea>
   function openEditor() {
     const target = createPanel();
 
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
     const draft = getDraft();
 
@@ -6504,10 +6589,6 @@ You were mine forever</textarea>
       draft?.savedAt || 0
     );
 
-    /*
-     * เปิด Editor แบบ force-active เพื่อไม่ให้ state จากหน้า FOR ROLEPLAY
-     * หรือ patch อื่นดึง panel กลับ
-     */
     document.documentElement.classList.add(
       "dds-editor-mode"
     );
@@ -6516,22 +6597,60 @@ You were mine forever</textarea>
       "dds-editor-mode"
     );
 
-    showPanel(PANEL_NAME);
+    /*
+     * Canonical activation:
+     * hide every other panel, then show CODE014 directly.
+     * Does not depend on the core router.
+     */
+    document
+      .querySelectorAll(".dds-panel")
+      .forEach((candidate) => {
+        candidate.classList.remove("is-active");
+      });
 
     target.classList.add("is-active");
+
+    document
+      .querySelectorAll("[data-page]")
+      .forEach((button) => {
+        const active =
+          button.dataset.page === "roleplay";
+
+        button.classList.toggle(
+          "is-active",
+          active
+        );
+
+        button.setAttribute(
+          "aria-current",
+          active ? "page" : "false"
+        );
+      });
+
+    const pageNumber =
+      document.getElementById(
+        "currentPageNumber"
+      );
+
+    if (pageNumber) {
+      pageNumber.textContent = "01";
+    }
 
     history.replaceState(
       null,
       "",
-      "#editor-code014-v169"
+      "#editor-code014"
     );
 
     window.scrollTo(0, 0);
 
+    /*
+     * Let the panel paint first, then build the live preview.
+     */
     requestAnimationFrame(() => {
-      updatePreview();
-
-      window.__ddsApplyUnifiedEditorPreview?.();
+      requestAnimationFrame(() => {
+        updatePreview();
+      });
     });
   }
 
@@ -6539,19 +6658,15 @@ You were mine forever</textarea>
    * v162: expose ตัวเปิด Editor โดยตรง
    * เพื่อไม่ต้องพึ่ง event/state ของ card อย่างเดียว
    */
-  window.__ddsOpenCode014V169 =
+  window.__ddsOpenCode014V170 =
     () => openEditor();
 
-  /*
-   * Compatibility alias for any existing button/helper.
-   * Our v168 route always wins after local script loads.
-   */
   window.__ddsOpenCode014 =
-    window.__ddsOpenCode014V169;
+    window.__ddsOpenCode014V170;
 
   function handleHash() {
     if (
-      location.hash === "#editor-code014-v169" &&
+      location.hash === "#editor-code014" &&
       !panel?.classList.contains("is-active")
     ) {
       openEditor();
@@ -6559,136 +6674,108 @@ You were mine forever</textarea>
   }
 
   function install() {
-    createPanel();
+    /*
+     * Most important part:
+     * bind the CODE014 button BEFORE doing any preview/order work.
+     * Even if card fitting later fails, EDIT CODE still works.
+     */
+    if (
+      window.__DDS_CODE014_CLICK_V170__ !== true
+    ) {
+      window.__DDS_CODE014_CLICK_V170__ = true;
+
+      window.addEventListener(
+        "click",
+        (event) => {
+          const button =
+            event.target?.closest?.(
+              ".dds-roleplay-card-code014 [data-code014-edit]"
+            );
+
+          if (!button) return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          openEditor();
+        },
+        true
+      );
+    }
+
+    /*
+     * The card is static HTML now.
+     * Card/order/preview maintenance is non-critical and must never
+     * be able to disable the EDIT CODE route.
+     */
+    try {
+      installCard();
+    } catch {}
 
     let attempts = 0;
 
-    const settleOrder = () => {
-      attempts += 1;
-
-      installCard();
-
-      const grid =
-        document.querySelector(
-          '[data-panel="roleplay"] .dds-roleplay-grid'
-        );
-
-      const code13 =
-        grid?.querySelector(
-          ".dds-roleplay-card-code013"
-        );
-
-      const code14 =
-        grid?.querySelector(
-          ".dds-roleplay-card-code014"
-        );
-
-      if (
-        (
-          code13 &&
-          code14 &&
-          code13.nextElementSibling === code14
-        ) ||
-        attempts >= 80
-      ) {
-        window.clearInterval(orderTimer);
-      }
-    };
-
     const orderTimer =
       window.setInterval(
-        settleOrder,
+        () => {
+          attempts += 1;
+
+          try {
+            installCard();
+          } catch {}
+
+          const grid =
+            document.querySelector(
+              '[data-panel="roleplay"] .dds-roleplay-grid'
+            );
+
+          const code13 =
+            grid?.querySelector(
+              ".dds-roleplay-card-code013"
+            );
+
+          const code14 =
+            grid?.querySelector(
+              ".dds-roleplay-card-code014"
+            );
+
+          if (
+            (
+              code13 &&
+              code14 &&
+              code13.nextElementSibling === code14
+            ) ||
+            attempts >= 40
+          ) {
+            window.clearInterval(
+              orderTimer
+            );
+          }
+        },
         100
       );
-
-    settleOrder();
-
-    /*
-     * Capture at WINDOW level.
-     * This fires before document/card handlers from older CODE014 modules.
-     */
-    window.addEventListener(
-      "click",
-      (event) => {
-        const button =
-          event.target?.closest?.(
-            ".dds-roleplay-card-code014 [data-code014-edit]"
-          );
-
-        if (!button) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-
-        openEditor();
-      },
-      true
-    );
-
-    window.addEventListener(
-      "resize",
-      () => {
-        const cardFrame =
-          card?.querySelector(
-            "[data-code014-card-preview]"
-          );
-
-        if (cardFrame) {
-          fitIframe(
-            cardFrame,
-            card?.querySelector(
-              ".dds-roleplay-card-preview"
-            ),
-            16
-          );
-        }
-
-        const editorFrame =
-          panel?.querySelector(
-            "[data-code014-editor-preview]"
-          );
-
-        if (
-          editorFrame &&
-          panel?.classList.contains("is-active")
-        ) {
-          sizeEditorPreviewActual(
-            editorFrame,
-            panel.querySelector(
-              ".dds-code014-editor-stage"
-            ),
-            28
-          );
-        }
-      }
-    );
 
     window.addEventListener(
       "hashchange",
       handleHash
     );
 
-    window.setTimeout(
-      handleHash,
-      100
-    );
+    if (
+      location.hash === "#editor-code014"
+    ) {
+      openEditor();
+      return;
+    }
+
+    if (
+      window.__DDS_CODE014_PENDING_OPEN_V170__
+    ) {
+      window.__DDS_CODE014_PENDING_OPEN_V170__ = false;
+      openEditor();
+    }
   }
 
-  /*
-   * v169:
-   * script นี้วางท้าย HTML แต่ก่อน remote core
-   * DOM ของ FOR ROLEPLAY มีอยู่แล้ว จึงติดตั้งทันที
-   * click capture จะถูกลงทะเบียนก่อน handler CODE014 รุ่นเก่าทั้งหมด
-   */
   if (
-    document.querySelector(".dds-main") &&
-    document.querySelector(
-      '[data-panel="roleplay"]'
-    )
-  ) {
-    install();
-  } else if (
     document.readyState === "loading"
   ) {
     document.addEventListener(
@@ -6699,12 +6786,13 @@ You were mine forever</textarea>
   } else {
     install();
   }
+
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script src="./script.js?v=20260924-code014-precore-v169"></script>
+<script src="./script.js?v=20260924-code014-canonical-v170"></script>
 
 
 
