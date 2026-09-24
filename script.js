@@ -22416,7 +22416,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const refit = () => requestAnimationFrame(() => requestAnimationFrame(() => afterLoad?.()));
     iframe.onload = () => {
       refit();
-      [80, 180, 420, 850, 1500].forEach((delay) => setTimeout(refit, delay));
+      [60, 180].forEach((delay) => setTimeout(refit, delay));
       try { iframe.contentDocument?.fonts?.ready?.then(refit); } catch {}
     };
     iframe.srcdoc = previewDocument(code);
@@ -22723,6 +22723,32 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel.querySelector("[data-code014-reset]")?.addEventListener("click", () => { setValues(editorDefaults); updatePreview(); scheduleDraftSave(); notify("รีเซ็ต CODE014 แล้ว"); });
   }
 
+  function bindCardEditButton() {
+    const button =
+      card?.querySelector(
+        "[data-code014-edit]"
+      );
+
+    if (
+      !button ||
+      button.dataset.code014Bound === "1"
+    ) {
+      return;
+    }
+
+    button.dataset.code014Bound = "1";
+
+    button.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openEditor();
+      },
+      true
+    );
+  }
+
   function installCard() {
     if (card?.isConnected) return true;
     const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
@@ -22732,6 +22758,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const existing = grid.querySelector(".dds-roleplay-card-code014");
     if (existing) {
       card = existing;
+      bindCardEditButton();
       return true;
     }
 
@@ -22739,6 +22766,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     card.className = "dds-roleplay-card dds-roleplay-card-code014";
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE014</span><h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2><button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     code13.insertAdjacentElement("afterend", card);
+
+    bindCardEditButton();
 
     const iframe = card.querySelector("[data-code014-card-preview]");
     const render = () => {
@@ -22781,13 +22810,51 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function openEditor() {
-    createPanel();
+    const target = createPanel();
+
+    if (!target) return;
+
     const draft = getDraft();
-    setValues(draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults });
-    setDraftStatus(draft?.savedAt || 0);
+
+    setValues(
+      draft?.values
+        ? { ...editorDefaults, ...draft.values }
+        : { ...editorDefaults }
+    );
+
+    setDraftStatus(
+      draft?.savedAt || 0
+    );
+
+    /*
+     * เปิด Editor แบบ force-active เพื่อไม่ให้ state จากหน้า FOR ROLEPLAY
+     * หรือ patch อื่นดึง panel กลับ
+     */
+    document.documentElement.classList.add(
+      "dds-editor-mode"
+    );
+
+    document.body.classList.add(
+      "dds-editor-mode"
+    );
+
     showPanel(PANEL_NAME);
-    history.replaceState(null, "", "#editor-code014");
-    updatePreview();
+
+    target.classList.add("is-active");
+
+    history.replaceState(
+      null,
+      "",
+      "#editor-code014"
+    );
+
+    window.scrollTo(0, 0);
+
+    requestAnimationFrame(() => {
+      updatePreview();
+
+      window.__ddsApplyUnifiedEditorPreview?.();
+    });
   }
 
   function handleHash() {
@@ -22852,6 +22919,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function isEditorPanel(panel) {
     if (!panel?.classList?.contains("dds-panel")) return false;
+
+    /*
+     * VIEW WORK ต้องยาวตามงานจริง ห้ามถูกระบบ 1-screen ของ Editor บีบ
+     */
+    if (panel.classList.contains("dds-commission-view-panel")) {
+      return false;
+    }
 
     const name = String(panel.dataset?.panel || "");
 
@@ -22995,33 +23069,937 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   EDITOR PREVIEW — ON DEMAND LIGHT CONTROLLER v159
-   No background interval. No all-page iframe scan.
+   FOR ROLEPLAY + FOR REVIEW EDITOR PREVIEW — UNIFIED v161
+
+   กติกาเดียวสำหรับ:
+   ROLEPLAY CODE001–014
+   REVIEW CODE001–003
+
+   - Fit ตาม "ความกว้าง" ของกรอบเท่านั้น ไม่บีบตามความสูง
+   - รักษาสัดส่วนจริงของโค้ด
+   - ถ้างานยาว ให้ scroll แนวตั้งใน preview ได้จริง
+   - ไม่มี scroll แนวนอน
+   - scrollbar สีแดงตามธีม
+   - ทำงานเฉพาะ panel ที่ active เท่านั้น
 ========================================================= */
 (() => {
   "use strict";
-  if(window.__DDS_EDITOR_LIGHT_V159__)return;
-  window.__DDS_EDITOR_LIGHT_V159__=true;
-  const CFG={
-    "editor-code002":{id:"weirdoPreview"},
-    "editor-code003":{id:"hihiPreview"},
-    "editor-code004":{id:"uuiaaPreview"},
-    "editor-code005":{id:"commaPreview",width:650},
-    "editor-code006":{id:"newRulesPreview",width:720},
-    "editor-code009":{id:"higherHeavenPreview"},
-    "editor-code010":{id:"longWayLongRidePreview"}
+
+  if (window.__DDS_ROLEPLAY_REVIEW_PREVIEW_V161__) return;
+  window.__DDS_ROLEPLAY_REVIEW_PREVIEW_V161__ = true;
+
+  const CFG = {
+    "editor-code001": { id: "pageOfOnePreview" },
+    "editor-code002": { id: "weirdoPreview" },
+    "editor-code003": { id: "hihiPreview" },
+    "editor-code004": { id: "uuiaaPreview" },
+    "editor-code005": { id: "commaPreview", width: 650 },
+    "editor-code006": { id: "newRulesPreview", width: 720 },
+    "editor-code007": { id: "loveSongPreview" },
+    "editor-code008": { id: "dumbDumberPreview" },
+    "editor-code009": { id: "higherHeavenPreview" },
+    "editor-code010": { id: "longWayLongRidePreview" },
+    "editor-code011": { id: "onCloudPreview" },
+    "editor-code012": { id: "chocolateLovePreview" },
+
+    "editor-code013": {
+      selector: "[data-code013-editor-preview]",
+      width: 720
+    },
+
+    "editor-code014": {
+      selector: "[data-code014-editor-preview]",
+      width: 650
+    },
+
+    "editor-review001": { id: "foodReviewPreview" },
+    "editor-review002": { id: "musicReviewPreview" },
+    "editor-review003": { id: "movieReviewPreview" }
   };
-  const cache=new WeakMap();
-  function active(){return [...document.querySelectorAll('.dds-panel.is-active')].find(p=>CFG[p.dataset.panel])||null}
-  function parts(f){const d=f?.contentDocument;if(!d?.body)return null;const shell=d.querySelector('.dds-preview-shell')||d.querySelector('.dds-lwl-preview-shell');const target=d.querySelector('.dds-preview-target');if(!shell||!target)return null;const root=[...target.children].find(e=>e.tagName!=="STYLE"&&!String(e.className||"").toLowerCase().includes("credit"));return root?{d,shell,target,root}:null}
-  function widthFor(f,p,cfg){if(cfg.width)return cfg.width;if(cache.has(f))return cache.get(f);p.target.style.cssText+=';visibility:hidden!important;width:1200px!important;min-width:1200px!important;max-width:1200px!important;transform:none!important;zoom:1!important';void p.root.offsetWidth;const cs=p.d.defaultView.getComputedStyle(p.root),q=p.root.getBoundingClientRect(),mw=cs.maxWidth&&cs.maxWidth!=="none"?parseFloat(cs.maxWidth)||0:0;let w=Math.max(parseFloat(cs.width)||0,q.width,p.root.offsetWidth||0,p.root.scrollWidth||0);if(mw>220&&mw<1200)w=Math.min(w,mw);if(!Number.isFinite(w)||w<220||w>=1198)return 0;w=Math.ceil(w);cache.set(f,w);return w}
-  function apply(panel){const cfg=CFG[panel?.dataset.panel];if(!cfg)return;const f=document.getElementById(cfg.id),p=parts(f);if(!f||!p)return;const w=widthFor(f,p,cfg);if(!w)return;p.d.documentElement.style.setProperty('overflow','hidden','important');p.d.body.style.setProperty('overflow','hidden','important');p.shell.style.cssText+=';width:100%!important;height:100%!important;min-height:100%!important;max-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-width:thin!important;scrollbar-color:#c11724 #090909!important';p.target.style.cssText+=`;width:${w}px!important;min-width:${w}px!important;max-width:${w}px!important;flex:0 0 ${w}px!important;margin:auto!important;transform:none!important;zoom:1!important;visibility:visible!important;opacity:1!important`;f.style.cssText+=';width:100%!important;min-width:100%!important;max-width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;margin:0!important;transform:none!important;overflow:hidden!important';if(!p.d.getElementById('ddsEditorRedScrollV159')){const st=p.d.createElement('style');st.id='ddsEditorRedScrollV159';st.textContent='.dds-preview-shell::-webkit-scrollbar,.dds-lwl-preview-shell::-webkit-scrollbar{width:7px;height:7px}.dds-preview-shell::-webkit-scrollbar-track,.dds-lwl-preview-shell::-webkit-scrollbar-track{background:#090909}.dds-preview-shell::-webkit-scrollbar-thumb,.dds-lwl-preview-shell::-webkit-scrollbar-thumb{background:#c11724;border-radius:999px}';p.d.head.appendChild(st)}if(!f.dataset.ddsLightBound){f.dataset.ddsLightBound='1';f.addEventListener('load',()=>requestAnimationFrame(()=>{const a=active();if(a&&CFG[a.dataset.panel]?.id===f.id)apply(a)}))}}
-  function run(){const p=active();if(p)requestAnimationFrame(()=>apply(p))}
-  document.addEventListener('click',()=>setTimeout(run,0),true);
-  document.addEventListener('input',e=>{const p=e.target.closest?.('.dds-panel.is-active');if(p&&CFG[p.dataset.panel])requestAnimationFrame(()=>apply(p))},true);
-  document.addEventListener('change',e=>{const p=e.target.closest?.('.dds-panel.is-active');if(p&&CFG[p.dataset.panel])requestAnimationFrame(()=>apply(p))},true);
-  window.addEventListener('hashchange',run,{passive:true});
+
+  const states = new WeakMap();
+
+  function getState(iframe) {
+    let state = states.get(iframe);
+
+    if (!state) {
+      state = {
+        width: 0,
+        bound: false,
+        timer: 0
+      };
+      states.set(iframe, state);
+    }
+
+    return state;
+  }
+
+  function activePanel() {
+    return Array
+      .from(document.querySelectorAll(".dds-panel.is-active"))
+      .find((panel) => CFG[panel.dataset.panel]) || null;
+  }
+
+  function iframeFor(panel, cfg) {
+    if (!panel || !cfg) return null;
+
+    if (cfg.id) {
+      return document.getElementById(cfg.id);
+    }
+
+    if (cfg.selector) {
+      return panel.querySelector(cfg.selector);
+    }
+
+    return null;
+  }
+
+  function parts(iframe) {
+    const doc = iframe?.contentDocument;
+
+    if (!doc?.body) return null;
+
+    const shell =
+      doc.querySelector(
+        ".dds-preview-shell, .dds-lwl-preview-shell, [class*='preview-shell']"
+      ) ||
+      doc.body;
+
+    const target =
+      doc.querySelector(
+        ".dds-preview-target, [class*='preview-target']"
+      ) ||
+      shell.firstElementChild ||
+      doc.body;
+
+    let root = null;
+
+    if (target !== doc.body) {
+      root = Array
+        .from(target.children)
+        .find((element) => {
+          if (
+            !(element instanceof doc.defaultView.HTMLElement)
+          ) {
+            return false;
+          }
+
+          if (
+            element.tagName === "STYLE" ||
+            element.tagName === "SCRIPT" ||
+            element.tagName === "LINK"
+          ) {
+            return false;
+          }
+
+          const cls =
+            String(element.className || "")
+              .toLowerCase();
+
+          return !cls.includes("credit");
+        });
+    }
+
+    root =
+      root ||
+      target.querySelector?.(":scope > *:not(style):not(script):not(link)") ||
+      target;
+
+    return {
+      doc,
+      shell,
+      target,
+      root
+    };
+  }
+
+  function probeWidth(parts) {
+    const { doc, target, root } = parts;
+
+    /*
+     * วัดจาก clone นอกจอ ไม่ขยายตัวพรีวิวจริง
+     * จึงไม่เกิดจังหวะกาง/หดให้ผู้ใช้เห็น
+     */
+    const probe = doc.createElement("div");
+
+    probe.style.cssText = [
+      "position:fixed!important",
+      "left:-100000px!important",
+      "top:0!important",
+      "width:1600px!important",
+      "min-width:1600px!important",
+      "max-width:1600px!important",
+      "visibility:hidden!important",
+      "pointer-events:none!important",
+      "overflow:visible!important",
+      "contain:layout style paint!important",
+      "z-index:-99999!important"
+    ].join(";");
+
+    const targetClone = target.cloneNode(true);
+
+    targetClone.style.setProperty(
+      "width",
+      "1600px",
+      "important"
+    );
+    targetClone.style.setProperty(
+      "min-width",
+      "1600px",
+      "important"
+    );
+    targetClone.style.setProperty(
+      "max-width",
+      "1600px",
+      "important"
+    );
+    targetClone.style.setProperty(
+      "transform",
+      "none",
+      "important"
+    );
+    targetClone.style.setProperty(
+      "zoom",
+      "1",
+      "important"
+    );
+
+    probe.appendChild(targetClone);
+    doc.body.appendChild(probe);
+
+    const cloneRoot =
+      Array.from(targetClone.children).find((element) => {
+        if (
+          !(element instanceof doc.defaultView.HTMLElement)
+        ) {
+          return false;
+        }
+
+        const cls =
+          String(element.className || "")
+            .toLowerCase();
+
+        return (
+          element.tagName !== "STYLE" &&
+          element.tagName !== "SCRIPT" &&
+          !cls.includes("credit")
+        );
+      }) ||
+      targetClone.firstElementChild ||
+      targetClone;
+
+    void cloneRoot.offsetWidth;
+
+    const style =
+      doc.defaultView.getComputedStyle(cloneRoot);
+
+    const rect =
+      cloneRoot.getBoundingClientRect();
+
+    const maxWidth =
+      style.maxWidth &&
+      style.maxWidth !== "none"
+        ? Number.parseFloat(style.maxWidth) || 0
+        : 0;
+
+    let width = Math.max(
+      Number.parseFloat(style.width) || 0,
+      rect.width || 0,
+      cloneRoot.offsetWidth || 0,
+      cloneRoot.scrollWidth || 0
+    );
+
+    if (
+      maxWidth > 180 &&
+      maxWidth < 1598
+    ) {
+      width = Math.min(width, maxWidth);
+    }
+
+    probe.remove();
+
+    if (
+      !Number.isFinite(width) ||
+      width < 180 ||
+      width >= 1598
+    ) {
+      /*
+       * fallback จาก root จริง โดยไม่แก้ layout
+       */
+      const rootStyle =
+        doc.defaultView.getComputedStyle(root);
+
+      const rootRect =
+        root.getBoundingClientRect();
+
+      width = Math.max(
+        Number.parseFloat(rootStyle.width) || 0,
+        rootRect.width || 0,
+        root.offsetWidth || 0,
+        root.scrollWidth || 0
+      );
+    }
+
+    if (
+      !Number.isFinite(width) ||
+      width < 180
+    ) {
+      return 0;
+    }
+
+    return Math.ceil(width);
+  }
+
+  function visualHeight(parts) {
+    const { doc, target, root } = parts;
+
+    const elements = [
+      root,
+      ...Array.from(root.querySelectorAll?.("*") || [])
+    ];
+
+    let minTop = Infinity;
+    let maxBottom = -Infinity;
+
+    elements.forEach((element) => {
+      if (
+        !(element instanceof doc.defaultView.HTMLElement)
+      ) {
+        return;
+      }
+
+      const style =
+        doc.defaultView.getComputedStyle(element);
+
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const rect =
+        element.getBoundingClientRect();
+
+      if (
+        !Number.isFinite(rect.top) ||
+        !Number.isFinite(rect.bottom) ||
+        rect.width <= 0.5 ||
+        rect.height <= 0.5
+      ) {
+        return;
+      }
+
+      minTop = Math.min(minTop, rect.top);
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    });
+
+    if (
+      !Number.isFinite(minTop) ||
+      !Number.isFinite(maxBottom) ||
+      maxBottom <= minTop
+    ) {
+      const rect =
+        root.getBoundingClientRect();
+
+      minTop = rect.top;
+      maxBottom = rect.bottom;
+    }
+
+    return Math.max(
+      1,
+      Math.ceil(
+        Math.max(
+          maxBottom - minTop,
+          root.scrollHeight || 0,
+          root.offsetHeight || 0,
+          target.scrollHeight || 0
+        )
+      )
+    );
+  }
+
+  function installScrollbarStyle(doc) {
+    if (
+      doc.getElementById(
+        "ddsRoleplayReviewScrollV161"
+      )
+    ) {
+      return;
+    }
+
+    const style =
+      doc.createElement("style");
+
+    style.id =
+      "ddsRoleplayReviewScrollV161";
+
+    style.textContent = `
+      html,
+      body{
+        width:100%!important;
+        height:100%!important;
+        min-height:100%!important;
+        margin:0!important;
+        overflow:hidden!important;
+        scrollbar-width:none!important;
+      }
+
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar{
+        width:0!important;
+        height:0!important;
+        display:none!important;
+      }
+
+      .dds-preview-shell,
+      .dds-lwl-preview-shell,
+      [class*="preview-shell"]{
+        scrollbar-width:thin!important;
+        scrollbar-color:#c11724 #090909!important;
+      }
+
+      .dds-preview-shell::-webkit-scrollbar,
+      .dds-lwl-preview-shell::-webkit-scrollbar,
+      [class*="preview-shell"]::-webkit-scrollbar{
+        width:7px;
+        height:7px;
+      }
+
+      .dds-preview-shell::-webkit-scrollbar-track,
+      .dds-lwl-preview-shell::-webkit-scrollbar-track,
+      [class*="preview-shell"]::-webkit-scrollbar-track{
+        background:#090909;
+      }
+
+      .dds-preview-shell::-webkit-scrollbar-thumb,
+      .dds-lwl-preview-shell::-webkit-scrollbar-thumb,
+      [class*="preview-shell"]::-webkit-scrollbar-thumb{
+        background:#c11724;
+        border-radius:999px;
+      }
+
+      .dds-preview-shell::-webkit-scrollbar-thumb:hover,
+      .dds-lwl-preview-shell::-webkit-scrollbar-thumb:hover,
+      [class*="preview-shell"]::-webkit-scrollbar-thumb:hover{
+        background:#df2632;
+      }
+
+      .dds-preview-shell::-webkit-scrollbar-corner,
+      .dds-lwl-preview-shell::-webkit-scrollbar-corner,
+      [class*="preview-shell"]::-webkit-scrollbar-corner{
+        background:#090909;
+      }
+    `;
+
+    doc.head?.appendChild(style);
+  }
+
+  function apply(panel) {
+    const cfg =
+      CFG[panel?.dataset.panel];
+
+    if (!cfg) return false;
+
+    const iframe =
+      iframeFor(panel, cfg);
+
+    const p =
+      parts(iframe);
+
+    if (
+      !iframe ||
+      !p
+    ) {
+      return false;
+    }
+
+    const state =
+      getState(iframe);
+
+    if (!state.width) {
+      state.width =
+        cfg.width ||
+        probeWidth(p);
+    }
+
+    const naturalWidth =
+      state.width;
+
+    if (!naturalWidth) {
+      return false;
+    }
+
+    installScrollbarStyle(p.doc);
+
+    /*
+     * Outer iframe = viewport คงที่
+     */
+    iframe.style.setProperty(
+      "position",
+      "relative",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "inset",
+      "auto",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "width",
+      "100%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      "100%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      "100%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      "100%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      "0",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      "100%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "margin",
+      "0",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      "none",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "visibility",
+      "visible",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "opacity",
+      "1",
+      "important"
+    );
+
+    /*
+     * Inner document = scroll owner เพียงอันเดียว
+     */
+    p.doc.documentElement.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    p.doc.body.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    p.doc.body.style.setProperty(
+      "padding",
+      "0",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "width",
+      "100%",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "height",
+      "100%",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "min-height",
+      "100%",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "max-height",
+      "100%",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "box-sizing",
+      "border-box",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "padding",
+      "16px",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "display",
+      "flex",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "flex-direction",
+      "column",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "align-items",
+      "center",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "justify-content",
+      "flex-start",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "overflow-y",
+      "auto",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "overflow-x",
+      "hidden",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    p.shell.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+
+    const availableWidth =
+      Math.max(
+        1,
+        p.shell.clientWidth - 32
+      );
+
+    const scale =
+      Math.max(
+        0.01,
+        Math.min(
+          1,
+          availableWidth / naturalWidth
+        )
+      );
+
+    /*
+     * ก่อนวัดความสูง ให้คืน layout จริงของ code
+     */
+    p.target.style.setProperty(
+      "position",
+      "relative",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "inset",
+      "auto",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "min-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "max-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "transform",
+      "none",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "margin",
+      "0 auto",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "flex",
+      "0 0 auto",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "visibility",
+      "visible",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "opacity",
+      "1",
+      "important"
+    );
+
+    p.target.style.setProperty(
+      "zoom",
+      "1",
+      "important"
+    );
+
+    void p.root.offsetHeight;
+
+    const naturalHeight =
+      visualHeight(p);
+
+    p.target.style.setProperty(
+      "min-height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    /*
+     * zoom กระทบ layout size ใน Chromium
+     * จึงได้ scrollHeight ที่ตรงกับขนาดหลัง fit width
+     */
+    p.target.style.setProperty(
+      "zoom",
+      String(scale),
+      "important"
+    );
+
+    if (
+      iframe.dataset.ddsUnifiedPreviewReady !== "1"
+    ) {
+      p.shell.scrollTop = 0;
+      iframe.dataset.ddsUnifiedPreviewReady = "1";
+    }
+
+    /*
+     * Bind แค่ iframe ที่กำลังใช้งาน
+     */
+    if (!state.bound) {
+      state.bound = true;
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          state.width = cfg.width || 0;
+
+          requestAnimationFrame(() => {
+            const current =
+              activePanel();
+
+            if (
+              current &&
+              iframeFor(
+                current,
+                CFG[current.dataset.panel]
+              ) === iframe
+            ) {
+              apply(current);
+            }
+          });
+        }
+      );
+    }
+
+    return true;
+  }
+
+  function schedule(panel = activePanel()) {
+    if (!panel) return;
+
+    const cfg =
+      CFG[panel.dataset.panel];
+
+    const iframe =
+      iframeFor(panel, cfg);
+
+    if (!iframe) return;
+
+    const state =
+      getState(iframe);
+
+    clearTimeout(state.timer);
+
+    state.timer =
+      window.setTimeout(() => {
+        requestAnimationFrame(
+          () => apply(panel)
+        );
+      }, 0);
+
+    /*
+     * retry สั้น ๆ เฉพาะ Editor ที่เปิดอยู่
+     * เผื่อ stylesheet/font ภายใน iframe เพิ่งโหลด
+     */
+    [80, 260].forEach((delay) => {
+      window.setTimeout(() => {
+        if (panel.classList.contains("is-active")) {
+          requestAnimationFrame(
+            () => apply(panel)
+          );
+        }
+      }, delay);
+    });
+  }
+
+  /*
+   * หลังคลิกเข้า Editor ให้จัด preview ทันที
+   */
+  document.addEventListener(
+    "click",
+    (event) => {
+      const button =
+        event.target?.closest?.(
+          "[data-edit-code], [data-edit-review], [data-code013-edit], [data-code014-edit]"
+        );
+
+      if (!button) return;
+
+      window.setTimeout(
+        () => schedule(),
+        0
+      );
+    },
+    true
+  );
+
+  /*
+   * เวลาแก้ค่า จัดใหม่เฉพาะ active editor
+   */
+  document.addEventListener(
+    "input",
+    (event) => {
+      const panel =
+        event.target?.closest?.(
+          ".dds-panel.is-active"
+        );
+
+      if (
+        panel &&
+        CFG[panel.dataset.panel]
+      ) {
+        window.setTimeout(
+          () => schedule(panel),
+          20
+        );
+      }
+    },
+    true
+  );
+
+  document.addEventListener(
+    "change",
+    (event) => {
+      const panel =
+        event.target?.closest?.(
+          ".dds-panel.is-active"
+        );
+
+      if (
+        panel &&
+        CFG[panel.dataset.panel]
+      ) {
+        window.setTimeout(
+          () => schedule(panel),
+          20
+        );
+      }
+    },
+    true
+  );
+
+  window.addEventListener(
+    "hashchange",
+    () => schedule(),
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    () => {
+      const panel =
+        activePanel();
+
+      if (panel) {
+        requestAnimationFrame(
+          () => apply(panel)
+        );
+      }
+    },
+    { passive: true }
+  );
+
+  /*
+   * expose สำหรับ CODE013/014 หรือ debug
+   */
+  window.__ddsApplyUnifiedEditorPreview =
+    () => schedule();
 })();
+
 
 /* NEW RULES card — center/fit only when it is actually visible */
 (() => {
@@ -23030,5 +24008,587 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fit(){const f=document.getElementById(ID),s=f?.closest('.dds-roleplay-card-preview'),d=f?.contentDocument;if(!f||!s||!d?.body)return;const t=d.querySelector('.dds-preview-target')||d.body,r=t.querySelector?.(':scope > *:not(style)')||t;t.style.cssText+=`;width:${W}px!important;min-width:${W}px!important;max-width:${W}px!important;transform:none!important;zoom:1!important`;void r.offsetHeight;const h=Math.max(r.scrollHeight||0,r.offsetHeight||0,Math.ceil(r.getBoundingClientRect().height)||1),pad=16,sc=Math.min(1,(s.clientWidth-pad*2)/W,(s.clientHeight-pad*2)/h),vw=W*sc,vh=h*sc;f.style.cssText+=`;position:absolute!important;left:${Math.max(0,(s.clientWidth-vw)/2)}px!important;top:${Math.max(0,(s.clientHeight-vh)/2)}px!important;width:${W}px!important;height:${h}px!important;margin:0!important;transform:scale(${sc})!important;transform-origin:top left!important;pointer-events:none!important`}
   function bind(){const f=document.getElementById(ID);if(!f)return;f.addEventListener('load',()=>requestAnimationFrame(fit));const s=f.closest('.dds-roleplay-card-preview');if('IntersectionObserver'in window&&s)new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting))requestAnimationFrame(fit)},{rootMargin:'150px'}).observe(s)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+})();
+
+
+
+
+/* =========================================================
+   COMMISSION & SHOWCASE — VIEW WORK FULL CONTENT v161
+
+   - ไม่ใช้ 1-screen editor mode
+   - Fit ตามความกว้างหน้าจอเท่านั้น
+   - stage สูงตามความยาวจริงของงาน
+   - เห็นครบทั้งโค้ดของแต่ละผู้จ้าง
+   - ทำงานเฉพาะตอนกด VIEW WORK
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_COMMISSION_VIEW_FULL_V161__) return;
+  window.__DDS_COMMISSION_VIEW_FULL_V161__ = true;
+
+  const bound = new WeakSet();
+
+  function activeViewPanel() {
+    return Array
+      .from(
+        document.querySelectorAll(
+          ".dds-commission-view-panel.is-active"
+        )
+      )
+      .find((panel) => {
+        const name =
+          String(panel.dataset.panel || "");
+
+        /*
+         * ไม่แตะ ACTIVITY / MY OWN CODE
+         */
+        return (
+          !name.startsWith("view-activity") &&
+          !name.startsWith("view-my-own-code")
+        );
+      }) || null;
+  }
+
+  function meaningfulRoot(doc) {
+    const content =
+      doc.querySelector(
+        ".dds-commission-preview-content, .dds-preview-target, [class*='preview-content'], [class*='preview-target']"
+      ) ||
+      doc.body;
+
+    let root = null;
+
+    if (content !== doc.body) {
+      root = Array
+        .from(content.children)
+        .find((element) => {
+          if (
+            !(element instanceof doc.defaultView.HTMLElement)
+          ) {
+            return false;
+          }
+
+          if (
+            element.tagName === "STYLE" ||
+            element.tagName === "SCRIPT" ||
+            element.tagName === "LINK"
+          ) {
+            return false;
+          }
+
+          const cls =
+            String(element.className || "")
+              .toLowerCase();
+
+          return !cls.includes("credit");
+        });
+    }
+
+    root =
+      root ||
+      content.querySelector?.(
+        ":scope > *:not(style):not(script):not(link)"
+      ) ||
+      content;
+
+    return { content, root };
+  }
+
+  function visualBounds(doc, root) {
+    const elements = [
+      root,
+      ...Array.from(root.querySelectorAll?.("*") || [])
+    ];
+
+    let minLeft = Infinity;
+    let maxRight = -Infinity;
+    let minTop = Infinity;
+    let maxBottom = -Infinity;
+
+    elements.forEach((element) => {
+      if (
+        !(element instanceof doc.defaultView.HTMLElement)
+      ) {
+        return;
+      }
+
+      const style =
+        doc.defaultView.getComputedStyle(element);
+
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const rect =
+        element.getBoundingClientRect();
+
+      if (
+        !Number.isFinite(rect.left) ||
+        !Number.isFinite(rect.right) ||
+        !Number.isFinite(rect.top) ||
+        !Number.isFinite(rect.bottom) ||
+        rect.width <= 0.5 ||
+        rect.height <= 0.5
+      ) {
+        return;
+      }
+
+      minLeft = Math.min(minLeft, rect.left);
+      maxRight = Math.max(maxRight, rect.right);
+      minTop = Math.min(minTop, rect.top);
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    });
+
+    if (
+      !Number.isFinite(minLeft) ||
+      !Number.isFinite(maxRight) ||
+      !Number.isFinite(minTop) ||
+      !Number.isFinite(maxBottom)
+    ) {
+      const rect =
+        root.getBoundingClientRect();
+
+      minLeft = rect.left;
+      maxRight = rect.right;
+      minTop = rect.top;
+      maxBottom = rect.bottom;
+    }
+
+    return {
+      width: Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            maxRight - minLeft,
+            root.scrollWidth || 0,
+            root.offsetWidth || 0
+          )
+        )
+      ),
+
+      height: Math.max(
+        1,
+        Math.ceil(
+          Math.max(
+            maxBottom - minTop,
+            root.scrollHeight || 0,
+            root.offsetHeight || 0
+          )
+        )
+      )
+    };
+  }
+
+  function fitIframe(panel, iframe) {
+    const doc =
+      iframe?.contentDocument;
+
+    if (!doc?.body) return false;
+
+    const stage =
+      iframe.closest(
+        ".dds-commission-preview-stage, [class*='-view-stage']"
+      ) ||
+      iframe.parentElement;
+
+    if (!stage) return false;
+
+    const holder =
+      iframe.parentElement !== stage
+        ? iframe.parentElement
+        : null;
+
+    const { content, root } =
+      meaningfulRoot(doc);
+
+    if (!root) return false;
+
+    /*
+     * natural width:
+     * dataset > current unscaled iframe width > visual root
+     */
+    const datasetWidth =
+      Number(
+        iframe.dataset.commissionCanvasWidth ||
+        iframe.getAttribute(
+          "data-commission-canvas-width"
+        )
+      ) || 0;
+
+    const inlineWidth =
+      Number.parseFloat(
+        iframe.style.width || ""
+      ) || 0;
+
+    const computedWidth =
+      Number.parseFloat(
+        getComputedStyle(iframe).width
+      ) || 0;
+
+    const bounds =
+      visualBounds(doc, root);
+
+    let naturalWidth =
+      datasetWidth ||
+      inlineWidth ||
+      bounds.width ||
+      computedWidth;
+
+    naturalWidth =
+      Math.max(
+        1,
+        Math.ceil(naturalWidth)
+      );
+
+    /*
+     * iframe กว้างเท่าขนาดจริงก่อนวัด height
+     */
+    iframe.style.setProperty(
+      "width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      "none",
+      "important"
+    );
+
+    void root.offsetHeight;
+
+    const finalBounds =
+      visualBounds(doc, root);
+
+    const naturalHeight =
+      Math.max(
+        1,
+        finalBounds.height
+      );
+
+    const padding = 20;
+
+    const availableWidth =
+      Math.max(
+        1,
+        stage.clientWidth - padding * 2
+      );
+
+    const scale =
+      Math.max(
+        0.01,
+        Math.min(
+          1,
+          availableWidth / naturalWidth
+        )
+      );
+
+    const scaledHeight =
+      Math.ceil(
+        naturalHeight * scale
+      );
+
+    /*
+     * VIEW WORK ไม่ใช่ Editor:
+     * คืน page scroll ปกติและให้ panel ยาวตามงาน
+     */
+    document.documentElement.classList.remove(
+      "dds-editor-one-screen"
+    );
+
+    document.body.classList.remove(
+      "dds-editor-one-screen"
+    );
+
+    panel.style.setProperty(
+      "height",
+      "auto",
+      "important"
+    );
+
+    panel.style.setProperty(
+      "min-height",
+      `${scaledHeight + 80}px`,
+      "important"
+    );
+
+    panel.style.setProperty(
+      "max-height",
+      "none",
+      "important"
+    );
+
+    panel.style.setProperty(
+      "overflow",
+      "visible",
+      "important"
+    );
+
+    const main =
+      panel.closest(".dds-main");
+
+    main?.style.setProperty(
+      "overflow",
+      "visible",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "position",
+      "relative",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "width",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "height",
+      `${scaledHeight + padding * 2}px`,
+      "important"
+    );
+
+    stage.style.setProperty(
+      "min-height",
+      `${scaledHeight + padding * 2}px`,
+      "important"
+    );
+
+    stage.style.setProperty(
+      "max-height",
+      "none",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow",
+      "visible",
+      "important"
+    );
+
+    if (holder) {
+      holder.style.setProperty(
+        "position",
+        "relative",
+        "important"
+      );
+
+      holder.style.setProperty(
+        "width",
+        "100%",
+        "important"
+      );
+
+      holder.style.setProperty(
+        "height",
+        `${scaledHeight}px`,
+        "important"
+      );
+
+      holder.style.setProperty(
+        "min-height",
+        `${scaledHeight}px`,
+        "important"
+      );
+
+      holder.style.setProperty(
+        "max-height",
+        "none",
+        "important"
+      );
+
+      holder.style.setProperty(
+        "overflow",
+        "visible",
+        "important"
+      );
+    }
+
+    iframe.style.setProperty(
+      "position",
+      "absolute",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "left",
+      "50%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "top",
+      `${padding}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "margin",
+      "0",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      `translateX(-50%) scale(${scale})`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "visibility",
+      "visible",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "opacity",
+      "1",
+      "important"
+    );
+
+    if (!bound.has(iframe)) {
+      bound.add(iframe);
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          window.setTimeout(
+            () => {
+              const active =
+                activeViewPanel();
+
+              if (active?.contains(iframe)) {
+                fitIframe(active, iframe);
+              }
+            },
+            0
+          );
+        }
+      );
+    }
+
+    return true;
+  }
+
+  function fitActive() {
+    const panel =
+      activeViewPanel();
+
+    if (!panel) return;
+
+    panel
+      .querySelectorAll("iframe")
+      .forEach((iframe) => {
+        requestAnimationFrame(
+          () => fitIframe(panel, iframe)
+        );
+      });
+  }
+
+  function schedule() {
+    [0, 100, 350, 900, 1800].forEach(
+      (delay) => {
+        window.setTimeout(
+          fitActive,
+          delay
+        );
+      }
+    );
+  }
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const button =
+        event.target?.closest?.(
+          ".dds-commission-card button"
+        );
+
+      if (
+        !button ||
+        !/VIEW WORK/i.test(
+          button.textContent || ""
+        )
+      ) {
+        return;
+      }
+
+      schedule();
+    },
+    true
+  );
+
+  window.addEventListener(
+    "hashchange",
+    () => {
+      window.setTimeout(
+        fitActive,
+        0
+      );
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    () => {
+      if (activeViewPanel()) {
+        requestAnimationFrame(
+          fitActive
+        );
+      }
+    },
+    { passive: true }
+  );
 })();
 

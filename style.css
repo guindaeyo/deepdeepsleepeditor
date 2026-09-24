@@ -10238,58 +10238,6 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 
 
 /* =========================================================
-   7 LEGACY EDITORS — FIXED PREVIEW VIEWPORT v148
-========================================================= */
-@media (min-width:1251px){
-  [data-panel="editor-code002"] .dds-editor-preview-column,
-  [data-panel="editor-code003"] .dds-editor-preview-column,
-  [data-panel="editor-code004"] .dds-editor-preview-column,
-  [data-panel="editor-code005"] .dds-editor-preview-column,
-  [data-panel="editor-code006"] .dds-editor-preview-column,
-  [data-panel="editor-code009"] .dds-editor-preview-column,
-  [data-panel="editor-code010"] .dds-editor-preview-column{
-    overflow:hidden !important;
-  }
-
-  [data-panel="editor-code002"] .dds-editor-preview-frame,
-  [data-panel="editor-code003"] .dds-editor-preview-frame,
-  [data-panel="editor-code004"] .dds-editor-preview-frame,
-  [data-panel="editor-code005"] .dds-editor-preview-frame,
-  [data-panel="editor-code006"] .dds-editor-preview-frame,
-  [data-panel="editor-code009"] .dds-editor-preview-frame,
-  [data-panel="editor-code010"] .dds-editor-preview-frame{
-    height:calc(100% - 42px) !important;
-    min-height:calc(100% - 42px) !important;
-    max-height:calc(100% - 42px) !important;
-  }
-}
-
-
-/* =========================================================
-   LONG WAY LONG RIDE — SINGLE RED SCROLLBAR v149
-   Outer editor column never scrolls; iframe shell owns scrolling.
-========================================================= */
-@media (min-width:1251px){
-  [data-panel="editor-code010"] .dds-editor-preview-column{
-    overflow:hidden !important;
-    scrollbar-width:none !important;
-  }
-
-  [data-panel="editor-code010"] .dds-editor-preview-column::-webkit-scrollbar{
-    width:0 !important;
-    height:0 !important;
-    display:none !important;
-  }
-
-  #longWayLongRidePreview{
-    overflow:hidden !important;
-  }
-}
-
-
-
-
-/* =========================================================
    MAIN PAGE PERFORMANCE CLEANUP v159
 ========================================================= */
 .dds-roleplay-grid .dds-roleplay-card{
@@ -10304,3 +10252,108 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow:hidden!important;
   }
 }
+
+
+/* =========================================================
+   FOR ROLEPLAY + FOR REVIEW EDITOR PREVIEW — UNIFIED v161
+========================================================= */
+@media (min-width:1251px){
+
+  [data-panel^="editor-code"].is-active .dds-editor-preview-column,
+  [data-panel^="editor-review"].is-active .dds-editor-preview-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+
+  [data-panel^="editor-code"].is-active
+  .dds-editor-preview-column > .dds-editor-preview-top,
+  [data-panel^="editor-review"].is-active
+  .dds-editor-preview-column > .dds-editor-preview-top{
+    grid-row:1;
+    position:relative !important;
+    top:auto !important;
+    min-height:42px;
+    z-index:5;
+  }
+
+  [data-panel^="editor-code"].is-active
+  .dds-editor-preview-column > iframe,
+  [data-panel^="editor-review"].is-active
+  .dds-editor-preview-column > iframe{
+    grid-row:2;
+    width:100% !important;
+    min-width:100% !important;
+    max-width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    margin:0 !important;
+    transform:none !important;
+    overflow:hidden !important;
+  }
+
+  /*
+   * CODE013 / CODE014 ใช้ stage ซ้อนอีกชั้น
+   */
+  .dds-code013-editor .dds-code013-editor-stage,
+  .dds-code014-editor .dds-code014-editor-stage{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    position:relative !important;
+    overflow:hidden !important;
+  }
+
+  .dds-code013-editor
+  .dds-code013-editor-stage > iframe,
+  .dds-code014-editor
+  .dds-code014-editor-stage > iframe{
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    width:100% !important;
+    min-width:100% !important;
+    max-width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    transform:none !important;
+    margin:0 !important;
+    overflow:hidden !important;
+  }
+
+  /*
+   * HIGHER THAN HEAVEN:
+   * ก่อน unified controller จัด layout ไม่ให้โชว์ layout ที่บีบอยู่เดิม
+   */
+  #higherHeavenPreview:not([data-dds-unified-preview-ready="1"]){
+    opacity:0 !important;
+  }
+
+  #higherHeavenPreview[data-dds-unified-preview-ready="1"]{
+    opacity:1 !important;
+  }
+}
+
+/* =========================================================
+   COMMISSION & SHOWCASE VIEW WORK — FULL CONTENT v161
+========================================================= */
+.dds-commission-view-panel.is-active{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:visible !important;
+}
+
+.dds-commission-view-panel.is-active
+.dds-commission-preview-stage,
+.dds-commission-view-panel.is-active
+[class*="-view-stage"]{
+  max-height:none !important;
+}
+
