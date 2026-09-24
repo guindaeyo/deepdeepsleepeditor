@@ -11220,3 +11220,105 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   padding-top:10px !important;
   padding-bottom:10px !important;
 }
+
+
+/* =========================================================
+   CODE013 EDITOR — FULL PREVIEW + REAL SCROLL v175
+   Only candy pink magic hole flip phone.
+========================================================= */
+@media (min-width:1251px){
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-protected-commission-preview-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-editor-preview-top{
+    position:relative !important;
+    top:auto !important;
+    grid-row:1 !important;
+    min-height:42px !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage{
+    grid-row:2 !important;
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#c11724 #090909 !important;
+  }
+
+  /*
+   * iframe เป็น absolute หลัง scale
+   * spacer นี้สร้าง scrollHeight ตามความยาวจริงของโค้ด
+   */
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage::after{
+    content:"";
+    display:block !important;
+    width:1px !important;
+    height:var(--dds-code013-scroll-height,1px) !important;
+    min-height:var(--dds-code013-scroll-height,1px) !important;
+    pointer-events:none !important;
+    visibility:hidden !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage > iframe{
+    position:absolute !important;
+    left:50% !important;
+    top:28px !important;
+    width:720px !important;
+    min-width:720px !important;
+    max-width:720px !important;
+    height:auto;
+    margin:0 !important;
+    transform-origin:top center !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage::-webkit-scrollbar{
+    width:7px !important;
+    height:7px !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage::-webkit-scrollbar-track{
+    background:#090909 !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage::-webkit-scrollbar-thumb{
+    background:#c11724 !important;
+    border-radius:999px !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-code013-editor
+  .dds-code013-editor-stage::-webkit-scrollbar-thumb:hover{
+    background:#df2632 !important;
+  }
+}

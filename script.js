@@ -19482,28 +19482,177 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function sizeEditorPreviewActual(iframe, stage, padding = 28) {
-    if (!iframe || !stage) return;
+    if (!iframe || !stage || stage.clientWidth < 20) return;
+
     const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
-    const scale = Math.min(1, availableWidth / m.width);
-    const renderedHeight = Math.ceil(m.height * scale);
-    const stageHeight = renderedHeight + padding * 2;
 
-    stage.style.setProperty("height", `${stageHeight}px`, "important");
-    stage.style.setProperty("min-height", `${stageHeight}px`, "important");
-    iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", `${padding}px`, "important");
-    iframe.style.setProperty("width", `${m.width}px`, "important");
-    iframe.style.setProperty("height", `${m.height}px`, "important");
-    iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("transform", `translateX(-50%) scale(${scale})`, "important");
-    iframe.style.setProperty("transform-origin", "top center", "important");
+    /*
+     * CODE013 v175:
+     * fit ตามความกว้างเท่านั้น
+     * ถ้าโค้ดยาวให้ stage เป็นคน scroll แนวตั้ง
+     * ไม่ย่อทั้งก้อนตามความสูง และไม่ตัดช่วงล่าง
+     */
+    const availableWidth = Math.max(
+      1,
+      stage.clientWidth - padding * 2
+    );
 
-    const previewColumn = stage.closest(".dds-protected-commission-preview-column");
-    const previewTop = previewColumn?.querySelector(".dds-editor-preview-top");
-    const totalHeight = stageHeight + (previewTop?.offsetHeight || 0);
-    if (panel && totalHeight > 0) panel.style.setProperty("--dds-code013-editor-height", `${totalHeight}px`);
+    const scale = Math.min(
+      1,
+      availableWidth / m.width
+    );
+
+    const renderedHeight = Math.ceil(
+      m.height * scale
+    );
+
+    stage.style.setProperty(
+      "--dds-code013-scroll-height",
+      `${renderedHeight + padding * 2}px`
+    );
+
+    stage.style.setProperty(
+      "height",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "min-height",
+      "0",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "max-height",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-y",
+      "auto",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-x",
+      "hidden",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overscroll-behavior",
+      "contain",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "position",
+      "absolute",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "left",
+      "50%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "top",
+      `${padding}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "margin",
+      "0",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      `translateX(-50%) scale(${scale})`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    /*
+     * Preview ไม่ต้องรับ click
+     * ให้ wheel/trackpad ตกที่ stage เพื่อ scroll ได้จริง
+     */
+    iframe.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
+
+    if (
+      stage.dataset.code013ScrollReady !== "1"
+    ) {
+      stage.dataset.code013ScrollReady = "1";
+      stage.scrollTop = 0;
+    }
   }
 
   function updateCardState() {
@@ -22549,11 +22698,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     "editor-code010": { id: "longWayLongRidePreview" },
     "editor-code011": { id: "onCloudPreview" },
     "editor-code012": { id: "chocolateLovePreview" },
-
-    "editor-code013": {
-      selector: "[data-code013-editor-preview]",
-      width: 720
-    },
 
     "editor-review001": { id: "foodReviewPreview" },
     "editor-review002": { id: "musicReviewPreview" },
