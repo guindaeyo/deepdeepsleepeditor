@@ -11480,3 +11480,84 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow:visible !important;
   }
 }
+
+
+/* =========================================================
+   FOR PROFILE EDITORS — VERTICAL SCROLL ONLY v177
+   เฉพาะ editor-profile001..004
+========================================================= */
+@media (min-width:1251px){
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile001"].is-active
+  .dds-profile-preview-stage,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile002"].is-active
+  .dds-moodboard-preview-stage,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile003"].is-active
+  .dds-fortyone-preview-stage,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile004"].is-active
+  .dds-nothin-preview-stage{
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile001"].is-active
+  .dds-profile-preview-canvas-host,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile002"].is-active
+  .dds-moodboard-preview-canvas-host,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile003"].is-active
+  .dds-fortyone-preview-canvas-host,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile004"].is-active
+  .dds-nothin-preview-canvas-host{
+    width:100% !important;
+    min-width:100% !important;
+    max-width:100% !important;
+    margin:0 auto !important;
+    overflow:visible !important;
+  }
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile001"].is-active
+  .dds-profile-preview-canvas-host > iframe,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile002"].is-active
+  .dds-moodboard-preview-canvas-host > iframe,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile003"].is-active
+  .dds-fortyone-preview-canvas-host > iframe,
+
+  body.dds-editor-one-screen
+  [data-panel="editor-profile004"].is-active
+  .dds-nothin-preview-canvas-host > iframe{
+    left:50% !important;
+    right:auto !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    transform-origin:top center !important;
+  }
+
+  /*
+   * ซ่อน horizontal scrollbar ให้เด็ดขาด
+   * เหลือเฉพาะ scrollbar แนวตั้งสีแดง
+   */
+  body.dds-editor-one-screen
+  [data-panel^="editor-profile"].is-active
+  [class*="preview-stage"]::-webkit-scrollbar:horizontal{
+    height:0 !important;
+  }
+}

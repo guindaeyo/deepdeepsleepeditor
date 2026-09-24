@@ -25173,10 +25173,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
      * This is the important part that prevents the bottom
      * of a transformed absolute iframe from being cut off.
      */
-    const hostWidth = Math.max(
-      stage.clientWidth,
-      renderedWidth + padding * 2
-    );
+    /*
+     * v177:
+     * พรีวิว FOR PROFILE เลื่อนเฉพาะขึ้น-ลง
+     * host กว้างเท่ากรอบเสมอ เพื่อไม่สร้าง horizontal scroll
+     */
+    const hostWidth = stage.clientWidth;
 
     const hostHeight = Math.max(
       stage.clientHeight,
@@ -25321,21 +25323,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           stage.scrollHeight - stage.clientHeight
         )
       );
-
-      stage.scrollLeft = Math.min(
-        beforeLeft,
-        Math.max(
-          0,
-          stage.scrollWidth - stage.clientWidth
-        )
-      );
     } else {
       stage.scrollTop = 0;
-      stage.scrollLeft = Math.max(
-        0,
-        (stage.scrollWidth - stage.clientWidth) / 2
-      );
     }
+
+    /*
+     * ไม่มี horizontal scroll ใน FOR PROFILE
+     */
+    stage.scrollLeft = 0;
 
     if (!boundFrames.has(iframe)) {
       boundFrames.add(iframe);
