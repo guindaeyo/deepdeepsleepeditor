@@ -22053,13 +22053,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   CODE005 — THIS HITS LIKE COMA / CARD SHOW WHOLE CODE v154
+   CODE005 — THIS HITS LIKE COMA / CARD FIT REAL BOUNDS v156
    Scope ONLY: #roleplayCardPreview005 in CATEGORY 01 / FOR ROLEPLAY
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE005_CARD_WHOLE_V154__) return;
+  if (window.__DDS_CODE005_CARD_WHOLE_V156__) return;
   window.__DDS_CODE005_CARD_WHOLE_V154__ = true;
 
   const IFRAME_ID = "roleplayCardPreview005";
@@ -22157,26 +22157,94 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     prepareNaturalCanvas(parts);
 
-    const { doc, target, root } = parts;
+    const { doc, root } = parts;
 
+    /*
+     * Force final 650px layout before measuring.
+     */
     void root.offsetHeight;
 
-    const rootRect = root.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
+    /*
+     * Measure only the visible design.
+     * Do NOT use body/html scrollHeight because those can include
+     * the iframe viewport itself and make the card scale far too small.
+     */
+    const elements = [
+      root,
+      ...Array.from(root.querySelectorAll("*"))
+    ];
 
-    const height = Math.max(
+    let minTop = Infinity;
+    let maxBottom = -Infinity;
+
+    elements.forEach((element) => {
+      if (!(element instanceof doc.defaultView.HTMLElement)) return;
+
+      const tag = element.tagName;
+      if (
+        tag === "STYLE" ||
+        tag === "SCRIPT" ||
+        tag === "LINK" ||
+        tag === "META"
+      ) {
+        return;
+      }
+
+      const style = doc.defaultView.getComputedStyle(element);
+
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const rect = element.getBoundingClientRect();
+
+      if (
+        !Number.isFinite(rect.top) ||
+        !Number.isFinite(rect.bottom) ||
+        rect.width <= 0.5 ||
+        rect.height <= 0.5
+      ) {
+        return;
+      }
+
+      minTop = Math.min(minTop, rect.top);
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    });
+
+    if (
+      !Number.isFinite(minTop) ||
+      !Number.isFinite(maxBottom) ||
+      maxBottom <= minTop
+    ) {
+      const rect = root.getBoundingClientRect();
+      minTop = rect.top;
+      maxBottom = rect.bottom;
+    }
+
+    const rootStyle = doc.defaultView.getComputedStyle(root);
+
+    const marginTop =
+      Number.parseFloat(rootStyle.marginTop) || 0;
+
+    const marginBottom =
+      Number.parseFloat(rootStyle.marginBottom) || 0;
+
+    const visualHeight = Math.max(
       1,
-      Math.ceil(rootRect.height || 0),
-      root.scrollHeight || 0,
-      Math.ceil(targetRect.height || 0),
-      target.scrollHeight || 0,
-      doc.body.scrollHeight || 0,
-      doc.documentElement.scrollHeight || 0
+      Math.ceil(
+        (maxBottom - minTop) +
+        Math.max(0, marginTop) +
+        Math.max(0, marginBottom) +
+        8
+      )
     );
 
     return {
       width: CANVAS_WIDTH,
-      height,
+      height: visualHeight,
       parts
     };
   }
