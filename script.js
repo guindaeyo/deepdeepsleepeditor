@@ -8540,7 +8540,67 @@ ${stylesheetLinks}
       return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:1300px;min-width:1300px;max-width:1300px;height:920px;min-height:920px;max-height:920px;background:#242424;overflow:hidden}.dds-music-preview-shell{position:relative;width:1300px;height:920px;overflow:hidden}.dds-music-preview-target{position:absolute;inset:0;width:1300px;height:920px;transform:translate(0,0);transform-origin:0 0}.dds-music-preview-target>.ddsh-revmus-wrap{margin:0!important}</style></head><body data-preview-mode="card"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-music-preview-shell');const target=document.querySelector('.dds-music-preview-target');const wrap=document.querySelector('.ddsh-revmus-wrap');let raf=0;function centerOnly(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!wrap)return;target.style.transform='translate(0px,0px)';const shellRect=shell.getBoundingClientRect();const wrapRect=wrap.getBoundingClientRect();const dx=(shellRect.left+shellRect.width/2)-(wrapRect.left+wrapRect.width/2);const dy=(shellRect.top+shellRect.height/2)-(wrapRect.top+wrapRect.height/2);target.style.transform='translate('+dx+'px,'+dy+'px)';window.frameElement?.classList.add('dds-preview-ready');window.frameElement?.classList.remove('dds-preview-loading')})}window.addEventListener('load',centerOnly,{once:true});document.fonts?.ready?.then(centerOnly);if(window.ResizeObserver&&wrap)new ResizeObserver(centerOnly).observe(wrap);setTimeout(centerOnly,100);setTimeout(centerOnly,500);centerOnly()})();<\/script></body></html>`;
     }
 
-    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;min-height:100%;background:#242424;overflow:hidden}.dds-music-preview-shell{position:relative;width:100%;min-height:100%;overflow:hidden}.dds-music-preview-target{position:absolute!important;top:14px!important;left:0;right:auto!important;bottom:auto!important;width:max-content!important;min-width:0!important;max-width:none!important;height:auto!important;will-change:transform}.dds-music-preview-target>.ddsh-revmus-wrap{margin:0!important;flex:none!important}</style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-music-preview-shell');const target=document.querySelector('.dds-music-preview-target');const wrap=document.querySelector('.ddsh-revmus-wrap');let raf=0;function set(name,value){target.style.setProperty(name,value,'important')}function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!target||!wrap||!shell)return;set('transform','none');set('transform-origin','top left');set('left','0px');set('top','14px');set('width','max-content');set('height','auto');const rect=wrap.getBoundingClientRect();const w=Math.max(Math.ceil(wrap.scrollWidth),Math.ceil(wrap.offsetWidth),Math.ceil(rect.width),1);const h=Math.max(Math.ceil(wrap.scrollHeight),Math.ceil(wrap.offsetHeight),Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);const scale=Math.max(Math.min((vw-28)/w,1),.08);const x=Math.max(14,Math.round((vw-(w*scale))/2));set('width',w+'px');set('height',h+'px');set('left',x+'px');set('transform-origin','top left');set('transform','scale('+scale+')');const scaledHeight=Math.ceil(h*scale+28);shell.style.height=scaledHeight+'px';document.body.style.height=scaledHeight+'px';document.documentElement.style.height=scaledHeight+'px';if(window.frameElement){window.frameElement.style.height=Math.max(720,scaledHeight)+'px';window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);if(window.ResizeObserver&&wrap)new ResizeObserver(fit).observe(wrap);if(window.MutationObserver&&wrap)new MutationObserver(fit).observe(wrap,{childList:true,subtree:true,characterData:true});setTimeout(fit,80);setTimeout(fit,350);window.__ddsFitMusic=fit;fit()})();<\/script></body></html>`;
+    /*
+     * v162 Editor:
+     * ไม่จัด left/scale ภายใน iframe ซ้ำกับ unified preview controller
+     * ให้ target อยู่กลางตามธรรมชาติ แล้ว v161 เป็นผู้ fit width/scroll เพียงระบบเดียว
+     */
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="${FONT_URL}" rel="stylesheet"><style>
+      html,body{
+        margin:0;
+        width:100%;
+        height:100%;
+        min-height:100%;
+        background:#242424;
+        overflow:hidden;
+      }
+      .dds-music-preview-shell{
+        position:relative;
+        width:100%;
+        height:100%;
+        min-height:100%;
+        box-sizing:border-box;
+        padding:16px;
+        overflow-y:auto;
+        overflow-x:hidden;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:flex-start;
+      }
+      .dds-music-preview-target{
+        position:relative!important;
+        inset:auto!important;
+        left:auto!important;
+        right:auto!important;
+        top:auto!important;
+        bottom:auto!important;
+        width:max-content!important;
+        min-width:0!important;
+        max-width:none!important;
+        height:auto!important;
+        margin:0 auto!important;
+        flex:0 0 auto!important;
+        transform:none;
+        transform-origin:top center;
+      }
+      .dds-music-preview-target>.ddsh-revmus-wrap{
+        margin:0 auto!important;
+        flex:none!important;
+      }
+    </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
+      (() => {
+        const ready = () => {
+          const frame = window.frameElement;
+          frame?.classList.add('dds-preview-ready');
+          frame?.classList.remove('dds-preview-loading');
+        };
+        window.addEventListener('load', ready, { once:true });
+        document.fonts?.ready?.then(ready);
+        window.__ddsFitMusic = ready;
+        ready();
+      })();
+    <\/script></body></html>`;
   }
 
   function copyText(text) {
@@ -19459,20 +19519,120 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
     if (!grid) return false;
     const existing = grid.querySelector(".dds-roleplay-card-code013");
-    if (existing) { card = existing; updateCardState(); return true; }
+    if (existing) {
+      card = existing;
+      updateCardState();
+
+      const iframe =
+        card.querySelector("[data-code013-card-preview]");
+
+      /*
+       * v162: ถ้าการ์ดมีอยู่แล้วแต่ iframe ยังว่าง/ค้าง LOADING PREVIEW
+       * ให้คืน OFFICIAL preview ทันที
+       */
+      if (
+        iframe &&
+        (
+          !String(iframe.getAttribute("srcdoc") || "").trim() ||
+          !iframe.contentDocument?.body?.children?.length
+        )
+      ) {
+        cardRendered = false;
+
+        writeIframe(
+          iframe,
+          OFFICIAL_CODE,
+          () => fitIframe(
+            iframe,
+            card.querySelector(".dds-roleplay-card-preview"),
+            16
+          )
+        );
+      } else if (iframe) {
+        requestAnimationFrame(() => {
+          fitIframe(
+            iframe,
+            card.querySelector(".dds-roleplay-card-preview"),
+            16
+          );
+        });
+      }
+
+      return true;
+    }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code013";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="eager" fetchpriority="high" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     grid.appendChild(card);
     card.querySelector("[data-code013-edit]")?.addEventListener("click", openEditor);
     updateCardState();
     const iframe = card.querySelector("[data-code013-card-preview]");
-    const render = () => {
-      if (cardRendered || !iframe) return;
+    const render = (force = false) => {
+      if (!iframe) return;
+
+      if (
+        !force &&
+        cardRendered &&
+        String(iframe.getAttribute("srcdoc") || "").trim()
+      ) {
+        fitIframe(
+          iframe,
+          card.querySelector(".dds-roleplay-card-preview"),
+          16
+        );
+        return;
+      }
+
       cardRendered = true;
-      writeIframe(iframe, OFFICIAL_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
+
+      writeIframe(
+        iframe,
+        OFFICIAL_CODE,
+        () => fitIframe(
+          iframe,
+          card.querySelector(".dds-roleplay-card-preview"),
+          16
+        )
+      );
     };
-    render();
+
+    render(true);
+
+    document
+      .querySelectorAll('[data-page="roleplay"], [data-go="roleplay"]')
+      .forEach((button) => {
+        if (button.dataset.code013PreviewRepair === "1") return;
+        button.dataset.code013PreviewRepair = "1";
+
+        button.addEventListener(
+          "click",
+          () => {
+            window.setTimeout(
+              () => {
+                const frame =
+                  card?.querySelector("[data-code013-card-preview]");
+
+                if (!frame) return;
+
+                if (
+                  !String(frame.getAttribute("srcdoc") || "").trim()
+                ) {
+                  cardRendered = false;
+                  render(true);
+                } else {
+                  fitIframe(
+                    frame,
+                    card?.querySelector(".dds-roleplay-card-preview"),
+                    16
+                  );
+                }
+              },
+              0
+            );
+          }
+        );
+      });
+
     return true;
   }
 
@@ -22738,13 +22898,21 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     button.dataset.code014Bound = "1";
 
+    const run = (event) => {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      window.__ddsOpenCode014?.();
+    };
+
+    /*
+     * ทั้ง onclick + capture listener:
+     * ต่อให้ card ถูกระบบอื่น patch/reflow ปุ่มก็ยังเปิด Editor ได้
+     */
+    button.onclick = run;
+
     button.addEventListener(
       "click",
-      (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        openEditor();
-      },
+      run,
       true
     );
   }
@@ -22857,8 +23025,20 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
 
+  /*
+   * v162: expose ตัวเปิด Editor โดยตรง
+   * เพื่อไม่ต้องพึ่ง event/state ของ card อย่างเดียว
+   */
+  window.__ddsOpenCode014 =
+    () => openEditor();
+
   function handleHash() {
-    if (location.hash === "#editor-code014" && !panel?.classList.contains("is-active")) openEditor();
+    if (
+      location.hash === "#editor-code014" &&
+      !panel?.classList.contains("is-active")
+    ) {
+      openEditor();
+    }
   }
 
   function install() {
@@ -22876,7 +23056,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         if (!button) return;
 
         event.preventDefault();
-        openEditor();
+        window.__ddsOpenCode014?.();
       },
       true
     );
@@ -24592,3 +24772,53 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   );
 })();
 
+
+
+/* =========================================================
+   CODE014 — EDIT BUTTON LAST-RESORT FALLBACK v162
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE014_EDIT_FALLBACK_V162__) return;
+  window.__DDS_CODE014_EDIT_FALLBACK_V162__ = true;
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const button =
+        event.target?.closest?.(
+          ".dds-roleplay-card-code014 [data-code014-edit]"
+        );
+
+      if (!button) return;
+
+      event.preventDefault();
+
+      if (
+        typeof window.__ddsOpenCode014 === "function"
+      ) {
+        window.__ddsOpenCode014();
+        return;
+      }
+
+      /*
+       * เผื่อ module ยังสร้างไม่เสร็จ:
+       * hash handler ของ CODE014 จะเปิด Editor ทันทีเมื่อพร้อม
+       */
+      if (location.hash !== "#editor-code014") {
+        location.hash = "editor-code014";
+      }
+
+      window.setTimeout(
+        () => {
+          window.dispatchEvent(
+            new Event("hashchange")
+          );
+        },
+        0
+      );
+    },
+    true
+  );
+})();

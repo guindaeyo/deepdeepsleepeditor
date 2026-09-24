@@ -10357,3 +10357,166 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   max-height:none !important;
 }
 
+
+
+/* =========================================================
+   GLOBAL EDITOR — COMPACT DRAFT + COPY / MORE EDIT SPACE v162
+   Desktop only. Middle editable area receives most of the height.
+========================================================= */
+@media (min-width:1101px){
+
+  /* ---------- Legacy ROLEPLAY / PROFILE / REVIEW editors ---------- */
+  [data-panel^="editor-code"] .dds-editor-tools-column,
+  [data-panel^="editor-profile"] .dds-editor-tools-column,
+  [data-panel^="editor-review"] .dds-editor-tools-column{
+    gap:8px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-draft-manager,
+  [data-panel^="editor-profile"] .dds-draft-manager,
+  [data-panel^="editor-review"] .dds-draft-manager{
+    min-height:0 !important;
+    padding:9px 11px !important;
+    gap:10px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-draft-manager-copy,
+  [data-panel^="editor-profile"] .dds-draft-manager-copy,
+  [data-panel^="editor-review"] .dds-draft-manager-copy{
+    gap:2px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-draft-manager-copy strong,
+  [data-panel^="editor-profile"] .dds-draft-manager-copy strong,
+  [data-panel^="editor-review"] .dds-draft-manager-copy strong{
+    font-size:10px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-draft-status,
+  [data-panel^="editor-profile"] .dds-draft-status,
+  [data-panel^="editor-review"] .dds-draft-status{
+    font-size:8px !important;
+    line-height:1.25 !important;
+  }
+
+  [data-panel^="editor-code"] .dds-draft-save-button,
+  [data-panel^="editor-code"] .dds-draft-delete-button,
+  [data-panel^="editor-profile"] .dds-draft-save-button,
+  [data-panel^="editor-profile"] .dds-draft-delete-button,
+  [data-panel^="editor-review"] .dds-draft-save-button,
+  [data-panel^="editor-review"] .dds-draft-delete-button{
+    min-height:32px !important;
+    height:32px !important;
+    padding:0 10px !important;
+    font-size:7px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock > .dds-copy-section,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock > .dds-copy-section,
+  [data-panel^="editor-review"] .dds-editor-copy-dock > .dds-copy-section{
+    padding:9px 11px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title{
+    margin-bottom:5px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-control-title > span,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-control-title > span,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-control-title > span{
+    font-size:18px !important;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-description,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-description,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-description{
+    display:none !important;
+  }
+
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-code"] .dds-editor-copy-dock .dds-reset-button,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-profile"] .dds-editor-copy-dock .dds-reset-button,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-copy-button,
+  [data-panel^="editor-review"] .dds-editor-copy-dock .dds-reset-button{
+    min-height:36px !important;
+    height:36px !important;
+  }
+
+  /* ---------- Protected / CODE013 / CODE014 / Commission-style editors ---------- */
+  .dds-protected-commission-controls-column{
+    gap:8px !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+  }
+
+  .dds-protected-commission-draft,
+  .dds-protected-commission-copy,
+  .dds-protected-commission-controls-column > .dds-copy-section{
+    padding:10px 12px !important;
+  }
+
+  .dds-protected-commission-draft{
+    gap:7px !important;
+  }
+
+  .dds-protected-commission-draft strong{
+    font-size:10px !important;
+  }
+
+  .dds-protected-commission-draft small{
+    margin-top:2px !important;
+    font-size:8px !important;
+    line-height:1.25 !important;
+  }
+
+  .dds-protected-commission-draft button,
+  .dds-protected-commission-copy button,
+  .dds-protected-commission-controls-column > .dds-copy-section button{
+    min-height:34px !important;
+    height:34px !important;
+    padding:0 11px !important;
+    font-size:8px !important;
+  }
+
+  .dds-protected-commission-copy .dds-control-title,
+  .dds-protected-commission-controls-column > .dds-copy-section .dds-control-title{
+    margin-bottom:5px !important;
+  }
+
+  .dds-protected-commission-copy p,
+  .dds-protected-commission-controls-column > .dds-copy-section > p{
+    display:none !important;
+  }
+
+  .dds-protected-commission-scroll{
+    min-height:0 !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+}
+
+/* CODE014 card button must always sit above its preview iframe. */
+.dds-roleplay-card-code014 .dds-roleplay-card-preview{
+  overflow:hidden !important;
+}
+
+.dds-roleplay-card-code014 .dds-roleplay-card-preview iframe{
+  pointer-events:none !important;
+}
+
+.dds-roleplay-card-code014 .dds-roleplay-card-body,
+.dds-roleplay-card-code014 [data-code014-edit]{
+  position:relative !important;
+  z-index:10 !important;
+  pointer-events:auto !important;
+}
+
+/* REVIEW002 editor — explicit visual centering guard. */
+[data-panel="editor-review002"].is-active #musicReviewPreview{
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
