@@ -10296,3 +10296,25 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     max-height:calc(100% - 42px) !important;
   }
 }
+
+
+/* =========================================================
+   LONG WAY LONG RIDE — SINGLE RED SCROLLBAR v149
+   Outer editor column never scrolls; iframe shell owns scrolling.
+========================================================= */
+@media (min-width:1251px){
+  [data-panel="editor-code010"] .dds-editor-preview-column{
+    overflow:hidden !important;
+    scrollbar-width:none !important;
+  }
+
+  [data-panel="editor-code010"] .dds-editor-preview-column::-webkit-scrollbar{
+    width:0 !important;
+    height:0 !important;
+    display:none !important;
+  }
+
+  #longWayLongRidePreview{
+    overflow:hidden !important;
+  }
+}

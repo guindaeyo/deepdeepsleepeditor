@@ -23011,8 +23011,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     { id: "weirdoPreview", panel: "editor-code002" },
     { id: "hihiPreview", panel: "editor-code003" },
     { id: "uuiaaPreview", panel: "editor-code004" },
-    { id: "commaPreview", panel: "editor-code005" },
-    { id: "newRulesPreview", panel: "editor-code006" },
+    { id: "commaPreview", panel: "editor-code005", fixedWidth: 650 },
+    { id: "newRulesPreview", panel: "editor-code006", fixedWidth: 720 },
     { id: "higherHeavenPreview", panel: "editor-code009" },
     { id: "longWayLongRidePreview", panel: "editor-code010" }
   ];
@@ -23103,6 +23103,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     shell.style.setProperty("overflow", "auto", "important");
     shell.style.setProperty("box-sizing", "border-box", "important");
 
+    /*
+     * LONG WAY LONG RIDE:
+     * ให้ scroll เฉพาะ shell ชั้นเดียว ป้องกัน scrollbar ซ้อน body + shell
+     */
+    if (parts.doc.defaultView?.frameElement?.id === "longWayLongRidePreview") {
+      parts.doc.documentElement.style.setProperty("overflow", "hidden", "important");
+      parts.doc.body.style.setProperty("overflow", "hidden", "important");
+      shell.style.setProperty("overflow", "auto", "important");
+      shell.style.setProperty("scrollbar-width", "thin", "important");
+      shell.style.setProperty("scrollbar-color", "#c11724 #090909", "important");
+    }
+
     target.style.setProperty("flex", "0 0 auto", "important");
     target.style.setProperty("transform", "none", "important");
     target.style.setProperty("transform-origin", "center center", "important");
@@ -23184,8 +23196,47 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
 
+  function ensureLongWayScrollbarStyle(iframe, parts) {
+    if (iframe?.id !== "longWayLongRidePreview") return;
+
+    const { doc, shell } = parts;
+    if (!doc || !shell) return;
+
+    if (!doc.getElementById("ddsLongWaySingleScrollbarStyle")) {
+      const style = doc.createElement("style");
+      style.id = "ddsLongWaySingleScrollbarStyle";
+      style.textContent = `
+        html,body{
+          overflow:hidden!important;
+        }
+        .dds-lwl-preview-shell{
+          overflow:auto!important;
+          scrollbar-width:thin;
+          scrollbar-color:#c11724 #090909;
+        }
+        .dds-lwl-preview-shell::-webkit-scrollbar{
+          width:7px;
+          height:7px;
+        }
+        .dds-lwl-preview-shell::-webkit-scrollbar-track{
+          background:#090909;
+        }
+        .dds-lwl-preview-shell::-webkit-scrollbar-thumb{
+          background:#c11724;
+          border-radius:999px;
+        }
+        .dds-lwl-preview-shell::-webkit-scrollbar-thumb:hover{
+          background:#df2632;
+        }
+      `;
+      doc.head.appendChild(style);
+    }
+  }
+
   function watchAssets(iframe, parts) {
     const state = getState(iframe);
+
+    ensureLongWayScrollbarStyle(iframe, parts);
 
     parts.doc.querySelectorAll("img").forEach((img) => {
       if (state.imageListeners.has(img)) return;
@@ -23266,6 +23317,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.dataset.ddsStableViewportBound = "1";
 
     /*
+     * CODE005 / CODE006 รู้ขนาดจริงล่วงหน้าแล้ว
+     * จึงไม่ต้อง probe และไม่เกิดจังหวะ width กระโดด
+     */
+    if (Number.isFinite(config.fixedWidth) && config.fixedWidth > 0) {
+      getState(iframe).naturalWidth = config.fixedWidth;
+    }
+
+    /*
      * outer viewport คงที่ตั้งแต่ยังไม่เปิด editor
      */
     keepOuterIframeStable(iframe);
@@ -23337,4 +23396,73 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 
+
+
+
+
+/* =========================================================
+   CODE005 + CODE006 — FIX WIDTH BEFORE FIRST PAINT v149
+   Prevent inner preview from changing width after srcdoc renders.
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE005_006_PREPAINT_WIDTH_V149__) return;
+  window.__DDS_CODE005_006_PREPAINT_WIDTH_V149__ = true;
+
+  if (typeof window.queuePreviewDocument !== "function") return;
+
+  const originalQueuePreviewDocument = window.queuePreviewDocument;
+
+  function injectStableWidth(srcdoc, width) {
+    const style = `<style data-dds-prepaint-width>
+      html,body{width:100%!important;height:100%!important;overflow:hidden!important}
+      .dds-preview-shell{
+        width:100%!important;
+        height:100%!important;
+        min-height:100%!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        overflow:auto!important;
+      }
+      .dds-preview-target{
+        width:${width}px!important;
+        min-width:${width}px!important;
+        max-width:${width}px!important;
+        flex:0 0 ${width}px!important;
+        margin:auto!important;
+        transform:none!important;
+        zoom:1!important;
+      }
+    </style>`;
+
+    if (/<\/head>/i.test(srcdoc)) {
+      return srcdoc.replace(/<\/head>/i, `${style}</head>`);
+    }
+
+    return style + srcdoc;
+  }
+
+  window.queuePreviewDocument = function (
+    iframe,
+    srcdoc,
+    resizeFunction
+  ) {
+    let nextSrcdoc = srcdoc;
+
+    if (iframe?.id === "commaPreview") {
+      nextSrcdoc = injectStableWidth(nextSrcdoc, 650);
+    } else if (iframe?.id === "newRulesPreview") {
+      nextSrcdoc = injectStableWidth(nextSrcdoc, 720);
+    }
+
+    return originalQueuePreviewDocument.call(
+      this,
+      iframe,
+      nextSrcdoc,
+      resizeFunction
+    );
+  };
+})();
 
