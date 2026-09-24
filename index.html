@@ -5897,28 +5897,93 @@ You were mine forever</textarea>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./script.js?v=20260924-editor-fixes-v150"></script>
 
-<!-- CODE005 / CODE006 cold-start prewarm v151 -->
-<script id="dds-code005006-prewarm-v151">
+<!-- CODE005 / CODE006 cold-start prewarm v152 -->
+<script id="dds-code005006-prewarm-v152">
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE005006_PREWARM_V151__) return;
-  window.__DDS_CODE005006_PREWARM_V151__ = true;
+  if (window.__DDS_CODE005006_PREWARM_V152__) return;
+  window.__DDS_CODE005006_PREWARM_V152__ = true;
 
   const targets = [
-    { panelName: "editor-code005", iframeId: "commaPreview" },
-    { panelName: "editor-code006", iframeId: "newRulesPreview" }
+    {
+      panelName: "editor-code005",
+      iframeId: "commaPreview",
+      cardId: "roleplayCardPreview005"
+    },
+    {
+      panelName: "editor-code006",
+      iframeId: "newRulesPreview",
+      cardId: "roleplayCardPreview006"
+    }
   ];
 
   let finished = false;
 
+  function waitFrame() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+  }
+
   function preloadPanelImages(panel) {
     panel?.querySelectorAll('input[type="url"]').forEach((input) => {
       const url = String(input.value || "").trim();
+
       if (!/^https?:\/\//i.test(url)) return;
+
       const img = new Image();
       img.decoding = "async";
       img.src = url;
+    });
+  }
+
+  function iframeHasRenderedContent(iframe) {
+    if (!iframe) return false;
+
+    const srcdoc = String(
+      iframe.getAttribute("srcdoc") || ""
+    );
+
+    if (srcdoc.length > 250) {
+      return true;
+    }
+
+    try {
+      const body = iframe.contentDocument?.body;
+      return Boolean(
+        body &&
+        body.children.length &&
+        body.innerHTML.length > 250
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  function waitForCardPreview(iframe, timeout = 1800) {
+    return new Promise((resolve) => {
+      const started = performance.now();
+
+      function check() {
+        if (iframeHasRenderedContent(iframe)) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(resolve);
+          });
+          return;
+        }
+
+        if (performance.now() - started >= timeout) {
+          resolve();
+          return;
+        }
+
+        window.setTimeout(check, 30);
+      }
+
+      check();
     });
   }
 
@@ -5969,45 +6034,206 @@ You were mine forever</textarea>
     });
   }
 
+  function snapshotCardPreview(iframe) {
+    if (!iframe) return null;
+
+    let previewState = null;
+
+    try {
+      const state =
+        typeof window.getPreviewState === "function"
+          ? window.getPreviewState(iframe)
+          : null;
+
+      if (state) {
+        previewState = {
+          currentSrcdoc:
+            typeof state.currentSrcdoc === "string"
+              ? state.currentSrcdoc
+              : null,
+          pendingSrcdoc:
+            typeof state.pendingSrcdoc === "string"
+              ? state.pendingSrcdoc
+              : null
+        };
+      }
+    } catch {}
+
+    return {
+      srcdoc: iframe.getAttribute("srcdoc"),
+      style: iframe.getAttribute("style"),
+      className: iframe.className,
+      previewState
+    };
+  }
+
+  function restoreCardPreview(iframe, snapshot) {
+    if (!iframe || !snapshot) return;
+
+    /*
+     * คืน queue state ของระบบ preview ก่อน
+     * ป้องกัน pending srcdoc จาก editor warm มาทับ card ทีหลัง
+     */
+    try {
+      const state =
+        typeof window.getPreviewState === "function"
+          ? window.getPreviewState(iframe)
+          : null;
+
+      if (state && snapshot.previewState) {
+        if (
+          snapshot.previewState.currentSrcdoc !== null
+        ) {
+          state.currentSrcdoc =
+            snapshot.previewState.currentSrcdoc;
+        }
+
+        if (
+          snapshot.previewState.pendingSrcdoc !== null
+        ) {
+          state.pendingSrcdoc =
+            snapshot.previewState.pendingSrcdoc;
+        }
+      }
+    } catch {}
+
+    const wantedSrcdoc =
+      snapshot.srcdoc ||
+      snapshot.previewState?.currentSrcdoc ||
+      snapshot.previewState?.pendingSrcdoc ||
+      "";
+
+    if (
+      wantedSrcdoc &&
+      iframe.getAttribute("srcdoc") !== wantedSrcdoc
+    ) {
+      iframe.setAttribute("srcdoc", wantedSrcdoc);
+    }
+
+    if (snapshot.style === null) {
+      iframe.removeAttribute("style");
+    } else {
+      iframe.setAttribute("style", snapshot.style);
+    }
+
+    iframe.className = snapshot.className;
+
+    /*
+     * card fit/center เดิมอาจฟัง load/resize อยู่
+     * หลัง restore ให้เวลา browser render แล้ว dispatch resize
+     */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+    });
+  }
+
   async function warmOne(target) {
     const panel = document.querySelector(
       `[data-panel="${target.panelName}"]`
     );
-    const iframe = document.getElementById(target.iframeId);
+
+    const iframe = document.getElementById(
+      target.iframeId
+    );
+
+    const cardIframe = document.getElementById(
+      target.cardId
+    );
 
     if (!panel || !iframe) return;
+
+    /*
+     * สำคัญ:
+     * รอ card preview จริงให้สร้างเสร็จก่อน แล้ว snapshot ไว้
+     * editor warm จึงไม่มีสิทธิ์ทำให้หน้า FOR ROLEPLAY หายถาวร
+     */
+    if (cardIframe) {
+      await waitForCardPreview(cardIframe);
+    }
+
+    const cardSnapshot =
+      snapshotCardPreview(cardIframe);
 
     preloadPanelImages(panel);
 
     const oldStyle = panel.getAttribute("style");
-    const wasActive = panel.classList.contains("is-active");
+    const wasActive =
+      panel.classList.contains("is-active");
 
-    panel.style.setProperty("display", "block", "important");
-    panel.style.setProperty("position", "fixed", "important");
-    panel.style.setProperty("left", "-200vw", "important");
-    panel.style.setProperty("top", "0", "important");
-    panel.style.setProperty("width", "100vw", "important");
-    panel.style.setProperty("height", "100vh", "important");
-    panel.style.setProperty("visibility", "hidden", "important");
-    panel.style.setProperty("opacity", "0", "important");
-    panel.style.setProperty("pointer-events", "none", "important");
-    panel.style.setProperty("z-index", "-99999", "important");
+    panel.style.setProperty(
+      "display",
+      "block",
+      "important"
+    );
+    panel.style.setProperty(
+      "position",
+      "fixed",
+      "important"
+    );
+    panel.style.setProperty(
+      "left",
+      "-200vw",
+      "important"
+    );
+    panel.style.setProperty(
+      "top",
+      "0",
+      "important"
+    );
+    panel.style.setProperty(
+      "width",
+      "100vw",
+      "important"
+    );
+    panel.style.setProperty(
+      "height",
+      "100vh",
+      "important"
+    );
+    panel.style.setProperty(
+      "visibility",
+      "hidden",
+      "important"
+    );
+    panel.style.setProperty(
+      "opacity",
+      "0",
+      "important"
+    );
+    panel.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
+    panel.style.setProperty(
+      "z-index",
+      "-99999",
+      "important"
+    );
 
     panel.classList.add("is-active");
     window.dispatchEvent(new Event("resize"));
 
-    const loadPromise = new Promise((resolve) => {
-      let done = false;
+    const loadPromise =
+      new Promise((resolve) => {
+        let done = false;
 
-      function finish() {
-        if (done) return;
-        done = true;
-        resolve();
-      }
+        function finish() {
+          if (done) return;
+          done = true;
+          resolve();
+        }
 
-      iframe.addEventListener("load", finish, { once: true });
-      window.setTimeout(finish, 450);
-    });
+        iframe.addEventListener(
+          "load",
+          finish,
+          { once: true }
+        );
+
+        window.setTimeout(finish, 450);
+      });
 
     await loadPromise;
     await waitForIframeAssets(iframe);
@@ -6022,26 +6248,43 @@ You were mine forever</textarea>
       panel.setAttribute("style", oldStyle);
     }
 
-    await new Promise((resolve) => {
-      requestAnimationFrame(resolve);
-    });
+    /*
+     * คืน card preview ที่ v151 warm เคยไปแตะ
+     */
+    restoreCardPreview(
+      cardIframe,
+      cardSnapshot
+    );
+
+    await waitFrame();
   }
 
   async function warmBoth() {
     if (finished) return;
 
+    /*
+     * วอร์มทีละ Editor เพื่อไม่ให้ระบบ active-panel ชนกัน
+     */
     for (const target of targets) {
       await warmOne(target);
     }
 
     finished = true;
-    document.documentElement.dataset.ddsCode005006Warm = "1";
+
+    document.documentElement.dataset
+      .ddsCode005006Warm = "1";
   }
 
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      () => window.setTimeout(warmBoth, 0),
+      () => {
+        /*
+         * ให้ main card preview installer ได้เริ่มสร้าง card ก่อน
+         * แต่ warmOne จะรอ card จริงอีกชั้นอยู่แล้ว
+         */
+        window.setTimeout(warmBoth, 0);
+      },
       { once: true }
     );
   } else {
