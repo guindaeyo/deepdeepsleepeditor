@@ -5896,5 +5896,159 @@ You were mine forever</textarea>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./script.js?v=20260924-editor-fixes-v150"></script>
+
+<!-- CODE005 / CODE006 cold-start prewarm v151 -->
+<script id="dds-code005006-prewarm-v151">
+(() => {
+  "use strict";
+
+  if (window.__DDS_CODE005006_PREWARM_V151__) return;
+  window.__DDS_CODE005006_PREWARM_V151__ = true;
+
+  const targets = [
+    { panelName: "editor-code005", iframeId: "commaPreview" },
+    { panelName: "editor-code006", iframeId: "newRulesPreview" }
+  ];
+
+  let finished = false;
+
+  function preloadPanelImages(panel) {
+    panel?.querySelectorAll('input[type="url"]').forEach((input) => {
+      const url = String(input.value || "").trim();
+      if (!/^https?:\/\//i.test(url)) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = url;
+    });
+  }
+
+  function waitForIframeAssets(iframe, timeout = 1800) {
+    return new Promise((resolve) => {
+      const started = performance.now();
+
+      function check() {
+        const doc = iframe?.contentDocument;
+
+        if (!doc?.body) {
+          if (performance.now() - started < timeout) {
+            requestAnimationFrame(check);
+          } else {
+            resolve();
+          }
+          return;
+        }
+
+        const stylesReady = Array
+          .from(doc.querySelectorAll('link[rel~="stylesheet"]'))
+          .every((link) => Boolean(link.sheet));
+
+        const imagesReady = Array
+          .from(doc.images || [])
+          .every((img) => img.complete);
+
+        const fontsReady =
+          !doc.fonts ||
+          doc.fonts.status === "loaded";
+
+        if (stylesReady && imagesReady && fontsReady) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(resolve);
+          });
+          return;
+        }
+
+        if (performance.now() - started >= timeout) {
+          resolve();
+          return;
+        }
+
+        requestAnimationFrame(check);
+      }
+
+      check();
+    });
+  }
+
+  async function warmOne(target) {
+    const panel = document.querySelector(
+      `[data-panel="${target.panelName}"]`
+    );
+    const iframe = document.getElementById(target.iframeId);
+
+    if (!panel || !iframe) return;
+
+    preloadPanelImages(panel);
+
+    const oldStyle = panel.getAttribute("style");
+    const wasActive = panel.classList.contains("is-active");
+
+    panel.style.setProperty("display", "block", "important");
+    panel.style.setProperty("position", "fixed", "important");
+    panel.style.setProperty("left", "-200vw", "important");
+    panel.style.setProperty("top", "0", "important");
+    panel.style.setProperty("width", "100vw", "important");
+    panel.style.setProperty("height", "100vh", "important");
+    panel.style.setProperty("visibility", "hidden", "important");
+    panel.style.setProperty("opacity", "0", "important");
+    panel.style.setProperty("pointer-events", "none", "important");
+    panel.style.setProperty("z-index", "-99999", "important");
+
+    panel.classList.add("is-active");
+    window.dispatchEvent(new Event("resize"));
+
+    const loadPromise = new Promise((resolve) => {
+      let done = false;
+
+      function finish() {
+        if (done) return;
+        done = true;
+        resolve();
+      }
+
+      iframe.addEventListener("load", finish, { once: true });
+      window.setTimeout(finish, 450);
+    });
+
+    await loadPromise;
+    await waitForIframeAssets(iframe);
+
+    if (!wasActive) {
+      panel.classList.remove("is-active");
+    }
+
+    if (oldStyle === null) {
+      panel.removeAttribute("style");
+    } else {
+      panel.setAttribute("style", oldStyle);
+    }
+
+    await new Promise((resolve) => {
+      requestAnimationFrame(resolve);
+    });
+  }
+
+  async function warmBoth() {
+    if (finished) return;
+
+    for (const target of targets) {
+      await warmOne(target);
+    }
+
+    finished = true;
+    document.documentElement.dataset.ddsCode005006Warm = "1";
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => window.setTimeout(warmBoth, 0),
+      { once: true }
+    );
+  } else {
+    window.setTimeout(warmBoth, 0);
+  }
+})();
+</script>
+
 </body>
 </html>
