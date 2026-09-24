@@ -10158,46 +10158,6 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — FIXED VIEWPORT / NO JUMP v148
-   Only the seven requested editor previews.
-========================================================= */
-#weirdoPreview,
-#hihiPreview,
-#uuiaaPreview,
-#commaPreview,
-#newRulesPreview,
-#higherHeavenPreview,
-#longWayLongRidePreview {
-  display:block !important;
-  position:relative !important;
-  width:100% !important;
-  min-width:100% !important;
-  max-width:100% !important;
-  height:100% !important;
-  min-height:100% !important;
-  max-height:100% !important;
-  margin:0 !important;
-  flex:none !important;
-  transform:none !important;
-  transform-origin:top left !important;
-  visibility:visible !important;
-  opacity:1 !important;
-  transition:none !important;
-}
-
-
-#weirdoPreview[data-dds-true-canvas-ready="1"],
-#hihiPreview[data-dds-true-canvas-ready="1"],
-#uuiaaPreview[data-dds-true-canvas-ready="1"],
-#commaPreview[data-dds-true-canvas-ready="1"],
-#newRulesPreview[data-dds-true-canvas-ready="1"],
-#higherHeavenPreview[data-dds-true-canvas-ready="1"],
-#longWayLongRidePreview[data-dds-true-canvas-ready="1"] {
-  margin-left:auto !important;
-  margin-right:auto !important;
-}
-
-/* =========================================================
    CLOUD SAVE — TEXT NORMALLY / CLOUD ICON IN EDITORS v145
 ========================================================= */
 
@@ -10327,80 +10287,20 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 }
 
 
+
+
 /* =========================================================
-   HIGHER THAN HEAVEN — SINGLE RED PREVIEW SCROLLBAR v153
-   Outer editor column must not create a second scrollbar.
+   MAIN PAGE PERFORMANCE CLEANUP v159
 ========================================================= */
-@media (min-width:1251px){
-  [data-panel="editor-code009"] .dds-editor-preview-column{
-    overflow:hidden !important;
-    scrollbar-width:none !important;
-  }
-
-  [data-panel="editor-code009"] .dds-editor-preview-column::-webkit-scrollbar{
-    width:0 !important;
-    height:0 !important;
-    display:none !important;
-  }
-
-  #higherHeavenPreview{
-    overflow:hidden !important;
-  }
+.dds-roleplay-grid .dds-roleplay-card{
+  content-visibility:auto;
+  contain-intrinsic-size:420px 500px;
 }
-
-/* =========================================================
-   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v157 LIGHT
-========================================================= */
+.dds-roleplay-card-preview iframe{pointer-events:none!important}
+.dds-roleplay-card-body,.dds-roleplay-edit{position:relative;z-index:2}
 @media (min-width:1251px){
-  .dds-panel.is-active .dds-editor-preview-column,
-  .dds-panel.is-active .dds-protected-commission-preview-column{
-    overflow:hidden !important;
-  }
-
-  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"],
-  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]{
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    overscroll-behavior:contain;
-    scrollbar-width:thin !important;
-    scrollbar-color:#c11724 #090909 !important;
-  }
-
-  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar,
-  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar{
-    width:7px !important;
-    height:7px !important;
-  }
-
-  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar-track,
-  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar-track{
-    background:#090909 !important;
-  }
-
-  .dds-panel.is-active .dds-protected-commission-preview-column > [class*="stage"]::-webkit-scrollbar-thumb,
-  .dds-panel.is-active .dds-editor-preview-column > [class*="stage"]::-webkit-scrollbar-thumb{
-    background:#c11724 !important;
-    border-radius:999px !important;
-  }
-
-  .dds-code014-editor .dds-code014-editor-stage{
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    position:relative !important;
-  }
-
-  .dds-code014-editor .dds-code014-editor-stage::after{
-    content:"";
-    display:block;
-    width:1px;
-    height:var(--dds-code014-scroll-height,1px);
-    pointer-events:none;
-  }
-
-  .dds-code014-editor .dds-code014-editor-preview{
-    overflow:hidden !important;
+  body.dds-editor-one-screen .dds-editor-preview-column,
+  body.dds-editor-one-screen .dds-protected-commission-preview-column{
+    overflow:hidden!important;
   }
 }
