@@ -22988,24 +22988,24 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — NO-JUMP TRUE CANVAS v147
+   LEGACY ROLEPLAY EDITORS — FIXED VIEWPORT / NO JUMP v148
    Only:
    WEIRDO / HIHI!, BABY / U-I-A U-I-A U-E /
    THIS HITS LIKE COMA / NEW RULES, I'M TROUBLEMAKER /
    HIGHER THAN HEAVEN / LONG WAY LONG RIDE
 
-   จุดต่างจาก v146:
-   - ระหว่างการเปิด Editor ครั้งแรก iframe จะยังไม่ถูก reveal
-   - รอ srcdoc รอบสุดท้าย + stylesheet + font + image พร้อมก่อน
-   - ค่อยเปิดให้เห็นเพียงครั้งเดียว
-   - natural width ที่หาได้แล้วจะไม่ถูก reset เมื่อ iframe load ซ้ำ
-   - หลัง reveal ครั้งแรก จะคง canvas width เดิมตลอด
+   หลักการ:
+   - iframe ด้านนอกมีขนาดคงที่ 100% ตั้งแต่เฟรมแรก
+   - ไม่ขยาย iframe เป็น 1200px แล้วหดกลับอีก
+   - probe เฉพาะ .dds-preview-target ภายใน iframe แบบ visibility:hidden
+   - เมื่อ CSS บอกความกว้างจริงได้แล้ว ค่อยล็อก target และแสดงทันที
+   - หลังจากนั้น width ไม่เปลี่ยนอีก อัปเดตเฉพาะเนื้อหา/ความสูงภายใน
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_LEGACY_NO_JUMP_V147__) return;
-  window.__DDS_LEGACY_NO_JUMP_V147__ = true;
+  if (window.__DDS_LEGACY_FIXED_VIEWPORT_V148__) return;
+  window.__DDS_LEGACY_FIXED_VIEWPORT_V148__ = true;
 
   const CONFIGS = [
     { id: "weirdoPreview", panel: "editor-code002" },
@@ -23017,8 +23017,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     { id: "longWayLongRidePreview", panel: "editor-code010" }
   ];
 
-  const PROBE_CONTENT_WIDTH = 1200;
-  const FIRST_REVEAL_QUIET_MS = 260;
+  const PROBE_WIDTH = 1200;
   const states = new WeakMap();
 
   function getState(iframe) {
@@ -23026,21 +23025,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     if (!state) {
       state = {
-        applying: false,
         naturalWidth: 0,
-        finalWidth: 0,
-        finalHeight: 0,
-        firstTopGap: null,
-        everRevealed: false,
-        applyTimer: 0,
-        revealTimer: 0,
-        stableCheckTimer: 0,
-        sourceVersion: 0,
-        rootObserver: null,
-        root: null,
+        applying: false,
+        timer: 0,
         imageListeners: new WeakSet()
       };
-
       states.set(iframe, state);
     }
 
@@ -23049,11 +23038,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function getParts(iframe) {
     const doc = iframe?.contentDocument;
-
     if (!doc?.body) return null;
 
     const target = doc.querySelector(".dds-preview-target");
-
     const shell =
       doc.querySelector(".dds-preview-shell") ||
       doc.querySelector(".dds-lwl-preview-shell");
@@ -23065,7 +23052,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (element.tagName === "STYLE") return false;
 
       const cls = String(element.className || "").toLowerCase();
-
       if (cls.includes("credit")) return false;
 
       return true;
@@ -23073,333 +23059,74 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     if (!root) return null;
 
-    return {
-      doc,
-      html: doc.documentElement,
-      body: doc.body,
-      shell,
-      target,
-      root
-    };
+    return { doc, shell, target, root };
   }
 
-  function bodyPadding(doc) {
-    const style = doc.defaultView.getComputedStyle(doc.body);
-
-    return {
-      x:
-        (Number.parseFloat(style.paddingLeft) || 0) +
-        (Number.parseFloat(style.paddingRight) || 0),
-
-      y:
-        (Number.parseFloat(style.paddingTop) || 0) +
-        (Number.parseFloat(style.paddingBottom) || 0)
-    };
+  function keepOuterIframeStable(iframe) {
+    iframe.style.setProperty("position", "relative", "important");
+    iframe.style.setProperty("left", "auto", "important");
+    iframe.style.setProperty("top", "auto", "important");
+    iframe.style.setProperty("width", "100%", "important");
+    iframe.style.setProperty("min-width", "100%", "important");
+    iframe.style.setProperty("max-width", "100%", "important");
+    iframe.style.setProperty("height", "100%", "important");
+    iframe.style.setProperty("min-height", "100%", "important");
+    iframe.style.setProperty("max-height", "100%", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.style.setProperty("display", "block", "important");
   }
 
-  function hideUntilFirstStableFrame(iframe) {
-    const state = getState(iframe);
+  function prepareInsideViewport(parts) {
+    const { doc, shell, target } = parts;
 
-    if (state.everRevealed) return;
+    doc.documentElement.style.setProperty("width", "100%", "important");
+    doc.documentElement.style.setProperty("height", "100%", "important");
+    doc.documentElement.style.setProperty("overflow", "hidden", "important");
 
-    iframe.removeAttribute("data-dds-true-canvas-ready");
+    doc.body.style.setProperty("width", "100%", "important");
+    doc.body.style.setProperty("height", "100%", "important");
+    doc.body.style.setProperty("min-height", "100%", "important");
+    doc.body.style.setProperty("box-sizing", "border-box", "important");
+    doc.body.style.setProperty("overflow", "auto", "important");
 
-    iframe.style.setProperty(
-      "visibility",
-      "hidden",
-      "important"
-    );
+    shell.style.setProperty("width", "100%", "important");
+    shell.style.setProperty("min-width", "100%", "important");
+    shell.style.setProperty("height", "100%", "important");
+    shell.style.setProperty("min-height", "100%", "important");
+    shell.style.setProperty("display", "flex", "important");
+    shell.style.setProperty("align-items", "center", "important");
+    shell.style.setProperty("justify-content", "center", "important");
+    shell.style.setProperty("overflow", "auto", "important");
+    shell.style.setProperty("box-sizing", "border-box", "important");
 
-    iframe.style.setProperty(
-      "opacity",
-      "0",
-      "important"
-    );
+    target.style.setProperty("flex", "0 0 auto", "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("transform-origin", "center center", "important");
+    target.style.setProperty("zoom", "1", "important");
+    target.style.setProperty("margin", "auto", "important");
   }
 
-  function documentAssetsReady(parts) {
-    const { doc } = parts;
+  function probeNaturalWidth(parts) {
+    const { doc, target, root } = parts;
 
-    const stylesheetLinks =
-      Array.from(
-        doc.querySelectorAll(
-          'link[rel~="stylesheet"]'
-        )
-      );
-
-    const stylesReady =
-      stylesheetLinks.every(
-        (link) => Boolean(link.sheet)
-      );
-
-    const imagesReady =
-      Array.from(doc.images || [])
-        .every((img) => img.complete);
-
-    const fontsReady =
-      !doc.fonts ||
-      doc.fonts.status === "loaded";
-
-    return (
-      doc.readyState === "complete" &&
-      stylesReady &&
-      imagesReady &&
-      fontsReady
-    );
-  }
-
-  function watchAssets(iframe, parts) {
-    const state = getState(iframe);
-    const { doc } = parts;
-
-    doc.querySelectorAll("img").forEach((img) => {
-      if (state.imageListeners.has(img)) return;
-
-      state.imageListeners.add(img);
-
-      img.addEventListener(
-        "load",
-        () => scheduleApply(iframe, false),
-        { once: true }
-      );
-
-      img.addEventListener(
-        "error",
-        () => scheduleApply(iframe, false),
-        { once: true }
-      );
-    });
-
-    try {
-      doc.fonts?.ready?.then(() => {
-        scheduleApply(iframe, false);
-      });
-    } catch {}
-  }
-
-  function watchRoot(iframe, root) {
-    const state = getState(iframe);
-
-    if (!("ResizeObserver" in window)) return;
-
-    if (
-      state.root === root &&
-      state.rootObserver
-    ) {
-      return;
-    }
-
-    state.rootObserver?.disconnect();
-    state.root = root;
-
-    let lastHeight = 0;
-
-    state.rootObserver =
-      new ResizeObserver(() => {
-        if (state.applying) return;
-
-        const height =
-          Math.round(
-            root.getBoundingClientRect().height
-          );
-
-        if (
-          Math.abs(height - lastHeight) < 2
-        ) {
-          return;
-        }
-
-        lastHeight = height;
-
-        scheduleApply(
-          iframe,
-          false
-        );
-      });
-
-    state.rootObserver.observe(root);
-  }
-
-  function prepareProbe(iframe, parts) {
-    const { doc, html, body, shell, target } = parts;
-    const padding = bodyPadding(doc);
-
-    hideUntilFirstStableFrame(iframe);
-
-    iframe.style.setProperty(
-      "width",
-      `${PROBE_CONTENT_WIDTH + padding.x}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "min-width",
-      `${PROBE_CONTENT_WIDTH + padding.x}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "max-width",
-      "none",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "height",
-      "1600px",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "min-height",
-      "1600px",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "max-height",
-      "none",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "transform",
-      "none",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "transform-origin",
-      "top left",
-      "important"
-    );
-
-    html.style.setProperty(
-      "width",
-      "auto",
-      "important"
-    );
-
-    body.style.setProperty(
-      "width",
-      "auto",
-      "important"
-    );
-
-    body.style.setProperty(
-      "min-width",
-      "0",
-      "important"
-    );
-
-    body.style.setProperty(
-      "overflow",
-      "visible",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "width",
-      "100%",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "height",
-      "auto",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "min-height",
-      "0",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "display",
-      "flex",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "justify-content",
-      "center",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "align-items",
-      "flex-start",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "overflow",
-      "visible",
-      "important"
-    );
-
-    target.style.setProperty(
-      "width",
-      `${PROBE_CONTENT_WIDTH}px`,
-      "important"
-    );
-
-    target.style.setProperty(
-      "min-width",
-      `${PROBE_CONTENT_WIDTH}px`,
-      "important"
-    );
-
-    target.style.setProperty(
-      "max-width",
-      "none",
-      "important"
-    );
-
-    target.style.setProperty(
-      "flex",
-      "0 0 auto",
-      "important"
-    );
-
-    target.style.setProperty(
-      "transform",
-      "none",
-      "important"
-    );
-
-    target.style.setProperty(
-      "transform-origin",
-      "top center",
-      "important"
-    );
-
-    target.style.setProperty(
-      "zoom",
-      "1",
-      "important"
-    );
-  }
-
-  function detectNaturalWidth(parts) {
-    const { doc, root } = parts;
+    target.style.setProperty("visibility", "hidden", "important");
+    target.style.setProperty("opacity", "0", "important");
+    target.style.setProperty("width", `${PROBE_WIDTH}px`, "important");
+    target.style.setProperty("min-width", `${PROBE_WIDTH}px`, "important");
+    target.style.setProperty("max-width", `${PROBE_WIDTH}px`, "important");
 
     void root.offsetWidth;
 
-    const style =
-      doc.defaultView.getComputedStyle(root);
+    const style = doc.defaultView.getComputedStyle(root);
+    const rect = root.getBoundingClientRect();
 
-    const rect =
-      root.getBoundingClientRect();
-
-    const computedWidth =
-      Number.parseFloat(style.width) || 0;
-
+    const computedWidth = Number.parseFloat(style.width) || 0;
     const maxWidth =
-      style.maxWidth &&
-      style.maxWidth !== "none"
+      style.maxWidth && style.maxWidth !== "none"
         ? Number.parseFloat(style.maxWidth) || 0
         : 0;
 
@@ -23410,20 +23137,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       root.scrollWidth || 0
     );
 
-    if (
-      maxWidth > 240 &&
-      maxWidth < PROBE_CONTENT_WIDTH
-    ) {
-      width = Math.min(
-        width,
-        maxWidth
-      );
+    if (maxWidth > 240 && maxWidth < PROBE_WIDTH) {
+      width = Math.min(width, maxWidth);
     }
 
     if (
       !Number.isFinite(width) ||
       width < 240 ||
-      width >= PROBE_CONTENT_WIDTH - 2
+      width >= PROBE_WIDTH - 2
     ) {
       return 0;
     }
@@ -23431,717 +23152,159 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return Math.ceil(width);
   }
 
-  function applyLockedCanvas(
-    iframe,
-    parts,
-    naturalWidth
-  ) {
-    const state = getState(iframe);
+  function lockTarget(parts, naturalWidth) {
+    const { shell, target } = parts;
 
-    const {
-      doc,
-      shell,
-      target,
-      root
-    } = parts;
+    target.style.setProperty("width", `${naturalWidth}px`, "important");
+    target.style.setProperty("min-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("max-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("margin", "auto", "important");
 
-    const column =
-      iframe.closest(
-        ".dds-editor-preview-column"
-      );
-
-    if (!column) return false;
-
-    const padding = bodyPadding(doc);
-
-    target.style.setProperty(
-      "width",
-      `${naturalWidth}px`,
-      "important"
-    );
-
-    target.style.setProperty(
-      "min-width",
-      `${naturalWidth}px`,
-      "important"
-    );
-
-    target.style.setProperty(
-      "max-width",
-      `${naturalWidth}px`,
-      "important"
-    );
-
-    target.style.setProperty(
-      "flex",
-      "0 0 auto",
-      "important"
-    );
-
-    target.style.setProperty(
-      "transform",
-      "none",
-      "important"
-    );
-
-    target.style.setProperty(
-      "zoom",
-      "1",
-      "important"
-    );
-
+    /*
+     * ถ้างานกว้างกว่า viewport ให้ shell เป็นพื้นที่ scroll
+     * แต่ไม่ scale งานให้เล็ก
+     */
     shell.style.setProperty(
-      "width",
-      `${naturalWidth}px`,
+      "justify-content",
+      naturalWidth > shell.clientWidth ? "flex-start" : "center",
       "important"
     );
 
-    shell.style.setProperty(
-      "min-width",
-      `${naturalWidth}px`,
-      "important"
-    );
-
-    shell.style.setProperty(
-      "max-width",
-      `${naturalWidth}px`,
-      "important"
-    );
-
-    shell.style.setProperty(
-      "height",
-      "auto",
-      "important"
-    );
-
-    shell.style.setProperty(
-      "overflow",
-      "visible",
-      "important"
-    );
-
-    void target.offsetHeight;
-
-    const naturalHeight =
-      Math.max(
-        1,
-        Math.ceil(
-          root.getBoundingClientRect().height || 0
-        ),
-        root.scrollHeight || 0,
-        target.scrollHeight || 0
-      );
-
-    const finalWidth =
-      Math.ceil(
-        naturalWidth + padding.x
-      );
-
-    const finalHeight =
-      Math.ceil(
-        naturalHeight + padding.y
-      );
-
-    state.finalWidth = finalWidth;
-    state.finalHeight = finalHeight;
-
-    iframe.style.setProperty(
-      "width",
-      `${finalWidth}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "min-width",
-      `${finalWidth}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "max-width",
-      `${finalWidth}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "height",
-      `${finalHeight}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "min-height",
-      `${finalHeight}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "max-height",
-      `${finalHeight}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "display",
-      "block",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "margin-left",
-      "auto",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "margin-right",
-      "auto",
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "transform",
-      "none",
-      "important"
-    );
-
-    const previewTop =
-      column.querySelector(
-        ".dds-editor-preview-top"
-      )?.offsetHeight || 0;
-
-    const availableHeight =
-      Math.max(
-        0,
-        column.clientHeight - previewTop
-      );
-
-    if (state.firstTopGap === null) {
-      state.firstTopGap =
-        Math.max(
-          0,
-          Math.round(
-            (
-              availableHeight -
-              finalHeight
-            ) / 2
-          )
-        );
-    }
-
-    iframe.style.setProperty(
-      "margin-top",
-      `${state.firstTopGap}px`,
-      "important"
-    );
-
-    iframe.style.setProperty(
-      "margin-bottom",
-      "0",
-      "important"
-    );
-
-    column.style.setProperty(
-      "overflow",
-      "auto",
-      "important"
-    );
-
-    column.style.setProperty(
-      "overscroll-behavior",
-      "contain",
-      "important"
-    );
+    target.style.setProperty("visibility", "visible", "important");
+    target.style.setProperty("opacity", "1", "important");
 
     requestAnimationFrame(() => {
-      const maxScroll =
-        Math.max(
+      if (naturalWidth > shell.clientWidth) {
+        shell.scrollLeft = Math.max(
           0,
-          finalWidth - column.clientWidth
+          Math.round((naturalWidth - shell.clientWidth) / 2)
         );
-
-      if (
-        maxScroll > 0 &&
-        !column.dataset.ddsCanvasUserScrolled
-      ) {
-        column.scrollLeft =
-          Math.round(maxScroll / 2);
       }
     });
-
-    watchAssets(iframe, parts);
-    watchRoot(iframe, root);
-
-    return true;
   }
 
-  function revealWhenStable(
-    iframe,
-    expectedSourceVersion
-  ) {
+  function watchAssets(iframe, parts) {
     const state = getState(iframe);
 
-    if (state.everRevealed) {
-      iframe.setAttribute(
-        "data-dds-true-canvas-ready",
-        "1"
-      );
+    parts.doc.querySelectorAll("img").forEach((img) => {
+      if (state.imageListeners.has(img)) return;
 
-      iframe.style.setProperty(
-        "visibility",
-        "visible",
-        "important"
-      );
+      state.imageListeners.add(img);
+      img.addEventListener("load", () => schedule(iframe), { once: true });
+      img.addEventListener("error", () => schedule(iframe), { once: true });
+    });
 
-      iframe.style.setProperty(
-        "opacity",
-        "1",
-        "important"
-      );
-
-      return;
-    }
-
-    clearTimeout(
-      state.revealTimer
-    );
-
-    clearTimeout(
-      state.stableCheckTimer
-    );
-
-    const check = () => {
-      if (
-        expectedSourceVersion !==
-        state.sourceVersion
-      ) {
-        return;
-      }
-
-      const parts = getParts(iframe);
-
-      if (!parts || !state.naturalWidth) {
-        state.stableCheckTimer =
-          window.setTimeout(
-            check,
-            80
-          );
-
-        return;
-      }
-
-      if (!documentAssetsReady(parts)) {
-        state.stableCheckTimer =
-          window.setTimeout(
-            check,
-            80
-          );
-
-        return;
-      }
-
-      /*
-       * ต้องนิ่งต่ออีกช่วงหนึ่ง
-       * ถ้ามี srcdoc/load รอบใหม่ timer จะถูกยกเลิกก่อน reveal
-       */
-      state.revealTimer =
-        window.setTimeout(() => {
-          if (
-            expectedSourceVersion !==
-            state.sourceVersion
-          ) {
-            return;
-          }
-
-          const latestParts =
-            getParts(iframe);
-
-          if (!latestParts) return;
-
-          applyLockedCanvas(
-            iframe,
-            latestParts,
-            state.naturalWidth
-          );
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              if (
-                expectedSourceVersion !==
-                state.sourceVersion
-              ) {
-                return;
-              }
-
-              state.everRevealed = true;
-
-              iframe.setAttribute(
-                "data-dds-true-canvas-ready",
-                "1"
-              );
-
-              iframe.style.setProperty(
-                "visibility",
-                "visible",
-                "important"
-              );
-
-              iframe.style.setProperty(
-                "opacity",
-                "1",
-                "important"
-              );
-            });
-          });
-        }, FIRST_REVEAL_QUIET_MS);
-    };
-
-    check();
+    try {
+      parts.doc.fonts?.ready?.then(() => schedule(iframe));
+    } catch {}
   }
 
-  function applyCanvas(
-    iframe,
-    allowProbe
-  ) {
+  function apply(iframe) {
     const state = getState(iframe);
-
     if (state.applying) return false;
 
-    const column =
-      iframe?.closest(
-        ".dds-editor-preview-column"
-      );
+    const panel = iframe.closest("[data-panel]");
+    if (!panel?.classList.contains("is-active")) return false;
 
-    const parts =
-      getParts(iframe);
-
-    if (!column || !parts) {
-      return false;
-    }
-
-    if (
-      column.clientWidth < 80 ||
-      column.clientHeight < 80
-    ) {
-      return false;
-    }
+    const parts = getParts(iframe);
+    if (!parts) return false;
 
     state.applying = true;
 
     try {
-      /*
-       * สำคัญ:
-       * width ที่หาได้ครั้งแรกจะไม่ reset แม้ srcdoc load ซ้ำ
-       */
-      if (state.naturalWidth > 0) {
-        return applyLockedCanvas(
-          iframe,
-          parts,
-          state.naturalWidth
-        );
+      keepOuterIframeStable(iframe);
+      prepareInsideViewport(parts);
+
+      if (!state.naturalWidth) {
+        const detected = probeNaturalWidth(parts);
+
+        if (!detected) {
+          return false;
+        }
+
+        state.naturalWidth = detected;
       }
 
-      if (!allowProbe) {
-        return false;
-      }
+      lockTarget(parts, state.naturalWidth);
+      watchAssets(iframe, parts);
 
-      prepareProbe(
-        iframe,
-        parts
-      );
-
-      const width =
-        detectNaturalWidth(parts);
-
-      if (!width) {
-        return false;
-      }
-
-      state.naturalWidth = width;
-
-      return applyLockedCanvas(
-        iframe,
-        parts,
-        width
-      );
+      iframe.dataset.ddsStableViewportReady = "1";
+      return true;
     } finally {
       state.applying = false;
     }
   }
 
-  function scheduleApply(
-    iframe,
-    allowProbe
-  ) {
+  function schedule(iframe) {
     const state = getState(iframe);
+    clearTimeout(state.timer);
 
-    clearTimeout(
-      state.applyTimer
-    );
+    const run = () => requestAnimationFrame(() => apply(iframe));
 
-    const version =
-      state.sourceVersion;
-
-    const run = () => {
-      if (
-        version !==
-        state.sourceVersion
-      ) {
-        return;
-      }
-
-      requestAnimationFrame(() => {
-        const applied =
-          applyCanvas(
-            iframe,
-            allowProbe
-          );
-
-        if (
-          applied &&
-          !state.everRevealed
-        ) {
-          revealWhenStable(
-            iframe,
-            version
-          );
-        }
-      });
-    };
-
-    state.applyTimer =
-      window.setTimeout(
-        run,
-        8
-      );
-
-    if (!state.everRevealed) {
-      [
-        50,
-        120,
-        240,
-        420,
-        700,
-        1100,
-        1700
-      ].forEach((delay) => {
-        window.setTimeout(
-          run,
-          delay
-        );
-      });
-    }
-  }
-
-  function markNewSource(iframe) {
-    const state = getState(iframe);
-
-    state.sourceVersion += 1;
-
-    clearTimeout(
-      state.revealTimer
-    );
-
-    clearTimeout(
-      state.stableCheckTimer
-    );
+    state.timer = window.setTimeout(run, 0);
 
     /*
-     * ก่อน first reveal ทุก srcdoc รอบยังถูกซ่อนไว้
-     * หลังเคย reveal แล้วจะไม่กระพริบหายเมื่อแก้ข้อมูล
+     * retry เฉพาะช่วง CSS ยังไม่พร้อม
+     * outer iframe ไม่เปลี่ยนขนาดจึงไม่เกิด jump
      */
-    hideUntilFirstStableFrame(
-      iframe
-    );
+    if (!state.naturalWidth) {
+      [35, 80, 150, 260, 420, 700].forEach((delay) => {
+        window.setTimeout(run, delay);
+      });
+    }
   }
 
   function bind(config) {
-    const iframe =
-      document.getElementById(
-        config.id
-      );
+    const iframe = document.getElementById(config.id);
+    const panel = document.querySelector(`[data-panel="${config.panel}"]`);
 
-    const panel =
-      document.querySelector(
-        `[data-panel="${config.panel}"]`
-      );
-
-    if (
-      !iframe ||
-      !panel ||
-      iframe.dataset.ddsNoJumpBound === "1"
-    ) {
+    if (!iframe || !panel || iframe.dataset.ddsStableViewportBound === "1") {
       return;
     }
 
-    iframe.dataset.ddsNoJumpBound =
-      "1";
+    iframe.dataset.ddsStableViewportBound = "1";
 
     /*
-     * ซ่อนตั้งแต่ JS ผูกกับ iframe
-     * ก่อนระบบหลักเริ่มวัดรอบแรก
+     * outer viewport คงที่ตั้งแต่ยังไม่เปิด editor
      */
-    hideUntilFirstStableFrame(
-      iframe
-    );
+    keepOuterIframeStable(iframe);
 
-    /*
-     * จับ srcdoc เปลี่ยนโดยตรง:
-     * ป้องกัน source รอบแรก/รอบสองจากระบบเดิมหลุดให้เห็น
-     */
-    const sourceObserver =
-      new MutationObserver(
-        (records) => {
-          if (
-            !records.some(
-              (record) =>
-                record.attributeName ===
-                "srcdoc"
-            )
-          ) {
-            return;
-          }
+    iframe.addEventListener("load", () => {
+      /*
+       * srcdoc เปลี่ยนได้ แต่ natural width ของโค้ดชนิดเดิมไม่เปลี่ยน
+       */
+      schedule(iframe);
+    });
 
-          markNewSource(
-            iframe
-          );
-        }
-      );
+    panel.addEventListener("input", () => schedule(iframe), true);
+    panel.addEventListener("change", () => schedule(iframe), true);
 
-    sourceObserver.observe(
-      iframe,
-      {
-        attributes: true,
-        attributeFilter: ["srcdoc"]
+    const observer = new MutationObserver(() => {
+      if (panel.classList.contains("is-active")) {
+        schedule(iframe);
       }
-    );
+    });
 
-    iframe.addEventListener(
-      "load",
-      () => {
-        /*
-         * ไม่ reset naturalWidth
-         * จึงไม่มี probe 1200px ซ้ำหลังได้ width แล้ว
-         */
-        const state =
-          getState(iframe);
+    observer.observe(panel, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
 
-        const allowProbe =
-          state.naturalWidth <= 0;
+    if ("ResizeObserver" in window) {
+      const column = iframe.closest(".dds-editor-preview-column");
 
-        scheduleApply(
-          iframe,
-          allowProbe
-        );
-      }
-    );
-
-    const column =
-      iframe.closest(
-        ".dds-editor-preview-column"
-      );
-
-    if (column) {
-      column.addEventListener(
-        "scroll",
-        () => {
-          if (
-            column.scrollLeft > 2
-          ) {
-            column.dataset.ddsCanvasUserScrolled =
-              "1";
-          }
-        },
-        { passive: true }
-      );
-    }
-
-    /*
-     * หลัง reveal แล้ว input/change ไม่ probe width
-     * แค่อัปเดต height ของ canvas เดิม
-     */
-    panel.addEventListener(
-      "input",
-      () => {
-        scheduleApply(
-          iframe,
-          false
-        );
-      },
-      true
-    );
-
-    panel.addEventListener(
-      "change",
-      () => {
-        scheduleApply(
-          iframe,
-          false
-        );
-      },
-      true
-    );
-
-    const panelObserver =
-      new MutationObserver(() => {
-        if (
-          panel.classList.contains(
-            "is-active"
-          )
-        ) {
-          scheduleApply(
-            iframe,
-            getState(iframe)
-              .naturalWidth <= 0
-          );
-        }
-      });
-
-    panelObserver.observe(
-      panel,
-      {
-        attributes: true,
-        attributeFilter: ["class"]
-      }
-    );
-
-    if (
-      "ResizeObserver" in window &&
-      column
-    ) {
-      const columnObserver =
+      if (column) {
         new ResizeObserver(() => {
-          if (
-            panel.classList.contains(
-              "is-active"
-            )
-          ) {
-            scheduleApply(
-              iframe,
-              getState(iframe)
-                .naturalWidth <= 0
-            );
+          if (panel.classList.contains("is-active")) {
+            schedule(iframe);
           }
-        });
-
-      columnObserver.observe(
-        column
-      );
+        }).observe(column);
+      }
     }
 
-    /*
-     * iframe อาจมี srcdoc อยู่แล้วตอน patch ถูกโหลด
-     */
-    if (
-      iframe.getAttribute("srcdoc") ||
-      iframe.contentDocument?.body
-    ) {
-      markNewSource(iframe);
-
-      scheduleApply(
-        iframe,
-        true
-      );
+    if (panel.classList.contains("is-active")) {
+      schedule(iframe);
     }
   }
 
@@ -24150,41 +23313,23 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     let attempts = 0;
 
-    const timer =
-      window.setInterval(() => {
-        attempts += 1;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      CONFIGS.forEach(bind);
 
-        CONFIGS.forEach(bind);
+      const done = CONFIGS.every((config) => {
+        return document.getElementById(config.id)?.dataset
+          .ddsStableViewportBound === "1";
+      });
 
-        const allBound =
-          CONFIGS.every(
-            (config) =>
-              document.getElementById(
-                config.id
-              )?.dataset
-                .ddsNoJumpBound === "1"
-          );
-
-        if (
-          allBound ||
-          attempts > 80
-        ) {
-          clearInterval(
-            timer
-          );
-        }
-      }, 100);
+      if (done || attempts > 80) {
+        window.clearInterval(timer);
+      }
+    }, 100);
   }
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
-    document.addEventListener(
-      "DOMContentLoaded",
-      boot,
-      { once: true }
-    );
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
     boot();
   }

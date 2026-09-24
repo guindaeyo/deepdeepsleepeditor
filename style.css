@@ -10151,7 +10151,7 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — NO-JUMP TRUE CANVAS v147
+   LEGACY ROLEPLAY EDITORS — FIXED VIEWPORT / NO JUMP v148
    Only the seven requested editor previews.
 ========================================================= */
 #weirdoPreview,
@@ -10162,27 +10162,22 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 #higherHeavenPreview,
 #longWayLongRidePreview {
   display:block !important;
-  max-width:none !important;
+  position:relative !important;
+  width:100% !important;
+  min-width:100% !important;
+  max-width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  max-height:100% !important;
+  margin:0 !important;
   flex:none !important;
   transform:none !important;
   transform-origin:top left !important;
-  visibility:hidden !important;
-  opacity:0 !important;
-  transition:none !important;
-  contain:layout paint style !important;
-}
-
-#weirdoPreview[data-dds-true-canvas-ready="1"],
-#hihiPreview[data-dds-true-canvas-ready="1"],
-#uuiaaPreview[data-dds-true-canvas-ready="1"],
-#commaPreview[data-dds-true-canvas-ready="1"],
-#newRulesPreview[data-dds-true-canvas-ready="1"],
-#higherHeavenPreview[data-dds-true-canvas-ready="1"],
-#longWayLongRidePreview[data-dds-true-canvas-ready="1"] {
   visibility:visible !important;
   opacity:1 !important;
   transition:none !important;
 }
+
 
 #weirdoPreview[data-dds-true-canvas-ready="1"],
 #hihiPreview[data-dds-true-canvas-ready="1"],
@@ -10272,4 +10267,32 @@ body.dds-commission-editor-mode .dds-account-cloud-trigger:hover,
 body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   border-color:rgba(193,23,36,.78) !important;
   background:#171717 !important;
+}
+
+
+/* =========================================================
+   7 LEGACY EDITORS — FIXED PREVIEW VIEWPORT v148
+========================================================= */
+@media (min-width:1251px){
+  [data-panel="editor-code002"] .dds-editor-preview-column,
+  [data-panel="editor-code003"] .dds-editor-preview-column,
+  [data-panel="editor-code004"] .dds-editor-preview-column,
+  [data-panel="editor-code005"] .dds-editor-preview-column,
+  [data-panel="editor-code006"] .dds-editor-preview-column,
+  [data-panel="editor-code009"] .dds-editor-preview-column,
+  [data-panel="editor-code010"] .dds-editor-preview-column{
+    overflow:hidden !important;
+  }
+
+  [data-panel="editor-code002"] .dds-editor-preview-frame,
+  [data-panel="editor-code003"] .dds-editor-preview-frame,
+  [data-panel="editor-code004"] .dds-editor-preview-frame,
+  [data-panel="editor-code005"] .dds-editor-preview-frame,
+  [data-panel="editor-code006"] .dds-editor-preview-frame,
+  [data-panel="editor-code009"] .dds-editor-preview-frame,
+  [data-panel="editor-code010"] .dds-editor-preview-frame{
+    height:calc(100% - 42px) !important;
+    min-height:calc(100% - 42px) !important;
+    max-height:calc(100% - 42px) !important;
+  }
 }
