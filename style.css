@@ -10520,3 +10520,150 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   margin-left:auto !important;
   margin-right:auto !important;
 }
+
+
+/* =========================================================
+   GLOBAL EDITOR — ONE-LINE DRAFT STATUS v163
+   บันทึกแบบร่าง (บันทึกล่าสุด เวลา)
+   คืนพื้นที่แนวตั้งให้ส่วนแก้ไขตรงกลาง
+========================================================= */
+@media (min-width:1101px){
+
+  /* Legacy editor draft */
+  .dds-draft-manager{
+    min-height:34px !important;
+    padding:6px 9px !important;
+    gap:7px !important;
+    align-items:center !important;
+  }
+
+  .dds-draft-manager-copy{
+    min-width:0 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:baseline !important;
+    gap:0 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+  }
+
+  .dds-draft-manager-copy strong{
+    flex:0 0 auto;
+    margin:0 !important;
+    font-size:9px !important;
+    line-height:1.2 !important;
+  }
+
+  .dds-draft-manager-copy strong::after{
+    content:" (";
+  }
+
+  .dds-draft-manager-copy .dds-draft-status{
+    min-width:0;
+    margin:0 !important;
+    display:block !important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:8px !important;
+    line-height:1.2 !important;
+  }
+
+  .dds-draft-manager-copy .dds-draft-status::after{
+    content:")";
+  }
+
+  .dds-draft-manager-actions{
+    flex:0 0 auto;
+    gap:5px !important;
+  }
+
+  .dds-draft-manager-actions button{
+    height:28px !important;
+    min-height:28px !important;
+    padding:0 8px !important;
+  }
+
+  /* Protected / Commission / CODE013 / CODE014 drafts */
+  .dds-protected-commission-draft{
+    min-height:34px !important;
+    padding:6px 9px !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:7px !important;
+  }
+
+  .dds-protected-commission-draft > div:first-child{
+    min-width:0 !important;
+    flex:1 1 auto !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:baseline !important;
+    gap:0 !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+  }
+
+  .dds-protected-commission-draft > div:first-child > strong{
+    flex:0 0 auto;
+    margin:0 !important;
+    font-size:9px !important;
+    line-height:1.2 !important;
+  }
+
+  .dds-protected-commission-draft > div:first-child > strong::after{
+    content:" (";
+  }
+
+  .dds-protected-commission-draft > div:first-child > small{
+    min-width:0;
+    margin:0 !important;
+    display:block !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:8px !important;
+    line-height:1.2 !important;
+  }
+
+  .dds-protected-commission-draft > div:first-child > small::after{
+    content:")";
+  }
+
+  .dds-protected-commission-draft > button{
+    flex:0 0 auto !important;
+    height:28px !important;
+    min-height:28px !important;
+    padding:0 8px !important;
+  }
+
+  /*
+   * ถ้า draft ไม่มีปุ่ม เช่น CODE013/014
+   * จะเหลือเป็นบรรทัดบาง ๆ เพียงบรรทัดเดียว
+   */
+  .dds-code013-draft,
+  .dds-code014-editor .dds-protected-commission-draft{
+    min-height:30px !important;
+    padding-top:5px !important;
+    padding-bottom:5px !important;
+  }
+}
+
+/* Rescue editor uses the same layout/preview rules as normal CODE014. */
+.dds-code014-editor[data-panel="editor-code014-rescue-v163"]{
+  width:100%;
+}
+
+/*
+ * Card iframe must never cover the CODE014 button.
+ */
+.dds-roleplay-card-code014 .dds-roleplay-card-preview iframe{
+  pointer-events:none !important;
+}
+
+.dds-roleplay-card-code014 .dds-roleplay-card-body,
+.dds-roleplay-card-code014 [data-code014-edit]{
+  position:relative !important;
+  z-index:20 !important;
+  pointer-events:auto !important;
+}
