@@ -29,7 +29,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20260924-code014-inline-v166" rel="stylesheet"/>
+<link href="./style.css?v=20260924-code014-static-card-v167" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -304,6 +304,17 @@
 <span class="dds-roleplay-index">CODE012</span>
 <h2 class="dds-roleplay-name">chocolate love</h2>
 <button class="dds-roleplay-edit" data-edit-code="code012" type="button">EDIT CODE <span>↗</span></button>
+</div>
+</article>
+<article class="dds-roleplay-card dds-roleplay-card-code014">
+<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014">
+<iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe>
+<span class="dds-roleplay-preview-badge">AVAILABLE</span>
+</div>
+<div class="dds-roleplay-card-body">
+<span class="dds-roleplay-index">CODE014</span>
+<h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2>
+<button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button>
 </div>
 </article>
 </div>
@@ -6362,6 +6373,70 @@ You were mine forever</textarea>
         };
       }
 
+      const iframe =
+        card.querySelector(
+          "[data-code014-card-preview]"
+        );
+
+      const stage =
+        card.querySelector(
+          ".dds-roleplay-card-preview"
+        );
+
+      /*
+       * v167:
+       * การ์ดอยู่ใน HTML ตั้งแต่แรก
+       * owner มีหน้าที่เติมพรีวิวให้มันเสมอ
+       */
+      if (
+        iframe &&
+        !String(
+          iframe.getAttribute("srcdoc") || ""
+        ).trim()
+      ) {
+        cardRendered = true;
+
+        writeIframe(
+          iframe,
+          CARD_PREVIEW_CODE,
+          () => fitIframe(
+            iframe,
+            stage,
+            16
+          )
+        );
+      } else if (iframe && stage) {
+        requestAnimationFrame(
+          () => fitIframe(
+            iframe,
+            stage,
+            16
+          )
+        );
+      }
+
+      if (
+        iframe &&
+        stage &&
+        "ResizeObserver" in window &&
+        stage.dataset.code014ResizeBound !== "1"
+      ) {
+        stage.dataset.code014ResizeBound = "1";
+
+        const observer =
+          new ResizeObserver(() => {
+            requestAnimationFrame(
+              () => fitIframe(
+                iframe,
+                stage,
+                16
+              )
+            );
+          });
+
+        observer.observe(stage);
+      }
+
       return true;
     }
 
@@ -6567,7 +6642,7 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script src="./script.js?v=20260924-code014-inline-v166"></script>
+<script src="./script.js?v=20260924-code014-static-card-v167"></script>
 
 
 
