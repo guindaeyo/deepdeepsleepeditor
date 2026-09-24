@@ -22847,3 +22847,138 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   else install();
 })();
 
+
+
+
+/* =========================================================
+   GLOBAL EDITOR — ONE SCREEN DESKTOP v141
+   ใช้เฉพาะหน้า Editor จริง ไม่ใช้กับ VIEW WORK
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_EDITOR_ONE_SCREEN_V141__) return;
+  window.__DDS_EDITOR_ONE_SCREEN_V141__ = true;
+
+  const DESKTOP_MIN = 1251;
+  let panelObservers = new WeakMap();
+  let scheduled = 0;
+
+  function isEditorPanel(panel) {
+    if (!panel?.classList?.contains("dds-panel")) return false;
+
+    const name = String(panel.dataset?.panel || "");
+
+    return (
+      name.startsWith("editor-") ||
+      name.startsWith("protected-commission") ||
+      panel.classList.contains("dds-protected-commission-editor")
+    );
+  }
+
+  function getActiveEditor() {
+    return Array.from(document.querySelectorAll(".dds-panel.is-active"))
+      .find(isEditorPanel) || null;
+  }
+
+  function applyState() {
+    scheduled = 0;
+
+    const activeEditor = getActiveEditor();
+    const enabled = window.innerWidth >= DESKTOP_MIN && Boolean(activeEditor);
+
+    document.documentElement.classList.toggle("dds-editor-one-screen", enabled);
+    document.body.classList.toggle("dds-editor-one-screen", enabled);
+
+    if (enabled) {
+      window.scrollTo(0, 0);
+
+      /*
+       * ให้ browser คำนวณ grid/flex ใหม่ก่อน
+       * จากนั้น sync ความสูงของคอลัมน์และ preview ที่มีระบบเดิมอยู่แล้ว
+       */
+      requestAnimationFrame(() => {
+        activeEditor?.style?.setProperty(
+          "--dds-editor-viewport-height",
+          `${window.innerHeight}px`
+        );
+      });
+    }
+  }
+
+  function schedule() {
+    if (scheduled) cancelAnimationFrame(scheduled);
+    scheduled = requestAnimationFrame(applyState);
+  }
+
+  function observePanel(panel) {
+    if (!panel || panelObservers.has(panel)) return;
+
+    const observer = new MutationObserver((records) => {
+      if (records.some((record) => record.attributeName === "class")) {
+        schedule();
+      }
+    });
+
+    observer.observe(panel, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    panelObservers.set(panel, observer);
+  }
+
+  function scanPanels() {
+    document.querySelectorAll(".dds-panel").forEach(observePanel);
+    schedule();
+  }
+
+  function boot() {
+    scanPanels();
+
+    const main = document.querySelector(".dds-main");
+    if (main) {
+      const childObserver = new MutationObserver((records) => {
+        let changed = false;
+
+        records.forEach((record) => {
+          record.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+
+            if (node.matches?.(".dds-panel")) {
+              observePanel(node);
+              changed = true;
+            }
+
+            node.querySelectorAll?.(".dds-panel").forEach((panel) => {
+              observePanel(panel);
+              changed = true;
+            });
+          });
+        });
+
+        schedule();
+      });
+
+      childObserver.observe(main, {
+        childList: true,
+        subtree: false
+      });
+    }
+
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("hashchange", schedule, { passive: true });
+    window.addEventListener("popstate", schedule, { passive: true });
+
+    document.addEventListener("click", () => {
+      requestAnimationFrame(schedule);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+})();
+

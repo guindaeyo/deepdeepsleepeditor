@@ -9826,3 +9826,297 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
     align-self:end !important;
   }
 }
+
+
+/* =========================================================
+   GLOBAL EDITOR — ONE SCREEN DESKTOP v141
+   1 viewport / aligned preview + COPY CODE bottom edges
+========================================================= */
+@media (min-width:1251px) {
+  html.dds-editor-one-screen,
+  body.dds-editor-one-screen {
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden !important;
+    overscroll-behavior:none;
+  }
+
+  body.dds-editor-one-screen .dds-app {
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  body.dds-editor-one-screen .dds-main {
+    width:100% !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    max-height:100dvh !important;
+    box-sizing:border-box;
+    padding:
+      10px
+      clamp(22px,3vw,58px)
+      12px !important;
+    overflow:hidden !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-panel.is-active[data-panel^="editor-"],
+  body.dds-editor-one-screen
+  .dds-panel.is-active[data-panel^="protected-commission"],
+  body.dds-editor-one-screen
+  .dds-panel.is-active.dds-protected-commission-editor {
+    width:100%;
+    height:100%;
+    min-height:0 !important;
+    max-height:100%;
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr);
+    overflow:hidden !important;
+  }
+
+  /* ---------- Compact editor heading ---------- */
+  body.dds-editor-one-screen .dds-editor-heading {
+    min-height:0 !important;
+    margin:0 !important;
+    padding:7px 0 12px !important;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:center;
+    column-gap:16px;
+    border-bottom:1px solid var(--dds-line);
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading .dds-back-button {
+    width:40px;
+    height:40px;
+    min-width:40px;
+    margin:0 !important;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:50%;
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading > div {
+    min-width:0;
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading .dds-eyebrow {
+    margin:0 0 4px !important;
+    font-size:7px !important;
+    line-height:1.1 !important;
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading h1 {
+    margin:0 !important;
+    font-size:clamp(34px,3.5vw,58px) !important;
+    line-height:.88 !important;
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading h1 > span:first-child {
+    font-size:1em !important;
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading h1 > span:last-child {
+  }
+
+  body.dds-editor-one-screen .dds-editor-heading > div > p:last-child {
+    max-width:760px;
+    max-height:2.8em;
+    margin:6px 0 0 !important;
+    overflow:hidden;
+    color:rgba(255,255,255,.46);
+    font-size:9px !important;
+    line-height:1.4 !important;
+  }
+
+  /* ---------- Main two-column editor layouts ---------- */
+  body.dds-editor-one-screen .dds-editor-layout,
+  body.dds-editor-one-screen .dds-protected-commission-layout {
+    width:100%;
+    height:100%;
+    min-height:0 !important;
+    max-height:100%;
+    box-sizing:border-box;
+    margin:0 !important;
+    padding:12px 0 0 !important;
+    align-items:stretch !important;
+    overflow:hidden;
+  }
+
+  body.dds-editor-one-screen .dds-editor-layout {
+    grid-template-columns:
+      minmax(0,1.45fr)
+      minmax(410px,.72fr);
+    gap:clamp(20px,2vw,32px);
+  }
+
+  body.dds-editor-one-screen .dds-protected-commission-layout {
+    gap:clamp(20px,2vw,32px);
+  }
+
+  /* ---------- Preview column: same bottom edge as tools ---------- */
+  body.dds-editor-one-screen .dds-editor-preview-column,
+  body.dds-editor-one-screen .dds-protected-commission-preview-column {
+    width:100%;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    align-self:stretch !important;
+    position:relative !important;
+    top:auto !important;
+    box-sizing:border-box;
+    overflow:auto !important;
+    scrollbar-width:thin;
+    scrollbar-color:
+      rgba(193,23,36,.62)
+      rgba(255,255,255,.04);
+  }
+
+  body.dds-editor-one-screen .dds-editor-preview-top {
+    position:sticky;
+    top:0;
+    z-index:8;
+    min-height:42px;
+    background:#090909;
+  }
+
+  /*
+   * Editor รุ่นเก่าใช้ iframe สูงตามงานเดิม
+   * ไม่บีบ scale — ถ้ายาวกว่าหน้าจอให้ scroll ในกรอบ preview แทน
+   */
+  body.dds-editor-one-screen .dds-editor-preview-frame {
+    max-width:none;
+  }
+
+  /* ---------- Legacy editor tools ---------- */
+  body.dds-editor-one-screen .dds-editor-tools-column {
+    width:100%;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    position:relative !important;
+    top:auto !important;
+    align-self:stretch !important;
+    overflow:hidden !important;
+    display:flex;
+    flex-direction:column;
+  }
+
+  body.dds-editor-one-screen
+  .dds-editor-tools-column > .dds-editor-controls {
+    min-height:0 !important;
+    flex:1 1 auto !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+
+  body.dds-editor-one-screen .dds-editor-copy-dock {
+    width:100%;
+    min-width:0;
+    flex:0 0 auto;
+    margin-top:auto;
+  }
+
+  body.dds-editor-one-screen
+  .dds-editor-copy-dock > .dds-copy-section {
+    width:100%;
+    margin:0 !important;
+    box-sizing:border-box;
+  }
+
+  /* ---------- Protected / commission editors ---------- */
+  body.dds-editor-one-screen
+  .dds-protected-commission-controls-column {
+    width:100%;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    align-self:stretch !important;
+    position:relative !important;
+    top:auto !important;
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    overflow:hidden !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-protected-commission-scroll {
+    min-height:0 !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+
+  body.dds-editor-one-screen
+  .dds-protected-commission-copy,
+  body.dds-editor-one-screen
+  .dds-protected-commission-controls-column > .dds-copy-section {
+    width:100%;
+    min-width:0;
+    margin:0 !important;
+    align-self:end !important;
+    box-sizing:border-box;
+  }
+
+  /*
+   * บาง editor มี custom height 1000/1200/1500px
+   * ตรงนี้บังคับให้ทุกตัวอิงความสูง viewport เดียวกัน
+   */
+  body.dds-editor-one-screen .dds-code013-editor
+  .dds-protected-commission-controls-column,
+  body.dds-editor-one-screen .dds-code014-editor
+  .dds-protected-commission-controls-column,
+  body.dds-editor-one-screen .dds-alan-commission-editor
+  .dds-protected-commission-controls-column,
+  body.dds-editor-one-screen .dds-mhp-editor
+  .dds-protected-commission-controls-column {
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+  }
+
+  /* Keep each editor's preview natural; only the column is viewport-bound. */
+  body.dds-editor-one-screen .dds-protected-commission-preview-stage,
+  body.dds-editor-one-screen .dds-code013-editor-stage,
+  body.dds-editor-one-screen .dds-code014-editor-stage,
+  body.dds-editor-one-screen .dds-alan-editor-stage {
+    max-width:100%;
+  }
+
+  /* Scrollbars kept inside the editor, never on the page itself. */
+  body.dds-editor-one-screen
+  .dds-editor-preview-column::-webkit-scrollbar,
+  body.dds-editor-one-screen
+  .dds-protected-commission-preview-column::-webkit-scrollbar,
+  body.dds-editor-one-screen
+  .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar,
+  body.dds-editor-one-screen
+  .dds-protected-commission-scroll::-webkit-scrollbar {
+    width:7px;
+  }
+
+  body.dds-editor-one-screen
+  .dds-editor-preview-column::-webkit-scrollbar-thumb,
+  body.dds-editor-one-screen
+  .dds-protected-commission-preview-column::-webkit-scrollbar-thumb,
+  body.dds-editor-one-screen
+  .dds-editor-tools-column > .dds-editor-controls::-webkit-scrollbar-thumb,
+  body.dds-editor-one-screen
+  .dds-protected-commission-scroll::-webkit-scrollbar-thumb {
+    background:rgba(193,23,36,.62);
+    border-radius:999px;
+  }
+}
+
+/* Mobile/tablet keeps the existing stacked layout and normal page scroll. */
+@media (max-width:1250px) {
+  html.dds-editor-one-screen,
+  body.dds-editor-one-screen {
+    height:auto;
+    overflow:auto !important;
+  }
+}
