@@ -10151,22 +10151,89 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   MIKAEL FREE HISTORY — EDIT BUTTON ONLY v143
-   Scope ONLY this commission card.
+   LEGACY ROLEPLAY EDITORS — NATURAL WIDTH PREVIEW v144
+   Only the seven requested editor preview iframes.
 ========================================================= */
-.dds-commission-card-mikael-history-free .dds-mhp-edit-only-actions{
-  display:block !important;
-}
-.dds-commission-card-mikael-history-free .dds-mhp-edit-only{
-  width:203px !important;
-  max-width:100% !important;
-  min-width:0 !important;
-  height:40px !important;
-  min-height:40px !important;
-  padding:0 15px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
+#weirdoPreview,
+#hihiPreview,
+#uuiaaPreview,
+#commaPreview,
+#newRulesPreview,
+#higherHeavenPreview,
+#longWayLongRidePreview {
+  max-width:none !important;
+  margin:0 !important;
+  transform:none;
+  transform-origin:top left !important;
   flex:none !important;
-  background:transparent !important;
+}
+
+body.dds-editor-one-screen #weirdoPreview,
+body.dds-editor-one-screen #hihiPreview,
+body.dds-editor-one-screen #uuiaaPreview,
+body.dds-editor-one-screen #commaPreview,
+body.dds-editor-one-screen #newRulesPreview,
+body.dds-editor-one-screen #higherHeavenPreview,
+body.dds-editor-one-screen #longWayLongRidePreview {
+  align-self:flex-start !important;
+}
+
+/* =========================================================
+   CLOUD SAVE — SMALL ROUND CLOUD BUTTON v144
+========================================================= */
+.dds-account-cloud-trigger {
+  width:42px !important;
+  min-width:42px !important;
+  height:42px !important;
+  min-height:42px !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:0 !important;
+  overflow:hidden !important;
+}
+
+.dds-account-cloud-trigger span {
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  padding:0 !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  white-space:nowrap !important;
+  border:0 !important;
+}
+
+.dds-account-cloud-trigger i,
+.dds-account-cloud-trigger[data-state="online"] i {
+  width:auto !important;
+  height:auto !important;
+  display:block !important;
+  border-radius:0 !important;
+  background:none !important;
+  color:#b8b8b8;
+  font-style:normal;
+  line-height:1;
+}
+
+.dds-account-cloud-trigger i::before {
+  content:"☁";
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:22px;
+  font-weight:400;
+  line-height:1;
+  transform:translateY(-1px);
+}
+
+.dds-account-cloud-trigger[data-state="online"] i {
+  color:#68cf88 !important;
+}
+
+.dds-account-cloud-trigger:hover {
+  border-color:rgba(193,23,36,.78) !important;
+  background:#171717 !important;
 }

@@ -21179,7 +21179,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const button = document.createElement("button");
     button.type = "button";
     button.className = "dds-account-cloud-trigger";
-    button.innerHTML = `<i></i><span>CLOUD SAVE</span>`;
+    button.innerHTML = `<i aria-hidden="true"></i><span>CLOUD SAVE</span>`;
+    button.setAttribute("aria-label", "CLOUD SAVE");
+    button.title = "CLOUD SAVE";
 
     const modal = document.createElement("div");
     modal.className = "dds-account-cloud-modal";
@@ -21809,10 +21811,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (existing) { card = existing; return true; }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-mikael-history-free";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-mhp-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-mhp-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นประวัติ Mikael"></iframe><span class="dds-roleplay-preview-badge">PREVIEW</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions dds-mhp-edit-only-actions"><button class="dds-roleplay-edit dds-mhp-edit-only" data-mhp-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-mhp-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-mhp-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นประวัติ Mikael"></iframe><span class="dds-roleplay-preview-badge">PREVIEW</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-mhp-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-mhp-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     const alanCard = grid.querySelector(".dds-commission-card-alan");
     if (alanCard?.parentElement === grid) alanCard.insertAdjacentElement("afterend", card);
     else grid.appendChild(card);
+    card.querySelector("[data-mhp-view]")?.addEventListener("click", openView);
     card.querySelector("[data-mhp-edit]")?.addEventListener("click", openEditor);
     const iframe = card.querySelector("[data-mhp-card-preview]");
     writeIframe(iframe, OFFICIAL_CODE, fitCardPreview);
@@ -22979,5 +22982,264 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   } else {
     boot();
   }
+})();
+
+
+
+
+/* =========================================================
+   LEGACY ROLEPLAY EDITORS — NATURAL WIDTH PREVIEW v144
+   Only:
+   WEIRDO / HIHI!, BABY / U-I-A U-I-A U-E / THIS HITS LIKE COMA /
+   NEW RULES, I'M TROUBLEMAKER / HIGHER THAN HEAVEN / LONG WAY LONG RIDE
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_LEGACY_NATURAL_PREVIEW_V144__) return;
+  window.__DDS_LEGACY_NATURAL_PREVIEW_V144__ = true;
+
+  const PREVIEW_IDS = [
+    "weirdoPreview",
+    "hihiPreview",
+    "uuiaaPreview",
+    "commaPreview",
+    "newRulesPreview",
+    "higherHeavenPreview",
+    "longWayLongRidePreview"
+  ];
+
+  const PROBE_WIDTH = 1200;
+  const states = new WeakMap();
+
+  function stateFor(iframe) {
+    let state = states.get(iframe);
+    if (!state) {
+      state = {
+        applying: false,
+        timer: 0,
+        bodyObserver: null,
+        resizeObserver: null
+      };
+      states.set(iframe, state);
+    }
+    return state;
+  }
+
+  function looksLikePreviewWrapper(element) {
+    const name = String(element?.className || "").toLowerCase();
+    return /preview|shell|target|canvas|scale/.test(name);
+  }
+
+  function removeOuterShrink(doc) {
+    const body = doc?.body;
+    if (!body) return;
+
+    const candidates = new Set([
+      ...body.children,
+      ...Array.from(body.children).flatMap((child) => Array.from(child.children || [])),
+      ...doc.querySelectorAll(
+        ".dds-preview-target,.dds-preview-shell,.dds-activity-preview-content,.dds-commission-preview-content,[data-preview-target]"
+      )
+    ]);
+
+    candidates.forEach((element) => {
+      if (!(element instanceof doc.defaultView.HTMLElement)) return;
+
+      const computed = doc.defaultView.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      const layoutWidth = element.offsetWidth || element.scrollWidth || 0;
+      const layoutHeight = element.offsetHeight || element.scrollHeight || 0;
+      const visuallyShrunk =
+        layoutWidth > 40 &&
+        rect.width > 0 &&
+        rect.width < layoutWidth * 0.985;
+
+      if (looksLikePreviewWrapper(element) && visuallyShrunk) {
+        element.style.setProperty("transform", "none", "important");
+        element.style.setProperty("transform-origin", "top left", "important");
+      }
+
+      const zoom = Number.parseFloat(computed.zoom || "1");
+      if (looksLikePreviewWrapper(element) && Number.isFinite(zoom) && zoom > 0 && zoom < 0.985) {
+        element.style.setProperty("zoom", "1", "important");
+      }
+    });
+  }
+
+  function resolveCodeRoot(doc) {
+    const body = doc?.body;
+    if (!body) return null;
+
+    let root = body.firstElementChild;
+    let guard = 0;
+
+    while (root && guard < 5) {
+      const name = String(root.className || "").toLowerCase();
+      const isWrapper = /preview|shell|target|canvas/.test(name);
+      if (!isWrapper || root.children.length !== 1) break;
+      root = root.firstElementChild;
+      guard += 1;
+    }
+
+    return root || body;
+  }
+
+  function naturalize(iframe) {
+    const state = stateFor(iframe);
+    if (state.applying) return false;
+
+    const doc = iframe.contentDocument;
+    const column = iframe.closest(".dds-editor-preview-column");
+    if (!doc?.body || !column) return false;
+
+    state.applying = true;
+
+    try {
+      /*
+       * Probe wide first. Templates using min(...,100%) can expand to their
+       * real CSS width instead of inheriting the narrow editor column width.
+       */
+      iframe.style.setProperty("position", "relative", "important");
+      iframe.style.setProperty("left", "0", "important");
+      iframe.style.setProperty("top", "0", "important");
+      iframe.style.setProperty("margin", "0", "important");
+      iframe.style.setProperty("transform", "none", "important");
+      iframe.style.setProperty("transform-origin", "top left", "important");
+      iframe.style.setProperty("width", `${PROBE_WIDTH}px`, "important");
+      iframe.style.setProperty("min-width", `${PROBE_WIDTH}px`, "important");
+      iframe.style.setProperty("max-width", "none", "important");
+      iframe.style.setProperty("--dds-preview-scale", "1");
+      iframe.style.setProperty("--dds-commission-canvas-scale", "1");
+
+      removeOuterShrink(doc);
+
+      const root = resolveCodeRoot(doc);
+      if (!root) return false;
+
+      const rootRect = root.getBoundingClientRect();
+      const bodyStyle = doc.defaultView.getComputedStyle(doc.body);
+      const padX =
+        (Number.parseFloat(bodyStyle.paddingLeft) || 0) +
+        (Number.parseFloat(bodyStyle.paddingRight) || 0);
+
+      let naturalWidth = Math.max(
+        1,
+        Math.ceil(rootRect.width || 0),
+        root.offsetWidth || 0,
+        root.scrollWidth || 0
+      );
+
+      /* Avoid retaining the 1200px probe when the actual code is narrower. */
+      naturalWidth = Math.min(PROBE_WIDTH, naturalWidth + padX);
+      naturalWidth = Math.max(280, naturalWidth);
+
+      iframe.style.setProperty("width", `${naturalWidth}px`, "important");
+      iframe.style.setProperty("min-width", `${naturalWidth}px`, "important");
+      iframe.style.setProperty("max-width", `${naturalWidth}px`, "important");
+
+      removeOuterShrink(doc);
+
+      const naturalHeight = Math.max(
+        1,
+        doc.body.scrollHeight || 0,
+        doc.documentElement.scrollHeight || 0,
+        root.scrollHeight || 0,
+        Math.ceil(root.getBoundingClientRect().height || 0)
+      );
+
+      iframe.style.setProperty("height", `${naturalHeight}px`, "important");
+      iframe.style.setProperty("min-height", `${naturalHeight}px`, "important");
+      iframe.style.setProperty("max-height", `${naturalHeight}px`, "important");
+
+      column.style.setProperty("overflow", "auto", "important");
+      column.style.setProperty("overscroll-behavior", "contain", "important");
+      iframe.dataset.ddsNaturalPreview = "1";
+      return true;
+    } finally {
+      state.applying = false;
+    }
+  }
+
+  function schedule(iframe) {
+    const state = stateFor(iframe);
+    window.clearTimeout(state.timer);
+
+    const run = () => requestAnimationFrame(() => naturalize(iframe));
+    state.timer = window.setTimeout(run, 20);
+    [80, 180, 420, 850].forEach((delay) => window.setTimeout(run, delay));
+  }
+
+  function attachDocumentObserver(iframe) {
+    const state = stateFor(iframe);
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return;
+
+    state.bodyObserver?.disconnect();
+    state.bodyObserver = new MutationObserver(() => {
+      if (!state.applying) schedule(iframe);
+    });
+    state.bodyObserver.observe(doc.body, {
+      childList: true,
+      subtree: true
+    });
+
+    if ("ResizeObserver" in window) {
+      state.resizeObserver?.disconnect();
+      state.resizeObserver = new ResizeObserver(() => {
+        if (!state.applying) schedule(iframe);
+      });
+      state.resizeObserver.observe(doc.body);
+    }
+  }
+
+  function attach(iframe) {
+    if (!iframe || iframe.dataset.ddsNaturalPreviewBound === "1") return;
+    iframe.dataset.ddsNaturalPreviewBound = "1";
+
+    iframe.addEventListener("load", () => {
+      attachDocumentObserver(iframe);
+      schedule(iframe);
+    });
+
+    const panel = iframe.closest(".dds-panel");
+    panel?.addEventListener("input", () => schedule(iframe), true);
+    panel?.addEventListener("change", () => schedule(iframe), true);
+
+    if (iframe.contentDocument?.readyState === "complete") {
+      attachDocumentObserver(iframe);
+      schedule(iframe);
+    }
+  }
+
+  function scan() {
+    PREVIEW_IDS.forEach((id) => attach(document.getElementById(id)));
+  }
+
+  function refreshActive() {
+    PREVIEW_IDS.forEach((id) => {
+      const iframe = document.getElementById(id);
+      if (iframe?.closest(".dds-panel")?.classList.contains("is-active")) {
+        schedule(iframe);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      scan();
+      refreshActive();
+    }, { once: true });
+  } else {
+    scan();
+    refreshActive();
+  }
+
+  document.addEventListener("click", () => {
+    window.setTimeout(refreshActive, 0);
+    window.setTimeout(refreshActive, 100);
+  });
+
+  window.addEventListener("resize", refreshActive, { passive: true });
 })();
 
