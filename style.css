@@ -9734,14 +9734,21 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   CODE005 — STABLE CENTER FIX v131
-   Scope ONLY #roleplayCardPreview005
+   CODE005 — CARD SHOW WHOLE CODE v154
+   Scope ONLY CATEGORY 01 / FOR ROLEPLAY card preview.
 ========================================================= */
-#roleplayCardPreview005 {
-  margin: 0 !important;
-  pointer-events: none !important;
+#roleplayCardPreview005{
+  position:absolute !important;
+  margin:0 !important;
+  max-width:none !important;
+  pointer-events:none !important;
+  transition:none !important;
 }
 
+#roleplayCardPreview005[data-dds-code005-whole-ready="1"]{
+  visibility:visible !important;
+  opacity:1 !important;
+}
 
 /* =========================================================
    CODE014 — www.s$sLuv.c0m v132

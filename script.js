@@ -22053,25 +22053,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   CODE005 — THIS HITS LIKE COMA / STABLE CENTER FIX v131
-   Scope ONLY: #roleplayCardPreview005
-
-   IMPORTANT:
-   - ไม่แก้ width / height / scale / transform ของพรีวิว
-   - ใช้ขนาดที่ระบบเดิม render เสร็จแล้ว
-   - ขยับเฉพาะ left/top เพื่อให้ visual box อยู่กลางช่อง
+   CODE005 — THIS HITS LIKE COMA / CARD SHOW WHOLE CODE v154
+   Scope ONLY: #roleplayCardPreview005 in CATEGORY 01 / FOR ROLEPLAY
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE005_CARD_CENTER_V131__) return;
-  window.__DDS_CODE005_CARD_CENTER_V131__ = true;
+  if (window.__DDS_CODE005_CARD_WHOLE_V154__) return;
+  window.__DDS_CODE005_CARD_WHOLE_V154__ = true;
 
   const IFRAME_ID = "roleplayCardPreview005";
-  let applying = false;
-  let stageObserver = null;
-  let iframeObserver = null;
-  let installedIframe = null;
+  const CANVAS_WIDTH = 650;
+  const states = new WeakMap();
+
+  function getState(iframe) {
+    let state = states.get(iframe);
+
+    if (!state) {
+      state = {
+        applying: false,
+        timer: 0,
+        resizeObserver: null,
+        imageListeners: new WeakSet()
+      };
+      states.set(iframe, state);
+    }
+
+    return state;
+  }
 
   function getTargets() {
     const iframe = document.getElementById(IFRAME_ID);
@@ -22079,106 +22088,280 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return { iframe, stage };
   }
 
-  function centerPreview() {
-    if (applying) return false;
+  function getParts(iframe) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body) return null;
 
-    const { iframe, stage } = getTargets();
-    if (!iframe || !stage) return false;
-    if (stage.clientWidth < 20 || stage.clientHeight < 20) return false;
+    const target =
+      doc.querySelector(".dds-preview-target") ||
+      doc.querySelector(".dds-preview-shell") ||
+      doc.body;
 
-    const stageRect = stage.getBoundingClientRect();
-    const frameRect = iframe.getBoundingClientRect();
+    let root = null;
 
-    /*
-     * ถ้ายังเป็น loading / iframe ยังไม่มีขนาดจริง ให้รอก่อน
-     */
-    if (frameRect.width < 10 || frameRect.height < 10) return false;
+    if (target !== doc.body) {
+      root = Array.from(target.children).find((element) => {
+        if (!(element instanceof doc.defaultView.HTMLElement)) return false;
+        if (element.tagName === "STYLE") return false;
 
-    const dx =
-      (stageRect.left + stageRect.width / 2) -
-      (frameRect.left + frameRect.width / 2);
+        const cls = String(element.className || "").toLowerCase();
+        if (cls.includes("credit")) return false;
 
-    const dy =
-      (stageRect.top + stageRect.height / 2) -
-      (frameRect.top + frameRect.height / 2);
+        return true;
+      });
+    }
 
-    /*
-     * ใกล้กลางแล้วไม่ต้องเขียน style ซ้ำ
-     */
-    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return true;
+    root =
+      root ||
+      doc.querySelector(".dds-preview-target > *:not(style)") ||
+      doc.body.firstElementChild ||
+      doc.body;
 
-    const computed = getComputedStyle(iframe);
-    let currentLeft = parseFloat(computed.left);
-    let currentTop = parseFloat(computed.top);
+    return { doc, target, root };
+  }
 
-    if (!Number.isFinite(currentLeft)) currentLeft = iframe.offsetLeft || 0;
-    if (!Number.isFinite(currentTop)) currentTop = iframe.offsetTop || 0;
+  function prepareNaturalCanvas(parts) {
+    const { doc, target } = parts;
 
-    applying = true;
+    doc.documentElement.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    doc.documentElement.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    doc.documentElement.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+    doc.documentElement.style.setProperty("height", "auto", "important");
+    doc.documentElement.style.setProperty("overflow", "visible", "important");
+
+    doc.body.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+    doc.body.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+    doc.body.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+    doc.body.style.setProperty("height", "auto", "important");
+    doc.body.style.setProperty("min-height", "0", "important");
+    doc.body.style.setProperty("overflow", "visible", "important");
+    doc.body.style.setProperty("margin", "0", "important");
+
+    if (target && target !== doc.body) {
+      target.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
+      target.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
+      target.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
+      target.style.setProperty("height", "auto", "important");
+      target.style.setProperty("min-height", "0", "important");
+      target.style.setProperty("max-height", "none", "important");
+      target.style.setProperty("margin", "0", "important");
+      target.style.setProperty("transform", "none", "important");
+      target.style.setProperty("zoom", "1", "important");
+      target.style.setProperty("overflow", "visible", "important");
+    }
+  }
+
+  function measureWholeCode(iframe) {
+    const parts = getParts(iframe);
+    if (!parts) return null;
+
+    prepareNaturalCanvas(parts);
+
+    const { doc, target, root } = parts;
+
+    void root.offsetHeight;
+
+    const rootRect = root.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    const height = Math.max(
+      1,
+      Math.ceil(rootRect.height || 0),
+      root.scrollHeight || 0,
+      Math.ceil(targetRect.height || 0),
+      target.scrollHeight || 0,
+      doc.body.scrollHeight || 0,
+      doc.documentElement.scrollHeight || 0
+    );
+
+    return {
+      width: CANVAS_WIDTH,
+      height,
+      parts
+    };
+  }
+
+  function watchAssets(iframe, parts) {
+    const state = getState(iframe);
+
+    parts.doc.querySelectorAll("img").forEach((img) => {
+      if (state.imageListeners.has(img)) return;
+
+      state.imageListeners.add(img);
+      img.addEventListener("load", () => schedule(iframe), { once: true });
+      img.addEventListener("error", () => schedule(iframe), { once: true });
+    });
+
     try {
+      parts.doc.fonts?.ready?.then(() => schedule(iframe));
+    } catch {}
+  }
+
+  function fitWholeCard(iframe = document.getElementById(IFRAME_ID)) {
+    const state = iframe ? getState(iframe) : null;
+    const stage = iframe?.closest(".dds-roleplay-card-preview");
+
+    if (!iframe || !stage || !state || state.applying) return false;
+    if (stage.clientWidth < 40 || stage.clientHeight < 40) return false;
+
+    const measured = measureWholeCode(iframe);
+    if (!measured) return false;
+
+    const { width, height, parts } = measured;
+
+    state.applying = true;
+
+    try {
+      const padding = 18;
+
+      const availableWidth =
+        Math.max(1, stage.clientWidth - padding * 2);
+
+      const availableHeight =
+        Math.max(1, stage.clientHeight - padding * 2);
+
+      const scale =
+        Math.max(
+          0.01,
+          Math.min(
+            1,
+            availableWidth / width,
+            availableHeight / height
+          )
+        );
+
+      const visualWidth = width * scale;
+      const visualHeight = height * scale;
+
+      const left =
+        Math.max(
+          0,
+          (stage.clientWidth - visualWidth) / 2
+        );
+
+      const top =
+        Math.max(
+          0,
+          (stage.clientHeight - visualHeight) / 2
+        );
+
       stage.style.setProperty("position", "relative", "important");
       stage.style.setProperty("overflow", "hidden", "important");
 
-      /*
-       * สำคัญ: ขยับแค่ตำแหน่ง
-       * ไม่แตะ transform / scale / width / height เดิมเลย
-       */
       iframe.style.setProperty("position", "absolute", "important");
-      iframe.style.setProperty("left", `${currentLeft + dx}px`, "important");
-      iframe.style.setProperty("top", `${currentTop + dy}px`, "important");
+      iframe.style.setProperty("inset", "auto", "important");
+      iframe.style.setProperty("left", `${left}px`, "important");
+      iframe.style.setProperty("top", `${top}px`, "important");
+      iframe.style.setProperty("width", `${width}px`, "important");
+      iframe.style.setProperty("min-width", `${width}px`, "important");
+      iframe.style.setProperty("max-width", `${width}px`, "important");
+      iframe.style.setProperty("height", `${height}px`, "important");
+      iframe.style.setProperty("min-height", `${height}px`, "important");
+      iframe.style.setProperty("max-height", `${height}px`, "important");
       iframe.style.setProperty("margin", "0", "important");
-    } finally {
-      applying = false;
-    }
+      iframe.style.setProperty("transform", `scale(${scale})`, "important");
+      iframe.style.setProperty("transform-origin", "top left", "important");
+      iframe.style.setProperty("overflow", "hidden", "important");
+      iframe.style.setProperty("visibility", "visible", "important");
+      iframe.style.setProperty("opacity", "1", "important");
 
-    return true;
+      iframe.dataset.ddsCode005WholeReady = "1";
+
+      watchAssets(iframe, parts);
+
+      return true;
+    } finally {
+      state.applying = false;
+    }
   }
 
-  function scheduleCenter() {
-    [0, 50, 120, 250, 500, 900, 1500].forEach((delay) => {
-      window.setTimeout(() => {
-        requestAnimationFrame(() => centerPreview());
-      }, delay);
-    });
+  function schedule(
+    iframe = document.getElementById(IFRAME_ID)
+  ) {
+    if (!iframe) return;
+
+    const state = getState(iframe);
+    clearTimeout(state.timer);
+
+    const run =
+      () => requestAnimationFrame(
+        () => fitWholeCard(iframe)
+      );
+
+    state.timer =
+      window.setTimeout(run, 0);
+
+    [60, 160, 320, 650, 1100, 1800]
+      .forEach((delay) => {
+        window.setTimeout(run, delay);
+      });
   }
 
   function install() {
     const { iframe, stage } = getTargets();
+
     if (!iframe || !stage) return false;
 
-    if (installedIframe === iframe) {
-      scheduleCenter();
+    if (
+      iframe.dataset.ddsCode005WholeBound === "1"
+    ) {
+      schedule(iframe);
       return true;
     }
 
-    installedIframe = iframe;
+    iframe.dataset.ddsCode005WholeBound = "1";
 
-    iframe.addEventListener("load", scheduleCenter);
+    iframe.style.setProperty("visibility", "hidden", "important");
+    iframe.style.setProperty("opacity", "0", "important");
+
+    iframe.addEventListener(
+      "load",
+      () => schedule(iframe)
+    );
+
+    const srcObserver =
+      new MutationObserver((records) => {
+        if (
+          records.some(
+            (record) =>
+              record.attributeName === "srcdoc"
+          )
+        ) {
+          iframe.style.setProperty(
+            "visibility",
+            "hidden",
+            "important"
+          );
+
+          iframe.style.setProperty(
+            "opacity",
+            "0",
+            "important"
+          );
+
+          schedule(iframe);
+        }
+      });
+
+    srcObserver.observe(iframe, {
+      attributes: true,
+      attributeFilter: ["srcdoc"]
+    });
 
     if ("ResizeObserver" in window) {
-      stageObserver?.disconnect();
-      stageObserver = new ResizeObserver(() => {
-        requestAnimationFrame(() => centerPreview());
-      });
-      stageObserver.observe(stage);
+      const state = getState(iframe);
+
+      state.resizeObserver =
+        new ResizeObserver(() => {
+          requestAnimationFrame(
+            () => fitWholeCard(iframe)
+          );
+        });
+
+      state.resizeObserver.observe(stage);
     }
 
-    /*
-     * ระบบหลักอาจปรับ transform/ขนาดหลัง CSS หรือรูปโหลด
-     * ถ้ามีการเปลี่ยน style ให้จัด "ตำแหน่ง" ใหม่เท่านั้น
-     */
-    iframeObserver?.disconnect();
-    iframeObserver = new MutationObserver((records) => {
-      if (applying) return;
-      if (!records.some((record) => record.attributeName === "style")) return;
-      requestAnimationFrame(() => centerPreview());
-    });
-    iframeObserver.observe(iframe, {
-      attributes: true,
-      attributeFilter: ["style"]
-    });
-
-    scheduleCenter();
+    schedule(iframe);
     return true;
   }
 
@@ -22186,24 +22369,38 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (install()) return;
 
     let attempts = 0;
-    const timer = window.setInterval(() => {
-      attempts += 1;
-      if (install() || attempts > 100) {
-        window.clearInterval(timer);
-      }
-    }, 100);
+
+    const timer =
+      window.setInterval(() => {
+        attempts += 1;
+
+        if (
+          install() ||
+          attempts > 100
+        ) {
+          window.clearInterval(timer);
+        }
+      }, 100);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once: true }
+    );
   } else {
     boot();
   }
 
-  window.addEventListener("resize", () => {
-    requestAnimationFrame(() => centerPreview());
-  });
+  window.addEventListener(
+    "resize",
+    () => schedule()
+  );
 })();
+
 
 
 
