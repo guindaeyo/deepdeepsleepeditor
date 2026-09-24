@@ -2688,7 +2688,7 @@ ${stylesheetLinks}
     viewPanel.className =
       "dds-panel dds-commission-view-panel dds-my-own-code-view-panel";
     viewPanel.dataset.panel =
-      "editor-commission003-my-own-code";
+      "view-my-own-code-profile";
     viewPanel.innerHTML = `
       <div class="dds-commission-view-toolbar">
         <button
@@ -2745,6 +2745,7 @@ ${stylesheetLinks}
       const root = previewDocument.querySelector(
         ".myyouth-wrap"
       );
+
       const content = previewDocument.querySelector(
         ".dds-commission-preview-content"
       );
@@ -2753,22 +2754,75 @@ ${stylesheetLinks}
         return 0;
       }
 
+      /*
+       * v160:
+       * วัดขอบเขตจริงของทุกชิ้นในโค้ด รวม element ที่ position:absolute
+       * เพื่อให้ VIEW WORK ไม่ถูกตัดช่วงล่าง
+       */
+      const elements = [
+        root,
+        ...Array.from(root.querySelectorAll("*"))
+      ];
+
+      let minTop = Infinity;
+      let maxBottom = -Infinity;
+
+      elements.forEach((element) => {
+        if (
+          !(element instanceof previewDocument.defaultView.HTMLElement)
+        ) {
+          return;
+        }
+
+        const style =
+          previewDocument.defaultView.getComputedStyle(element);
+
+        if (
+          style.display === "none" ||
+          style.visibility === "hidden"
+        ) {
+          return;
+        }
+
+        const rect = element.getBoundingClientRect();
+
+        if (
+          !Number.isFinite(rect.top) ||
+          !Number.isFinite(rect.bottom) ||
+          rect.width <= 0.5 ||
+          rect.height <= 0.5
+        ) {
+          return;
+        }
+
+        minTop = Math.min(minTop, rect.top);
+        maxBottom = Math.max(maxBottom, rect.bottom);
+      });
+
+      if (
+        !Number.isFinite(minTop) ||
+        !Number.isFinite(maxBottom) ||
+        maxBottom <= minTop
+      ) {
+        const rect = root.getBoundingClientRect();
+        minTop = rect.top;
+        maxBottom = rect.bottom;
+      }
+
       const rootRect = root.getBoundingClientRect();
-      const contentRect =
-        content.getBoundingClientRect();
+      const contentRect = content.getBoundingClientRect();
 
       return Math.max(
         1,
         Math.ceil(
           Math.max(
+            maxBottom - minTop,
             rootRect.height,
             contentRect.height,
             root.offsetHeight,
             root.scrollHeight,
             content.offsetHeight,
-            content.scrollHeight,
-            previewDocument.body.scrollHeight,
-            previewDocument.documentElement.scrollHeight
+            content.scrollHeight
           )
         )
       );
@@ -2835,6 +2889,48 @@ ${stylesheetLinks}
           "--dds-commission-stage-height",
           `${scaledHeight}px`
         );
+
+        /*
+         * VIEW WORK ต้องยาวตามงานจริง ไม่บังคับอยู่ใน 1 viewport
+         */
+        stage.style.setProperty(
+          "height",
+          `${scaledHeight}px`,
+          "important"
+        );
+        stage.style.setProperty(
+          "min-height",
+          "1px",
+          "important"
+        );
+        stage.style.setProperty(
+          "max-height",
+          "none",
+          "important"
+        );
+        stage.style.setProperty(
+          "overflow",
+          "visible",
+          "important"
+        );
+
+        const view = stage.closest(
+          ".dds-my-own-code-view-panel"
+        );
+
+        if (view) {
+          view.style.setProperty(
+            "min-height",
+            `${scaledHeight + 80}px`,
+            "important"
+          );
+          view.style.setProperty(
+            "overflow",
+            "visible",
+            "important"
+          );
+        }
+
         return;
       }
 
@@ -2950,6 +3046,13 @@ ${stylesheetLinks}
 
     function openCustomView() {
       ensureFullPreview();
+
+      document.documentElement.classList.remove(
+        "dds-editor-one-screen"
+      );
+      document.body.classList.remove(
+        "dds-editor-one-screen"
+      );
 
       document.body.classList.add(
         "dds-editor-mode"
@@ -22627,13 +22730,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const code13 = grid.querySelector(".dds-roleplay-card-code013");
     if (!code13) return false;
     const existing = grid.querySelector(".dds-roleplay-card-code014");
-    if (existing) { card = existing; return true; }
+    if (existing) {
+      card = existing;
+      return true;
+    }
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code014";
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE014</span><h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2><button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     code13.insertAdjacentElement("afterend", card);
-    card.querySelector("[data-code014-edit]")?.addEventListener("click", openEditor);
 
     const iframe = card.querySelector("[data-code014-card-preview]");
     const render = () => {
@@ -22690,6 +22795,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function install() {
+    /*
+     * v160:
+     * delegated listener ทำให้ EDIT CODE ใช้ได้แม้ card ถูกสร้างใหม่
+     * หรือถูกระบบหน้า FOR ROLEPLAY re-render
+     */
+    document.addEventListener(
+      "click",
+      (event) => {
+        const button =
+          event.target?.closest?.("[data-code014-edit]");
+
+        if (!button) return;
+
+        event.preventDefault();
+        openEditor();
+      },
+      true
+    );
+
     let attempts = 0;
     const timer = setInterval(() => {
       attempts += 1;
