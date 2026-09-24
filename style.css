@@ -10151,7 +10151,7 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — STABLE TRUE CANVAS v146
+   LEGACY ROLEPLAY EDITORS — NO-JUMP TRUE CANVAS v147
    Only the seven requested editor previews.
 ========================================================= */
 #weirdoPreview,
@@ -10169,6 +10169,7 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   visibility:hidden !important;
   opacity:0 !important;
   transition:none !important;
+  contain:layout paint style !important;
 }
 
 #weirdoPreview[data-dds-true-canvas-ready="1"],
