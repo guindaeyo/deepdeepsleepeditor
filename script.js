@@ -24898,3 +24898,631 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   );
 })();
 
+
+
+/* =========================================================
+   FOR PROFILE EDITOR PREVIEW — FULL HEIGHT SCROLL v176
+   Scope ONLY editor-profile001..004
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_PROFILE_EDITOR_SCROLL_V176__) return;
+  window.__DDS_PROFILE_EDITOR_SCROLL_V176__ = true;
+
+  const CONFIG = {
+    "editor-profile001": {
+      stage: "polaroidLovePreviewStage",
+      host: "polaroidLoveCanvasHost",
+      iframe: "polaroidLovePreview",
+      zoomData: "profileZoom",
+      widthData: "profileCanvasWidth",
+      heightData: "profileCanvasHeight",
+      fallbackWidth: 1100,
+      fallbackHeight: 1500
+    },
+
+    "editor-profile002": {
+      stage: "moodboardPreviewStage",
+      host: "moodboardCanvasHost",
+      iframe: "moodboardPreview",
+      zoomData: "moodboardZoom",
+      widthData: "moodboardCanvasWidth",
+      heightData: "moodboardCanvasHeight",
+      fallbackWidth: 1100,
+      fallbackHeight: 1200
+    },
+
+    "editor-profile003": {
+      stage: "fortyOnePreviewStage",
+      host: "fortyOneCanvasHost",
+      iframe: "fortyOnePreview",
+      zoomData: "fortyoneZoom",
+      widthData: "fortyoneCanvasWidth",
+      heightData: "fortyoneCanvasHeight",
+      fallbackWidth: 950,
+      fallbackHeight: 1700
+    },
+
+    "editor-profile004": {
+      stage: "nothinPreviewStage",
+      host: "nothinCanvasHost",
+      iframe: "nothinPreview",
+      zoomData: "nothinZoom",
+      widthData: "nothinCanvasWidth",
+      heightData: "nothinCanvasHeight",
+      fallbackWidth: 1200,
+      fallbackHeight: 1000
+    }
+  };
+
+  const boundFrames = new WeakSet();
+  const timers = new WeakMap();
+
+  function activeProfilePanel() {
+    return Array.from(
+      document.querySelectorAll(
+        '.dds-panel.is-active[data-panel^="editor-profile"]'
+      )
+    ).find((panel) => CONFIG[panel.dataset.panel]) || null;
+  }
+
+  function getParts(panel) {
+    const cfg = CONFIG[panel?.dataset.panel];
+    if (!cfg) return null;
+
+    const stage = document.getElementById(cfg.stage);
+    const host = document.getElementById(cfg.host);
+    const iframe = document.getElementById(cfg.iframe);
+
+    if (!stage || !host || !iframe) {
+      return null;
+    }
+
+    return { cfg, stage, host, iframe };
+  }
+
+  function innerBounds(iframe) {
+    const doc = iframe?.contentDocument;
+
+    if (!doc?.documentElement || !doc.body) {
+      return { width: 0, height: 0 };
+    }
+
+    const html = doc.documentElement;
+    const body = doc.body;
+
+    let minLeft = Infinity;
+    let minTop = Infinity;
+    let maxRight = -Infinity;
+    let maxBottom = -Infinity;
+
+    const elements = [
+      body,
+      ...Array.from(body.querySelectorAll("*"))
+    ];
+
+    elements.forEach((element) => {
+      if (!(element instanceof doc.defaultView.HTMLElement)) {
+        return;
+      }
+
+      const style = doc.defaultView.getComputedStyle(element);
+
+      if (
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const rect = element.getBoundingClientRect();
+
+      if (
+        !Number.isFinite(rect.left) ||
+        !Number.isFinite(rect.right) ||
+        !Number.isFinite(rect.top) ||
+        !Number.isFinite(rect.bottom) ||
+        rect.width <= 0.5 ||
+        rect.height <= 0.5
+      ) {
+        return;
+      }
+
+      minLeft = Math.min(minLeft, rect.left);
+      minTop = Math.min(minTop, rect.top);
+      maxRight = Math.max(maxRight, rect.right);
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    });
+
+    const visualWidth =
+      Number.isFinite(minLeft) &&
+      Number.isFinite(maxRight)
+        ? Math.ceil(maxRight - minLeft)
+        : 0;
+
+    const visualHeight =
+      Number.isFinite(minTop) &&
+      Number.isFinite(maxBottom)
+        ? Math.ceil(maxBottom - minTop)
+        : 0;
+
+    return {
+      width: Math.max(
+        visualWidth,
+        html.scrollWidth || 0,
+        body.scrollWidth || 0,
+        html.offsetWidth || 0,
+        body.offsetWidth || 0
+      ),
+
+      height: Math.max(
+        visualHeight,
+        html.scrollHeight || 0,
+        body.scrollHeight || 0,
+        html.offsetHeight || 0,
+        body.offsetHeight || 0
+      )
+    };
+  }
+
+  function numeric(value, fallback = 0) {
+    const number = Number.parseFloat(value);
+    return Number.isFinite(number) && number > 0
+      ? number
+      : fallback;
+  }
+
+  function fit(panel, preserveScroll = true) {
+    if (
+      !panel ||
+      !panel.classList.contains("is-active")
+    ) {
+      return false;
+    }
+
+    const parts = getParts(panel);
+    if (!parts) return false;
+
+    const { cfg, stage, host, iframe } = parts;
+
+    if (
+      stage.clientWidth < 30 ||
+      stage.clientHeight < 30
+    ) {
+      return false;
+    }
+
+    const beforeTop = stage.scrollTop;
+    const beforeLeft = stage.scrollLeft;
+
+    const measured = innerBounds(iframe);
+
+    const dataWidth = numeric(
+      iframe.dataset[cfg.widthData],
+      0
+    );
+
+    const dataHeight = numeric(
+      iframe.dataset[cfg.heightData],
+      0
+    );
+
+    const styledWidth = numeric(
+      iframe.style.width,
+      0
+    );
+
+    const styledHeight = numeric(
+      iframe.style.height,
+      0
+    );
+
+    const naturalWidth = Math.max(
+      1,
+      dataWidth,
+      styledWidth,
+      measured.width,
+      cfg.fallbackWidth
+    );
+
+    const naturalHeight = Math.max(
+      1,
+      dataHeight,
+      styledHeight,
+      measured.height,
+      cfg.fallbackHeight
+    );
+
+    const padding = 18;
+
+    const availableWidth = Math.max(
+      1,
+      stage.clientWidth - padding * 2
+    );
+
+    /*
+     * Base scale = fit width.
+     * Existing zoom controls keep working through data-*-zoom.
+     */
+    const fitScale = Math.min(
+      1,
+      availableWidth / naturalWidth
+    );
+
+    const zoomFactor = Math.max(
+      0.25,
+      numeric(
+        iframe.dataset[cfg.zoomData],
+        1
+      )
+    );
+
+    const scale = fitScale * zoomFactor;
+
+    const renderedWidth = Math.ceil(
+      naturalWidth * scale
+    );
+
+    const renderedHeight = Math.ceil(
+      naturalHeight * scale
+    );
+
+    /*
+     * The host is the real scroll-size owner.
+     * This is the important part that prevents the bottom
+     * of a transformed absolute iframe from being cut off.
+     */
+    const hostWidth = Math.max(
+      stage.clientWidth,
+      renderedWidth + padding * 2
+    );
+
+    const hostHeight = Math.max(
+      stage.clientHeight,
+      renderedHeight + padding * 2
+    );
+
+    host.style.setProperty(
+      "position",
+      "relative",
+      "important"
+    );
+
+    host.style.setProperty(
+      "width",
+      `${hostWidth}px`,
+      "important"
+    );
+
+    host.style.setProperty(
+      "min-width",
+      `${hostWidth}px`,
+      "important"
+    );
+
+    host.style.setProperty(
+      "height",
+      `${hostHeight}px`,
+      "important"
+    );
+
+    host.style.setProperty(
+      "min-height",
+      `${hostHeight}px`,
+      "important"
+    );
+
+    host.style.setProperty(
+      "max-height",
+      "none",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "position",
+      "absolute",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "inset",
+      "auto",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "top",
+      `${padding}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "left",
+      "50%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      `${naturalWidth}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      `${naturalHeight}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "margin",
+      "0",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      `translateX(-50%) scale(${scale})`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    /*
+     * wheel / trackpad must scroll the preview stage,
+     * not get trapped on the iframe.
+     */
+    iframe.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    if (preserveScroll) {
+      stage.scrollTop = Math.min(
+        beforeTop,
+        Math.max(
+          0,
+          stage.scrollHeight - stage.clientHeight
+        )
+      );
+
+      stage.scrollLeft = Math.min(
+        beforeLeft,
+        Math.max(
+          0,
+          stage.scrollWidth - stage.clientWidth
+        )
+      );
+    } else {
+      stage.scrollTop = 0;
+      stage.scrollLeft = Math.max(
+        0,
+        (stage.scrollWidth - stage.clientWidth) / 2
+      );
+    }
+
+    if (!boundFrames.has(iframe)) {
+      boundFrames.add(iframe);
+
+      iframe.addEventListener(
+        "load",
+        () => {
+          window.setTimeout(
+            () => fit(panel, true),
+            0
+          );
+
+          window.setTimeout(
+            () => fit(panel, true),
+            180
+          );
+        }
+      );
+    }
+
+    return true;
+  }
+
+  function schedule(panel = activeProfilePanel()) {
+    if (!panel) return;
+
+    const oldTimer = timers.get(panel);
+    if (oldTimer) {
+      window.clearTimeout(oldTimer);
+    }
+
+    const timer = window.setTimeout(
+      () => {
+        requestAnimationFrame(
+          () => fit(panel, true)
+        );
+      },
+      0
+    );
+
+    timers.set(panel, timer);
+
+    /*
+     * Short retry for webfonts / remote CSS inside srcdoc.
+     */
+    [120, 360].forEach((delay) => {
+      window.setTimeout(
+        () => {
+          if (panel.classList.contains("is-active")) {
+            requestAnimationFrame(
+              () => fit(panel, true)
+            );
+          }
+        },
+        delay
+      );
+    });
+  }
+
+  document.addEventListener(
+    "input",
+    (event) => {
+      const panel = event.target?.closest?.(
+        '.dds-panel.is-active[data-panel^="editor-profile"]'
+      );
+
+      if (panel && CONFIG[panel.dataset.panel]) {
+        window.setTimeout(
+          () => schedule(panel),
+          20
+        );
+      }
+    },
+    true
+  );
+
+  document.addEventListener(
+    "change",
+    (event) => {
+      const panel = event.target?.closest?.(
+        '.dds-panel.is-active[data-panel^="editor-profile"]'
+      );
+
+      if (panel && CONFIG[panel.dataset.panel]) {
+        window.setTimeout(
+          () => schedule(panel),
+          20
+        );
+      }
+    },
+    true
+  );
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const panel = event.target?.closest?.(
+        '.dds-panel.is-active[data-panel^="editor-profile"]'
+      );
+
+      if (!panel || !CONFIG[panel.dataset.panel]) {
+        return;
+      }
+
+      if (
+        event.target?.closest?.(
+          '[data-polaroid-zoom-step], ' +
+          '[data-moodboard-zoom-step], ' +
+          '[data-fortyone-zoom-step], ' +
+          '[data-nothin-zoom-step], ' +
+          '#resetPolaroidLoveZoom, ' +
+          '#resetMoodboardZoom, ' +
+          '#resetFortyOneZoom, ' +
+          '#resetNothinZoom'
+        )
+      ) {
+        window.setTimeout(
+          () => schedule(panel),
+          0
+        );
+      }
+    },
+    true
+  );
+
+  window.addEventListener(
+    "resize",
+    () => {
+      const panel = activeProfilePanel();
+
+      if (panel) {
+        requestAnimationFrame(
+          () => fit(panel, true)
+        );
+      }
+    },
+    { passive: true }
+  );
+
+  const main = document.querySelector(".dds-main");
+
+  if (main && "MutationObserver" in window) {
+    const observer = new MutationObserver(
+      (records) => {
+        for (const record of records) {
+          const target = record.target;
+
+          if (
+            target instanceof HTMLElement &&
+            target.matches?.(
+              '.dds-panel[data-panel^="editor-profile"]'
+            ) &&
+            target.classList.contains("is-active")
+          ) {
+            window.setTimeout(
+              () => fit(target, false),
+              0
+            );
+
+            break;
+          }
+        }
+      }
+    );
+
+    observer.observe(
+      main,
+      {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["class"]
+      }
+    );
+  }
+
+  window.addEventListener(
+    "hashchange",
+    () => {
+      const panel = activeProfilePanel();
+
+      if (panel) {
+        window.setTimeout(
+          () => fit(panel, false),
+          0
+        );
+      }
+    },
+    { passive: true }
+  );
+})();
