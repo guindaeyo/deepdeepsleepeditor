@@ -10148,3 +10148,25 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   background:rgba(193,23,36,.62);
   border-radius:999px;
 }
+
+
+/* =========================================================
+   MIKAEL FREE HISTORY — EDIT BUTTON ONLY v143
+   Scope ONLY this commission card.
+========================================================= */
+.dds-commission-card-mikael-history-free .dds-mhp-edit-only-actions{
+  display:block !important;
+}
+.dds-commission-card-mikael-history-free .dds-mhp-edit-only{
+  width:203px !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:40px !important;
+  min-height:40px !important;
+  padding:0 15px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  flex:none !important;
+  background:transparent !important;
+}

@@ -21809,11 +21809,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (existing) { card = existing; return true; }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-mikael-history-free";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-mhp-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-mhp-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นประวัติ Mikael"></iframe><span class="dds-roleplay-preview-badge">PREVIEW</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-mhp-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit" data-mhp-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-mhp-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-mhp-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นประวัติ Mikael"></iframe><span class="dds-roleplay-preview-badge">PREVIEW</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทประวัติ (ทุกคนใช้ได้ฟรี)</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions dds-mhp-edit-only-actions"><button class="dds-roleplay-edit dds-mhp-edit-only" data-mhp-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     const alanCard = grid.querySelector(".dds-commission-card-alan");
     if (alanCard?.parentElement === grid) alanCard.insertAdjacentElement("afterend", card);
     else grid.appendChild(card);
-    card.querySelector("[data-mhp-view]")?.addEventListener("click", openView);
     card.querySelector("[data-mhp-edit]")?.addEventListener("click", openEditor);
     const iframe = card.querySelector("[data-mhp-card-preview]");
     writeIframe(iframe, OFFICIAL_CODE, fitCardPreview);
