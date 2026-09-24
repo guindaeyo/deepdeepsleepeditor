@@ -19563,7 +19563,20 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code013";
     card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="eager" fetchpriority="high" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
-    grid.appendChild(card);
+    const code14 =
+      grid.querySelector(
+        ".dds-roleplay-card-code014"
+      );
+
+    if (code14) {
+      grid.insertBefore(
+        card,
+        code14
+      );
+    } else {
+      grid.appendChild(card);
+    }
+
     card.querySelector("[data-code013-edit]")?.addEventListener("click", openEditor);
     updateCardState();
     const iframe = card.querySelector("[data-code013-card-preview]");
@@ -22344,15 +22357,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 /* =========================================================
    CODE014 — www.s$sLuv.c0m
-   Protected roleplay editor / blur preview
+   SINGLE LOCAL OWNER v168
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_CODE014_SSSLUV_INSTALLED__) return;
-  window.__DDS_CODE014_SSSLUV_INSTALLED__ = true;
+  if (window.__DDS_CODE014_LOCAL_V168_INSTALLED__) return;
+  window.__DDS_CODE014_LOCAL_V168_INSTALLED__ = true;
 
-  const PANEL_NAME = "editor-code014";
+  const PANEL_NAME = "editor-code014-v168";
   const DRAFT_KEY = "dds:roleplay:code014:draft:v2";
   const STYLESHEET_URL = "https://guindaeyo.github.io/deepdshop/ddsh-sssluv01.css";
   const FONT_URL = "https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600&family=DotGothic16&display=swap";
@@ -23012,7 +23025,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const run = (event) => {
       event?.preventDefault?.();
       event?.stopPropagation?.();
-      window.__ddsOpenCode014?.();
+      window.__ddsOpenCode014V168?.();
     };
 
     /*
@@ -23029,37 +23042,115 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function installCard() {
-    if (card?.isConnected) return true;
-    const grid = document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
+    const grid =
+      document.querySelector(
+        '[data-panel="roleplay"] .dds-roleplay-grid'
+      );
+
     if (!grid) return false;
-    const code13 = grid.querySelector(".dds-roleplay-card-code013");
-    if (!code13) return false;
-    const existing = grid.querySelector(".dds-roleplay-card-code014");
+
+    const code13 =
+      grid.querySelector(
+        ".dds-roleplay-card-code013"
+      );
+
+    const existing =
+      grid.querySelector(
+        ".dds-roleplay-card-code014"
+      );
+
     if (existing) {
       card = existing;
-      bindCardEditButton();
-      return true;
+    } else {
+      card = document.createElement("article");
+      card.className =
+        "dds-roleplay-card dds-roleplay-card-code014";
+
+      card.innerHTML =
+        `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview id="roleplayCardPreview014" loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE014</span><h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2><button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button></div>`;
+
+      grid.appendChild(card);
     }
 
-    card = document.createElement("article");
-    card.className = "dds-roleplay-card dds-roleplay-card-code014";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code014"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-code014-card-preview-frame" data-code014-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE014"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE014</span><h2 class="dds-roleplay-name">www.s$sLuv.c0m</h2><button class="dds-roleplay-edit" data-code014-edit type="button">EDIT CODE <span>↗</span></button></div>`;
-    code13.insertAdjacentElement("afterend", card);
+    /*
+     * CODE014 ต้องอยู่ต่อ CODE013 เสมอ
+     */
+    if (
+      code13 &&
+      code13.nextElementSibling !== card
+    ) {
+      code13.insertAdjacentElement(
+        "afterend",
+        card
+      );
+    }
 
     bindCardEditButton();
 
-    const iframe = card.querySelector("[data-code014-card-preview]");
-    const render = () => {
-      if (cardRendered || !iframe) return;
-      cardRendered = true;
-      writeIframe(iframe, CARD_PREVIEW_CODE, () => fitIframe(iframe, card.querySelector(".dds-roleplay-card-preview"), 16));
-    };
-    render();
-    if ("ResizeObserver" in window) {
-      const stage = card.querySelector(".dds-roleplay-card-preview");
-      const observer = new ResizeObserver(() => requestAnimationFrame(() => fitIframe(iframe, stage, 16)));
-      observer.observe(stage);
+    const iframe =
+      card.querySelector(
+        "[data-code014-card-preview]"
+      );
+
+    const stage =
+      card.querySelector(
+        ".dds-roleplay-card-preview"
+      );
+
+    if (iframe && stage) {
+      /*
+       * Static HTML v168 already carries srcdoc.
+       * If another renderer cleared it, restore official preview here.
+       */
+      if (
+        !String(
+          iframe.getAttribute("srcdoc") || ""
+        ).trim()
+      ) {
+        cardRendered = true;
+
+        writeIframe(
+          iframe,
+          CARD_PREVIEW_CODE,
+          () => fitIframe(
+            iframe,
+            stage,
+            16
+          )
+        );
+      } else {
+        cardRendered = true;
+
+        requestAnimationFrame(
+          () => fitIframe(
+            iframe,
+            stage,
+            16
+          )
+        );
+      }
+
+      if (
+        "ResizeObserver" in window &&
+        stage.dataset.code014V168Resize !== "1"
+      ) {
+        stage.dataset.code014V168Resize = "1";
+
+        const observer =
+          new ResizeObserver(() => {
+            requestAnimationFrame(
+              () => fitIframe(
+                iframe,
+                stage,
+                16
+              )
+            );
+          });
+
+        observer.observe(stage);
+      }
     }
+
     return true;
   }
 
@@ -23124,7 +23215,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     history.replaceState(
       null,
       "",
-      "#editor-code014"
+      "#editor-code014-v168"
     );
 
     window.scrollTo(0, 0);
@@ -23140,12 +23231,19 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
    * v162: expose ตัวเปิด Editor โดยตรง
    * เพื่อไม่ต้องพึ่ง event/state ของ card อย่างเดียว
    */
-  window.__ddsOpenCode014 =
+  window.__ddsOpenCode014V168 =
     () => openEditor();
+
+  /*
+   * Compatibility alias for any existing button/helper.
+   * Our v168 route always wins after local script loads.
+   */
+  window.__ddsOpenCode014 =
+    window.__ddsOpenCode014V168;
 
   function handleHash() {
     if (
-      location.hash === "#editor-code014" &&
+      location.hash === "#editor-code014-v168" &&
       !panel?.classList.contains("is-active")
     ) {
       openEditor();
@@ -23153,38 +23251,120 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function install() {
+    createPanel();
+
+    let attempts = 0;
+
+    const settleOrder = () => {
+      attempts += 1;
+
+      installCard();
+
+      const grid =
+        document.querySelector(
+          '[data-panel="roleplay"] .dds-roleplay-grid'
+        );
+
+      const code13 =
+        grid?.querySelector(
+          ".dds-roleplay-card-code013"
+        );
+
+      const code14 =
+        grid?.querySelector(
+          ".dds-roleplay-card-code014"
+        );
+
+      if (
+        (
+          code13 &&
+          code14 &&
+          code13.nextElementSibling === code14
+        ) ||
+        attempts >= 80
+      ) {
+        window.clearInterval(orderTimer);
+      }
+    };
+
+    const orderTimer =
+      window.setInterval(
+        settleOrder,
+        100
+      );
+
+    settleOrder();
+
     /*
-     * v160:
-     * delegated listener ทำให้ EDIT CODE ใช้ได้แม้ card ถูกสร้างใหม่
-     * หรือถูกระบบหน้า FOR ROLEPLAY re-render
+     * Capture at WINDOW level.
+     * This fires before document/card handlers from older CODE014 modules.
      */
-    document.addEventListener(
+    window.addEventListener(
       "click",
       (event) => {
         const button =
-          event.target?.closest?.("[data-code014-edit]");
+          event.target?.closest?.(
+            ".dds-roleplay-card-code014 [data-code014-edit]"
+          );
 
         if (!button) return;
 
         event.preventDefault();
-        window.__ddsOpenCode014?.();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        openEditor();
       },
       true
     );
 
-    let attempts = 0;
-    const timer = setInterval(() => {
-      attempts += 1;
-      if (installCard() || attempts > 120) clearInterval(timer);
-    }, 100);
-    window.addEventListener("resize", () => {
-      const cardFrame = card?.querySelector("[data-code014-card-preview]");
-      if (cardFrame) fitIframe(cardFrame, card?.querySelector(".dds-roleplay-card-preview"), 16);
-      const editorFrame = panel?.querySelector("[data-code014-editor-preview]");
-      if (editorFrame && panel?.classList.contains("is-active")) sizeEditorPreviewActual(editorFrame, panel.querySelector(".dds-code014-editor-stage"), 28);
-    });
-    window.addEventListener("hashchange", handleHash);
-    setTimeout(handleHash, 320);
+    window.addEventListener(
+      "resize",
+      () => {
+        const cardFrame =
+          card?.querySelector(
+            "[data-code014-card-preview]"
+          );
+
+        if (cardFrame) {
+          fitIframe(
+            cardFrame,
+            card?.querySelector(
+              ".dds-roleplay-card-preview"
+            ),
+            16
+          );
+        }
+
+        const editorFrame =
+          panel?.querySelector(
+            "[data-code014-editor-preview]"
+          );
+
+        if (
+          editorFrame &&
+          panel?.classList.contains("is-active")
+        ) {
+          sizeEditorPreviewActual(
+            editorFrame,
+            panel.querySelector(
+              ".dds-code014-editor-stage"
+            ),
+            28
+          );
+        }
+      }
+    );
+
+    window.addEventListener(
+      "hashchange",
+      handleHash
+    );
+
+    window.setTimeout(
+      handleHash,
+      100
+    );
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once:true });

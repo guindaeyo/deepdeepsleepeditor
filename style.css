@@ -10921,3 +10921,53 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     visibility:hidden !important;
   }
 }
+
+
+/* =========================================================
+   GLOBAL EDITOR — DRAFT BAR COMFORT v168
+   บันทึกแบบร่าง = bold only
+   (บันทึกล่าสุด เวลา) = normal
+   vertical padding = 10px
+========================================================= */
+@media (min-width:1101px){
+
+  .dds-draft-manager,
+  .dds-draft-manager.dds-named-save-host,
+  .dds-protected-commission-draft,
+  .dds-protected-commission-draft.dds-named-save-host,
+  .dds-code013-draft,
+  .dds-code014-editor .dds-protected-commission-draft{
+    padding-top:10px !important;
+    padding-bottom:10px !important;
+    min-height:0 !important;
+  }
+
+  .dds-draft-manager-copy strong,
+  .dds-protected-commission-draft > div:first-child > strong{
+    font-weight:700 !important;
+    font-size:10px !important;
+    line-height:1.25 !important;
+  }
+
+  .dds-draft-manager-copy .dds-draft-status,
+  .dds-protected-commission-draft > div:first-child > small{
+    font-weight:400 !important;
+    font-size:9px !important;
+    line-height:1.25 !important;
+  }
+
+  .dds-draft-manager-copy strong::after,
+  .dds-protected-commission-draft > div:first-child > strong::after{
+    font-weight:400 !important;
+  }
+
+  .dds-draft-manager-copy .dds-draft-status::after,
+  .dds-protected-commission-draft > div:first-child > small::after{
+    font-weight:400 !important;
+  }
+}
+
+/* CODE014 v168 panel uses the same CODE014 editor layout. */
+[data-panel="editor-code014-v168"].dds-code014-editor{
+  width:100%;
+}
