@@ -22602,44 +22602,155 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function sizeEditorPreviewActual(iframe, stage, padding = 28) {
-    if (!iframe || !stage) return;
+    if (!iframe || !stage || stage.clientWidth < 20) return;
 
     const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
-    const scale = Math.min(1, availableWidth / m.width);
-    const renderedHeight = Math.ceil(m.height * scale);
+    const availableWidth = Math.max(
+      1,
+      stage.clientWidth - padding * 2
+    );
 
     /*
-     * v157:
-     * stage เป็น scrollbar แนวตั้งเพียงอันเดียว
-     * ไม่ขยาย stage ตามความยาวโค้ด และไม่มี scroll แนวนอน
+     * Fit แค่ความกว้าง ไม่ย่อทั้งก้อนตามความสูง
+     * งานยาวให้เลื่อนลงด้วย scrollbar ของ stage
      */
-    stage.style.setProperty("height", "100%", "important");
-    stage.style.setProperty("min-height", "0", "important");
-    stage.style.setProperty("max-height", "100%", "important");
-    stage.style.setProperty("overflow-y", "auto", "important");
-    stage.style.setProperty("overflow-x", "hidden", "important");
+    const scale = Math.min(
+      1,
+      availableWidth / m.width
+    );
+
+    const renderedHeight = Math.ceil(
+      m.height * scale
+    );
+
+    stage.style.setProperty(
+      "height",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "min-height",
+      "0",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "max-height",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-y",
+      "auto",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-x",
+      "hidden",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+
     stage.style.setProperty(
       "--dds-code014-scroll-height",
       `${renderedHeight + padding * 2}px`
     );
 
-    iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", `${padding}px`, "important");
-    iframe.style.setProperty("width", `${m.width}px`, "important");
-    iframe.style.setProperty("min-width", `${m.width}px`, "important");
-    iframe.style.setProperty("max-width", `${m.width}px`, "important");
-    iframe.style.setProperty("height", `${m.height}px`, "important");
-    iframe.style.setProperty("min-height", `${m.height}px`, "important");
-    iframe.style.setProperty("max-height", `${m.height}px`, "important");
+    iframe.style.setProperty(
+      "position",
+      "absolute",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "left",
+      "50%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "top",
+      `${padding}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      `${m.height}px`,
+      "important"
+    );
+
     iframe.style.setProperty(
       "transform",
       `translateX(-50%) scale(${scale})`,
       "important"
     );
-    iframe.style.setProperty("transform-origin", "top center", "important");
-    iframe.style.setProperty("overflow", "hidden", "important");
+
+    iframe.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    /*
+     * ให้ wheel / trackpad จับที่ stage โดยตรง
+     * ไม่ติดอยู่บน iframe ที่เลื่อนไม่ได้
+     */
+    iframe.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
   }
 
   function toolbarMarkup() {
@@ -23285,16 +23396,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     "editor-code013": {
       selector: "[data-code013-editor-preview]",
       width: 720
-    },
-
-    "editor-code014": {
-      selector: "[data-code014-editor-preview]",
-      width: 650
-    },
-
-    "editor-code014-rescue-v163": {
-      selector: "[data-code014-editor-preview]",
-      width: 650
     },
 
     "editor-review001": { id: "foodReviewPreview" },
@@ -25090,54 +25191,154 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function sizeEditorPreviewActual(iframe, stage, padding = 28) {
     if (!iframe || !stage || stage.clientWidth < 20) return;
-    const m = measureIframe(iframe);
-    const availableWidth = Math.max(1, stage.clientWidth - padding * 2);
-    const scale = Math.min(1, availableWidth / m.width);
-    const stageHeight = Math.ceil(m.height * scale) + padding * 2;
-    stage.style.setProperty("height", `${stageHeight}px`, "important");
-    stage.style.setProperty("min-height", `${stageHeight}px`, "important");
-    iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("left", "50%", "important");
-    iframe.style.setProperty("top", `${padding}px`, "important");
-    iframe.style.setProperty("width", `${m.width}px`, "important");
-    iframe.style.setProperty("height", `${m.height}px`, "important");
-    iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("transform", `translateX(-50%) scale(${scale})`, "important");
-    iframe.style.setProperty("transform-origin", "top center", "important");
 
-    const previewColumn = stage.closest(".dds-protected-commission-preview-column");
-    const previewTop = previewColumn?.querySelector(".dds-editor-preview-top");
-    const totalHeight = stageHeight + (previewTop?.offsetHeight || 0);
+    const m = measureIframe(iframe);
+    const availableWidth = Math.max(
+      1,
+      stage.clientWidth - padding * 2
+    );
 
     /*
-     * v134:
-     * ให้ขอบล่างของกล่อง 09 / COPY CODE จบตรงกับขอบล่างพรีวิวจริง
-     * ไม่บังคับขั้นต่ำ 1500px เพราะจะทำให้ฝั่งขวายาวเกินพรีวิว
+     * Fit แค่ความกว้าง ไม่ย่อทั้งก้อนตามความสูง
+     * งานยาวให้เลื่อนลงด้วย scrollbar ของ stage
      */
-    requestAnimationFrame(() => {
-      const previewHeight = Math.ceil(
-        previewColumn?.getBoundingClientRect().height || totalHeight || 0
-      );
+    const scale = Math.min(
+      1,
+      availableWidth / m.width
+    );
 
-      if (panel && previewHeight > 0) {
-        panel.style.setProperty(
-          "--dds-code014-editor-height",
-          `${previewHeight}px`
-        );
-      }
-    });
-  }
+    const renderedHeight = Math.ceil(
+      m.height * scale
+    );
 
-  function colorField(label, key, value) {
-    return `<label class="dds-color-field"><span>${label}</span><div><input type="color" data-code014-color-picker="${key}" data-dds-no-save value="${value}"><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}" spellcheck="false"></div></label>`;
-  }
+    stage.style.setProperty(
+      "height",
+      "100%",
+      "important"
+    );
 
-  function textField(label, key, value, full = false) {
-    return `<label class="dds-field${full ? " dds-field-full" : ""}"><span>${label}</span><input type="text" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${h(value)}"></label>`;
-  }
+    stage.style.setProperty(
+      "min-height",
+      "0",
+      "important"
+    );
 
-  function rangeRow(label, key, value, min, max, left, right, unit = "px") {
-    return `<label class="dds-position-row"><span>${label}</span><small>${left}</small><input type="range" min="${min}" max="${max}" step="1" data-code014-field="${key}" data-dds-field-key="code014-${key}" value="${value}"><small>${right}</small><output data-code014-output="${key}">${value}${unit}</output></label>`;
+    stage.style.setProperty(
+      "max-height",
+      "100%",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-y",
+      "auto",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "overflow-x",
+      "hidden",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+
+    stage.style.setProperty(
+      "--dds-code014-scroll-height",
+      `${renderedHeight + padding * 2}px`
+    );
+
+    iframe.style.setProperty(
+      "position",
+      "absolute",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "left",
+      "50%",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "top",
+      `${padding}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-width",
+      `${m.width}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "min-height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "max-height",
+      `${m.height}px`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform",
+      `translateX(-50%) scale(${scale})`,
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "transform-origin",
+      "top center",
+      "important"
+    );
+
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    /*
+     * ให้ wheel / trackpad จับที่ stage โดยตรง
+     * ไม่ติดอยู่บน iframe ที่เลื่อนไม่ได้
+     */
+    iframe.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
   }
 
   function toolbarMarkup() {

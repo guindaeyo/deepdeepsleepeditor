@@ -10667,3 +10667,185 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   z-index:20 !important;
   pointer-events:auto !important;
 }
+
+
+/* =========================================================
+   GLOBAL EDITOR — COMPACT DRAFT BAR v164
+   บันทึกแบบร่าง (บันทึกล่าสุด HH:MM)
+========================================================= */
+@media (min-width:1101px){
+
+  /*
+   * Draft title + status = บรรทัดเดียว
+   */
+  .dds-draft-manager-copy,
+  .dds-protected-commission-draft > div:first-child{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    gap:0 !important;
+    min-width:0 !important;
+    white-space:nowrap !important;
+  }
+
+  .dds-draft-manager-copy strong,
+  .dds-protected-commission-draft > div:first-child > strong{
+    flex:0 0 auto !important;
+    margin:0 !important;
+    font-size:9px !important;
+    line-height:1 !important;
+  }
+
+  .dds-draft-manager-copy strong::after,
+  .dds-protected-commission-draft > div:first-child > strong::after{
+    content:" (" !important;
+  }
+
+  .dds-draft-manager-copy .dds-draft-status,
+  .dds-protected-commission-draft > div:first-child > small{
+    display:block !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:8px !important;
+    line-height:1 !important;
+  }
+
+  .dds-draft-manager-copy .dds-draft-status::after,
+  .dds-protected-commission-draft > div:first-child > small::after{
+    content:")" !important;
+  }
+
+  /*
+   * Named saves เดิมกินพื้นที่แนวตั้งเยอะ
+   * ย่อ SAVE AS + รายการเซฟ + LOAD/DELETE ให้เป็นแถวเดียว
+   */
+  .dds-draft-manager.dds-named-save-host,
+  .dds-protected-commission-draft.dds-named-save-host{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:6px !important;
+    padding:6px 9px !important;
+    min-height:0 !important;
+    align-items:center !important;
+  }
+
+  .dds-named-save-library{
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    display:grid !important;
+    grid-template-columns:minmax(150px,.8fr) minmax(180px,1fr) !important;
+    align-items:center !important;
+    gap:6px !important;
+  }
+
+  .dds-named-save-create{
+    min-width:0 !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:5px !important;
+    align-items:center !important;
+  }
+
+  .dds-named-save-name-field{
+    min-width:0 !important;
+    display:block !important;
+  }
+
+  .dds-named-save-name-field > span,
+  .dds-named-save-heading,
+  .dds-named-save-empty{
+    display:none !important;
+  }
+
+  .dds-named-save-name-field input,
+  .dds-named-save-picker select{
+    width:100% !important;
+    min-width:0 !important;
+    height:28px !important;
+    min-height:28px !important;
+    padding:0 8px !important;
+    font-size:8px !important;
+  }
+
+  .dds-named-save-create-button,
+  .dds-named-save-picker button{
+    height:28px !important;
+    min-height:28px !important;
+    padding:0 8px !important;
+    font-size:7px !important;
+  }
+
+  .dds-named-save-picker{
+    min-width:0 !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto auto !important;
+    gap:5px !important;
+    align-items:center !important;
+  }
+}
+
+/* =========================================================
+   CODE014 EDITOR — ONE REAL VERTICAL SCROLLBAR v164
+========================================================= */
+@media (min-width:1101px){
+
+  .dds-code014-editor .dds-protected-commission-preview-column{
+    min-height:0 !important;
+    overflow:hidden !important;
+  }
+
+  .dds-code014-editor .dds-code014-editor-stage{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    position:relative !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#c11724 #090909 !important;
+  }
+
+  /*
+   * spacer สร้างความสูง scroll ตามความยาวโค้ดหลัง scale
+   */
+  .dds-code014-editor .dds-code014-editor-stage::after{
+    content:"";
+    display:block;
+    width:1px;
+    height:var(--dds-code014-scroll-height,1px);
+    pointer-events:none;
+  }
+
+  .dds-code014-editor .dds-code014-editor-stage::-webkit-scrollbar{
+    width:7px !important;
+    height:7px !important;
+  }
+
+  .dds-code014-editor .dds-code014-editor-stage::-webkit-scrollbar-track{
+    background:#090909 !important;
+  }
+
+  .dds-code014-editor .dds-code014-editor-stage::-webkit-scrollbar-thumb{
+    background:#c11724 !important;
+    border-radius:999px !important;
+  }
+
+  .dds-code014-editor .dds-code014-editor-stage::-webkit-scrollbar-thumb:hover{
+    background:#df2632 !important;
+  }
+
+  .dds-code014-editor .dds-code014-editor-preview{
+    position:absolute !important;
+    left:50% !important;
+    top:28px !important;
+    margin:0 !important;
+    max-width:none !important;
+    pointer-events:none !important;
+  }
+}
