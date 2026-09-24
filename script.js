@@ -22988,21 +22988,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — TRUE CANVAS FROM FIRST LOAD v145
+   LEGACY ROLEPLAY EDITORS — STABLE TRUE CANVAS v146
    Only:
    WEIRDO / HIHI!, BABY / U-I-A U-I-A U-E /
    THIS HITS LIKE COMA / NEW RULES, I'M TROUBLEMAKER /
    HIGHER THAN HEAVEN / LONG WAY LONG RIDE
 
-   ไม่ย่อ scale จากข้อมูลที่กรอก
-   เปิด parent กว้างก่อนเพื่อให้ CSS ของโค้ดคำนวณ
-   "ความกว้างจริง" ได้ตั้งแต่ครั้งแรก แล้วล็อก canvas ไว้
+   - ซ่อน iframe ตอนวัดขนาดครั้งแรก
+   - แสดงทีเดียวเมื่อ canvas พร้อม
+   - จำ natural width ไว้ ไม่ probe ซ้ำหลังจากนั้น
+   - input/change อัปเดตเฉพาะ height/content ไม่เด้ง width
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_LEGACY_TRUE_CANVAS_V145__) return;
-  window.__DDS_LEGACY_TRUE_CANVAS_V145__ = true;
+  if (window.__DDS_LEGACY_STABLE_TRUE_CANVAS_V146__) return;
+  window.__DDS_LEGACY_STABLE_TRUE_CANVAS_V146__ = true;
 
   const CONFIGS = [
     { id: "weirdoPreview", panel: "editor-code002" },
@@ -23024,6 +23025,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       state = {
         applying: false,
         timer: 0,
+        naturalWidth: 0,
+        ready: false,
         rootObserver: null,
         root: null,
         imageListeners: new WeakSet()
@@ -23045,9 +23048,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     if (!target || !shell) return null;
 
-    const children = Array.from(target.children);
-
-    const root = children.find((element) => {
+    const root = Array.from(target.children).find((element) => {
       if (!(element instanceof doc.defaultView.HTMLElement)) return false;
       if (element.tagName === "STYLE") return false;
 
@@ -23082,19 +23083,19 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     };
   }
 
-  function watchImages(iframe, doc) {
+  function watchAssets(iframe, doc) {
     const state = getState(iframe);
 
     doc.querySelectorAll("img").forEach((img) => {
       if (state.imageListeners.has(img)) return;
       state.imageListeners.add(img);
 
-      img.addEventListener("load", () => schedule(iframe), { once: true });
-      img.addEventListener("error", () => schedule(iframe), { once: true });
+      img.addEventListener("load", () => schedule(iframe, false), { once: true });
+      img.addEventListener("error", () => schedule(iframe, false), { once: true });
     });
 
     try {
-      doc.fonts?.ready?.then(() => schedule(iframe));
+      doc.fonts?.ready?.then(() => schedule(iframe, false));
     } catch {}
   }
 
@@ -23107,33 +23108,196 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     state.rootObserver?.disconnect();
     state.root = root;
 
-    let lastWidth = 0;
     let lastHeight = 0;
 
     state.rootObserver = new ResizeObserver(() => {
-      if (state.applying) return;
+      if (state.applying || !state.ready) return;
 
-      const rect = root.getBoundingClientRect();
-      const width = Math.round(rect.width);
-      const height = Math.round(rect.height);
+      const height = Math.round(root.getBoundingClientRect().height);
 
-      if (
-        Math.abs(width - lastWidth) < 2 &&
-        Math.abs(height - lastHeight) < 2
-      ) {
-        return;
-      }
+      if (Math.abs(height - lastHeight) < 2) return;
 
-      lastWidth = width;
       lastHeight = height;
-      schedule(iframe);
+      schedule(iframe, false);
     });
 
     state.rootObserver.observe(root);
   }
 
-  function applyCanvas(iframe) {
+  function prepareProbe(iframe, parts) {
     const state = getState(iframe);
+    const { doc, html, body, shell, target } = parts;
+    const padding = bodyPadding(doc);
+
+    /*
+     * ซ่อนก่อน probe เพื่อไม่ให้ผู้ใช้เห็น iframe กาง 1200px แล้วหดกลับ
+     */
+    iframe.style.setProperty("visibility", "hidden", "important");
+    iframe.style.setProperty("opacity", "0", "important");
+
+    iframe.style.setProperty(
+      "width",
+      `${PROBE_CONTENT_WIDTH + padding.x}px`,
+      "important"
+    );
+    iframe.style.setProperty(
+      "min-width",
+      `${PROBE_CONTENT_WIDTH + padding.x}px`,
+      "important"
+    );
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("height", "1600px", "important");
+    iframe.style.setProperty("min-height", "1600px", "important");
+    iframe.style.setProperty("max-height", "none", "important");
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+
+    html.style.setProperty("width", "auto", "important");
+    body.style.setProperty("width", "auto", "important");
+    body.style.setProperty("min-width", "0", "important");
+    body.style.setProperty("overflow", "visible", "important");
+
+    shell.style.setProperty("width", "100%", "important");
+    shell.style.setProperty("height", "auto", "important");
+    shell.style.setProperty("min-height", "0", "important");
+    shell.style.setProperty("display", "flex", "important");
+    shell.style.setProperty("justify-content", "center", "important");
+    shell.style.setProperty("align-items", "flex-start", "important");
+    shell.style.setProperty("overflow", "visible", "important");
+
+    target.style.setProperty("width", `${PROBE_CONTENT_WIDTH}px`, "important");
+    target.style.setProperty("min-width", `${PROBE_CONTENT_WIDTH}px`, "important");
+    target.style.setProperty("max-width", "none", "important");
+    target.style.setProperty("flex", "0 0 auto", "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("transform-origin", "top center", "important");
+    target.style.setProperty("zoom", "1", "important");
+
+    return padding;
+  }
+
+  function detectNaturalWidth(parts) {
+    const { doc, root } = parts;
+
+    void root.offsetWidth;
+
+    const rootStyle = doc.defaultView.getComputedStyle(root);
+    const rect = root.getBoundingClientRect();
+
+    const computedWidth = Number.parseFloat(rootStyle.width) || 0;
+    const maxWidth =
+      rootStyle.maxWidth && rootStyle.maxWidth !== "none"
+        ? Number.parseFloat(rootStyle.maxWidth) || 0
+        : 0;
+
+    let naturalWidth = Math.max(
+      computedWidth,
+      Math.ceil(rect.width || 0),
+      root.offsetWidth || 0,
+      root.scrollWidth || 0
+    );
+
+    if (maxWidth > 240 && maxWidth < PROBE_CONTENT_WIDTH) {
+      naturalWidth = Math.min(naturalWidth, maxWidth);
+    }
+
+    if (
+      !Number.isFinite(naturalWidth) ||
+      naturalWidth < 240 ||
+      naturalWidth >= PROBE_CONTENT_WIDTH - 2
+    ) {
+      return 0;
+    }
+
+    return Math.ceil(naturalWidth);
+  }
+
+  function applyLockedCanvas(iframe, parts, naturalWidth) {
+    const { doc, shell, target, root } = parts;
+    const column = iframe.closest(".dds-editor-preview-column");
+    if (!column) return false;
+
+    const padding = bodyPadding(doc);
+
+    /*
+     * ล็อกความกว้างจริงไว้เสมอ
+     * ต่อให้ข้อความ/รูปยังว่างก็ไม่หด
+     */
+    target.style.setProperty("width", `${naturalWidth}px`, "important");
+    target.style.setProperty("min-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("max-width", `${naturalWidth}px`, "important");
+    target.style.setProperty("flex", "0 0 auto", "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("zoom", "1", "important");
+
+    shell.style.setProperty("width", `${naturalWidth}px`, "important");
+    shell.style.setProperty("min-width", `${naturalWidth}px`, "important");
+    shell.style.setProperty("max-width", `${naturalWidth}px`, "important");
+    shell.style.setProperty("height", "auto", "important");
+    shell.style.setProperty("overflow", "visible", "important");
+
+    void target.offsetHeight;
+
+    const naturalHeight = Math.max(
+      1,
+      Math.ceil(root.getBoundingClientRect().height || 0),
+      root.scrollHeight || 0,
+      target.scrollHeight || 0
+    );
+
+    const finalWidth = Math.ceil(naturalWidth + padding.x);
+    const finalHeight = Math.ceil(naturalHeight + padding.y);
+
+    iframe.style.setProperty("width", `${finalWidth}px`, "important");
+    iframe.style.setProperty("min-width", `${finalWidth}px`, "important");
+    iframe.style.setProperty("max-width", `${finalWidth}px`, "important");
+    iframe.style.setProperty("height", `${finalHeight}px`, "important");
+    iframe.style.setProperty("min-height", `${finalHeight}px`, "important");
+    iframe.style.setProperty("max-height", `${finalHeight}px`, "important");
+    iframe.style.setProperty("display", "block", "important");
+    iframe.style.setProperty("margin-left", "auto", "important");
+    iframe.style.setProperty("margin-right", "auto", "important");
+    iframe.style.setProperty("transform", "none", "important");
+
+    const previewTop =
+      column.querySelector(".dds-editor-preview-top")?.offsetHeight || 0;
+    const availableHeight = Math.max(0, column.clientHeight - previewTop);
+    const verticalSpace = Math.max(0, (availableHeight - finalHeight) / 2);
+
+    iframe.style.setProperty(
+      "margin-top",
+      `${Math.round(verticalSpace)}px`,
+      "important"
+    );
+    iframe.style.setProperty("margin-bottom", "0", "important");
+
+    column.style.setProperty("overflow", "auto", "important");
+    column.style.setProperty("overscroll-behavior", "contain", "important");
+
+    requestAnimationFrame(() => {
+      const maxScroll = Math.max(0, finalWidth - column.clientWidth);
+
+      if (maxScroll > 0 && !column.dataset.ddsCanvasUserScrolled) {
+        column.scrollLeft = Math.round(maxScroll / 2);
+      }
+
+      /*
+       * แสดงทีเดียวหลังตำแหน่ง/ขนาดสุดท้ายพร้อมแล้ว
+       */
+      iframe.style.setProperty("visibility", "visible", "important");
+      iframe.style.setProperty("opacity", "1", "important");
+      iframe.dataset.ddsTrueCanvasReady = "1";
+    });
+
+    watchAssets(iframe, doc);
+    watchRoot(iframe, root);
+
+    return true;
+  }
+
+  function applyCanvas(iframe, forceProbe = false) {
+    const state = getState(iframe);
+
     if (state.applying) return false;
 
     const column = iframe?.closest(".dds-editor-preview-column");
@@ -23145,178 +23309,64 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     state.applying = true;
 
     try {
-      const { doc, html, body, shell, target, root } = parts;
-      const padding = bodyPadding(doc);
-
       /*
-       * 1) ให้ root มี parent กว้างพอก่อน
-       *    width:min(650px,100%) / min(720px,100%) ฯลฯ
-       *    จึงคำนวณได้จาก CSS จริง ไม่หดตามข้อความ/รูปที่ยังว่าง
+       * หลังได้ width ครั้งแรกแล้ว จะไม่ probe อีก
+       * input/change จึงไม่เห็นอาการเด้ง/สั่น
        */
-      iframe.style.setProperty(
-        "width",
-        `${PROBE_CONTENT_WIDTH + padding.x}px`,
-        "important"
-      );
-      iframe.style.setProperty(
-        "min-width",
-        `${PROBE_CONTENT_WIDTH + padding.x}px`,
-        "important"
-      );
-      iframe.style.setProperty("max-width", "none", "important");
-      iframe.style.setProperty("height", "1600px", "important");
-      iframe.style.setProperty("min-height", "1600px", "important");
-      iframe.style.setProperty("max-height", "none", "important");
-      iframe.style.setProperty("transform", "none", "important");
-      iframe.style.setProperty("transform-origin", "top left", "important");
+      if (state.naturalWidth > 0 && !forceProbe) {
+        const result = applyLockedCanvas(
+          iframe,
+          parts,
+          state.naturalWidth
+        );
 
-      html.style.setProperty("width", "auto", "important");
-      body.style.setProperty("width", "auto", "important");
-      body.style.setProperty("min-width", "0", "important");
-      body.style.setProperty("overflow", "visible", "important");
-
-      shell.style.setProperty("width", "100%", "important");
-      shell.style.setProperty("height", "auto", "important");
-      shell.style.setProperty("min-height", "0", "important");
-      shell.style.setProperty("display", "flex", "important");
-      shell.style.setProperty("justify-content", "center", "important");
-      shell.style.setProperty("align-items", "flex-start", "important");
-      shell.style.setProperty("overflow", "visible", "important");
-
-      target.style.setProperty(
-        "width",
-        `${PROBE_CONTENT_WIDTH}px`,
-        "important"
-      );
-      target.style.setProperty(
-        "min-width",
-        `${PROBE_CONTENT_WIDTH}px`,
-        "important"
-      );
-      target.style.setProperty("max-width", "none", "important");
-      target.style.setProperty("flex", "0 0 auto", "important");
-      target.style.setProperty("transform", "none", "important");
-      target.style.setProperty("transform-origin", "top center", "important");
-      target.style.setProperty("zoom", "1", "important");
-
-      void root.offsetWidth;
-
-      const rootStyle = doc.defaultView.getComputedStyle(root);
-      const rect = root.getBoundingClientRect();
-
-      const computedWidth = Number.parseFloat(rootStyle.width) || 0;
-      const maxWidth =
-        rootStyle.maxWidth && rootStyle.maxWidth !== "none"
-          ? Number.parseFloat(rootStyle.maxWidth) || 0
-          : 0;
-
-      let naturalWidth = Math.max(
-        computedWidth,
-        Math.ceil(rect.width || 0),
-        root.offsetWidth || 0,
-        root.scrollWidth || 0
-      );
-
-      if (maxWidth > 240 && maxWidth < PROBE_CONTENT_WIDTH) {
-        naturalWidth = Math.min(naturalWidth, maxWidth);
+        if (result) state.ready = true;
+        return result;
       }
 
-      /*
-       * ถ้า stylesheet ยังโหลดไม่เสร็จและได้ 1200px เต็ม
-       * รอ retry รอบถัดไป แทนการล็อกค่าผิด
-       */
-      if (
-        !Number.isFinite(naturalWidth) ||
-        naturalWidth < 240 ||
-        naturalWidth >= PROBE_CONTENT_WIDTH - 2
-      ) {
+      prepareProbe(iframe, parts);
+
+      const detectedWidth = detectNaturalWidth(parts);
+
+      if (!detectedWidth) {
         return false;
       }
 
-      /*
-       * 2) ล็อก parent ตามความกว้างจริง
-       *    จากนี้ต่อให้ยังไม่กรอกรูป/เนื้อหา ขนาดก็ไม่หด
-       */
-      target.style.setProperty("width", `${naturalWidth}px`, "important");
-      target.style.setProperty("min-width", `${naturalWidth}px`, "important");
-      target.style.setProperty("max-width", `${naturalWidth}px`, "important");
-      target.style.setProperty("transform", "none", "important");
+      state.naturalWidth = detectedWidth;
 
-      void target.offsetHeight;
-
-      const naturalHeight = Math.max(
-        1,
-        Math.ceil(root.getBoundingClientRect().height || 0),
-        root.scrollHeight || 0,
-        target.scrollHeight || 0
+      const result = applyLockedCanvas(
+        iframe,
+        parts,
+        state.naturalWidth
       );
 
-      const finalWidth = Math.ceil(naturalWidth + padding.x);
-      const finalHeight = Math.ceil(naturalHeight + padding.y);
+      if (result) state.ready = true;
 
-      iframe.style.setProperty("width", `${finalWidth}px`, "important");
-      iframe.style.setProperty("min-width", `${finalWidth}px`, "important");
-      iframe.style.setProperty("max-width", `${finalWidth}px`, "important");
-      iframe.style.setProperty("height", `${finalHeight}px`, "important");
-      iframe.style.setProperty("min-height", `${finalHeight}px`, "important");
-      iframe.style.setProperty("max-height", `${finalHeight}px`, "important");
-      iframe.style.setProperty("display", "block", "important");
-      iframe.style.setProperty("margin-left", "auto", "important");
-      iframe.style.setProperty("margin-right", "auto", "important");
-      iframe.style.setProperty("transform", "none", "important");
-
-      /*
-       * จัดกลางแนวตั้งเมื่อ canvas สั้นกว่าพื้นที่ preview
-       */
-      const previewTop =
-        column.querySelector(".dds-editor-preview-top")?.offsetHeight || 0;
-      const availableHeight = Math.max(0, column.clientHeight - previewTop);
-      const verticalSpace = Math.max(0, (availableHeight - finalHeight) / 2);
-
-      iframe.style.setProperty(
-        "margin-top",
-        `${Math.round(verticalSpace)}px`,
-        "important"
-      );
-      iframe.style.setProperty("margin-bottom", "0", "important");
-
-      column.style.setProperty("overflow", "auto", "important");
-      column.style.setProperty("overscroll-behavior", "contain", "important");
-
-      /*
-       * ถ้า canvas กว้างกว่าช่อง preview:
-       * ไม่ scale ให้เล็ก แต่เปิดมาที่กึ่งกลางของ canvas
-       */
-      requestAnimationFrame(() => {
-        const maxScroll = Math.max(0, finalWidth - column.clientWidth);
-
-        if (maxScroll > 0 && !column.dataset.ddsCanvasUserScrolled) {
-          column.scrollLeft = Math.round(maxScroll / 2);
-        }
-      });
-
-      iframe.dataset.ddsTrueCanvasReady = "1";
-
-      watchImages(iframe, doc);
-      watchRoot(iframe, root);
-
-      return true;
+      return result;
     } finally {
       state.applying = false;
     }
   }
 
-  function schedule(iframe) {
+  function schedule(iframe, forceProbe = false) {
     const state = getState(iframe);
     clearTimeout(state.timer);
 
-    const run = () => requestAnimationFrame(() => applyCanvas(iframe));
+    const run = () => {
+      requestAnimationFrame(() => applyCanvas(iframe, forceProbe));
+    };
 
-    state.timer = window.setTimeout(run, 20);
+    state.timer = window.setTimeout(run, 10);
 
-    [70, 160, 320, 650, 1100, 1800, 2800].forEach((delay) => {
-      window.setTimeout(run, delay);
-    });
+    /*
+     * ตอนยังไม่ ready มี retry เผื่อ external CSS/font ยังโหลดไม่เสร็จ
+     * หลัง ready แล้วไม่ยิง retry ยาว ๆ อีก
+     */
+    if (!state.ready) {
+      [60, 140, 280, 520, 900, 1500].forEach((delay) => {
+        window.setTimeout(run, delay);
+      });
+    }
   }
 
   function bind(config) {
@@ -23329,10 +23379,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     iframe.dataset.ddsTrueCanvasBound = "1";
 
-    iframe.addEventListener("load", () => schedule(iframe));
+    /*
+     * ปิดการแสดงตั้งแต่ก่อน load เพื่อไม่ให้มี flash/jump
+     */
+    iframe.style.setProperty("visibility", "hidden", "important");
+    iframe.style.setProperty("opacity", "0", "important");
 
-    panel.addEventListener("input", () => schedule(iframe), true);
-    panel.addEventListener("change", () => schedule(iframe), true);
+    iframe.addEventListener("load", () => {
+      const state = getState(iframe);
+      state.ready = false;
+      state.naturalWidth = 0;
+      schedule(iframe, true);
+    });
+
+    /*
+     * ระบบเดิมอัปเดต srcdoc/DOM เมื่อกรอกค่า
+     * แต่ความกว้างจริงไม่เปลี่ยน จึง reuse naturalWidth
+     */
+    panel.addEventListener(
+      "input",
+      () => schedule(iframe, false),
+      true
+    );
+
+    panel.addEventListener(
+      "change",
+      () => schedule(iframe, false),
+      true
+    );
 
     const column = iframe.closest(".dds-editor-preview-column");
 
@@ -23349,7 +23423,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
 
     const panelObserver = new MutationObserver(() => {
-      if (panel.classList.contains("is-active")) schedule(iframe);
+      if (panel.classList.contains("is-active")) {
+        schedule(iframe, false);
+      }
     });
 
     panelObserver.observe(panel, {
@@ -23359,14 +23435,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     if ("ResizeObserver" in window && column) {
       const columnObserver = new ResizeObserver(() => {
-        if (panel.classList.contains("is-active")) schedule(iframe);
+        if (panel.classList.contains("is-active")) {
+          schedule(iframe, false);
+        }
       });
 
       columnObserver.observe(column);
     }
 
     if (iframe.contentDocument?.body) {
-      schedule(iframe);
+      schedule(iframe, true);
     }
   }
 
@@ -23396,5 +23474,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     boot();
   }
 })();
+
 
 

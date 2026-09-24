@@ -10151,7 +10151,7 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — TRUE CANVAS FROM FIRST LOAD v145
+   LEGACY ROLEPLAY EDITORS — STABLE TRUE CANVAS v146
    Only the seven requested editor previews.
 ========================================================= */
 #weirdoPreview,
@@ -10166,6 +10166,21 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
   flex:none !important;
   transform:none !important;
   transform-origin:top left !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  transition:none !important;
+}
+
+#weirdoPreview[data-dds-true-canvas-ready="1"],
+#hihiPreview[data-dds-true-canvas-ready="1"],
+#uuiaaPreview[data-dds-true-canvas-ready="1"],
+#commaPreview[data-dds-true-canvas-ready="1"],
+#newRulesPreview[data-dds-true-canvas-ready="1"],
+#higherHeavenPreview[data-dds-true-canvas-ready="1"],
+#longWayLongRidePreview[data-dds-true-canvas-ready="1"] {
+  visibility:visible !important;
+  opacity:1 !important;
+  transition:none !important;
 }
 
 #weirdoPreview[data-dds-true-canvas-ready="1"],
