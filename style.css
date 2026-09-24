@@ -11131,3 +11131,92 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 
 /* CODE014 v172 panel compatibility */
 [data-panel="editor-code014-fixed-v172"].dds-code014-editor{width:100%;}
+
+
+/* =========================================================
+   ALL CODE EDITORS — READABLE CONTROL TYPOGRAPHY v174
+   ปรับเฉพาะ UI ฝั่งแก้ไข ไม่กระทบตัวโค้ดใน preview
+========================================================= */
+
+/* ---------- หัวข้อ / label / คำอธิบาย ---------- */
+[data-panel^="editor-"] .dds-control-title,
+[data-panel^="editor-"] .dds-control-title > span,
+[data-panel^="editor-"] label,
+[data-panel^="editor-"] .dds-field-label,
+[data-panel^="editor-"] .dds-range-label,
+[data-panel^="editor-"] .dds-editor-label,
+.dds-protected-commission-editor label,
+.dds-protected-commission-editor .dds-field-label{
+  font-size:12px !important;
+  line-height:1.35 !important;
+}
+
+/* ---------- input / select / textarea ---------- */
+[data-panel^="editor-"] input:not([type="range"]):not([type="color"]),
+[data-panel^="editor-"] select,
+[data-panel^="editor-"] textarea,
+.dds-protected-commission-editor input:not([type="range"]):not([type="color"]),
+.dds-protected-commission-editor select,
+.dds-protected-commission-editor textarea{
+  font-size:11px !important;
+  line-height:1.45 !important;
+}
+
+/* ---------- ปุ่มทั้งหมดใน control side ---------- */
+[data-panel^="editor-"] button,
+.dds-protected-commission-editor button{
+  font-size:10px !important;
+  line-height:1.2 !important;
+}
+
+/* ---------- Draft title / status ---------- */
+.dds-draft-manager-copy > strong,
+.dds-protected-commission-draft > div:first-child > strong{
+  font-size:11px !important;
+  line-height:1.3 !important;
+}
+
+.dds-draft-status,
+.dds-draft-manager-copy .dds-draft-status,
+.dds-protected-commission-draft small,
+.dds-protected-commission-draft > div:first-child > small,
+[data-draft-status],
+[data-code013-draft-status],
+[data-code014-draft-status]{
+  font-size:10px !important;
+  line-height:1.3 !important;
+}
+
+/* ---------- Named-save bar ---------- */
+.dds-named-save-name-field input,
+.dds-named-save-picker select{
+  font-size:10px !important;
+}
+
+.dds-named-save-create-button,
+.dds-named-save-picker button{
+  font-size:9px !important;
+}
+
+/* ---------- helper / note text ---------- */
+[data-panel^="editor-"] small,
+[data-panel^="editor-"] .dds-help,
+[data-panel^="editor-"] .dds-hint,
+[data-panel^="editor-"] .dds-note,
+.dds-protected-commission-editor small,
+.dds-protected-commission-editor .dds-help,
+.dds-protected-commission-editor .dds-hint,
+.dds-protected-commission-editor .dds-note{
+  font-size:10px !important;
+  line-height:1.45 !important;
+}
+
+/*
+ * กันพื้นที่ Draft แน่นเกินเมื่อเพิ่ม font
+ * ยังเก็บระยะบน/ล่าง 10px ตาม v168+
+ */
+.dds-draft-manager,
+.dds-protected-commission-draft{
+  padding-top:10px !important;
+  padding-bottom:10px !important;
+}
