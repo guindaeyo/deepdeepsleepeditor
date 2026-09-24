@@ -23843,3 +23843,356 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 })();
 
+
+
+
+/* =========================================================
+   GLOBAL EDITOR PREVIEW — SINGLE RED SCROLLBAR v155
+   Scope: Editor preview only
+   - Legacy direct iframe -> inner preview shell owns scroll
+   - Stage/Protected editors -> preview stage owns scroll
+   - All duplicate html/body/outer scrollbars hidden
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_EDITOR_SINGLE_SCROLL_V155__) return;
+  window.__DDS_EDITOR_SINGLE_SCROLL_V155__ = true;
+
+  const STYLE_ID = "ddsEditorSingleScrollV155";
+
+  function isEditorPanel(panel) {
+    if (!panel?.classList?.contains("dds-panel")) return false;
+
+    const name = String(panel.dataset?.panel || "");
+
+    return (
+      name.startsWith("editor-") ||
+      name.startsWith("protected-commission") ||
+      panel.classList.contains("dds-protected-commission-editor")
+    );
+  }
+
+  function isEditorPreviewIframe(iframe) {
+    const panel = iframe?.closest(".dds-panel");
+    if (!isEditorPanel(panel)) return false;
+
+    return Boolean(
+      iframe.closest(
+        ".dds-editor-preview-column, .dds-protected-commission-preview-column"
+      )
+    );
+  }
+
+  function injectLegacyShellScrollbar(iframe, doc) {
+    const shell =
+      doc.querySelector(".dds-preview-shell") ||
+      doc.querySelector(".dds-lwl-preview-shell");
+
+    if (!shell) {
+      if (!doc.getElementById(STYLE_ID)) {
+        const style = doc.createElement("style");
+        style.id = STYLE_ID;
+        style.textContent = `
+          html{
+            width:100%!important;
+            height:100%!important;
+            overflow:hidden!important;
+          }
+
+          body{
+            width:100%!important;
+            height:100%!important;
+            min-height:100%!important;
+            overflow:auto!important;
+            scrollbar-width:thin!important;
+            scrollbar-color:#c11724 #090909!important;
+          }
+
+          body::-webkit-scrollbar{
+            width:7px;
+            height:7px;
+          }
+
+          body::-webkit-scrollbar-track{
+            background:#090909;
+          }
+
+          body::-webkit-scrollbar-thumb{
+            background:#c11724;
+            border-radius:999px;
+          }
+
+          body::-webkit-scrollbar-thumb:hover{
+            background:#df2632;
+          }
+
+          body::-webkit-scrollbar-corner{
+            background:#090909;
+          }
+        `;
+        doc.head?.appendChild(style);
+      }
+
+      return;
+    }
+
+    if (!doc.getElementById(STYLE_ID)) {
+      const style = doc.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = `
+        html,
+        body{
+          width:100%!important;
+          height:100%!important;
+          min-height:100%!important;
+          overflow:hidden!important;
+          scrollbar-width:none!important;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar{
+          width:0!important;
+          height:0!important;
+          display:none!important;
+        }
+
+        .dds-preview-shell,
+        .dds-lwl-preview-shell{
+          width:100%!important;
+          height:100%!important;
+          min-height:100%!important;
+          max-height:100%!important;
+          box-sizing:border-box!important;
+          overflow:auto!important;
+          scrollbar-width:thin!important;
+          scrollbar-color:#c11724 #090909!important;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar,
+        .dds-lwl-preview-shell::-webkit-scrollbar{
+          width:7px;
+          height:7px;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-track,
+        .dds-lwl-preview-shell::-webkit-scrollbar-track{
+          background:#090909;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-thumb,
+        .dds-lwl-preview-shell::-webkit-scrollbar-thumb{
+          background:#c11724;
+          border-radius:999px;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-thumb:hover,
+        .dds-lwl-preview-shell::-webkit-scrollbar-thumb:hover{
+          background:#df2632;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-corner,
+        .dds-lwl-preview-shell::-webkit-scrollbar-corner{
+          background:#090909;
+        }
+      `;
+      doc.head?.appendChild(style);
+    }
+
+    doc.documentElement.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    doc.body.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "overflow",
+      "auto",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+  }
+
+  function injectNoInnerScrollbar(iframe, doc) {
+    if (!doc.getElementById(STYLE_ID)) {
+      const style = doc.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = `
+        html,
+        body{
+          overflow:hidden!important;
+          scrollbar-width:none!important;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar{
+          width:0!important;
+          height:0!important;
+          display:none!important;
+        }
+
+        .dds-preview-shell,
+        .dds-lwl-preview-shell{
+          overflow:visible!important;
+          scrollbar-width:none!important;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar,
+        .dds-lwl-preview-shell::-webkit-scrollbar{
+          width:0!important;
+          height:0!important;
+          display:none!important;
+        }
+      `;
+      doc.head?.appendChild(style);
+    }
+
+    doc.documentElement.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    doc.body.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+  }
+
+  function applyToIframe(iframe) {
+    if (!isEditorPreviewIframe(iframe)) return false;
+
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return false;
+
+    const column = iframe.closest(
+      ".dds-editor-preview-column, .dds-protected-commission-preview-column"
+    );
+
+    if (!column) return false;
+
+    const isLegacyDirect =
+      column.classList.contains("dds-editor-preview-column") &&
+      iframe.parentElement === column;
+
+    if (isLegacyDirect) {
+      injectLegacyShellScrollbar(iframe, doc);
+    } else {
+      /*
+       * Stage-based / protected editor:
+       * scrollbar owner is outside iframe, so inner doc must never scroll.
+       */
+      injectNoInnerScrollbar(iframe, doc);
+    }
+
+    iframe.dataset.ddsSingleScrollReady = "1";
+    return true;
+  }
+
+  function schedule(iframe) {
+    [0, 30, 90, 180, 360, 700].forEach((delay) => {
+      window.setTimeout(() => {
+        requestAnimationFrame(() => applyToIframe(iframe));
+      }, delay);
+    });
+  }
+
+  function bindIframe(iframe) {
+    if (!isEditorPreviewIframe(iframe)) return;
+    if (iframe.dataset.ddsSingleScrollBound === "1") {
+      schedule(iframe);
+      return;
+    }
+
+    iframe.dataset.ddsSingleScrollBound = "1";
+
+    iframe.addEventListener(
+      "load",
+      () => schedule(iframe)
+    );
+
+    const srcObserver =
+      new MutationObserver((records) => {
+        if (
+          records.some(
+            (record) =>
+              record.attributeName === "srcdoc"
+          )
+        ) {
+          schedule(iframe);
+        }
+      });
+
+    srcObserver.observe(iframe, {
+      attributes:true,
+      attributeFilter:["srcdoc"]
+    });
+
+    schedule(iframe);
+  }
+
+  function scan(root = document) {
+    root
+      .querySelectorAll?.(
+        ".dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe"
+      )
+      .forEach(bindIframe);
+  }
+
+  function boot() {
+    scan();
+
+    const observer =
+      new MutationObserver((records) => {
+        records.forEach((record) => {
+          record.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+
+            if (
+              node.matches?.(
+                ".dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe"
+              )
+            ) {
+              bindIframe(node);
+            }
+
+            scan(node);
+          });
+        });
+      });
+
+    observer.observe(document.body, {
+      childList:true,
+      subtree:true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once:true }
+    );
+  } else {
+    boot();
+  }
+})();
+
