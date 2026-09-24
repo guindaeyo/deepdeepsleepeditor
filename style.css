@@ -10971,3 +10971,47 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 [data-panel="editor-code014-v168"].dds-code014-editor{
   width:100%;
 }
+
+
+/* =========================================================
+   ALL CODE EDITORS — DRAFT TYPOGRAPHY v169
+   หนาเฉพาะ "บันทึกแบบร่าง"
+   "(บันทึกล่าสุด เวลา)" = น้ำหนักปกติ
+========================================================= */
+.dds-draft-manager,
+.dds-protected-commission-draft,
+.dds-draft-manager-copy,
+.dds-protected-commission-draft > div:first-child{
+  font-weight:400 !important;
+}
+
+.dds-draft-manager-copy > strong,
+.dds-protected-commission-draft > div:first-child > strong{
+  font-weight:700 !important;
+}
+
+.dds-draft-manager-copy > strong::after,
+.dds-protected-commission-draft > div:first-child > strong::after{
+  font-weight:400 !important;
+}
+
+.dds-draft-status,
+.dds-draft-manager-copy .dds-draft-status,
+.dds-protected-commission-draft small,
+.dds-protected-commission-draft > div:first-child > small,
+[data-draft-status],
+[data-code013-draft-status],
+[data-code014-draft-status]{
+  font-weight:400 !important;
+}
+
+.dds-draft-status::before,
+.dds-draft-status::after,
+.dds-protected-commission-draft small::before,
+.dds-protected-commission-draft small::after,
+[data-code013-draft-status]::before,
+[data-code013-draft-status]::after,
+[data-code014-draft-status]::before,
+[data-code014-draft-status]::after{
+  font-weight:400 !important;
+}
