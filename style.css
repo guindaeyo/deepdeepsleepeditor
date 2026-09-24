@@ -10151,8 +10151,8 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — NATURAL WIDTH PREVIEW v144
-   Only the seven requested editor preview iframes.
+   LEGACY ROLEPLAY EDITORS — TRUE CANVAS FROM FIRST LOAD v145
+   Only the seven requested editor previews.
 ========================================================= */
 #weirdoPreview,
 #hihiPreview,
@@ -10161,29 +10161,40 @@ body.dds-alan-view-mode .dds-alan-view-canvas > iframe {
 #newRulesPreview,
 #higherHeavenPreview,
 #longWayLongRidePreview {
+  display:block !important;
   max-width:none !important;
-  margin:0 !important;
-  transform:none;
-  transform-origin:top left !important;
   flex:none !important;
+  transform:none !important;
+  transform-origin:top left !important;
 }
 
-body.dds-editor-one-screen #weirdoPreview,
-body.dds-editor-one-screen #hihiPreview,
-body.dds-editor-one-screen #uuiaaPreview,
-body.dds-editor-one-screen #commaPreview,
-body.dds-editor-one-screen #newRulesPreview,
-body.dds-editor-one-screen #higherHeavenPreview,
-body.dds-editor-one-screen #longWayLongRidePreview {
-  align-self:flex-start !important;
+#weirdoPreview[data-dds-true-canvas-ready="1"],
+#hihiPreview[data-dds-true-canvas-ready="1"],
+#uuiaaPreview[data-dds-true-canvas-ready="1"],
+#commaPreview[data-dds-true-canvas-ready="1"],
+#newRulesPreview[data-dds-true-canvas-ready="1"],
+#higherHeavenPreview[data-dds-true-canvas-ready="1"],
+#longWayLongRidePreview[data-dds-true-canvas-ready="1"] {
+  margin-left:auto !important;
+  margin-right:auto !important;
 }
 
 /* =========================================================
-   CLOUD SAVE — SMALL ROUND CLOUD BUTTON v144
+   CLOUD SAVE — TEXT NORMALLY / CLOUD ICON IN EDITORS v145
 ========================================================= */
-.dds-account-cloud-trigger {
+
+/*
+ * หน้าปกติไม่ override:
+ * ใช้ปุ่ม CLOUD SAVE แบบข้อความเดิม
+ *
+ * เข้า Editor เท่านั้น -> วงกลมไอคอนเมฆ
+ */
+body.dds-editor-mode .dds-account-cloud-trigger,
+body.dds-commission-editor-mode .dds-account-cloud-trigger,
+body.dds-editor-one-screen .dds-account-cloud-trigger {
   width:42px !important;
   min-width:42px !important;
+  max-width:42px !important;
   height:42px !important;
   min-height:42px !important;
   padding:0 !important;
@@ -10195,7 +10206,9 @@ body.dds-editor-one-screen #longWayLongRidePreview {
   overflow:hidden !important;
 }
 
-.dds-account-cloud-trigger span {
+body.dds-editor-mode .dds-account-cloud-trigger span,
+body.dds-commission-editor-mode .dds-account-cloud-trigger span,
+body.dds-editor-one-screen .dds-account-cloud-trigger span {
   position:absolute !important;
   width:1px !important;
   height:1px !important;
@@ -10207,19 +10220,22 @@ body.dds-editor-one-screen #longWayLongRidePreview {
   border:0 !important;
 }
 
-.dds-account-cloud-trigger i,
-.dds-account-cloud-trigger[data-state="online"] i {
+body.dds-editor-mode .dds-account-cloud-trigger i,
+body.dds-commission-editor-mode .dds-account-cloud-trigger i,
+body.dds-editor-one-screen .dds-account-cloud-trigger i {
   width:auto !important;
   height:auto !important;
   display:block !important;
   border-radius:0 !important;
   background:none !important;
-  color:#b8b8b8;
-  font-style:normal;
-  line-height:1;
+  color:#b8b8b8 !important;
+  font-style:normal !important;
+  line-height:1 !important;
 }
 
-.dds-account-cloud-trigger i::before {
+body.dds-editor-mode .dds-account-cloud-trigger i::before,
+body.dds-commission-editor-mode .dds-account-cloud-trigger i::before,
+body.dds-editor-one-screen .dds-account-cloud-trigger i::before {
   content:"☁";
   display:block;
   font-family:Arial,sans-serif;
@@ -10229,11 +10245,15 @@ body.dds-editor-one-screen #longWayLongRidePreview {
   transform:translateY(-1px);
 }
 
-.dds-account-cloud-trigger[data-state="online"] i {
+body.dds-editor-mode .dds-account-cloud-trigger[data-state="online"] i,
+body.dds-commission-editor-mode .dds-account-cloud-trigger[data-state="online"] i,
+body.dds-editor-one-screen .dds-account-cloud-trigger[data-state="online"] i {
   color:#68cf88 !important;
 }
 
-.dds-account-cloud-trigger:hover {
+body.dds-editor-mode .dds-account-cloud-trigger:hover,
+body.dds-commission-editor-mode .dds-account-cloud-trigger:hover,
+body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   border-color:rgba(193,23,36,.78) !important;
   background:#171717 !important;
 }

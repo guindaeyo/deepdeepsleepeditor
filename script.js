@@ -22988,173 +22988,318 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   LEGACY ROLEPLAY EDITORS — NATURAL WIDTH PREVIEW v144
+   LEGACY ROLEPLAY EDITORS — TRUE CANVAS FROM FIRST LOAD v145
    Only:
-   WEIRDO / HIHI!, BABY / U-I-A U-I-A U-E / THIS HITS LIKE COMA /
-   NEW RULES, I'M TROUBLEMAKER / HIGHER THAN HEAVEN / LONG WAY LONG RIDE
+   WEIRDO / HIHI!, BABY / U-I-A U-I-A U-E /
+   THIS HITS LIKE COMA / NEW RULES, I'M TROUBLEMAKER /
+   HIGHER THAN HEAVEN / LONG WAY LONG RIDE
+
+   ไม่ย่อ scale จากข้อมูลที่กรอก
+   เปิด parent กว้างก่อนเพื่อให้ CSS ของโค้ดคำนวณ
+   "ความกว้างจริง" ได้ตั้งแต่ครั้งแรก แล้วล็อก canvas ไว้
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_LEGACY_NATURAL_PREVIEW_V144__) return;
-  window.__DDS_LEGACY_NATURAL_PREVIEW_V144__ = true;
+  if (window.__DDS_LEGACY_TRUE_CANVAS_V145__) return;
+  window.__DDS_LEGACY_TRUE_CANVAS_V145__ = true;
 
-  const PREVIEW_IDS = [
-    "weirdoPreview",
-    "hihiPreview",
-    "uuiaaPreview",
-    "commaPreview",
-    "newRulesPreview",
-    "higherHeavenPreview",
-    "longWayLongRidePreview"
+  const CONFIGS = [
+    { id: "weirdoPreview", panel: "editor-code002" },
+    { id: "hihiPreview", panel: "editor-code003" },
+    { id: "uuiaaPreview", panel: "editor-code004" },
+    { id: "commaPreview", panel: "editor-code005" },
+    { id: "newRulesPreview", panel: "editor-code006" },
+    { id: "higherHeavenPreview", panel: "editor-code009" },
+    { id: "longWayLongRidePreview", panel: "editor-code010" }
   ];
 
-  const PROBE_WIDTH = 1200;
+  const PROBE_CONTENT_WIDTH = 1200;
   const states = new WeakMap();
 
-  function stateFor(iframe) {
+  function getState(iframe) {
     let state = states.get(iframe);
+
     if (!state) {
       state = {
         applying: false,
         timer: 0,
-        bodyObserver: null,
-        resizeObserver: null
+        rootObserver: null,
+        root: null,
+        imageListeners: new WeakSet()
       };
       states.set(iframe, state);
     }
+
     return state;
   }
 
-  function looksLikePreviewWrapper(element) {
-    const name = String(element?.className || "").toLowerCase();
-    return /preview|shell|target|canvas|scale/.test(name);
-  }
+  function getParts(iframe) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body) return null;
 
-  function removeOuterShrink(doc) {
-    const body = doc?.body;
-    if (!body) return;
+    const target = doc.querySelector(".dds-preview-target");
+    const shell =
+      doc.querySelector(".dds-preview-shell") ||
+      doc.querySelector(".dds-lwl-preview-shell");
 
-    const candidates = new Set([
-      ...body.children,
-      ...Array.from(body.children).flatMap((child) => Array.from(child.children || [])),
-      ...doc.querySelectorAll(
-        ".dds-preview-target,.dds-preview-shell,.dds-activity-preview-content,.dds-commission-preview-content,[data-preview-target]"
-      )
-    ]);
+    if (!target || !shell) return null;
 
-    candidates.forEach((element) => {
-      if (!(element instanceof doc.defaultView.HTMLElement)) return;
+    const children = Array.from(target.children);
 
-      const computed = doc.defaultView.getComputedStyle(element);
-      const rect = element.getBoundingClientRect();
-      const layoutWidth = element.offsetWidth || element.scrollWidth || 0;
-      const layoutHeight = element.offsetHeight || element.scrollHeight || 0;
-      const visuallyShrunk =
-        layoutWidth > 40 &&
-        rect.width > 0 &&
-        rect.width < layoutWidth * 0.985;
+    const root = children.find((element) => {
+      if (!(element instanceof doc.defaultView.HTMLElement)) return false;
+      if (element.tagName === "STYLE") return false;
 
-      if (looksLikePreviewWrapper(element) && visuallyShrunk) {
-        element.style.setProperty("transform", "none", "important");
-        element.style.setProperty("transform-origin", "top left", "important");
-      }
+      const cls = String(element.className || "").toLowerCase();
+      if (cls.includes("credit")) return false;
 
-      const zoom = Number.parseFloat(computed.zoom || "1");
-      if (looksLikePreviewWrapper(element) && Number.isFinite(zoom) && zoom > 0 && zoom < 0.985) {
-        element.style.setProperty("zoom", "1", "important");
-      }
+      return true;
     });
+
+    if (!root) return null;
+
+    return {
+      doc,
+      html: doc.documentElement,
+      body: doc.body,
+      shell,
+      target,
+      root
+    };
   }
 
-  function resolveCodeRoot(doc) {
-    const body = doc?.body;
-    if (!body) return null;
+  function bodyPadding(doc) {
+    const style = doc.defaultView.getComputedStyle(doc.body);
 
-    let root = body.firstElementChild;
-    let guard = 0;
-
-    while (root && guard < 5) {
-      const name = String(root.className || "").toLowerCase();
-      const isWrapper = /preview|shell|target|canvas/.test(name);
-      if (!isWrapper || root.children.length !== 1) break;
-      root = root.firstElementChild;
-      guard += 1;
-    }
-
-    return root || body;
+    return {
+      x:
+        (Number.parseFloat(style.paddingLeft) || 0) +
+        (Number.parseFloat(style.paddingRight) || 0),
+      y:
+        (Number.parseFloat(style.paddingTop) || 0) +
+        (Number.parseFloat(style.paddingBottom) || 0)
+    };
   }
 
-  function naturalize(iframe) {
-    const state = stateFor(iframe);
+  function watchImages(iframe, doc) {
+    const state = getState(iframe);
+
+    doc.querySelectorAll("img").forEach((img) => {
+      if (state.imageListeners.has(img)) return;
+      state.imageListeners.add(img);
+
+      img.addEventListener("load", () => schedule(iframe), { once: true });
+      img.addEventListener("error", () => schedule(iframe), { once: true });
+    });
+
+    try {
+      doc.fonts?.ready?.then(() => schedule(iframe));
+    } catch {}
+  }
+
+  function watchRoot(iframe, root) {
+    const state = getState(iframe);
+
+    if (!("ResizeObserver" in window)) return;
+    if (state.root === root && state.rootObserver) return;
+
+    state.rootObserver?.disconnect();
+    state.root = root;
+
+    let lastWidth = 0;
+    let lastHeight = 0;
+
+    state.rootObserver = new ResizeObserver(() => {
+      if (state.applying) return;
+
+      const rect = root.getBoundingClientRect();
+      const width = Math.round(rect.width);
+      const height = Math.round(rect.height);
+
+      if (
+        Math.abs(width - lastWidth) < 2 &&
+        Math.abs(height - lastHeight) < 2
+      ) {
+        return;
+      }
+
+      lastWidth = width;
+      lastHeight = height;
+      schedule(iframe);
+    });
+
+    state.rootObserver.observe(root);
+  }
+
+  function applyCanvas(iframe) {
+    const state = getState(iframe);
     if (state.applying) return false;
 
-    const doc = iframe.contentDocument;
-    const column = iframe.closest(".dds-editor-preview-column");
-    if (!doc?.body || !column) return false;
+    const column = iframe?.closest(".dds-editor-preview-column");
+    const parts = getParts(iframe);
+
+    if (!column || !parts) return false;
+    if (column.clientWidth < 80 || column.clientHeight < 80) return false;
 
     state.applying = true;
 
     try {
+      const { doc, html, body, shell, target, root } = parts;
+      const padding = bodyPadding(doc);
+
       /*
-       * Probe wide first. Templates using min(...,100%) can expand to their
-       * real CSS width instead of inheriting the narrow editor column width.
+       * 1) ให้ root มี parent กว้างพอก่อน
+       *    width:min(650px,100%) / min(720px,100%) ฯลฯ
+       *    จึงคำนวณได้จาก CSS จริง ไม่หดตามข้อความ/รูปที่ยังว่าง
        */
-      iframe.style.setProperty("position", "relative", "important");
-      iframe.style.setProperty("left", "0", "important");
-      iframe.style.setProperty("top", "0", "important");
-      iframe.style.setProperty("margin", "0", "important");
+      iframe.style.setProperty(
+        "width",
+        `${PROBE_CONTENT_WIDTH + padding.x}px`,
+        "important"
+      );
+      iframe.style.setProperty(
+        "min-width",
+        `${PROBE_CONTENT_WIDTH + padding.x}px`,
+        "important"
+      );
+      iframe.style.setProperty("max-width", "none", "important");
+      iframe.style.setProperty("height", "1600px", "important");
+      iframe.style.setProperty("min-height", "1600px", "important");
+      iframe.style.setProperty("max-height", "none", "important");
       iframe.style.setProperty("transform", "none", "important");
       iframe.style.setProperty("transform-origin", "top left", "important");
-      iframe.style.setProperty("width", `${PROBE_WIDTH}px`, "important");
-      iframe.style.setProperty("min-width", `${PROBE_WIDTH}px`, "important");
-      iframe.style.setProperty("max-width", "none", "important");
-      iframe.style.setProperty("--dds-preview-scale", "1");
-      iframe.style.setProperty("--dds-commission-canvas-scale", "1");
 
-      removeOuterShrink(doc);
+      html.style.setProperty("width", "auto", "important");
+      body.style.setProperty("width", "auto", "important");
+      body.style.setProperty("min-width", "0", "important");
+      body.style.setProperty("overflow", "visible", "important");
 
-      const root = resolveCodeRoot(doc);
-      if (!root) return false;
+      shell.style.setProperty("width", "100%", "important");
+      shell.style.setProperty("height", "auto", "important");
+      shell.style.setProperty("min-height", "0", "important");
+      shell.style.setProperty("display", "flex", "important");
+      shell.style.setProperty("justify-content", "center", "important");
+      shell.style.setProperty("align-items", "flex-start", "important");
+      shell.style.setProperty("overflow", "visible", "important");
 
-      const rootRect = root.getBoundingClientRect();
-      const bodyStyle = doc.defaultView.getComputedStyle(doc.body);
-      const padX =
-        (Number.parseFloat(bodyStyle.paddingLeft) || 0) +
-        (Number.parseFloat(bodyStyle.paddingRight) || 0);
+      target.style.setProperty(
+        "width",
+        `${PROBE_CONTENT_WIDTH}px`,
+        "important"
+      );
+      target.style.setProperty(
+        "min-width",
+        `${PROBE_CONTENT_WIDTH}px`,
+        "important"
+      );
+      target.style.setProperty("max-width", "none", "important");
+      target.style.setProperty("flex", "0 0 auto", "important");
+      target.style.setProperty("transform", "none", "important");
+      target.style.setProperty("transform-origin", "top center", "important");
+      target.style.setProperty("zoom", "1", "important");
+
+      void root.offsetWidth;
+
+      const rootStyle = doc.defaultView.getComputedStyle(root);
+      const rect = root.getBoundingClientRect();
+
+      const computedWidth = Number.parseFloat(rootStyle.width) || 0;
+      const maxWidth =
+        rootStyle.maxWidth && rootStyle.maxWidth !== "none"
+          ? Number.parseFloat(rootStyle.maxWidth) || 0
+          : 0;
 
       let naturalWidth = Math.max(
-        1,
-        Math.ceil(rootRect.width || 0),
+        computedWidth,
+        Math.ceil(rect.width || 0),
         root.offsetWidth || 0,
         root.scrollWidth || 0
       );
 
-      /* Avoid retaining the 1200px probe when the actual code is narrower. */
-      naturalWidth = Math.min(PROBE_WIDTH, naturalWidth + padX);
-      naturalWidth = Math.max(280, naturalWidth);
+      if (maxWidth > 240 && maxWidth < PROBE_CONTENT_WIDTH) {
+        naturalWidth = Math.min(naturalWidth, maxWidth);
+      }
 
-      iframe.style.setProperty("width", `${naturalWidth}px`, "important");
-      iframe.style.setProperty("min-width", `${naturalWidth}px`, "important");
-      iframe.style.setProperty("max-width", `${naturalWidth}px`, "important");
+      /*
+       * ถ้า stylesheet ยังโหลดไม่เสร็จและได้ 1200px เต็ม
+       * รอ retry รอบถัดไป แทนการล็อกค่าผิด
+       */
+      if (
+        !Number.isFinite(naturalWidth) ||
+        naturalWidth < 240 ||
+        naturalWidth >= PROBE_CONTENT_WIDTH - 2
+      ) {
+        return false;
+      }
 
-      removeOuterShrink(doc);
+      /*
+       * 2) ล็อก parent ตามความกว้างจริง
+       *    จากนี้ต่อให้ยังไม่กรอกรูป/เนื้อหา ขนาดก็ไม่หด
+       */
+      target.style.setProperty("width", `${naturalWidth}px`, "important");
+      target.style.setProperty("min-width", `${naturalWidth}px`, "important");
+      target.style.setProperty("max-width", `${naturalWidth}px`, "important");
+      target.style.setProperty("transform", "none", "important");
+
+      void target.offsetHeight;
 
       const naturalHeight = Math.max(
         1,
-        doc.body.scrollHeight || 0,
-        doc.documentElement.scrollHeight || 0,
+        Math.ceil(root.getBoundingClientRect().height || 0),
         root.scrollHeight || 0,
-        Math.ceil(root.getBoundingClientRect().height || 0)
+        target.scrollHeight || 0
       );
 
-      iframe.style.setProperty("height", `${naturalHeight}px`, "important");
-      iframe.style.setProperty("min-height", `${naturalHeight}px`, "important");
-      iframe.style.setProperty("max-height", `${naturalHeight}px`, "important");
+      const finalWidth = Math.ceil(naturalWidth + padding.x);
+      const finalHeight = Math.ceil(naturalHeight + padding.y);
+
+      iframe.style.setProperty("width", `${finalWidth}px`, "important");
+      iframe.style.setProperty("min-width", `${finalWidth}px`, "important");
+      iframe.style.setProperty("max-width", `${finalWidth}px`, "important");
+      iframe.style.setProperty("height", `${finalHeight}px`, "important");
+      iframe.style.setProperty("min-height", `${finalHeight}px`, "important");
+      iframe.style.setProperty("max-height", `${finalHeight}px`, "important");
+      iframe.style.setProperty("display", "block", "important");
+      iframe.style.setProperty("margin-left", "auto", "important");
+      iframe.style.setProperty("margin-right", "auto", "important");
+      iframe.style.setProperty("transform", "none", "important");
+
+      /*
+       * จัดกลางแนวตั้งเมื่อ canvas สั้นกว่าพื้นที่ preview
+       */
+      const previewTop =
+        column.querySelector(".dds-editor-preview-top")?.offsetHeight || 0;
+      const availableHeight = Math.max(0, column.clientHeight - previewTop);
+      const verticalSpace = Math.max(0, (availableHeight - finalHeight) / 2);
+
+      iframe.style.setProperty(
+        "margin-top",
+        `${Math.round(verticalSpace)}px`,
+        "important"
+      );
+      iframe.style.setProperty("margin-bottom", "0", "important");
 
       column.style.setProperty("overflow", "auto", "important");
       column.style.setProperty("overscroll-behavior", "contain", "important");
-      iframe.dataset.ddsNaturalPreview = "1";
+
+      /*
+       * ถ้า canvas กว้างกว่าช่อง preview:
+       * ไม่ scale ให้เล็ก แต่เปิดมาที่กึ่งกลางของ canvas
+       */
+      requestAnimationFrame(() => {
+        const maxScroll = Math.max(0, finalWidth - column.clientWidth);
+
+        if (maxScroll > 0 && !column.dataset.ddsCanvasUserScrolled) {
+          column.scrollLeft = Math.round(maxScroll / 2);
+        }
+      });
+
+      iframe.dataset.ddsTrueCanvasReady = "1";
+
+      watchImages(iframe, doc);
+      watchRoot(iframe, root);
+
       return true;
     } finally {
       state.applying = false;
@@ -23162,84 +23307,94 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function schedule(iframe) {
-    const state = stateFor(iframe);
-    window.clearTimeout(state.timer);
+    const state = getState(iframe);
+    clearTimeout(state.timer);
 
-    const run = () => requestAnimationFrame(() => naturalize(iframe));
+    const run = () => requestAnimationFrame(() => applyCanvas(iframe));
+
     state.timer = window.setTimeout(run, 20);
-    [80, 180, 420, 850].forEach((delay) => window.setTimeout(run, delay));
+
+    [70, 160, 320, 650, 1100, 1800, 2800].forEach((delay) => {
+      window.setTimeout(run, delay);
+    });
   }
 
-  function attachDocumentObserver(iframe) {
-    const state = stateFor(iframe);
-    const doc = iframe.contentDocument;
-    if (!doc?.body) return;
+  function bind(config) {
+    const iframe = document.getElementById(config.id);
+    const panel = document.querySelector(`[data-panel="${config.panel}"]`);
 
-    state.bodyObserver?.disconnect();
-    state.bodyObserver = new MutationObserver(() => {
-      if (!state.applying) schedule(iframe);
-    });
-    state.bodyObserver.observe(doc.body, {
-      childList: true,
-      subtree: true
+    if (!iframe || !panel || iframe.dataset.ddsTrueCanvasBound === "1") {
+      return;
+    }
+
+    iframe.dataset.ddsTrueCanvasBound = "1";
+
+    iframe.addEventListener("load", () => schedule(iframe));
+
+    panel.addEventListener("input", () => schedule(iframe), true);
+    panel.addEventListener("change", () => schedule(iframe), true);
+
+    const column = iframe.closest(".dds-editor-preview-column");
+
+    if (column) {
+      column.addEventListener(
+        "scroll",
+        () => {
+          if (column.scrollLeft > 2) {
+            column.dataset.ddsCanvasUserScrolled = "1";
+          }
+        },
+        { passive: true }
+      );
+    }
+
+    const panelObserver = new MutationObserver(() => {
+      if (panel.classList.contains("is-active")) schedule(iframe);
     });
 
-    if ("ResizeObserver" in window) {
-      state.resizeObserver?.disconnect();
-      state.resizeObserver = new ResizeObserver(() => {
-        if (!state.applying) schedule(iframe);
+    panelObserver.observe(panel, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    if ("ResizeObserver" in window && column) {
+      const columnObserver = new ResizeObserver(() => {
+        if (panel.classList.contains("is-active")) schedule(iframe);
       });
-      state.resizeObserver.observe(doc.body);
+
+      columnObserver.observe(column);
     }
-  }
 
-  function attach(iframe) {
-    if (!iframe || iframe.dataset.ddsNaturalPreviewBound === "1") return;
-    iframe.dataset.ddsNaturalPreviewBound = "1";
-
-    iframe.addEventListener("load", () => {
-      attachDocumentObserver(iframe);
-      schedule(iframe);
-    });
-
-    const panel = iframe.closest(".dds-panel");
-    panel?.addEventListener("input", () => schedule(iframe), true);
-    panel?.addEventListener("change", () => schedule(iframe), true);
-
-    if (iframe.contentDocument?.readyState === "complete") {
-      attachDocumentObserver(iframe);
+    if (iframe.contentDocument?.body) {
       schedule(iframe);
     }
   }
 
-  function scan() {
-    PREVIEW_IDS.forEach((id) => attach(document.getElementById(id)));
-  }
+  function boot() {
+    CONFIGS.forEach(bind);
 
-  function refreshActive() {
-    PREVIEW_IDS.forEach((id) => {
-      const iframe = document.getElementById(id);
-      if (iframe?.closest(".dds-panel")?.classList.contains("is-active")) {
-        schedule(iframe);
+    let attempts = 0;
+
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      CONFIGS.forEach(bind);
+
+      const allBound = CONFIGS.every((config) => {
+        return document.getElementById(config.id)?.dataset
+          .ddsTrueCanvasBound === "1";
+      });
+
+      if (allBound || attempts > 80) {
+        clearInterval(timer);
       }
-    });
+    }, 100);
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      scan();
-      refreshActive();
-    }, { once: true });
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
-    scan();
-    refreshActive();
+    boot();
   }
-
-  document.addEventListener("click", () => {
-    window.setTimeout(refreshActive, 0);
-    window.setTimeout(refreshActive, 100);
-  });
-
-  window.addEventListener("resize", refreshActive, { passive: true });
 })();
+
 
