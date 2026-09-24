@@ -10318,3 +10318,25 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow:hidden !important;
   }
 }
+
+
+/* =========================================================
+   HIGHER THAN HEAVEN — SINGLE RED PREVIEW SCROLLBAR v153
+   Outer editor column must not create a second scrollbar.
+========================================================= */
+@media (min-width:1251px){
+  [data-panel="editor-code009"] .dds-editor-preview-column{
+    overflow:hidden !important;
+    scrollbar-width:none !important;
+  }
+
+  [data-panel="editor-code009"] .dds-editor-preview-column::-webkit-scrollbar{
+    width:0 !important;
+    height:0 !important;
+    display:none !important;
+  }
+
+  #higherHeavenPreview{
+    overflow:hidden !important;
+  }
+}

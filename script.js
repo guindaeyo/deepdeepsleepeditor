@@ -23466,3 +23466,183 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   };
 })();
 
+
+
+
+/* =========================================================
+   HIGHER THAN HEAVEN — SINGLE RED PREVIEW SCROLLBAR v153
+   Scope ONLY: #higherHeavenPreview / editor-code009
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_HIGHER_SINGLE_SCROLL_V153__) return;
+  window.__DDS_HIGHER_SINGLE_SCROLL_V153__ = true;
+
+  const IFRAME_ID = "higherHeavenPreview";
+  const STYLE_ID = "ddsHigherSingleScrollbarV153";
+
+  function applySingleScrollbar() {
+    const iframe = document.getElementById(IFRAME_ID);
+    const doc = iframe?.contentDocument;
+
+    if (!iframe || !doc?.body) return false;
+
+    const shell = doc.querySelector(".dds-preview-shell");
+
+    if (!shell) return false;
+
+    /*
+     * ปิด scroll ชั้น html/body
+     * ให้เหลือ scroll เฉพาะ shell ชั้นเดียว
+     */
+    doc.documentElement.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    doc.body.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "overflow-x",
+      "auto",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "overflow-y",
+      "auto",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "scrollbar-width",
+      "thin",
+      "important"
+    );
+
+    shell.style.setProperty(
+      "scrollbar-color",
+      "#c11724 #090909",
+      "important"
+    );
+
+    /*
+     * WebKit / Chromium scrollbar
+     */
+    if (!doc.getElementById(STYLE_ID)) {
+      const style = doc.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = `
+        html,
+        body{
+          overflow:hidden!important;
+        }
+
+        .dds-preview-shell{
+          overflow:auto!important;
+          scrollbar-width:thin!important;
+          scrollbar-color:#c11724 #090909!important;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar{
+          width:7px;
+          height:7px;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-track{
+          background:#090909;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-thumb{
+          background:#c11724;
+          border-radius:999px;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-thumb:hover{
+          background:#df2632;
+        }
+
+        .dds-preview-shell::-webkit-scrollbar-corner{
+          background:#090909;
+        }
+      `;
+      doc.head.appendChild(style);
+    }
+
+    /*
+     * ป้องกัน iframe element เองสร้าง scrollbar เพิ่ม
+     */
+    iframe.style.setProperty(
+      "overflow",
+      "hidden",
+      "important"
+    );
+
+    return true;
+  }
+
+  function schedule() {
+    [0, 40, 120, 280, 600].forEach((delay) => {
+      window.setTimeout(() => {
+        requestAnimationFrame(applySingleScrollbar);
+      }, delay);
+    });
+  }
+
+  function bind() {
+    const iframe = document.getElementById(IFRAME_ID);
+
+    if (!iframe) return false;
+    if (iframe.dataset.ddsHigherScrollBound === "1") {
+      schedule();
+      return true;
+    }
+
+    iframe.dataset.ddsHigherScrollBound = "1";
+
+    iframe.addEventListener(
+      "load",
+      schedule
+    );
+
+    /*
+     * srcdoc เปลี่ยนเมื่อแก้ค่าใน Editor
+     * จึงลง scrollbar style ซ้ำใน document ใหม่
+     */
+    const observer = new MutationObserver((records) => {
+      if (
+        records.some(
+          (record) =>
+            record.attributeName === "srcdoc"
+        )
+      ) {
+        schedule();
+      }
+    });
+
+    observer.observe(iframe, {
+      attributes:true,
+      attributeFilter:["srcdoc"]
+    });
+
+    schedule();
+    return true;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      bind,
+      { once:true }
+    );
+  } else {
+    bind();
+  }
+})();
+
