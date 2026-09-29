@@ -9226,7 +9226,174 @@ ${stylesheetLinks}
     const card = mode === "card";
     const targetWidth = card ? "max-content" : "100%";
     const rootMargin = card ? "0!important" : "0 auto!important";
-    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;height:${card ? "100%" : "auto"};background:#242424;overflow:hidden}.dds-movie-preview-shell{position:relative;width:100%;${card ? "height:100%;" : "min-height:1px;"}overflow:hidden}.dds-movie-preview-target{position:absolute;left:0;top:0;width:${targetWidth};height:auto;transform-origin:top center;will-change:transform}.dds-movie-preview-target>.ddsh-moviereview{margin:${rootMargin}}</style></head><body><div class="dds-movie-preview-shell"><div class="dds-preview-target dds-movie-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-movie-preview-shell');const target=document.querySelector('.dds-movie-preview-target');const root=document.querySelector('.ddsh-moviereview');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!root)return;target.style.transform='none';target.style.left='0px';target.style.top='0px';${card ? "" : "target.style.width='100%';"}const rect=root.getBoundingClientRect();const w=Math.max(root.scrollWidth,root.offsetWidth,Math.ceil(rect.width),1);const h=Math.max(root.scrollHeight,root.offsetHeight,Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);${card ? "const vh=Math.max(shell.clientHeight,document.documentElement.clientHeight,1);const scale=Math.max(Math.min((vw-24)/w,(vh-24)/h,1),.05);const x=Math.max(12,Math.round((vw-w*scale)/2));const y=Math.max(12,Math.round((vh-h*scale)/2));target.style.transformOrigin='top left';target.style.left=x+'px';target.style.top=y+'px';target.style.transform='scale('+scale+')';" : "const scale=Math.max(Math.min((vw-28)/w,1),.08);target.style.transformOrigin='top center';target.style.left='0px';target.style.top='14px';target.style.transform='scale('+scale+')';const height=Math.ceil(h*scale+28);shell.style.height=height+'px';document.body.style.height=height+'px';document.documentElement.style.height=height+'px';if(window.frameElement)window.frameElement.style.height=height+'px';"}if(window.frameElement){window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);if(window.ResizeObserver&&root)new ResizeObserver(fit).observe(root);if(window.MutationObserver&&root)new MutationObserver(fit).observe(root,{childList:true,subtree:true,characterData:true,attributes:true});setTimeout(fit,80);setTimeout(fit,420);window.__ddsFitMovieReview=fit;fit()})();<\/script></body></html>`;
+
+    /*
+     * v180 / blue hour:
+     * Card keeps automatic observers.
+     * Editor fits only on initial load / real window resize.
+     * Typing must NOT trigger ResizeObserver/MutationObserver -> fit().
+     */
+    const liveObservers = card
+      ? "if(window.ResizeObserver&&root)new ResizeObserver(fit).observe(root);if(window.MutationObserver&&root)new MutationObserver(fit).observe(root,{childList:true,subtree:true,characterData:true,attributes:true});"
+      : "";
+
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;height:${card ? "100%" : "auto"};background:#242424;overflow:hidden}.dds-movie-preview-shell{position:relative;width:100%;${card ? "height:100%;" : "min-height:1px;"}overflow:hidden}.dds-movie-preview-target{position:absolute;left:0;top:0;width:${targetWidth};height:auto;transform-origin:top center;will-change:transform}.dds-movie-preview-target>.ddsh-moviereview{margin:${rootMargin}}</style></head><body><div class="dds-movie-preview-shell"><div class="dds-preview-target dds-movie-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-movie-preview-shell');const target=document.querySelector('.dds-movie-preview-target');const root=document.querySelector('.ddsh-moviereview');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!root)return;target.style.transform='none';target.style.left='0px';target.style.top='0px';${card ? "" : "target.style.width='100%';"}const rect=root.getBoundingClientRect();const w=Math.max(root.scrollWidth,root.offsetWidth,Math.ceil(rect.width),1);const h=Math.max(root.scrollHeight,root.offsetHeight,Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);${card ? "const vh=Math.max(shell.clientHeight,document.documentElement.clientHeight,1);const scale=Math.max(Math.min((vw-24)/w,(vh-24)/h,1),.05);const x=Math.max(12,Math.round((vw-w*scale)/2));const y=Math.max(12,Math.round((vh-h*scale)/2));target.style.transformOrigin='top left';target.style.left=x+'px';target.style.top=y+'px';target.style.transform='scale('+scale+')';" : "const scale=Math.max(Math.min((vw-28)/w,1),.08);target.style.transformOrigin='top center';target.style.left='0px';target.style.top='14px';target.style.transform='scale('+scale+')';const height=Math.ceil(h*scale+28);shell.style.height=height+'px';document.body.style.height=height+'px';document.documentElement.style.height=height+'px';if(window.frameElement)window.frameElement.style.height=height+'px';"}if(window.frameElement){window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);${liveObservers}setTimeout(fit,80);setTimeout(fit,420);window.__ddsFitMovieReview=fit;fit()})();<\/script></body></html>`;
+  }
+
+  function patchMovieReviewRootInPlace(iframe, srcdoc) {
+    const previewDocument =
+      iframe?.contentDocument;
+
+    if (
+      !previewDocument ||
+      previewDocument.readyState === "loading"
+    ) {
+      return false;
+    }
+
+    const currentRoot =
+      previewDocument.querySelector(
+        ".ddsh-moviereview"
+      );
+
+    if (!currentRoot) {
+      return false;
+    }
+
+    const parsed =
+      new DOMParser().parseFromString(
+        srcdoc,
+        "text/html"
+      );
+
+    const nextRoot =
+      parsed.querySelector(
+        ".ddsh-moviereview"
+      );
+
+    if (!nextRoot) {
+      return false;
+    }
+
+    function syncAttributes(current, next) {
+      Array.from(current.attributes).forEach(
+        (attribute) => {
+          if (!next.hasAttribute(attribute.name)) {
+            current.removeAttribute(attribute.name);
+          }
+        }
+      );
+
+      Array.from(next.attributes).forEach(
+        (attribute) => {
+          if (
+            current.getAttribute(attribute.name) !==
+            attribute.value
+          ) {
+            current.setAttribute(
+              attribute.name,
+              attribute.value
+            );
+          }
+        }
+      );
+    }
+
+    function patchNode(current, next) {
+      if (
+        current.nodeType !== next.nodeType
+      ) {
+        current.replaceWith(
+          next.cloneNode(true)
+        );
+        return;
+      }
+
+      if (
+        current.nodeType === Node.TEXT_NODE
+      ) {
+        if (
+          current.nodeValue !== next.nodeValue
+        ) {
+          current.nodeValue =
+            next.nodeValue;
+        }
+        return;
+      }
+
+      if (
+        current.nodeType !==
+        Node.ELEMENT_NODE
+      ) {
+        return;
+      }
+
+      if (
+        current.tagName !== next.tagName
+      ) {
+        current.replaceWith(
+          next.cloneNode(true)
+        );
+        return;
+      }
+
+      syncAttributes(
+        current,
+        next
+      );
+
+      const currentChildren =
+        Array.from(current.childNodes);
+
+      const nextChildren =
+        Array.from(next.childNodes);
+
+      const shared =
+        Math.min(
+          currentChildren.length,
+          nextChildren.length
+        );
+
+      for (
+        let index = 0;
+        index < shared;
+        index += 1
+      ) {
+        patchNode(
+          currentChildren[index],
+          nextChildren[index]
+        );
+      }
+
+      for (
+        let index =
+          currentChildren.length - 1;
+        index >= nextChildren.length;
+        index -= 1
+      ) {
+        current.removeChild(
+          current.childNodes[index]
+        );
+      }
+
+      for (
+        let index =
+          currentChildren.length;
+        index < nextChildren.length;
+        index += 1
+      ) {
+        current.appendChild(
+          nextChildren[index].cloneNode(true)
+        );
+      }
+    }
+
+    patchNode(
+      currentRoot,
+      nextRoot
+    );
+
+    return true;
   }
 
   function renderIframe(iframe, markup, mode) {
@@ -9240,26 +9407,33 @@ ${stylesheetLinks}
         ? "ddsMovieCardSrcdoc"
         : "ddsMovieEditorSrcdoc";
 
-    if (iframe.dataset[key] === srcdoc) {
-      iframe.contentWindow?.__ddsFitMovieReview?.();
+    if (
+      iframe.dataset[key] === srcdoc
+    ) {
+      /*
+       * Important:
+       * editor typing must not call fit() again.
+       */
+      if (mode === "card") {
+        iframe.contentWindow
+          ?.__ddsFitMovieReview?.();
+      }
+
       return;
     }
 
     /*
-     * v179 / blue hour:
-     * Editor preview is patched in-place so typing does not reload
-     * the iframe and does not throw the preview back to the top.
+     * v180 / blue hour editor:
+     * Patch ONLY .ddsh-moviereview.
+     * Do not touch shell/target/zoom/transform/iframe height.
      */
     if (
       mode === "editor" &&
-      iframe.contentDocument?.readyState !== "loading" &&
-      typeof window.updateLoadedPreviewDocument === "function"
+      iframe.contentDocument?.readyState !==
+        "loading"
     ) {
-      const previewDocument =
-        iframe.contentDocument;
-
       const shell =
-        previewDocument.querySelector(
+        iframe.contentDocument?.querySelector(
           ".dds-movie-preview-shell"
         );
 
@@ -9274,32 +9448,22 @@ ${stylesheetLinks}
       const previousOuterScrollTop =
         previewColumn?.scrollTop || 0;
 
-      const restorePosition = () => {
-        const currentShell =
-          iframe.contentDocument?.querySelector(
-            ".dds-movie-preview-shell"
+      try {
+        const patched =
+          patchMovieReviewRootInPlace(
+            iframe,
+            srcdoc
           );
 
-        if (currentShell) {
-          currentShell.scrollTop =
-            previousScrollTop;
-        }
+        if (patched) {
+          iframe.dataset[key] = srcdoc;
 
-        if (previewColumn) {
-          previewColumn.scrollTop =
-            previousOuterScrollTop;
-        }
-
-        iframe.contentWindow?.__ddsFitMovieReview?.();
-
-        requestAnimationFrame(() => {
-          const nextShell =
-            iframe.contentDocument?.querySelector(
-              ".dds-movie-preview-shell"
-            );
-
-          if (nextShell) {
-            nextShell.scrollTop =
+          /*
+           * No fit() here.
+           * Restore scroll only; target transform stays untouched.
+           */
+          if (shell) {
+            shell.scrollTop =
               previousScrollTop;
           }
 
@@ -9307,33 +9471,45 @@ ${stylesheetLinks}
             previewColumn.scrollTop =
               previousOuterScrollTop;
           }
-        });
-      };
 
-      try {
-        const patched =
-          window.updateLoadedPreviewDocument(
-            iframe,
-            srcdoc,
-            restorePosition
-          );
+          requestAnimationFrame(() => {
+            const nextShell =
+              iframe.contentDocument
+                ?.querySelector(
+                  ".dds-movie-preview-shell"
+                );
 
-        if (patched) {
-          iframe.dataset[key] = srcdoc;
-          restorePosition();
+            if (nextShell) {
+              nextShell.scrollTop =
+                previousScrollTop;
+            }
+
+            if (previewColumn) {
+              previewColumn.scrollTop =
+                previousOuterScrollTop;
+            }
+          });
+
           return;
         }
       } catch (error) {
         console.warn(
-          "[DDS REVIEW003] smooth preview patch failed",
+          "[DDS REVIEW003] root-only smooth patch failed",
           error
         );
       }
     }
 
+    /*
+     * Only initial load / recovery reaches here.
+     */
     iframe.dataset[key] = srcdoc;
-    iframe.classList.add("dds-preview-loading");
-    iframe.classList.remove("dds-preview-ready");
+    iframe.classList.add(
+      "dds-preview-loading"
+    );
+    iframe.classList.remove(
+      "dds-preview-ready"
+    );
     iframe.srcdoc = srcdoc;
   }
 
@@ -9389,7 +9565,7 @@ ${stylesheetLinks}
             previewRaf = 0;
             updateMovieReview();
           });
-      }, 90);
+      }, 160);
   }
 
   function copyText(text) {
