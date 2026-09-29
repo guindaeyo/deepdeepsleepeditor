@@ -8658,6 +8658,41 @@ ${stylesheetLinks}
       );
     }
 
+    /*
+     * v178:
+     * REVIEW CODE002 only.
+     * Text typing is grouped briefly so the preview does not rebuild
+     * its layout on every single character.
+     */
+    let musicReviewInputTimer = 0;
+    let musicReviewFrame = 0;
+
+    function queueMusicReviewUpdate(immediate = false) {
+      window.clearTimeout(musicReviewInputTimer);
+
+      if (musicReviewFrame) {
+        cancelAnimationFrame(musicReviewFrame);
+        musicReviewFrame = 0;
+      }
+
+      if (immediate) {
+        musicReviewFrame = requestAnimationFrame(() => {
+          musicReviewFrame = 0;
+          updateMusicReview();
+        });
+        return;
+      }
+
+      musicReviewInputTimer = window.setTimeout(() => {
+        musicReviewInputTimer = 0;
+
+        musicReviewFrame = requestAnimationFrame(() => {
+          musicReviewFrame = 0;
+          updateMusicReview();
+        });
+      }, 90);
+    }
+
     function removeReviewBbcodeForWordCount(value) {
       return String(value || "")
         .replace(/\[img(?:=[^\]]*)?\][\s\S]*?\[\/img\]/gi, " ")
@@ -8717,15 +8752,40 @@ ${stylesheetLinks}
         typeof window.updateLoadedPreviewDocument === "function"
       ) {
         try {
+          const currentShell =
+            previewDocument.querySelector(
+              ".dds-music-preview-shell"
+            );
+
+          const previousScrollTop =
+            currentShell?.scrollTop || 0;
+
+          const restoreScroll = () => {
+            const shell =
+              iframe.contentDocument?.querySelector(
+                ".dds-music-preview-shell"
+              );
+
+            if (shell) {
+              shell.scrollTop = previousScrollTop;
+            }
+
+            iframe.contentWindow?.__ddsFitMusic?.();
+          };
+
           const patched = window.updateLoadedPreviewDocument(
             iframe,
             srcdoc,
-            () => iframe.contentWindow?.__ddsFitMusic?.()
+            restoreScroll
           );
 
           if (patched) {
             iframe.dataset.ddsMusicSrcdoc = srcdoc;
-            iframe.contentWindow?.__ddsFitMusic?.();
+
+            requestAnimationFrame(
+              restoreScroll
+            );
+
             return;
           }
         } catch (error) {
@@ -8767,8 +8827,29 @@ ${stylesheetLinks}
       });
     });
 
-    panel.addEventListener("input", updateMusicReview);
-    panel.addEventListener("change", updateMusicReview);
+    panel.addEventListener(
+      "input",
+      (event) => {
+        const input = event.target;
+
+        /*
+         * color/range controls can stay responsive.
+         * Text fields are grouped for 90ms to remove typing jitter.
+         */
+        const immediate =
+          input?.type === "color" ||
+          input?.type === "range";
+
+        queueMusicReviewUpdate(immediate);
+      }
+    );
+
+    panel.addEventListener(
+      "change",
+      () => {
+        queueMusicReviewUpdate(true);
+      }
+    );
 
     copyButton.addEventListener("click", () => {
       updateMusicReview();
@@ -23527,7 +23608,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
       if (
         panel &&
-        CFG[panel.dataset.panel]
+        CFG[panel.dataset.panel] &&
+        panel.dataset.panel !== "editor-review002"
       ) {
         window.setTimeout(
           () => schedule(panel),
@@ -23548,7 +23630,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
       if (
         panel &&
-        CFG[panel.dataset.panel]
+        CFG[panel.dataset.panel] &&
+        panel.dataset.panel !== "editor-review002"
       ) {
         window.setTimeout(
           () => schedule(panel),
