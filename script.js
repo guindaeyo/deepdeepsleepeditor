@@ -9038,6 +9038,7 @@ ${stylesheetLinks}
   let editorIframe = null;
   let generatedCode = null;
   let previewRaf = 0;
+  let previewTimer = 0;
 
   function h(value) {
     return String(value ?? "")
@@ -9225,17 +9226,111 @@ ${stylesheetLinks}
     const card = mode === "card";
     const targetWidth = card ? "max-content" : "100%";
     const rootMargin = card ? "0!important" : "0 auto!important";
-    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;height:${card ? "100%" : "auto"};background:#242424;overflow:hidden}.dds-movie-preview-shell{position:relative;width:100%;${card ? "height:100%;" : "min-height:1px;"}overflow:hidden}.dds-movie-preview-target{position:absolute;left:0;top:0;width:${targetWidth};height:auto;transform-origin:top center;will-change:transform}.dds-movie-preview-target>.ddsh-moviereview{margin:${rootMargin}}</style></head><body><div class="dds-movie-preview-shell"><div class="dds-movie-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-movie-preview-shell');const target=document.querySelector('.dds-movie-preview-target');const root=document.querySelector('.ddsh-moviereview');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!root)return;target.style.transform='none';target.style.left='0px';target.style.top='0px';${card ? "" : "target.style.width='100%';"}const rect=root.getBoundingClientRect();const w=Math.max(root.scrollWidth,root.offsetWidth,Math.ceil(rect.width),1);const h=Math.max(root.scrollHeight,root.offsetHeight,Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);${card ? "const vh=Math.max(shell.clientHeight,document.documentElement.clientHeight,1);const scale=Math.max(Math.min((vw-24)/w,(vh-24)/h,1),.05);const x=Math.max(12,Math.round((vw-w*scale)/2));const y=Math.max(12,Math.round((vh-h*scale)/2));target.style.transformOrigin='top left';target.style.left=x+'px';target.style.top=y+'px';target.style.transform='scale('+scale+')';" : "const scale=Math.max(Math.min((vw-28)/w,1),.08);target.style.transformOrigin='top center';target.style.left='0px';target.style.top='14px';target.style.transform='scale('+scale+')';const height=Math.ceil(h*scale+28);shell.style.height=height+'px';document.body.style.height=height+'px';document.documentElement.style.height=height+'px';if(window.frameElement)window.frameElement.style.height=height+'px';"}if(window.frameElement){window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);if(window.ResizeObserver&&root)new ResizeObserver(fit).observe(root);if(window.MutationObserver&&root)new MutationObserver(fit).observe(root,{childList:true,subtree:true,characterData:true,attributes:true});setTimeout(fit,80);setTimeout(fit,420);window.__ddsFitMovieReview=fit;fit()})();<\/script></body></html>`;
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><link href="${CSS_URL}" rel="stylesheet"><link href="${FONT_URL}" rel="stylesheet"><style>html,body{margin:0;width:100%;height:${card ? "100%" : "auto"};background:#242424;overflow:hidden}.dds-movie-preview-shell{position:relative;width:100%;${card ? "height:100%;" : "min-height:1px;"}overflow:hidden}.dds-movie-preview-target{position:absolute;left:0;top:0;width:${targetWidth};height:auto;transform-origin:top center;will-change:transform}.dds-movie-preview-target>.ddsh-moviereview{margin:${rootMargin}}</style></head><body><div class="dds-movie-preview-shell"><div class="dds-preview-target dds-movie-preview-target">${markup}</div></div><script>(()=>{const shell=document.querySelector('.dds-movie-preview-shell');const target=document.querySelector('.dds-movie-preview-target');const root=document.querySelector('.ddsh-moviereview');let raf=0;function fit(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!shell||!target||!root)return;target.style.transform='none';target.style.left='0px';target.style.top='0px';${card ? "" : "target.style.width='100%';"}const rect=root.getBoundingClientRect();const w=Math.max(root.scrollWidth,root.offsetWidth,Math.ceil(rect.width),1);const h=Math.max(root.scrollHeight,root.offsetHeight,Math.ceil(rect.height),1);const vw=Math.max(shell.clientWidth,document.documentElement.clientWidth,1);${card ? "const vh=Math.max(shell.clientHeight,document.documentElement.clientHeight,1);const scale=Math.max(Math.min((vw-24)/w,(vh-24)/h,1),.05);const x=Math.max(12,Math.round((vw-w*scale)/2));const y=Math.max(12,Math.round((vh-h*scale)/2));target.style.transformOrigin='top left';target.style.left=x+'px';target.style.top=y+'px';target.style.transform='scale('+scale+')';" : "const scale=Math.max(Math.min((vw-28)/w,1),.08);target.style.transformOrigin='top center';target.style.left='0px';target.style.top='14px';target.style.transform='scale('+scale+')';const height=Math.ceil(h*scale+28);shell.style.height=height+'px';document.body.style.height=height+'px';document.documentElement.style.height=height+'px';if(window.frameElement)window.frameElement.style.height=height+'px';"}if(window.frameElement){window.frameElement.classList.add('dds-preview-ready');window.frameElement.classList.remove('dds-preview-loading')}})}window.addEventListener('load',fit);window.addEventListener('resize',fit);document.fonts?.ready?.then(fit);if(window.ResizeObserver&&root)new ResizeObserver(fit).observe(root);if(window.MutationObserver&&root)new MutationObserver(fit).observe(root,{childList:true,subtree:true,characterData:true,attributes:true});setTimeout(fit,80);setTimeout(fit,420);window.__ddsFitMovieReview=fit;fit()})();<\/script></body></html>`;
   }
 
   function renderIframe(iframe, markup, mode) {
     if (!iframe) return;
-    const srcdoc = buildPreviewDocument(markup, mode);
-    const key = mode === "card" ? "ddsMovieCardSrcdoc" : "ddsMovieEditorSrcdoc";
+
+    const srcdoc =
+      buildPreviewDocument(markup, mode);
+
+    const key =
+      mode === "card"
+        ? "ddsMovieCardSrcdoc"
+        : "ddsMovieEditorSrcdoc";
+
     if (iframe.dataset[key] === srcdoc) {
       iframe.contentWindow?.__ddsFitMovieReview?.();
       return;
     }
+
+    /*
+     * v179 / blue hour:
+     * Editor preview is patched in-place so typing does not reload
+     * the iframe and does not throw the preview back to the top.
+     */
+    if (
+      mode === "editor" &&
+      iframe.contentDocument?.readyState !== "loading" &&
+      typeof window.updateLoadedPreviewDocument === "function"
+    ) {
+      const previewDocument =
+        iframe.contentDocument;
+
+      const shell =
+        previewDocument.querySelector(
+          ".dds-movie-preview-shell"
+        );
+
+      const previousScrollTop =
+        shell?.scrollTop || 0;
+
+      const previewColumn =
+        iframe.closest(
+          ".dds-editor-preview-column"
+        );
+
+      const previousOuterScrollTop =
+        previewColumn?.scrollTop || 0;
+
+      const restorePosition = () => {
+        const currentShell =
+          iframe.contentDocument?.querySelector(
+            ".dds-movie-preview-shell"
+          );
+
+        if (currentShell) {
+          currentShell.scrollTop =
+            previousScrollTop;
+        }
+
+        if (previewColumn) {
+          previewColumn.scrollTop =
+            previousOuterScrollTop;
+        }
+
+        iframe.contentWindow?.__ddsFitMovieReview?.();
+
+        requestAnimationFrame(() => {
+          const nextShell =
+            iframe.contentDocument?.querySelector(
+              ".dds-movie-preview-shell"
+            );
+
+          if (nextShell) {
+            nextShell.scrollTop =
+              previousScrollTop;
+          }
+
+          if (previewColumn) {
+            previewColumn.scrollTop =
+              previousOuterScrollTop;
+          }
+        });
+      };
+
+      try {
+        const patched =
+          window.updateLoadedPreviewDocument(
+            iframe,
+            srcdoc,
+            restorePosition
+          );
+
+        if (patched) {
+          iframe.dataset[key] = srcdoc;
+          restorePosition();
+          return;
+        }
+      } catch (error) {
+        console.warn(
+          "[DDS REVIEW003] smooth preview patch failed",
+          error
+        );
+      }
+    }
+
     iframe.dataset[key] = srcdoc;
     iframe.classList.add("dds-preview-loading");
     iframe.classList.remove("dds-preview-ready");
@@ -9261,9 +9356,40 @@ ${stylesheetLinks}
 
   window.updateMovieReview = updateMovieReview;
 
-  function scheduleUpdate() {
-    cancelAnimationFrame(previewRaf);
-    previewRaf = requestAnimationFrame(updateMovieReview);
+  function scheduleUpdate(event) {
+    const field = event?.target;
+
+    const immediate =
+      field?.type === "color" ||
+      field?.type === "range";
+
+    window.clearTimeout(previewTimer);
+
+    if (previewRaf) {
+      cancelAnimationFrame(previewRaf);
+      previewRaf = 0;
+    }
+
+    if (immediate) {
+      previewRaf =
+        requestAnimationFrame(() => {
+          previewRaf = 0;
+          updateMovieReview();
+        });
+
+      return;
+    }
+
+    previewTimer =
+      window.setTimeout(() => {
+        previewTimer = 0;
+
+        previewRaf =
+          requestAnimationFrame(() => {
+            previewRaf = 0;
+            updateMovieReview();
+          });
+      }, 90);
   }
 
   function copyText(text) {
@@ -23609,7 +23735,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (
         panel &&
         CFG[panel.dataset.panel] &&
-        panel.dataset.panel !== "editor-review002"
+        ![
+          "editor-review001",
+          "editor-review002",
+          "editor-review003"
+        ].includes(panel.dataset.panel)
       ) {
         window.setTimeout(
           () => schedule(panel),
@@ -23631,7 +23761,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (
         panel &&
         CFG[panel.dataset.panel] &&
-        panel.dataset.panel !== "editor-review002"
+        ![
+          "editor-review001",
+          "editor-review002",
+          "editor-review003"
+        ].includes(panel.dataset.panel)
       ) {
         window.setTimeout(
           () => schedule(panel),
@@ -25603,4 +25737,175 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     },
     { passive: true }
   );
+})();
+
+
+/* =========================================================
+   REVIEW CODE001 — GGUM VER.EDM / SMOOTH TYPING v179
+   Editor preview only.
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_REVIEW001_SMOOTH_V179__) return;
+  window.__DDS_REVIEW001_SMOOTH_V179__ = true;
+
+  if (
+    typeof window.queuePreviewDocument !== "function"
+  ) {
+    return;
+  }
+
+  const originalQueuePreviewDocument =
+    window.queuePreviewDocument;
+
+  const state = {
+    timer: 0,
+    srcdoc: "",
+    resizeFunction: null
+  };
+
+  function patchFoodEditorPreview(
+    iframe,
+    srcdoc,
+    resizeFunction
+  ) {
+    const previewDocument =
+      iframe?.contentDocument;
+
+    if (
+      !previewDocument ||
+      previewDocument.readyState === "loading" ||
+      typeof window.updateLoadedPreviewDocument !== "function"
+    ) {
+      return false;
+    }
+
+    const shell =
+      previewDocument.querySelector(
+        ".dds-preview-shell"
+      );
+
+    const previousScrollTop =
+      shell?.scrollTop || 0;
+
+    const previewColumn =
+      iframe.closest(
+        ".dds-editor-preview-column"
+      );
+
+    const previousOuterScrollTop =
+      previewColumn?.scrollTop || 0;
+
+    const restorePosition = () => {
+      const currentShell =
+        iframe.contentDocument?.querySelector(
+          ".dds-preview-shell"
+        );
+
+      if (currentShell) {
+        currentShell.scrollTop =
+          previousScrollTop;
+      }
+
+      if (previewColumn) {
+        previewColumn.scrollTop =
+          previousOuterScrollTop;
+      }
+
+      if (
+        typeof resizeFunction === "function"
+      ) {
+        resizeFunction(iframe);
+      }
+
+      requestAnimationFrame(() => {
+        const nextShell =
+          iframe.contentDocument?.querySelector(
+            ".dds-preview-shell"
+          );
+
+        if (nextShell) {
+          nextShell.scrollTop =
+            previousScrollTop;
+        }
+
+        if (previewColumn) {
+          previewColumn.scrollTop =
+            previousOuterScrollTop;
+        }
+      });
+    };
+
+    try {
+      const patched =
+        window.updateLoadedPreviewDocument(
+          iframe,
+          srcdoc,
+          restorePosition
+        );
+
+      if (patched) {
+        restorePosition();
+        return true;
+      }
+    } catch (error) {
+      console.warn(
+        "[DDS REVIEW001] smooth preview patch failed",
+        error
+      );
+    }
+
+    return false;
+  }
+
+  window.queuePreviewDocument =
+    function review001SmoothQueue(
+      iframe,
+      srcdoc,
+      resizeFunction
+    ) {
+      if (iframe?.id !== "foodReviewPreview") {
+        return originalQueuePreviewDocument.call(
+          this,
+          iframe,
+          srcdoc,
+          resizeFunction
+        );
+      }
+
+      state.srcdoc = srcdoc;
+      state.resizeFunction = resizeFunction;
+
+      window.clearTimeout(state.timer);
+
+      /*
+       * Group rapid typing into one visual update.
+       * Generated code can still update immediately;
+       * only the editor preview waits 90ms.
+       */
+      state.timer =
+        window.setTimeout(() => {
+          state.timer = 0;
+
+          if (
+            patchFoodEditorPreview(
+              iframe,
+              state.srcdoc,
+              state.resizeFunction
+            )
+          ) {
+            return;
+          }
+
+          originalQueuePreviewDocument.call(
+            window,
+            iframe,
+            state.srcdoc,
+            state.resizeFunction
+          );
+        }, 90);
+
+      return true;
+    };
 })();
