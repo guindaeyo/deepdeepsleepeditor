@@ -8575,18 +8575,22 @@ ${stylesheetLinks}
         right:auto!important;
         top:auto!important;
         bottom:auto!important;
-        width:max-content!important;
-        min-width:0!important;
-        max-width:none!important;
+        width:100%!important;
+        min-width:100%!important;
+        max-width:100%!important;
         height:auto!important;
         margin:0 auto!important;
         flex:0 0 auto!important;
+        display:flex!important;
+        justify-content:center!important;
+        align-items:flex-start!important;
         transform:none;
         transform-origin:top center;
+        box-sizing:border-box!important;
       }
       .dds-music-preview-target>.ddsh-revmus-wrap{
-        margin:0 auto!important;
-        flex:none!important;
+        margin:0!important;
+        flex:0 0 auto!important;
       }
     </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
       (() => {
@@ -8730,6 +8734,165 @@ ${stylesheetLinks}
       counter.dataset.empty = count === 0 ? "true" : "false";
     }
 
+    function patchMusicReviewRootInPlace(
+      iframe,
+      srcdoc
+    ) {
+      const previewDocument =
+        iframe?.contentDocument;
+
+      if (
+        !previewDocument ||
+        previewDocument.readyState === "loading"
+      ) {
+        return false;
+      }
+
+      const currentRoot =
+        previewDocument.querySelector(
+          ".ddsh-revmus-wrap"
+        );
+
+      if (!currentRoot) {
+        return false;
+      }
+
+      const parsed =
+        new DOMParser().parseFromString(
+          srcdoc,
+          "text/html"
+        );
+
+      const nextRoot =
+        parsed.querySelector(
+          ".ddsh-revmus-wrap"
+        );
+
+      if (!nextRoot) {
+        return false;
+      }
+
+      function syncAttributes(current, next) {
+        Array.from(current.attributes).forEach(
+          (attribute) => {
+            if (!next.hasAttribute(attribute.name)) {
+              current.removeAttribute(attribute.name);
+            }
+          }
+        );
+
+        Array.from(next.attributes).forEach(
+          (attribute) => {
+            if (
+              current.getAttribute(attribute.name) !==
+              attribute.value
+            ) {
+              current.setAttribute(
+                attribute.name,
+                attribute.value
+              );
+            }
+          }
+        );
+      }
+
+      function patchNode(current, next) {
+        if (
+          current.nodeType !== next.nodeType
+        ) {
+          current.replaceWith(
+            next.cloneNode(true)
+          );
+          return;
+        }
+
+        if (
+          current.nodeType === Node.TEXT_NODE
+        ) {
+          if (
+            current.nodeValue !== next.nodeValue
+          ) {
+            current.nodeValue =
+              next.nodeValue;
+          }
+
+          return;
+        }
+
+        if (
+          current.nodeType !== Node.ELEMENT_NODE
+        ) {
+          return;
+        }
+
+        if (
+          current.tagName !== next.tagName
+        ) {
+          current.replaceWith(
+            next.cloneNode(true)
+          );
+          return;
+        }
+
+        syncAttributes(
+          current,
+          next
+        );
+
+        const currentChildren =
+          Array.from(current.childNodes);
+
+        const nextChildren =
+          Array.from(next.childNodes);
+
+        const shared =
+          Math.min(
+            currentChildren.length,
+            nextChildren.length
+          );
+
+        for (
+          let index = 0;
+          index < shared;
+          index += 1
+        ) {
+          patchNode(
+            currentChildren[index],
+            nextChildren[index]
+          );
+        }
+
+        for (
+          let index =
+            currentChildren.length - 1;
+          index >= nextChildren.length;
+          index -= 1
+        ) {
+          current.removeChild(
+            current.childNodes[index]
+          );
+        }
+
+        for (
+          let index =
+            currentChildren.length;
+          index < nextChildren.length;
+          index += 1
+        ) {
+          current.appendChild(
+            nextChildren[index].cloneNode(true)
+          );
+        }
+      }
+
+      patchNode(
+        currentRoot,
+        nextRoot
+      );
+
+      return true;
+    }
+
     function renderIframe(iframe, markup, mode) {
       const srcdoc = buildPreviewDocument(markup, mode);
       if (iframe.dataset.ddsMusicSrcdoc === srcdoc) return;
@@ -8744,12 +8907,12 @@ ${stylesheetLinks}
         return;
       }
 
-      const previewDocument = iframe.contentDocument;
+      const previewDocument =
+        iframe.contentDocument;
+
       if (
         previewDocument &&
-        previewDocument.readyState !== "loading" &&
-        previewDocument.querySelector(".dds-music-preview-target") &&
-        typeof window.updateLoadedPreviewDocument === "function"
+        previewDocument.readyState !== "loading"
       ) {
         try {
           const currentShell =
@@ -8760,36 +8923,68 @@ ${stylesheetLinks}
           const previousScrollTop =
             currentShell?.scrollTop || 0;
 
-          const restoreScroll = () => {
-            const shell =
-              iframe.contentDocument?.querySelector(
-                ".dds-music-preview-shell"
-              );
+          const previewColumn =
+            iframe.closest(
+              ".dds-editor-preview-column"
+            );
 
-            if (shell) {
-              shell.scrollTop = previousScrollTop;
-            }
+          const previousOuterScrollTop =
+            previewColumn?.scrollTop || 0;
 
-            iframe.contentWindow?.__ddsFitMusic?.();
-          };
-
-          const patched = window.updateLoadedPreviewDocument(
-            iframe,
-            srcdoc,
-            restoreScroll
-          );
+          /*
+           * v181 / LO$ER=LO♡ER:
+           * Patch ONLY .ddsh-revmus-wrap.
+           *
+           * Do NOT patch .dds-music-preview-target because its inline
+           * width/zoom/margin are owned by the central preview fitter.
+           * Losing those styles is what made the preview drift right
+           * as the user kept typing.
+           */
+          const patched =
+            patchMusicReviewRootInPlace(
+              iframe,
+              srcdoc
+            );
 
           if (patched) {
-            iframe.dataset.ddsMusicSrcdoc = srcdoc;
+            iframe.dataset.ddsMusicSrcdoc =
+              srcdoc;
 
-            requestAnimationFrame(
-              restoreScroll
-            );
+            if (currentShell) {
+              currentShell.scrollTop =
+                previousScrollTop;
+            }
+
+            if (previewColumn) {
+              previewColumn.scrollTop =
+                previousOuterScrollTop;
+            }
+
+            requestAnimationFrame(() => {
+              const shell =
+                iframe.contentDocument
+                  ?.querySelector(
+                    ".dds-music-preview-shell"
+                  );
+
+              if (shell) {
+                shell.scrollTop =
+                  previousScrollTop;
+              }
+
+              if (previewColumn) {
+                previewColumn.scrollTop =
+                  previousOuterScrollTop;
+              }
+            });
 
             return;
           }
         } catch (error) {
-          console.warn("[DDS REVIEW002] preview patch failed; reloading srcdoc", error);
+          console.warn(
+            "[DDS REVIEW002] root-only preview patch failed",
+            error
+          );
         }
       }
 
