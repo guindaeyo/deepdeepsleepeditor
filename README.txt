@@ -1,21 +1,20 @@
-DEEP DEEP SLEEP CODE SHOP — V210 READY
+DEEP DEEP SLEEP CODE SHOP — V211
 
-Use all five files together:
+วางไฟล์ทั้ง 5 ตัวทับชุดเดิม:
 - index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V210 changes:
-- Replaces the old Central Preview engine instead of stacking another patch.
-- Left editor preview = 60%, right controls = 40%.
-- Centers the actual visible code canvas in the left preview.
-- Fits the full code width inside the left preview.
-- Starts at the top of the code.
-- Long code scrolls vertically in the left preview with invisible scrollbar chrome.
-- Includes RORAIMA/HANS and GGUM visual roots.
-- Keeps V209 GGUM recovery.
-- Right-side controls / COPY CODE / Cloud / Draft are not intentionally changed.
+V211 แก้เฉพาะระบบ Preview ฝั่งซ้ายของหน้า Edit:
+- ไม่ reload iframe ตอนพิมพ์หลังโหลดครั้งแรก
+- compatibility กับ preview logic รุ่น V192/V203/V205
+- ล็อกตำแหน่งกึ่งกลางและ scale แนวนอนระหว่างพิมพ์
+- วัดความสูงจริงถึงขอบล่าง รวม element แบบ absolute และ credit
+- stage ฝั่งซ้ายเป็น vertical scroll viewport
+- scrollbar ฝั่งซ้ายล่องหน แต่ยัง scroll ได้
+- GGUM ใช้ Central Preview เดียวกัน
+- HANS/RORAIMA แสดง full-length preview ผ่าน Central Preview
 
-After uploading, hard refresh once (Ctrl+F5).
+ฝั่งขวา / COPY CODE / Draft / Cloud ไม่ได้แก้ในรอบนี้

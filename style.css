@@ -12358,3 +12358,58 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   animation:none !important;
   will-change:auto !important;
 }
+
+/* =========================================================
+   V211 — LEFT EDITOR PREVIEW SCROLLBAR ONLY
+   Scroll remains functional; only the LEFT preview bars are hidden.
+========================================================= */
+.dds-panel[data-panel^="editor-"] .dds-editor-preview-column,
+.dds-panel[data-panel^="editor-"] .dds-protected-commission-preview-column,
+.dds-panel[data-panel^="editor-"] [class*="preview-column"],
+.dds-panel[data-panel^="editor-"] .dds-editor-preview-stage,
+.dds-panel[data-panel^="editor-"] .dds-live-preview-stage,
+.dds-panel[data-panel^="editor-"] .dds-preview-stage,
+.dds-panel[data-panel^="editor-"] .dds-code013-editor-stage,
+.dds-panel[data-panel^="editor-"] .dds-code014-editor-stage,
+.dds-panel[data-panel^="editor-"] .dds-profile-preview-stage,
+.dds-panel[data-panel^="editor-"] .dds-rora-preview-stage,
+.dds-panel[data-panel^="editor-"] [class*="preview-stage"],
+.dds-protected-commission-editor .dds-protected-commission-preview-column,
+.dds-protected-commission-editor [class*="preview-column"],
+.dds-protected-commission-editor .dds-rora-preview-stage,
+.dds-protected-commission-editor [class*="preview-stage"],
+.dds-v211-preview-holder {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.dds-panel[data-panel^="editor-"] .dds-editor-preview-column::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-protected-commission-preview-column::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] [class*="preview-column"]::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-editor-preview-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-live-preview-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-preview-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-code013-editor-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-code014-editor-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-profile-preview-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] .dds-rora-preview-stage::-webkit-scrollbar,
+.dds-panel[data-panel^="editor-"] [class*="preview-stage"]::-webkit-scrollbar,
+.dds-protected-commission-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+.dds-protected-commission-editor [class*="preview-column"]::-webkit-scrollbar,
+.dds-protected-commission-editor .dds-rora-preview-stage::-webkit-scrollbar,
+.dds-protected-commission-editor [class*="preview-stage"]::-webkit-scrollbar,
+.dds-v211-preview-holder::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+.dds-panel[data-panel^="editor-"] [class*="preview-stage"]::-webkit-scrollbar-track,
+.dds-panel[data-panel^="editor-"] [class*="preview-stage"]::-webkit-scrollbar-thumb,
+.dds-protected-commission-editor [class*="preview-stage"]::-webkit-scrollbar-track,
+.dds-protected-commission-editor [class*="preview-stage"]::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
