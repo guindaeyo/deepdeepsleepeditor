@@ -26733,7 +26733,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function prepareSource(source) {
-    return stripPreviewFitScripts(renderBbcode(source));
+    // Keep the preview document intact.  The central engine owns sizing in the
+    // parent page, so removing whole scripts here can accidentally remove
+    // content initializers from older previews.
+    return renderBbcode(source);
   }
 
   function meaningfulChildren(parent) {
@@ -26768,24 +26771,67 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return width;
   }
 
+  function declaredHeight(iframe) {
+    let height = 0;
+    for (const attr of Array.from(iframe.attributes || [])) {
+      if (!/(?:canvas|preview)[-_]?height/i.test(attr.name)) continue;
+      const value = Number.parseFloat(attr.value);
+      if (Number.isFinite(value) && value > 100 && value < 12000) height = Math.max(height, value);
+    }
+    return height;
+  }
+
+  function probeNaturalHeight(iframe, doc, target) {
+    if (!target) return Math.max(1, iframe.clientHeight || 1);
+    const cs = doc.defaultView?.getComputedStyle(target);
+    const values = [
+      declaredHeight(iframe),
+      target.scrollHeight || 0,
+      target.offsetHeight || 0,
+      Math.ceil(target.getBoundingClientRect?.().height || 0),
+      Number.parseFloat(cs?.height || '0') || 0
+    ];
+    for (const child of meaningfulChildren(target)) {
+      values.push(
+        child.scrollHeight || 0,
+        child.offsetHeight || 0,
+        Math.ceil(child.getBoundingClientRect?.().height || 0)
+      );
+    }
+    const height = Math.max(...values.filter((v) => Number.isFinite(v) && v > 0), 1);
+    return Math.min(12000, Math.max(1, height));
+  }
+
   function probeNaturalWidth(iframe, doc, target) {
     const state = states.get(iframe) || {};
     if (state.naturalWidth) return state.naturalWidth;
 
     let width = declaredWidth(iframe);
-    const candidates = [target, ...meaningfulChildren(target)].filter(Boolean);
-    for (const el of candidates) {
+
+    const readWidth = (el) => {
+      if (!el) return 0;
       const cs = doc.defaultView?.getComputedStyle(el);
-      const values = [
-        el.scrollWidth || 0,
-        el.offsetWidth || 0,
-        Math.ceil(el.getBoundingClientRect?.().width || 0),
-        Number.parseFloat(cs?.width || '0') || 0
-      ];
-      const maxWidth = cs?.maxWidth && cs.maxWidth !== 'none' ? Number.parseFloat(cs.maxWidth) || 0 : 0;
-      let candidate = Math.max(...values);
-      if (maxWidth > 100 && maxWidth < 3000 && candidate > maxWidth) candidate = maxWidth;
-      if (candidate > 100 && candidate < 3000) width = Math.max(width, candidate);
+      const cssWidth = Number.parseFloat(cs?.width || '0') || 0;
+      const maxWidth = cs?.maxWidth && cs.maxWidth !== 'none'
+        ? Number.parseFloat(cs.maxWidth) || 0
+        : 0;
+      const rectWidth = Math.ceil(el.getBoundingClientRect?.().width || 0);
+      const offsetWidth = el.offsetWidth || 0;
+
+      // Prefer the designed box width.  scrollWidth can explode because of one
+      // long line of text and would make the whole preview shrink while typing.
+      let value = Math.max(cssWidth, offsetWidth, rectWidth);
+      if (maxWidth > 100 && maxWidth < 3000) value = Math.min(value || maxWidth, maxWidth);
+      return value > 100 && value < 3000 ? value : 0;
+    };
+
+    width = Math.max(width, readWidth(target));
+
+    // Generic preview targets are often 100% wrappers.  In that case use the
+    // single real code root inside them as the designed width when possible.
+    if (target?.matches?.('[class*="preview-target"],[class*="preview-positioner"]')) {
+      const children = meaningfulChildren(target);
+      if (children.length === 1) width = Math.max(width, readWidth(children[0]));
     }
 
     if (!(width > 100)) width = Math.max(320, iframe.clientWidth || 0);
@@ -26796,18 +26842,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function ensureDocStyle(doc) {
     if (!doc?.head || !doc.body || !doc.documentElement) return;
-    doc.documentElement.classList.add('dds-v202-preview-html');
-    doc.body.classList.add('dds-v202-preview-body');
+    doc.documentElement.classList.add('dds-v203-preview-html');
+    doc.body.classList.add('dds-v203-preview-body');
 
-    let style = doc.getElementById('dds-v202-preview-style');
+    let style = doc.getElementById('dds-v203-preview-style');
     if (!style) {
       style = doc.createElement('style');
-      style.id = 'dds-v202-preview-style';
+      style.id = 'dds-v203-preview-style';
       doc.head.appendChild(style);
     }
     style.textContent = `
-      html.dds-v202-preview-html,
-      body.dds-v202-preview-body {
+      html.dds-v203-preview-html,
+      body.dds-v203-preview-body {
         width:100% !important;
         min-width:0 !important;
         max-width:none !important;
@@ -26815,22 +26861,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         min-height:100% !important;
         max-height:none !important;
         margin:0 !important;
+        padding:0 !important;
         overflow-x:hidden !important;
         overflow-y:auto !important;
         overscroll-behavior:contain !important;
         scroll-behavior:auto !important;
         scrollbar-width:none !important;
+        scrollbar-color:transparent transparent !important;
         -ms-overflow-style:none !important;
       }
-      html.dds-v202-preview-html *,
-      body.dds-v202-preview-body * {
+      html.dds-v203-preview-html *,
+      body.dds-v203-preview-body * {
         scrollbar-width:none !important;
+        scrollbar-color:transparent transparent !important;
         -ms-overflow-style:none !important;
       }
-      html.dds-v202-preview-html::-webkit-scrollbar,
-      body.dds-v202-preview-body::-webkit-scrollbar,
-      html.dds-v202-preview-html *::-webkit-scrollbar,
-      body.dds-v202-preview-body *::-webkit-scrollbar {
+      html.dds-v203-preview-html::-webkit-scrollbar,
+      body.dds-v203-preview-body::-webkit-scrollbar,
+      html.dds-v203-preview-html *::-webkit-scrollbar,
+      body.dds-v203-preview-body *::-webkit-scrollbar {
         width:0 !important;
         height:0 !important;
         display:none !important;
@@ -26858,14 +26907,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         right:auto !important;
         top:auto !important;
         bottom:auto !important;
-        height:auto !important;
-        min-height:0 !important;
         max-height:none !important;
         margin-left:auto !important;
         margin-right:auto !important;
         overflow:visible !important;
-        transform:none !important;
-        transform-origin:top center !important;
         opacity:1 !important;
         visibility:visible !important;
         transition:none !important;
@@ -26874,11 +26919,31 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     `;
   }
 
+  function normalizePreviewChrome(iframe) {
+    const panel = panelFor(iframe);
+    if (!panel) return;
+
+    let node = iframe.parentElement;
+    while (node && node !== panel) {
+      const className = String(node.className || '');
+      if (/(?:preview|stage|holder|canvas)/i.test(className)) {
+        node.classList.add('dds-v203-left-preview-surface');
+        node.style.setProperty('scrollbar-width', 'none', 'important');
+        node.style.setProperty('scrollbar-color', 'transparent transparent', 'important');
+        node.style.setProperty('-ms-overflow-style', 'none', 'important');
+        node.style.setProperty('overflow-x', 'hidden', 'important');
+        node.style.setProperty('overflow-y', 'hidden', 'important');
+      }
+      node = node.parentElement;
+    }
+  }
+
   function applyStableLayout(iframe, recalc = false) {
     if (!owns(iframe)) return false;
     const doc = iframe.contentDocument;
     if (!doc?.body || doc.readyState === 'loading') return false;
 
+    normalizePreviewChrome(iframe);
     ensureDocStyle(doc);
     const parts = locate(doc);
     if (!parts?.target) return false;
@@ -26886,6 +26951,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const state = states.get(iframe) || {};
     if (recalc) state.naturalWidth = 0;
     const width = probeNaturalWidth(iframe, doc, parts.target);
+    const height = probeNaturalHeight(iframe, doc, parts.target);
     const viewport = Math.max(1, iframe.clientWidth || iframe.parentElement?.clientWidth || 1);
     const scale = state.scale && !recalc
       ? state.scale
@@ -26900,22 +26966,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     target.style.setProperty('width', `${width}px`, 'important');
     target.style.setProperty('min-width', `${width}px`, 'important');
     target.style.setProperty('max-width', `${width}px`, 'important');
+    target.style.setProperty('height', `${height}px`, 'important');
+    target.style.setProperty('min-height', `${height}px`, 'important');
+    target.style.setProperty('max-height', 'none', 'important');
     target.style.setProperty('margin-left', 'auto', 'important');
     target.style.setProperty('margin-right', 'auto', 'important');
     target.style.setProperty('position', 'relative', 'important');
     target.style.setProperty('inset', 'auto', 'important');
-    target.style.setProperty('transform', 'none', 'important');
+    target.style.setProperty('zoom', '1', 'important');
+    target.style.setProperty('transform', `scale(${scale})`, 'important');
+    // Scaling around the horizontal centre keeps the code visually centred.
     target.style.setProperty('transform-origin', 'top center', 'important');
-    target.style.setProperty('zoom', String(scale), 'important');
+    target.style.setProperty('overflow', 'visible', 'important');
     target.style.setProperty('opacity', '1', 'important');
     target.style.setProperty('visibility', 'visible', 'important');
+    target.style.setProperty('transition', 'none', 'important');
+    target.style.setProperty('animation', 'none', 'important');
 
     if (parts.shell) {
       parts.shell.style.setProperty('width', '100%', 'important');
       parts.shell.style.setProperty('min-width', '0', 'important');
       parts.shell.style.setProperty('max-width', 'none', 'important');
       parts.shell.style.setProperty('height', 'auto', 'important');
-      parts.shell.style.setProperty('min-height', '100%', 'important');
+      parts.shell.style.setProperty('min-height', `${Math.max(height, iframe.clientHeight || 0)}px`, 'important');
       parts.shell.style.setProperty('max-height', 'none', 'important');
       parts.shell.style.setProperty('overflow', 'visible', 'important');
       parts.shell.style.setProperty('display', 'flex', 'important');
@@ -26927,8 +27000,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function normalizeFrame(iframe) {
+    normalizePreviewChrome(iframe);
     iframe.classList.remove('dds-preview-loading');
-    iframe.classList.add('dds-preview-ready', 'dds-v202-editor-preview');
+    iframe.classList.add('dds-preview-ready', 'dds-v203-editor-preview');
     const s = iframe.style;
     s.setProperty('position', 'relative', 'important');
     s.setProperty('inset', 'auto', 'important');
@@ -26944,6 +27018,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     s.setProperty('max-height', 'none', 'important');
     s.setProperty('margin', '0', 'important');
     s.setProperty('transform', 'none', 'important');
+    s.setProperty('transform-origin', 'top center', 'important');
+    s.setProperty('zoom', '1', 'important');
     s.setProperty('opacity', '1', 'important');
     s.setProperty('visibility', 'visible', 'important');
     s.setProperty('transition', 'none', 'important');
@@ -27042,6 +27118,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function render(iframe, rawSource) {
     if (!owns(iframe)) return false;
+    // Older renderers often write inline width/height/transform immediately
+    // before assigning srcdoc.  Reassert the central frame geometry in the
+    // same task so the browser never paints that intermediate jump.
+    normalizeFrame(iframe);
     const source = prepareSource(rawSource);
     const state = states.get(iframe) || {};
     state.latest = source;
@@ -27183,9 +27263,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.__ddsCentralEditorRenderV200 = render;
   window.__ddsCentralEditorPreviewOwnsV202 = owns;
   window.__ddsCentralEditorRenderV202 = render;
+  window.__ddsCentralEditorPreviewOwnsV203 = owns;
+  window.__ddsCentralEditorRenderV203 = render;
+  window.__ddsCentralEditorNormalizeV203 = (iframe) => {
+    if (!owns(iframe)) return false;
+    normalizeFrame(iframe);
+    return applyStableLayout(iframe, false);
+  };
 
   function boot() {
-    document.body?.classList.add('dds-v202-central-preview');
+    document.body?.classList.add('dds-v202-central-preview', 'dds-v203-central-preview');
 
     document.addEventListener('click', (event) => {
       if (event.target?.closest?.(

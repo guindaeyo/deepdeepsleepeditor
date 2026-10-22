@@ -12186,3 +12186,85 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
     overflow:visible !important;
   }
 }
+
+/* =========================================================
+   V203 — LEFT PREVIEW ONLY: invisible scrollbar chrome
+   Keep RIGHT editor controls untouched.
+========================================================= */
+body.dds-v203-central-preview :is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+),
+body.dds-v203-central-preview :is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+) * {
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+
+body.dds-v203-central-preview :is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+)::-webkit-scrollbar,
+body.dds-v203-central-preview :is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+) *::-webkit-scrollbar {
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+  background:transparent !important;
+}
+
+/* The outer LEFT side never owns scrolling. The iframe document does. */
+body.dds-v203-central-preview :is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"],
+  .dds-editor-preview-stage,
+  .dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,
+  .dds-code014-editor-stage,
+  .dds-profile-preview-stage,
+  .dds-profile-preview-canvas-host,
+  [class*="preview-stage"],
+  [class*="preview-holder"],
+  [class*="preview-canvas-host"],
+  .dds-v203-left-preview-surface
+) {
+  overflow:hidden !important;
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
