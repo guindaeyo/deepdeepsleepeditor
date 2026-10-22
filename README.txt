@@ -1,20 +1,16 @@
-DEEP DEEP SLEEP EDITOR — V195 FAST BOOT
+DEEP DEEP SLEEP EDITOR — V196 HOTFIX
 
-ใช้ไฟล์ทั้ง 5 ตัวเขียนทับชุด V194:
-- index.html
+แก้เฉพาะบั๊ก V195 ที่ index.html ชี้ไฟล์ local ผิดชื่อ
+
+ไฟล์ที่ถูกต้อง:
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V195 เปลี่ยนระบบ Preview Engine ให้ไม่แตะ iframe ทั้งเว็บตอนเปิดหน้า:
-- ไม่มี global HTMLIFrameElement.prototype.srcdoc override
-- ไม่มี global iframe setAttribute override
-- ไม่มี startup scan / idle scan ของ editor
-- ไม่มี MutationObserver ของ Central Preview
-- ติดระบบกลางเฉพาะ iframe ใน Editor ที่ผู้ใช้กดเปิด
-- เอา MutationObserver ที่เฝ้า class ทั้ง body ของ Commission editor ออก
-- Preview editor ยังใช้ DOM patch หลังโหลดครั้งแรก เพื่อลดการกะพริบ
-- BBCode preview / toolbar ยังทำงานเมื่อเข้า editor
+วิธีใช้:
+1) สำรองชุดเดิม
+2) อัปโหลดไฟล์ทั้งหมดใน ZIP นี้ทับชุด V195
+3) กด Ctrl + F5
 
-หลังอัปโหลดให้ Ctrl+F5 หนึ่งครั้ง
+V196 ไม่ได้เพิ่มระบบพรีวิวใหม่ และไม่เปลี่ยน logic จาก V195
