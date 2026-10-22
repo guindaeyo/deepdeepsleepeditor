@@ -5862,11 +5862,84 @@ You were mine forever</textarea>
     }
   }, true);
 
+  function resetCommissionDirectoryView() {
+    /*
+     * COMMISSION BACK CONTRACT (V229)
+     * Any Commission editor/view — whether opened from COMMISSION & SHOWCASE,
+     * ACTIVITY, or MY OWN CODE — must return to the same main Commission
+     * directory shown in the browser UI, with tab 01 selected.
+     */
+    leaveEditorModeForDirectory();
+
+    document.body.classList.remove(
+      "dds-commission-editor-mode",
+      "dds-alan-view-mode",
+      "dds-vmac-view-mode",
+      "dds-hans-view-mode",
+      "dds-rora-view-mode"
+    );
+    document.documentElement.classList.remove(
+      "dds-commission-editor-mode",
+      "dds-alan-view-mode",
+      "dds-vmac-view-mode",
+      "dds-hans-view-mode",
+      "dds-rora-view-mode"
+    );
+
+    const commissionPanel = document.querySelector('[data-panel="commission"]');
+    if (commissionPanel) {
+      document.querySelectorAll("[data-panel]").forEach((panel) => {
+        panel.classList.toggle("is-active", panel === commissionPanel);
+      });
+    }
+
+    document.querySelectorAll('[data-work-tab]').forEach((button) => {
+      const active = button.dataset.workTab === "commission";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+
+    document.querySelectorAll('[data-work-panel]').forEach((panel) => {
+      const active = panel.dataset.workPanel === "commission";
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+
+    document.querySelectorAll('[data-page], [data-go]').forEach((button) => {
+      const target = button.dataset.page || button.dataset.go;
+      if (!PAGE_META[target]) return;
+      const active = target === "commission";
+      button.classList.toggle("is-active", active);
+      if (button.hasAttribute("aria-current")) {
+        button.setAttribute("aria-current", active ? "page" : "false");
+      }
+    });
+
+    try {
+      history.replaceState(
+        { ...(history.state || {}), ddsBrowserPage: "commission" },
+        "",
+        "#commission"
+      );
+    } catch (_) {}
+
+    syncChrome();
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }
+
   function restoreFromHistory(event) {
     const statePage = event?.state?.ddsBrowserPage;
     const hash = (location.hash || "").replace(/^#/, "").toLowerCase();
     const hashPage = PAGE_META[hash] ? hash : null;
     const page = statePage && PAGE_META[statePage] ? statePage : hashPage;
+
+    if (page === "commission") {
+      openCategory("commission", { checkpoint: false, writeHash: false });
+      requestAnimationFrame(resetCommissionDirectoryView);
+      return;
+    }
 
     if (page) {
       openCategory(page, { checkpoint: false, writeHash: false });
