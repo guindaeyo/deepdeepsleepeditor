@@ -1,1 +1,1 @@
-V234 — View Work canvas reaches viewport bottom. Based on v233; only view-work CSS, its sizing JS, and cache-busting HTML references changed. Invisible vertical scroll and centered previews retained.
+V235 — Based on V234. Unified BBCode styling and coverage for Roleplay, note prefix, Note and Commission editors. Browser Back and VIEW WORK canvas remain unchanged.

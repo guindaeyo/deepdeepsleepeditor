@@ -27396,3 +27396,103 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     document.addEventListener('DOMContentLoaded', init, {once: true});
   else init();
 })();
+
+
+/* V235 — Unified BBCode for all RP editors, note prefixes and notes.
+   The existing BBCode handlers are retained; only presentation/coverage changes. */
+(() => {
+  'use strict';
+  if (window.__DDS_UNIFIED_BBCODE_V235__) return;
+  window.__DDS_UNIFIED_BBCODE_V235__ = true;
+  const EDITORS = '[data-panel^="editor-"], .dds-protected-commission-editor, [class*="commission-editor"], [class*="-editor-panel"]';
+  const TEXTS = 'textarea, input[type="text"], input:not([type]), [contenteditable="true"]';
+  const ICONS = {
+    'b':'type-bold','i':'type-italic','u':'underline','s':'type-strikethrough',
+    'align-left':'text-left','align-center':'text-center','align-right':'text-right','align-justify':'justify',
+    'left':'text-left','center':'text-center','right':'text-right','justify':'justify',
+    'url':'link-45deg','link':'link-45deg','img':'image','image':'image','video':'youtube','youtube':'youtube',
+    'quote':'chat-left-quote','code':'code-slash','hide':'eye-slash','spoiler':'eye-slash',
+    'list':'list-ul','list-1':'list-ol','list-item':'list-task','hr':'dash-lg','clear':'eraser',
+    'size-small':'type','size-medium':'type','size-large':'type', 'color':'palette'
+  };
+  const NAMES = {b:'ตัวหนา',i:'ตัวเอียง',u:'ขีดเส้นใต้',s:'ขีดฆ่า',
+    'align-left':'ชิดซ้าย','align-center':'กึ่งกลาง','align-right':'ชิดขวา','align-justify':'เต็มบรรทัด',
+    'url':'ลิงก์','img':'รูปภาพ','video':'YouTube','quote':'อ้างอิง','code':'โค้ด',
+    'hide':'ซ่อนข้อความ','spoiler':'สปอยล์','list':'รายการจุด','list-1':'รายการตัวเลข',
+    'list-item':'รายการย่อย','hr':'เส้นคั่น','clear':'ล้างรูปแบบ'};
+  let timer;
+  function isTarget(field) {
+    if (!field.matches(TEXTS) || field.closest('.dds-rich-toolbar, .dds-bbcode-toolbar, .dds-named-save-library')) return false;
+    if (field.type === 'color' || field.matches('[data-bbcode-color],[data-dds-no-save]')) return false;
+    const label = field.closest('label');
+    const name = (label?.querySelector(':scope > span,:scope > strong')?.textContent || '').trim();
+    const section = field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent || '';
+    const key = [field.id, field.name, ...Object.entries(field.dataset).filter(([k]) => /field|key|note|roleplay/i.test(k)).map(([,v])=>v)].join(' ');
+    const isNote = /หมายเหตุ|\bnote\b|note(?:text|content|prefix|label)|(?:note|remark)(?:Text|Content|Prefix|Label)?$/i.test(`${name} ${key}`)
+      || (/^(?:หมายเหตุ|note)$/i.test(section.trim()) && !/สี|color|icon|สัญลักษณ์|border|ขอบ|พื้นหลัง|background/i.test(name));
+    const isRP = /โรลเพลย์|role\s*play|roleplay|rptext|rpcontent|rpbody/i.test(`${name} ${key}`);
+    const invalid = /สี|color|สัญลักษณ์|symbol|icon|border|ขอบ|พื้นหลัง|background|note\s*color|notecolor|noteicon|topnote/i.test(name+' '+key);
+    if (invalid) return false;
+    return isNote || isRP;
+  }
+  function decorate(toolbar) {
+    if (!toolbar || toolbar.dataset.ddsV235Decorated === 'true') return;
+    toolbar.classList.add('dds-unified-bbcode-v235');
+    toolbar.querySelectorAll('button').forEach(b=>{
+      const raw=b.dataset.bbcode || b.dataset.code014Bbcode || b.dataset.code013Bbcode || b.dataset.foodBbcode || b.dataset.hansBbcode || b.dataset.action || '';
+      let action=raw.toLowerCase();
+      if(!action) {
+        const opener=b.dataset.ericOpen || b.dataset.hansOpen || b.dataset.open || '';
+        const match=opener.match(/^\[(?:align|size)=([^\]]+)|^\[([^\]=]+)/i);
+        if(match) action=match[2]||('align-'+match[1]);
+      }
+      if(!action) {
+        const title=(b.title+' '+b.getAttribute('aria-label')).toLowerCase();
+        if(/ตัวหนา/.test(title)) action='b';
+        else if(/ตัวเอียง/.test(title)) action='i';
+        else if(/ขีดเส้นใต้/.test(title)) action='u';
+        else if(/ขีดฆ่า/.test(title)) action='s';
+      }
+      const key=action.replace(/^(?:bbcode-|insert-)/,'');
+      if (ICONS[key]) {
+        if (key.startsWith('size-')) { b.innerHTML='<i class="bi bi-type" aria-hidden="true"></i><small>'+({ 'size-small':'−','size-medium':'','size-large':'+' }[key])+'</small>'; }
+        else b.innerHTML='<i class="bi bi-'+ICONS[key]+'" aria-hidden="true"></i>';
+        b.setAttribute('aria-label', b.getAttribute('aria-label') || NAMES[key] || b.title || key);
+      } else if (/^clear$/i.test(b.textContent.trim())) {
+        b.innerHTML='<i class="bi bi-eraser" aria-hidden="true"></i>';
+      }
+    });
+    toolbar.querySelectorAll('label.dds-bbcode-color,label.dds-rich-color').forEach(label=>{
+      const span=label.querySelector('span'); if(span) span.innerHTML='<i class="bi bi-palette" aria-hidden="true"></i>';
+    });
+    toolbar.dataset.ddsV235Decorated='true';
+  }
+  function scan(){
+    document.querySelectorAll(EDITORS).forEach(panel=>{
+      if(panel.matches('.dds-commission-view-panel')) return;
+      panel.querySelectorAll(TEXTS).forEach(field=>{
+        if (!isTarget(field)) return;
+        field.removeAttribute('data-dds-no-bbcode');
+        // Call the site's original fully featured insertion logic.
+        if(typeof window.__ddsInstallBbcodeToolbarForTarget==='function')
+          window.__ddsInstallBbcodeToolbarForTarget(field);
+        const toolbar=field.previousElementSibling?.matches('.dds-rich-toolbar')
+          ? field.previousElementSibling : panel.querySelector(`[data-toolbar-for="${CSS.escape(field.id||'__missing__')}"]`);
+        if(toolbar) { toolbar.classList.add('dds-unified-bbcode-v235'); field.closest('label')?.classList.add('dds-note-bbcode-field'); }
+      });
+      panel.querySelectorAll('.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]').forEach(decorate);
+    });
+  }
+  function schedule(){clearTimeout(timer);timer=setTimeout(scan,45)}
+  function boot(){
+    scan();
+    document.addEventListener('click',schedule,true);
+    window.addEventListener('hashchange',schedule);
+    const main=document.querySelector('.dds-main') || document.body;
+    new MutationObserver(records=>{
+      if(records.some(r=>Array.from(r.addedNodes).some(n=>n.nodeType===1 && !(n.matches?.('i,small')||n.closest?.('.dds-rich-toolbar'))))) schedule();
+    }).observe(main,{childList:true,subtree:true});
+    setTimeout(scan,650);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
