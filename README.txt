@@ -1,1 +1,1 @@
-V238 — All editable multiline fields set to 150px height; overflow scrolls vertically with red theme scrollbar. Word counters and other functionality unchanged.
+V239 — Based on V238. Only left live-preview scrollbars hidden from first render; scrolling still enabled. Input text-area red scrollbars, word counters and other features unchanged.\n

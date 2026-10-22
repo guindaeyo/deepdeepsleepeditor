@@ -24019,15 +24019,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       .dds-preview-shell,
       .dds-lwl-preview-shell,
       [class*="preview-shell"]{
-        scrollbar-width:thin!important;
-        scrollbar-color:#c11724 #090909!important;
+        scrollbar-width:none!important;
+        -ms-overflow-style:none!important;
       }
 
       .dds-preview-shell::-webkit-scrollbar,
       .dds-lwl-preview-shell::-webkit-scrollbar,
       [class*="preview-shell"]::-webkit-scrollbar{
-        width:7px;
-        height:7px;
+        width:0!important;
+        height:0!important;
+        display:none!important;
       }
 
       .dds-preview-shell::-webkit-scrollbar-track,

@@ -14708,3 +14708,23 @@ body.dds-y2k-vampire .dds-rich-editor[contenteditable="true"]::-webkit-scrollbar
   background: #b5162e !important;
   border-radius: 4px !important;
 }
+
+
+/* V239 — invisible scrollbar on LEFT live preview from initial render.
+   Scrolling remains enabled; form-field scrollbars on the right are unchanged. */
+body.dds-y2k-vampire :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-protected-commission-preview-stage,.dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,.dds-fortyone-preview-stage,
+  .dds-nothin-preview-stage,.dds-commission-preview-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+) { scrollbar-width:none !important; -ms-overflow-style:none !important; }
+body.dds-y2k-vampire :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-protected-commission-preview-stage,.dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,.dds-fortyone-preview-stage,
+  .dds-nothin-preview-stage,.dds-commission-preview-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+)::-webkit-scrollbar { display:none !important; width:0 !important; height:0 !important; }
