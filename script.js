@@ -208,7 +208,7 @@
         }
 
         const selector =
-          ".dds-preview-target, .dds-card-preview-target";
+          ".dds-preview-target, .dds-card-preview-target, [class*=\"preview-root\"], [class*=\"preview-shell\"]";
         const currentTarget =
           previewDocument.querySelector(selector);
 
@@ -6937,7 +6937,7 @@ ${stylesheetLinks}
         return false;
       }
 
-      const selector = ".dds-preview-target, .dds-card-preview-target";
+      const selector = ".dds-preview-target, .dds-card-preview-target, [class*=\"preview-root\"], [class*=\"preview-shell\"]";
       const currentTarget = previewDocument.querySelector(selector);
       if (!currentTarget) {
         return false;
@@ -15944,7 +15944,7 @@ ${stylesheetLinks}
       const doc = iframe?.contentDocument;
       const root = doc?.querySelector(".dds-hans-preview-root");
       if (!doc || !root) return { width: CANVAS_WIDTH, height: 900 };
-      const width = Math.max(1, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH));
+      const width = CANVAS_WIDTH;
       const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 900));
       return { width, height };
     } catch {
@@ -16794,7 +16794,7 @@ ${stylesheetLinks}
       const doc = iframe?.contentDocument;
       const root = doc?.querySelector(".dds-hans-preview-root");
       if (!doc || !root) return { width: CANVAS_WIDTH, height: 900 };
-      const width = Math.max(1, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH));
+      const width = CANVAS_WIDTH;
       const height = Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 900));
       return { width, height };
     } catch {
@@ -18840,7 +18840,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const root = doc?.querySelector(".dds-jewel-preview-root");
       if (!doc || !root) return { width: CANVAS_WIDTH, height: 950 };
       return {
-        width: Math.max(1, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH)),
+        width: CANVAS_WIDTH,
         height: Math.max(1, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 950))
       };
     } catch { return { width: CANVAS_WIDTH, height: 950 }; }
@@ -19737,7 +19737,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (!doc || !root) return { width: CANVAS_WIDTH, height: 1000 };
       const rect = root.getBoundingClientRect();
       return {
-        width: Math.max(CANVAS_WIDTH, Math.ceil(root.scrollWidth || rect.width || CANVAS_WIDTH)),
+        width: CANVAS_WIDTH,
         height: Math.max(1, Math.ceil(root.scrollHeight || rect.height || doc.body.scrollHeight || 1000))
       };
     } catch {
@@ -20246,7 +20246,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const root = doc?.querySelector(".dds-code013-preview-root");
       if (!root) return { width: CANVAS_WIDTH, height: 850 };
       return {
-        width: Math.max(CANVAS_WIDTH, Math.ceil(root.scrollWidth || root.getBoundingClientRect().width || CANVAS_WIDTH)),
+        width: CANVAS_WIDTH,
         height: Math.max(320, Math.ceil(root.scrollHeight || root.getBoundingClientRect().height || 850))
       };
     } catch { return { width: CANVAS_WIDTH, height: 850 }; }
@@ -27647,7 +27647,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
               : value;
 
             /*
-             * V186: once an editor iframe is already loaded, patch the
+             * V187: once an editor iframe is already loaded, patch the
              * existing preview DOM instead of navigating srcdoc again.
              * This keeps the current pixels visible while typing and
              * removes the white/transparent flash between keystrokes.
@@ -27683,7 +27683,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
                 }
               } catch (error) {
                 console.warn(
-                  "[DDS V186] steady preview patch failed; falling back to srcdoc reload",
+                  "[DDS V187] steady preview patch failed; falling back to srcdoc reload",
                   error
                 );
               }
@@ -27765,3 +27765,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     boot();
   }
 })();
+
+
+/* =========================================================
+   V187 — FIXED CANVAS PREVIEW WIDTH GUARD
+   Editor previews with a declared CANVAS_WIDTH must never use
+   overflowing child scrollWidth as the canvas width. This keeps
+   long text/BBCode from shrinking the whole preview into a strip.
+========================================================= */
