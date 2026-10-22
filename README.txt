@@ -1,21 +1,16 @@
-DEEP DEEP SLEEP EDITOR — V193 TRUE CENTRAL PREVIEW
+DEEP DEEP SLEEP CODE SHOP — V194 FAST BOOT
 
-Replace these files together:
+ใช้ไฟล์ทั้ง 5 ตัวนี้เขียนทับชุด V193 เดิม:
 - index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V193 preview rules:
-- every editor iframe is intercepted centrally
-- first load only: one real srcdoc navigation
-- typing: DOM morph only, no iframe reload
-- width measured once and kept stable while typing
-- no zoom reset / no scale pulse on keystrokes
-- full code width fits horizontally
-- long code scrolls vertically inside preview
-- scrollbar remains invisible
-- BBCode renders in preview
+V194 เปลี่ยนเฉพาะ startup ของ Central Preview Engine:
+- ไม่สแกน iframe/input/textarea/toolbar ทั้งเว็บตอนเปิดหน้า
+- ไม่มี MutationObserver เฝ้า subtree ทั้ง .dds-main
+- ค่อยติดตั้ง preview/BBCode เฉพาะ editor ที่ผู้ใช้เปิดหรือช่องที่ผู้ใช้โฟกัส
+- ระบบพรีวิวไม่กะพริบ, BBCode preview, Cloud Save และ Draft ยังคงเดิม
 
-After upload, hard refresh once (Ctrl+F5).
+หลังอัปโหลดให้ Ctrl+F5 หนึ่งครั้ง

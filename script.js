@@ -26595,7 +26595,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V193 — ONE TRUE CENTRAL EDITOR PREVIEW ENGINE
+   V193/V194 — ONE TRUE CENTRAL EDITOR PREVIEW ENGINE + LAZY BOOT
    Applies to every EDIT page:
    FOR ROLEPLAY / FOR PROFILE / FOR REVIEW / COMMISSION & ACTIVITY
 
@@ -27402,38 +27402,70 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }
 
+  function activeEditorPanel() {
+    const direct = document.querySelector(`${EDITOR_PANEL_SELECTOR}.is-active`);
+    if (direct) return direct;
+    const panel = document.querySelector('.dds-panel.is-active');
+    return panel && panel.matches?.(EDITOR_PANEL_SELECTOR) ? panel : null;
+  }
+
+  function scanActiveEditorOnly() {
+    const active = activeEditorPanel();
+    if (!active) return;
+    scanInserted(active);
+  }
+
+  function scheduleLazyEditorScan() {
+    requestAnimationFrame(scanActiveEditorOnly);
+    // Dynamic commission editors are sometimes inserted a little after the click.
+    // These delayed scans inspect only the currently active editor, never the site.
+    setTimeout(scanActiveEditorOnly,90);
+    setTimeout(scanActiveEditorOnly,260);
+  }
+
   function boot() {
     document.body?.classList.remove('dds-v192-central-preview');
-    document.body?.classList.add('dds-v193-central-preview');
-    ensureIconFont();
+    document.body?.classList.add('dds-v193-central-preview','dds-v194-fast-boot');
+
+    // Keep startup almost free: install only the hooks. Do NOT scan every iframe,
+    // input, textarea or toolbar on the home page. The central srcdoc hook catches
+    // an editor preview automatically the moment that editor actually renders.
     installSrcdocHook();
     installQueueHooks();
-    scanInserted(document);
-    removeToolbarTargetLabels(document);
-
-    const main = document.querySelector('.dds-main') || document.body;
-    if (main && 'MutationObserver' in window) {
-      const observer = new MutationObserver((records) => {
-        records.forEach((record) => {
-          if (record.type !== 'childList' || !record.addedNodes.length) return;
-          record.addedNodes.forEach((node) => {
-            if (node instanceof Element) scanInserted(node);
-          });
-        });
-      });
-      observer.observe(main,{childList:true,subtree:true});
-    }
 
     document.addEventListener('click',(event) => {
       if (!event.target?.closest?.('[data-edit-code],[data-edit-review],[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],[data-code014-edit],[class*="commission-card"] button')) return;
-      requestAnimationFrame(scheduleActiveScan);
-      setTimeout(scheduleActiveScan,120);
+      scheduleLazyEditorScan();
     },true);
 
+    // Lazy BBCode/preview setup: touch only the field the user actually enters.
+    document.addEventListener('focusin',(event) => {
+      const field = event.target?.closest?.('textarea,[contenteditable="true"],input[type="text"],input:not([type]),select');
+      if (!field) return;
+      const panel = field.closest(EDITOR_PANEL_SELECTOR) || field.closest('.dds-panel');
+      if (!panel || !panel.matches?.(EDITOR_PANEL_SELECTOR) || !panel.querySelector('iframe')) return;
+      installToolbarCoverage(field);
+      removeToolbarTargetLabels(panel);
+      panel.querySelectorAll('iframe').forEach(registerFrame);
+    },true);
+
+    // Support a direct/deep link into an editor without blocking first paint.
+    const idleScan = () => scanActiveEditorOnly();
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(idleScan,{timeout:900});
+    } else {
+      setTimeout(idleScan,500);
+    }
+
+    let resizeTimer = 0;
     window.addEventListener('resize',() => {
-      document.querySelectorAll('iframe').forEach((iframe) => {
-        if (isEditorPreview(iframe)) scheduleFit(iframe,null,false);
-      });
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const active = activeEditorPanel();
+        active?.querySelectorAll('iframe').forEach((iframe) => {
+          if (isEditorPreview(iframe)) scheduleFit(iframe,null,false);
+        });
+      },80);
     },{passive:true});
   }
 
