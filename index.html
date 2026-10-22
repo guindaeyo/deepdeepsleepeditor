@@ -22,7 +22,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=P261022-v213-interactive-first" rel="stylesheet"/>
+<link href="./style.css?v=P261022-v214-edit-click-gate" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5661,15 +5661,16 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script id="dds-local-enhancements-loader-v213">
+<script id="dds-local-enhancements-loader-v214">
 (() => {
   "use strict";
 
-  if (window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V213__) return;
-  window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V213__ = true;
+  if (window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V214__) return;
+  window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V214__ = true;
 
-  let loading = false;
   let loaded = false;
+  let loadPromise = null;
+  let replaying = false;
 
   function needsEnhancementsFromHash() {
     const hash = String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || "");
@@ -5677,30 +5678,38 @@ You were mine forever</textarea>
   }
 
   function loadEnhancements() {
-    if (loaded || loading) return;
-    loading = true;
+    if (loaded) return Promise.resolve(true);
+    if (loadPromise) return loadPromise;
 
-    const script = document.createElement("script");
-    script.src = "./script.js?v=P261022-v213-interactive-first";
-    script.async = true;
-    script.dataset.ddsLocalEnhancements = "v213";
-    script.onload = () => {
-      loaded = true;
-      loading = false;
-      window.dispatchEvent(new CustomEvent("dds-local-enhancements-ready"));
-    };
-    script.onerror = () => {
-      loading = false;
-      console.error("[DDS V213] local enhancements failed to load");
-    };
-    document.head.appendChild(script);
+    loadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "./script.js?v=P261022-v214-edit-click-gate";
+      script.async = true;
+      script.dataset.ddsLocalEnhancements = "v214";
+      script.onload = () => {
+        loaded = true;
+        window.dispatchEvent(new CustomEvent("dds-local-enhancements-ready"));
+        resolve(true);
+      };
+      script.onerror = () => {
+        loadPromise = null;
+        console.error("[DDS V214] local enhancements failed to load");
+        reject(new Error("DDS local enhancements failed to load"));
+      };
+      document.head.appendChild(script);
+    });
+
+    return loadPromise;
   }
 
-  const triggerSelector = [
+  const preloadSelector = [
     "[data-page=\"roleplay\"]", "[data-page=\"profile\"]",
     "[data-page=\"review\"]", "[data-page=\"commission\"]",
     "[data-go=\"roleplay\"]", "[data-go=\"profile\"]",
-    "[data-go=\"review\"]", "[data-go=\"commission\"]",
+    "[data-go=\"review\"]", "[data-go=\"commission\"]"
+  ].join(",");
+
+  const editSelector = [
     "[data-edit-code]", "[data-edit-profile]", "[data-edit-review]",
     "[data-commission-edit]", "[data-protected-commission-edit]",
     "[data-edit-protected-commission]", "[data-code013-edit]", "[data-code014-edit]",
@@ -5710,20 +5719,78 @@ You were mine forever</textarea>
     ".dds-commission-card button"
   ].join(",");
 
+  function isCommissionEdit(target) {
+    return Boolean(target?.closest?.(
+      "[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission]," +
+      "[data-rora-edit],[data-hans-edit],[data-jewel-edit],[data-landon-file-edit]," +
+      "[data-alan-edit],[data-mhp-edit],.dds-commission-card button"
+    ));
+  }
+
+  function waitFrames(count) {
+    return new Promise((resolve) => {
+      const next = () => {
+        if (count-- <= 0) return resolve();
+        requestAnimationFrame(next);
+      };
+      requestAnimationFrame(next);
+    });
+  }
+
+  // Preload as soon as the pointer goes down so normal category navigation stays instant.
   document.addEventListener("pointerdown", (event) => {
-    if (event.target?.closest?.(triggerSelector)) loadEnhancements();
+    if (event.target?.closest?.(preloadSelector + "," + editSelector)) {
+      loadEnhancements().catch(() => {});
+    }
+  }, true);
+
+  // IMPORTANT: the first EDIT click must not outrun the async script load.
+  // Hold it, finish loading/binding the editor handlers, then replay exactly once.
+  document.addEventListener("click", async (event) => {
+    const target = event.target?.closest?.(editSelector);
+    if (!target || loaded || replaying) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    const commission = isCommissionEdit(target);
+    target.setAttribute("aria-busy", "true");
+
+    try {
+      await loadEnhancements();
+
+      if (commission && typeof window.__ddsActivateCommissionInstallersV212 === "function") {
+        window.__ddsActivateCommissionInstallersV212();
+        // Commission installers are intentionally chunked 3-per-frame.
+        // Give the queue enough frames to bind the requested editor before replaying.
+        await waitFrames(7);
+      } else {
+        await waitFrames(2);
+      }
+
+      replaying = true;
+      target.click();
+    } catch (error) {
+      console.error("[DDS V214] could not open editor after lazy load", error);
+    } finally {
+      target.removeAttribute("aria-busy");
+      requestAnimationFrame(() => { replaying = false; });
+    }
   }, true);
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
-    if (event.target?.closest?.(triggerSelector)) loadEnhancements();
+    if (event.target?.closest?.(preloadSelector + "," + editSelector)) {
+      loadEnhancements().catch(() => {});
+    }
   }, true);
 
   window.addEventListener("hashchange", () => {
-    if (needsEnhancementsFromHash()) loadEnhancements();
+    if (needsEnhancementsFromHash()) loadEnhancements().catch(() => {});
   }, { passive: true });
 
-  if (needsEnhancementsFromHash()) loadEnhancements();
+  if (needsEnhancementsFromHash()) loadEnhancements().catch(() => {});
 })();
 </script>
 <script id="dds-code014-fixed-v172">
