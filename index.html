@@ -22,7 +22,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=P261022-v216-explicit-editor-only" rel="stylesheet"/>
+<link href="./style.css?v=20261022-v210-central-preview" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5661,132 +5661,7 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script id="dds-local-enhancements-loader-v216">
-(() => {
-  "use strict";
-
-  if (window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V216__) return;
-  window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V216__ = true;
-
-  let loaded = false;
-  let loadPromise = null;
-  let replaying = false;
-
-  function needsEnhancementsFromHash() {
-    const hash = String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || "");
-    return /#(?:editor-(?:code01[0-3]|commission)|protected-|view-commission)/i.test(hash);
-  }
-
-  function loadEnhancements() {
-    if (loaded) return Promise.resolve(true);
-    if (loadPromise) return loadPromise;
-
-    loadPromise = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "./script.js?v=P261022-v216-explicit-editor-only";
-      script.async = true;
-      script.dataset.ddsLocalEnhancements = "v216";
-      script.onload = () => {
-        loaded = true;
-        window.dispatchEvent(new CustomEvent("dds-local-enhancements-ready"));
-        resolve(true);
-      };
-      script.onerror = () => {
-        loadPromise = null;
-        console.error("[DDS V216] local enhancements failed to load");
-        reject(new Error("DDS local enhancements failed to load"));
-      };
-      document.head.appendChild(script);
-    });
-
-    return loadPromise;
-  }
-
-  /*
-   * IMPORTANT PERFORMANCE RULE:
-   * Category navigation NEVER loads the 1.2 MB local enhancement bundle.
-   * The base/core site is allowed to navigate and paint immediately.
-   * Only editor implementations that actually live in the local bundle
-   * are gated below.
-   */
-  const localOnlyEditSelector = [
-    '[data-edit-code="code010"]',
-    '[data-edit-code="code011"]',
-    '[data-edit-code="code012"]',
-    '[data-code013-edit]',
-    '[data-edit-protected-commission]',
-    '[data-commission-edit]',
-    '[data-protected-commission-edit]',
-    '[data-rora-edit]',
-    '[data-hans-edit]',
-    '[data-jewel-edit]',
-    '[data-landon-file-edit]',
-    '[data-alan-edit]',
-    '[data-mhp-edit]'
-  ].join(",");
-
-  function isCommissionEdit(target) {
-    return Boolean(target?.closest?.([
-      '[data-edit-protected-commission]',
-      '[data-commission-edit]',
-      '[data-protected-commission-edit]',
-      '[data-rora-edit]', '[data-hans-edit]', '[data-jewel-edit]',
-      '[data-landon-file-edit]', '[data-alan-edit]', '[data-mhp-edit]'
-    ].join(',')));
-  }
-
-  function waitFrames(count) {
-    return new Promise((resolve) => {
-      const next = () => {
-        if (count-- <= 0) return resolve();
-        requestAnimationFrame(next);
-      };
-      requestAnimationFrame(next);
-    });
-  }
-
-  document.addEventListener("click", async (event) => {
-    const target = event.target?.closest?.(localOnlyEditSelector);
-    if (!target || loaded || replaying) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    target.setAttribute("aria-busy", "true");
-
-    try {
-      await loadEnhancements();
-
-      if (isCommissionEdit(target) && typeof window.__ddsActivateCommissionInstallersV212 === "function") {
-        window.__ddsActivateCommissionInstallersV212();
-        await waitFrames(5);
-      } else {
-        await waitFrames(1);
-      }
-
-      replaying = true;
-      target.click();
-    } catch (error) {
-      console.error("[DDS V216] could not open local editor", error);
-    } finally {
-      target.removeAttribute("aria-busy");
-      requestAnimationFrame(() => { replaying = false; });
-    }
-  }, true);
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const target = event.target?.closest?.(localOnlyEditSelector);
-    if (target && !loaded) loadEnhancements().catch(() => {});
-  }, true);
-
-  window.addEventListener("hashchange", () => {
-    if (needsEnhancementsFromHash()) loadEnhancements().catch(() => {});
-  }, { passive: true });
-
-  if (needsEnhancementsFromHash()) loadEnhancements().catch(() => {});
-})();
-</script>
+<script src="./script.js?v=20261022-v210-stable-preview-hotfix"></script>
 <script id="dds-code014-fixed-v172">
 /* CODE014 FIXED MODULE v172 — self-contained helpers + tested editor route */
 

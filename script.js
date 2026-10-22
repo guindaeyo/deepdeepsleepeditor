@@ -5475,128 +5475,18 @@ ${stylesheetLinks}
   }
 
 
-
-  /* =========================================================
-     V212 — FAST BOOT / LAZY COMMISSION INSTALLERS
-     Keep the landing page interactive. Heavy commission cards,
-     modals and preview installers are created only when the user
-     actually enters COMMISSION & ACTIVITY or opens a commission link.
-     ========================================================= */
-  (() => {
-    if (window.__DDS_V212_COMMISSION_BOOT_GATE__) return;
-    window.__DDS_V212_COMMISSION_BOOT_GATE__ = true;
-
-    const queue = [];
-    let active = false;
-    let scheduled = false;
-
-    function commissionHash(value = window.location.hash) {
-      return /commission/i.test(String(value || ""));
-    }
-
-    function runChunk() {
-      scheduled = false;
-      if (!active || !queue.length) return;
-
-      // Keep each frame small so navigation remains clickable/smooth.
-      let count = 0;
-      while (queue.length && count < 3) {
-        const installer = queue.shift();
-        try { installer(); }
-        catch (error) { console.warn("[DDS V212] deferred commission installer failed", error); }
-        count += 1;
-      }
-
-      if (queue.length) schedule();
-    }
-
-    function schedule() {
-      if (scheduled || !active || !queue.length) return;
-      scheduled = true;
-      requestAnimationFrame(runChunk);
-    }
-
-    function activate() {
-      if (!active) active = true;
-      schedule();
-    }
-
-    window.__ddsDeferCommissionInstallerV212 = function (installer) {
-      if (typeof installer !== "function") return;
-      queue.push(installer);
-      if (active) schedule();
-    };
-
-    window.__ddsActivateCommissionInstallersV212 = activate;
-
-    document.addEventListener("click", (event) => {
-      const target = event.target?.closest?.([
-        '[data-page="commission"]',
-        '[data-go="commission"]',
-        '[data-work-tab="commission"]',
-        '[data-commission-edit]',
-        '[data-protected-commission-edit]',
-        '[data-edit-protected-commission]',
-        '[data-rora-edit]',
-        '[data-hans-edit]',
-        '[data-jewel-edit]',
-        '[data-landon-file-edit]',
-        '[data-alan-edit]',
-        '[data-mhp-edit]',
-        '.dds-commission-card button'
-      ].join(','));
-      if (target) activate();
-    }, true);
-
-    window.addEventListener("hashchange", () => {
-      if (commissionHash()) activate();
-    }, { passive: true });
-
-    const initialHash = String(window.__DDS_INITIAL_DEEP_LINK_HASH__ || window.location.hash || "");
-    if (commissionHash(initialHash)) {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", activate, { once: true });
-      } else {
-        activate();
-      }
-    }
-  })();
-
   installLivePreviewPerformanceFix();
   installNewRulesWebsiteImageFix();
-  window.__ddsDeferCommissionInstallerV212(installCommissionActivityLayout);
-  window.__ddsDeferCommissionInstallerV212(installActivityTopMovies);
-  window.__ddsDeferCommissionInstallerV212(installActivityTopMoviesReply);
-  window.__ddsDeferCommissionInstallerV212(installCommissionThreeHouse);
-  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeCommission);
-  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeHistory);
-  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeTopicHeader);
+  installCommissionActivityLayout();
+  installActivityTopMovies();
+  installActivityTopMoviesReply();
+  installCommissionThreeHouse();
+  installMyOwnCodeCommission();
+  installMyOwnCodeHistory();
+  installMyOwnCodeTopicHeader();
   normalizeShowcaseCardLabels();
-  window.__ddsDeferCommissionInstallerV212(installThreeColumnShowcaseGrids);
-  const activateBlankEditorToolsV213 = () => {
-    installBlankEditorFormsAndBbcodeTools();
-  };
-
-  const blankEditorTriggerV213 = [
-    "[data-edit-code]", "[data-edit-profile]", "[data-edit-review]",
-    "[data-commission-edit]", "[data-protected-commission-edit]",
-    "[data-edit-protected-commission]", "[data-code013-edit]", "[data-code014-edit]",
-    "[data-rora-edit]", "[data-hans-edit]", "[data-jewel-edit]",
-    "[data-landon-file-edit]", "[data-alan-edit]", "[data-mhp-edit]",
-    ".dds-roleplay-edit", ".dds-profile-edit", ".dds-review-edit",
-    ".dds-commission-card button"
-  ].join(",");
-
-  document.addEventListener("pointerdown", (event) => {
-    if (event.target?.closest?.(blankEditorTriggerV213)) {
-      activateBlankEditorToolsV213();
-    }
-  }, true);
-
-  if (/#(?:editor-|protected-)/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
-    activateBlankEditorToolsV213();
-  }
-
+  installThreeColumnShowcaseGrids();
+  installBlankEditorFormsAndBbcodeTools();
   installStaticCataloguePreviewFix();
   installStaticFoodReviewCataloguePreviewFix();
   window.__DDS_PERFORMANCE_BUILD_READY__ = true;
@@ -7104,67 +6994,45 @@ ${stylesheetLinks}
     installOfficialCardPreviewProtection();
     installLivePreviewPerformanceFix();
 
-    const initializedPanels = new Set();
+    const panels = Array.from(document.querySelectorAll(EDITOR_PANEL_SELECTOR));
+    panels.forEach((panel) => {
+      getPanelState(panel);
+      installDraftManager(panel);
+      installBbcodeToolbars(panel);
+      installRoleplayWordCounters(panel);
+    });
 
-    function ensurePanel(panel) {
-      if (!panel || !isEditorPanel(panel)) return;
-
-      if (!initializedPanels.has(panel)) {
-        getPanelState(panel);
-        installDraftManager(panel);
-        installBbcodeToolbars(panel);
-        installRoleplayWordCounters(panel);
-        initializedPanels.add(panel);
+    const activateCurrentPanel = () => {
+      const activePanel = panels.find((panel) => panel.classList.contains("is-active"));
+      if (activePanel) {
+        activatePanel(activePanel);
       }
+    };
 
-      activatePanel(panel);
-    }
+    activateCurrentPanel();
 
-    function activeEditorPanel() {
-      return Array.from(document.querySelectorAll(EDITOR_PANEL_SELECTOR))
-        .find((panel) => panel.classList.contains("is-active")) || null;
-    }
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class" &&
+          mutation.target.classList.contains("is-active") &&
+          isEditorPanel(mutation.target)
+        ) {
+          activatePanel(mutation.target);
+        }
+      }
+    });
 
-    let activationFrame = 0;
-    function scheduleActivePanel() {
-      cancelAnimationFrame(activationFrame);
-      activationFrame = requestAnimationFrame(() => {
-        activationFrame = requestAnimationFrame(() => {
-          activationFrame = 0;
-          const panel = activeEditorPanel();
-          if (panel) ensurePanel(panel);
-        });
+    panels.forEach((panel) => {
+      observer.observe(panel, {
+        attributes: true,
+        attributeFilter: ["class"]
       });
-    }
-
-    const editorTrigger = [
-      "[data-edit-code]", "[data-edit-profile]", "[data-edit-review]",
-      "[data-commission-edit]", "[data-protected-commission-edit]",
-      "[data-edit-protected-commission]", "[data-code013-edit]", "[data-code014-edit]",
-      "[data-rora-edit]", "[data-hans-edit]", "[data-jewel-edit]",
-      "[data-landon-file-edit]", "[data-alan-edit]", "[data-mhp-edit]",
-      ".dds-roleplay-edit", ".dds-profile-edit", ".dds-review-edit",
-      ".dds-commission-card button"
-    ].join(",");
-
-    document.addEventListener("pointerdown", (event) => {
-      if (event.target?.closest?.(editorTrigger)) scheduleActivePanel();
-    }, true);
-
-    document.addEventListener("focusin", (event) => {
-      const panel = event.target?.closest?.(EDITOR_PANEL_SELECTOR);
-      if (panel && isEditorPanel(panel)) ensurePanel(panel);
-    }, true);
-
-    window.addEventListener("hashchange", scheduleActivePanel, { passive: true });
-    window.addEventListener("popstate", scheduleActivePanel, { passive: true });
-
-    if (/#(?:editor-|protected-)/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
-      scheduleActivePanel();
-    }
+    });
 
     window.addEventListener("beforeunload", () => {
-      initializedPanels.forEach((panel) => {
+      panels.forEach((panel) => {
         const state = getPanelState(panel);
         if (state.initialized) {
           window.clearTimeout(state.saveTimer);
@@ -10868,7 +10736,11 @@ ${stylesheetLinks}
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
 })();
 
 /* =========================================================
@@ -11689,7 +11561,11 @@ ${stylesheetLinks}
     window.addEventListener("resize", fitPreview);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
 })();
 
 
@@ -12601,7 +12477,11 @@ ${stylesheetLinks}
     window.addEventListener("resize", fitPreview);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
 })();
 
 /* =========================================================
@@ -13266,7 +13146,11 @@ ${stylesheetLinks}
     }, 100);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
 })();
 
 /* =========================================================
@@ -13940,7 +13824,8 @@ ${stylesheetLinks}
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
+  else install();
 })();
 
 /* =========================================================
@@ -15141,7 +15026,8 @@ ${stylesheetLinks}
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
+  else install();
 })();
 
 
@@ -15688,7 +15574,8 @@ ${stylesheetLinks}
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
 })();
 
 
@@ -16537,7 +16424,8 @@ ${stylesheetLinks}
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
 })();
 
 
@@ -17437,7 +17325,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
 })();
 
 
@@ -17615,7 +17504,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       } catch {}
     };
 
-    iframe.srcdoc = previewDocument(code, canvasWidth);
+    const source = previewDocument(code, canvasWidth);
+    if (window.__ddsCentralEditorPreviewOwnsV210?.(iframe) && typeof window.__ddsCentralEditorRenderV210 === "function") {
+      window.__ddsCentralEditorRenderV210(iframe, source);
+      refit();
+      return;
+    }
+    iframe.srcdoc = source;
   }
 
   function shellMetrics(iframe) {
@@ -17767,7 +17662,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const stage=frame?.closest(".dds-roleplay-card-preview");warmRoraPreviewAssets();if(frame){frame.style.setProperty("visibility","hidden","important");frame.style.setProperty("opacity","0","important")}const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};render();if("ResizeObserver" in window&&stage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitCardPreview()));observer.observe(stage)}[0,100,260,600,1100,1900].forEach(delay=>window.setTimeout(()=>fitCardPreview(),delay));return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
-  window.__ddsDeferCommissionInstallerV212(install);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
 
 
@@ -19332,7 +19227,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 250);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
+  else install();
 })();
 
 /* =========================================================
@@ -20295,7 +20191,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 250);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, { once: true });
+  } else {
+    install();
+  }
 })();
 
 
@@ -21927,7 +21827,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash,250);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",install,{once:true});
+  else install();
 })();
 
 /* =========================================================
@@ -23451,7 +23352,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 260);
   }
 
-  window.__ddsDeferCommissionInstallerV212(install);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once:true });
+  else install();
 })();
 
 
@@ -26541,55 +26443,70 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   V211 — STABLE CENTRAL EDITOR PREVIEW ENGINE
-   Editor preview only.
-   - one real iframe load, then DOM updates in-place
-   - locks horizontal center/scale while typing
-   - full visual top-to-bottom height
-   - outer LEFT stage owns vertical scrolling
-   - LEFT scrollbar invisible
-   - compatibility aliases for legacy V192/V203/V205 checks
+   V210 — STABLE CENTRAL PREVIEW HOTFIX
+   Base: V210 only.
+   Fixes only:
+   - no iframe reload / no transform reset while typing
+   - every editor preview keeps the complete top-to-bottom canvas
+   - RORAIMA / HANS house-thread measures the whole preview shell
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_V211_STABLE_CENTRAL_PREVIEW__) return;
-  window.__DDS_V211_STABLE_CENTRAL_PREVIEW__ = true;
+  if (window.__DDS_V210_CENTRAL_PREVIEW__) return;
+  window.__DDS_V210_CENTRAL_PREVIEW__ = true;
+  window.__DDS_V210_STABLE_PREVIEW_HOTFIX__ = true;
+
+  const STAGE_SELECTOR = [
+    ".dds-editor-preview-stage",
+    ".dds-live-preview-stage",
+    ".dds-preview-stage",
+    ".dds-protected-commission-preview-stage",
+    ".dds-code013-editor-stage",
+    ".dds-code014-editor-stage",
+    ".dds-profile-preview-stage",
+    ".dds-moodboard-preview-stage",
+    ".dds-fortyone-preview-stage",
+    ".dds-nothin-preview-stage",
+    '[class*="preview-stage"]'
+  ].join(",");
+
+  const IFRAME_SELECTOR = [
+    ".dds-editor-preview-frame",
+    ".dds-live-preview-frame",
+    ".dds-preview-frame",
+    ".dds-protected-commission-preview-frame",
+    'iframe[class*="preview-frame"]'
+  ].join(",");
 
   const EDIT_PANEL_SELECTOR = [
     '.dds-panel[data-panel^="editor-"]',
     '.dds-protected-commission-editor',
     '[class*="protected-commission-editor"]',
     '[class*="editor-panel"]'
-  ].join(',');
+  ].join(",");
 
-  const STAGE_SELECTOR = [
-    '.dds-editor-preview-stage',
-    '.dds-live-preview-stage',
-    '.dds-preview-stage',
-    '.dds-protected-commission-preview-stage',
-    '.dds-code013-editor-stage',
-    '.dds-code014-editor-stage',
-    '.dds-profile-preview-stage',
-    '.dds-moodboard-preview-stage',
-    '.dds-fortyone-preview-stage',
-    '.dds-nothin-preview-stage',
-    '.dds-rora-preview-stage',
-    '.dds-hans-preview-stage',
-    '.dds-jewel-preview-stage',
-    '.dds-landon-file-preview-stage',
-    '[class*="preview-stage"]'
-  ].join(',');
+  const attachedStages = new WeakSet();
+  const frameStates = new WeakMap();
+  const nativeSrcdoc = Object.getOwnPropertyDescriptor(
+    window.HTMLIFrameElement?.prototype || {},
+    "srcdoc"
+  );
 
-  const PREVIEW_COLUMN_SELECTOR = [
-    '.dds-editor-preview-column',
-    '.dds-protected-commission-preview-column',
-    '[class*="preview-column"]'
-  ].join(',');
-
-  const iframeStates = new WeakMap();
-  const managedFrames = new WeakSet();
-  const nativeSrcdoc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'srcdoc');
+  const protectedRootStyles = new Set([
+    "transform",
+    "transform-origin",
+    "position",
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "margin",
+    "margin-left",
+    "margin-right",
+    "margin-top",
+    "margin-bottom"
+  ]);
 
   function isElement(node) {
     return !!node && node.nodeType === 1;
@@ -26597,11 +26514,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function isEditorPanel(panel) {
     if (!panel) return false;
-    const name = String(panel.dataset?.panel || '');
-    if (/^view-/i.test(name)) return false;
-    if (panel.classList.contains('dds-commission-view-panel')) return false;
+    const panelName = String(panel.dataset?.panel || "");
+    if (/^view-/i.test(panelName) || panel.classList.contains("dds-commission-view-panel")) return false;
     return Boolean(
-      name.startsWith('editor-') ||
+      panelName.startsWith("editor-") ||
       panel.matches('.dds-protected-commission-editor,[class*="protected-commission-editor"],[class*="editor-panel"]')
     );
   }
@@ -26612,84 +26528,47 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function stageFor(iframe) {
-    if (!iframe) return null;
-    const panel = editorPanelFor(iframe);
-    if (!panel) return null;
+    const stage = iframe?.closest?.(STAGE_SELECTOR) || null;
+    return stage && editorPanelFor(stage) ? stage : null;
+  }
 
-    let stage = iframe.closest(STAGE_SELECTOR);
-    if (stage && panel.contains(stage)) return stage;
-
-    stage = iframe.closest(PREVIEW_COLUMN_SELECTOR);
-    return stage && panel.contains(stage) ? stage : null;
+  function owns(iframe) {
+    return Boolean(stageFor(iframe));
   }
 
   function stateFor(iframe) {
-    let state = iframeStates.get(iframe);
+    let state = frameStates.get(iframe);
     if (!state) {
       state = {
-        source: '',
-        loaded: false,
-        initialLayoutDone: false,
+        documentLoaded: false,
+        nativeWrite: false,
+        pendingSource: "",
+        ready: false,
+        root: null,
+        rootOriginal: null,
+        bounds: null,
         scale: 1,
-        visualLeft: 0,
-        visualTop: 0,
-        visualWidth: 1,
-        naturalWidth: 1,
-        holder: null,
-        stage: null,
-        lockingStyle: false,
-        fitRaf: 0,
-        nativeSetAttribute: iframe.setAttribute.bind(iframe),
-        nativeGetAttribute: iframe.getAttribute.bind(iframe)
+        raf: 0
       };
-      iframeStates.set(iframe, state);
+      frameStates.set(iframe, state);
     }
     return state;
   }
 
-  function installParentScrollbarCss() {
-    if (document.getElementById('dds-v211-left-preview-scrollbar-css')) return;
-    const style = document.createElement('style');
-    style.id = 'dds-v211-left-preview-scrollbar-css';
-    style.textContent = `
-      .dds-v211-central-stage,
-      .dds-v211-preview-holder {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
-      }
-      .dds-v211-central-stage::-webkit-scrollbar,
-      .dds-v211-preview-holder::-webkit-scrollbar {
-        width: 0 !important;
-        height: 0 !important;
-        display: none !important;
-        background: transparent !important;
-      }
-      .dds-v211-central-stage::-webkit-scrollbar-track,
-      .dds-v211-central-stage::-webkit-scrollbar-thumb {
-        background: transparent !important;
-        border: 0 !important;
-        box-shadow: none !important;
-      }
-      .dds-v211-preview-managed {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transition: none !important;
-        animation: none !important;
-      }
-    `;
-    document.head?.appendChild(style);
-  }
+  function ensurePreviewStyle(doc) {
+    let style = doc.getElementById("dds-central-preview-style-v210");
+    if (style) return;
 
-  function ensureInsideStyle(doc) {
-    if (!doc?.head || doc.getElementById('dds-v211-preview-inside-css')) return;
-    const style = doc.createElement('style');
-    style.id = 'dds-v211-preview-inside-css';
+    style = doc.createElement("style");
+    style.id = "dds-central-preview-style-v210";
     style.textContent = `
       html, body {
         margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: hidden !important;
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
-        overflow: hidden !important;
       }
       html::-webkit-scrollbar,
       body::-webkit-scrollbar,
@@ -26701,513 +26580,448 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       }
       * { scrollbar-width: none !important; }
     `;
-    doc.head.appendChild(style);
+    doc.head?.appendChild(style);
   }
 
-  function knownVisualRoot(doc) {
-    const selectors = [
-      '.ddsh-roraima',
-      '.fdpopup-wrap',
-      '.ddsh-sssluv',
-      '.ddsh-oncloud',
-      '.ddsh-chocolove-wrap',
-      '.ddsh-bluehour',
-      '.ddsh-loserlover',
-      '.ddsh-higherthanheaven',
-      '.ddsh-fortyonewinks',
-      '.ddsh-nothinboutme',
-      '.ddsh-dumbanddumber',
-      '.ddsh-0x1lovesong',
-      '.ddsh-lwlrz-wrap',
-      '.ddsh-moonsong',
-      '.ddsh-esq',
-      '.ddsh-revmus',
-      '.ddsh-moviereview',
-      '.ddsh-vmac',
-      '.ddsh-hxf',
-      '.ddsh-lldon01',
-      '.ddsh-file-window',
-      '.ddsh-cpmhfp',
-      '.ddsh-commitalan-ref',
-      '.ddsh-commtmklpfofile',
-      '.ddsh-revfoodie',
-      '[data-preview-root]',
-      '[data-preview-canvas]',
-      '.profile-root',
-      '.roleplay-root',
-      '.review-root',
-      '.commission-root'
+  function findVisualRoot(doc) {
+    const priority = [
+      /* RORAIMA must use the WHOLE shell.  The title/top padding and
+         bottom credit are outside the .ddsh-roraima measurement. */
+      ".dds-rora-preview-shell",
+      ".ddsh-roraima",
+      ".fdpopup-wrap",
+      ".ddsh-sssluv",
+      ".ddsh-bluehour",
+      ".ddsh-loserlover",
+      ".ddsh-higherthanheaven",
+      ".ddsh-fortyonewinks",
+      ".ddsh-nothinboutme",
+      ".ddsh-dumbanddumber",
+      ".ddsh-0x1lovesong",
+      "[data-preview-root]",
+      "[data-preview-canvas]",
+      ".dds-preview-target",
+      ".dds-card-preview-target",
+      ".preview-root",
+      ".preview-canvas",
+      ".roleplay-root",
+      ".profile-root",
+      ".review-root",
+      ".commission-root",
+      ".dds-preview-shell"
     ];
-    for (const selector of selectors) {
-      const root = doc.querySelector(selector);
-      if (root) return root;
+
+    for (const sel of priority) {
+      const el = doc.querySelector(sel);
+      if (el) return el;
     }
-    return doc.querySelector('.dds-preview-target,.dds-card-preview-target,.preview-root,.preview-canvas') ||
-      Array.from(doc.body?.children || []).find((node) =>
-        isElement(node) && !['SCRIPT','STYLE','LINK','META','NOSCRIPT'].includes(node.tagName)
-      ) || doc.body;
+
+    const bodyChildren = Array.from(doc.body?.children || []).filter((el) =>
+      !["SCRIPT", "STYLE", "LINK", "META", "NOSCRIPT"].includes(el.tagName)
+    );
+    return bodyChildren[0] || doc.body;
   }
 
-  function includeCredits(doc, set) {
-    doc.querySelectorAll('[class*="credit"], [class*="Credit"]').forEach((node) => {
-      if (isElement(node)) set.add(node);
+  function visibleNodes(root) {
+    return [root, ...root.querySelectorAll("*")].filter((node) => {
+      if (!isElement(node)) return false;
+      if (["SCRIPT", "STYLE", "LINK", "META", "NOSCRIPT"].includes(node.tagName)) return false;
+      const win = node.ownerDocument.defaultView;
+      const cs = win?.getComputedStyle?.(node);
+      if (!cs) return false;
+      if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity || "1") === 0) return false;
+      const rect = node.getBoundingClientRect();
+      return rect.width > 0 || rect.height > 0;
     });
   }
 
-  function measureVisualBounds(doc) {
-    const root = knownVisualRoot(doc);
-    if (!root) return null;
+  function rememberOriginalRoot(iframe, root) {
+    const state = stateFor(iframe);
+    if (state.root === root && state.rootOriginal) return;
+    state.root = root;
+    state.rootOriginal = {
+      transform: root.style.transform || "",
+      transformOrigin: root.style.transformOrigin || "",
+      position: root.style.position || "",
+      left: root.style.left || "",
+      right: root.style.right || "",
+      top: root.style.top || "",
+      bottom: root.style.bottom || "",
+      margin: root.style.margin || ""
+    };
+  }
 
-    const nodes = new Set([root]);
-    root.querySelectorAll('*').forEach((node) => nodes.add(node));
-    includeCredits(doc, nodes);
+  function restoreOriginalRoot(iframe, root) {
+    rememberOriginalRoot(iframe, root);
+    const original = stateFor(iframe).rootOriginal;
+    root.style.transform = original.transform;
+    root.style.transformOrigin = original.transformOrigin;
+    root.style.position = original.position;
+    root.style.left = original.left;
+    root.style.right = original.right;
+    root.style.top = original.top;
+    root.style.bottom = original.bottom;
+    root.style.margin = original.margin;
+  }
 
-    let minLeft = Infinity;
-    let minTop = Infinity;
-    let maxRight = -Infinity;
-    let maxBottom = -Infinity;
+  /* This full natural measurement is used only on first layout or a real
+     viewport resize.  It is NEVER run on each keystroke. */
+  function naturalBounds(iframe, root) {
+    restoreOriginalRoot(iframe, root);
+    const rootRect = root.getBoundingClientRect();
+    let minLeft = 0;
+    let minTop = 0;
+    let maxRight = Math.max(rootRect.width || 0, root.offsetWidth || 0, root.scrollWidth || 0, 1);
+    let maxBottom = Math.max(rootRect.height || 0, root.offsetHeight || 0, root.scrollHeight || 0, 1);
 
-    for (const node of nodes) {
-      if (!isElement(node)) continue;
-      const win = node.ownerDocument.defaultView;
-      let cs;
-      try { cs = win.getComputedStyle(node); } catch { continue; }
-      if (!cs || cs.display === 'none' || cs.visibility === 'hidden' || Number.parseFloat(cs.opacity || '1') === 0) continue;
+    for (const node of visibleNodes(root)) {
       const rect = node.getBoundingClientRect();
-      if ((!rect.width && !rect.height) || !Number.isFinite(rect.left) || !Number.isFinite(rect.top)) continue;
-      minLeft = Math.min(minLeft, rect.left);
-      minTop = Math.min(minTop, rect.top);
-      maxRight = Math.max(maxRight, rect.right);
-      maxBottom = Math.max(maxBottom, rect.bottom);
+      minLeft = Math.min(minLeft, rect.left - rootRect.left);
+      minTop = Math.min(minTop, rect.top - rootRect.top);
+      maxRight = Math.max(maxRight, rect.right - rootRect.left);
+      maxBottom = Math.max(maxBottom, rect.bottom - rootRect.top);
     }
-
-    if (!Number.isFinite(minLeft)) {
-      const body = doc.body;
-      const html = doc.documentElement;
-      return {
-        left: 0,
-        top: 0,
-        right: Math.max(1, body?.scrollWidth || 0, html?.scrollWidth || 0),
-        bottom: Math.max(1, body?.scrollHeight || 0, html?.scrollHeight || 0),
-        width: Math.max(1, body?.scrollWidth || 0, html?.scrollWidth || 0),
-        height: Math.max(1, body?.scrollHeight || 0, html?.scrollHeight || 0)
-      };
-    }
-
-    // Also respect layout/scroll height so long text is never cut at the bottom.
-    const body = doc.body;
-    const html = doc.documentElement;
-    const layoutBottom = Math.max(
-      maxBottom,
-      body?.scrollHeight || 0,
-      body?.offsetHeight || 0,
-      html?.scrollHeight || 0,
-      html?.offsetHeight || 0
-    );
 
     return {
       left: minLeft,
       top: minTop,
-      right: maxRight,
-      bottom: layoutBottom,
       width: Math.max(1, maxRight - minLeft),
-      height: Math.max(1, layoutBottom - minTop)
+      height: Math.max(1, maxBottom - minTop)
     };
-  }
-
-  function naturalDocumentSize(doc, bounds) {
-    const body = doc.body;
-    const html = doc.documentElement;
-    return {
-      width: Math.max(
-        1,
-        body?.scrollWidth || 0,
-        body?.offsetWidth || 0,
-        html?.scrollWidth || 0,
-        html?.offsetWidth || 0,
-        Math.ceil(bounds.right + 2)
-      ),
-      height: Math.max(
-        1,
-        body?.scrollHeight || 0,
-        body?.offsetHeight || 0,
-        html?.scrollHeight || 0,
-        html?.offsetHeight || 0,
-        Math.ceil(bounds.bottom + 2)
-      )
-    };
-  }
-
-  function ensureHolder(iframe, stage) {
-    const state = stateFor(iframe);
-    if (state.holder?.isConnected) return state.holder;
-
-    let holder = iframe.parentElement?.classList?.contains('dds-v211-preview-holder')
-      ? iframe.parentElement
-      : null;
-
-    if (!holder) {
-      holder = document.createElement('div');
-      holder.className = 'dds-v211-preview-holder';
-      iframe.parentNode?.insertBefore(holder, iframe);
-      holder.appendChild(iframe);
-    }
-
-    holder.style.setProperty('position', 'relative', 'important');
-    holder.style.setProperty('display', 'block', 'important');
-    holder.style.setProperty('margin-left', 'auto', 'important');
-    holder.style.setProperty('margin-right', 'auto', 'important');
-    holder.style.setProperty('overflow', 'hidden', 'important');
-    holder.style.setProperty('flex', '0 0 auto', 'important');
-    holder.style.setProperty('max-width', '100%', 'important');
-
-    state.holder = holder;
-    state.stage = stage;
-    return holder;
   }
 
   function setupStage(stage) {
-    if (!stage) return;
-    stage.classList.add('dds-v211-central-stage');
-    stage.style.setProperty('display', 'block', 'important');
-    stage.style.setProperty('align-items', 'initial', 'important');
-    stage.style.setProperty('justify-content', 'initial', 'important');
-    stage.style.setProperty('overflow-y', 'auto', 'important');
-    stage.style.setProperty('overflow-x', 'hidden', 'important');
-    stage.style.setProperty('scrollbar-width', 'none', 'important');
-    stage.style.setProperty('-ms-overflow-style', 'none', 'important');
+    if (!stage || !editorPanelFor(stage)) return;
+    stage.style.setProperty("overflow-y", "auto", "important");
+    stage.style.setProperty("overflow-x", "hidden", "important");
+    stage.style.setProperty("scrollbar-width", "none", "important");
+    stage.style.setProperty("-ms-overflow-style", "none", "important");
   }
 
-  function lockFramePresentation(iframe) {
-    const state = stateFor(iframe);
-    if (!state.initialLayoutDone || state.lockingStyle) return;
-    state.lockingStyle = true;
-    try {
-      iframe.classList.remove('dds-preview-loading');
-      iframe.classList.add('dds-preview-ready');
-      iframe.setAttribute('scrolling', 'no');
-      iframe.style.setProperty('position', 'absolute', 'important');
-      iframe.style.setProperty('left', '0', 'important');
-      iframe.style.setProperty('top', '0', 'important');
-      iframe.style.setProperty('right', 'auto', 'important');
-      iframe.style.setProperty('bottom', 'auto', 'important');
-      iframe.style.setProperty('margin', '0', 'important');
-      iframe.style.setProperty('max-width', 'none', 'important');
-      iframe.style.setProperty('max-height', 'none', 'important');
-      iframe.style.setProperty('opacity', '1', 'important');
-      iframe.style.setProperty('visibility', 'visible', 'important');
-      iframe.style.setProperty('transition', 'none', 'important');
-      iframe.style.setProperty('animation', 'none', 'important');
-      iframe.style.setProperty('pointer-events', 'none', 'important');
-      iframe.style.setProperty('transform-origin', 'top left', 'important');
-      iframe.style.setProperty('width', `${state.naturalWidth}px`, 'important');
-      iframe.style.setProperty('min-width', `${state.naturalWidth}px`, 'important');
-      iframe.style.setProperty('height', `${state.naturalHeight}px`, 'important');
-      iframe.style.setProperty('min-height', `${state.naturalHeight}px`, 'important');
-      iframe.style.setProperty(
-        'transform',
-        `matrix(${state.scale},0,0,${state.scale},${-state.visualLeft * state.scale},${-state.visualTop * state.scale})`,
-        'important'
-      );
-    } finally {
-      state.lockingStyle = false;
-    }
+  function applyFrameBox(iframe, width, height) {
+    iframe.style.setProperty("display", "block", "important");
+    iframe.style.setProperty("width", `${Math.max(1, Math.ceil(width))}px`, "important");
+    iframe.style.setProperty("min-width", `${Math.max(1, Math.ceil(width))}px`, "important");
+    iframe.style.setProperty("max-width", `${Math.max(1, Math.ceil(width))}px`, "important");
+    iframe.style.setProperty("height", `${Math.max(1, Math.ceil(height))}px`, "important");
+    iframe.style.setProperty("min-height", `${Math.max(1, Math.ceil(height))}px`, "important");
+    iframe.style.setProperty("max-height", "none", "important");
+    iframe.style.setProperty("border", "0", "important");
+    iframe.style.setProperty("margin-left", "auto", "important");
+    iframe.style.setProperty("margin-right", "auto", "important");
+    iframe.style.setProperty("position", "relative", "important");
+    iframe.style.setProperty("inset", "auto", "important");
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("zoom", "1", "important");
+    iframe.style.setProperty("pointer-events", "none", "important");
+    iframe.style.setProperty("background", "transparent", "important");
   }
 
-  function layoutFrame(iframe, { initial = false, resetScroll = false } = {}) {
-    const panel = editorPanelFor(iframe);
-    const stage = stageFor(iframe);
+  function setDocumentBox(doc, width, height) {
+    const w = `${Math.max(1, Math.ceil(width))}px`;
+    const h = `${Math.max(1, Math.ceil(height))}px`;
+    doc.documentElement.style.setProperty("width", w, "important");
+    doc.documentElement.style.setProperty("height", h, "important");
+    doc.documentElement.style.setProperty("min-height", h, "important");
+    doc.body.style.setProperty("width", w, "important");
+    doc.body.style.setProperty("height", h, "important");
+    doc.body.style.setProperty("min-height", h, "important");
+  }
+
+  function applyFullFit(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
-    if (!panel || !stage || !doc?.body || doc.readyState === 'loading') return false;
+    if (!doc?.body || !stage || !editorPanelFor(stage) || stage.clientWidth < 40) return false;
+
+    ensurePreviewStyle(doc);
+    setupStage(stage);
+
+    const root = findVisualRoot(doc);
+    if (!root) return false;
+
+    const bounds = naturalBounds(iframe, root);
+    const availableWidth = Math.max(1, stage.clientWidth - 24);
+    const scale = Math.min(1, availableWidth / Math.max(1, bounds.width));
+
+    root.style.setProperty("transform-origin", "top left", "important");
+    root.style.setProperty("position", "relative", "important");
+    root.style.setProperty("left", "0", "important");
+    root.style.setProperty("right", "auto", "important");
+    root.style.setProperty("top", "0", "important");
+    root.style.setProperty("bottom", "auto", "important");
+    root.style.setProperty("margin", "0", "important");
+    /* Scale after shifting natural visual bounds.  This keeps protruding
+       top/left decoration inside the frame instead of clipping it. */
+    root.style.setProperty(
+      "transform",
+      `scale(${scale}) translate(${-bounds.left}px, ${-bounds.top}px)`,
+      "important"
+    );
+
+    const scaledWidth = Math.max(1, Math.ceil(bounds.width * scale));
+    const scaledHeight = Math.max(1, Math.ceil(bounds.height * scale));
+    setDocumentBox(doc, scaledWidth, scaledHeight);
+    applyFrameBox(iframe, scaledWidth, scaledHeight);
 
     const state = stateFor(iframe);
-    setupStage(stage);
-    const holder = ensureHolder(iframe, stage);
-    ensureInsideStyle(doc);
-
-    const bounds = measureVisualBounds(doc);
-    if (!bounds) return false;
-
-    if (initial || !state.initialLayoutDone) {
-      const availableWidth = Math.max(1, stage.clientWidth - 28);
-      state.visualLeft = bounds.left;
-      state.visualTop = bounds.top;
-      state.visualWidth = bounds.width;
-      state.scale = Math.max(0.01, Math.min(1, availableWidth / Math.max(1, bounds.width)));
-      state.initialLayoutDone = true;
-    }
-
-    // Horizontal geometry stays locked after first layout. Only grow/shrink the
-    // vertical extent while typing so the preview never jumps left/right.
-    const bottom = Math.max(bounds.bottom, state.visualTop + 1);
-    const visibleHeight = Math.max(1, bottom - state.visualTop);
-    const natural = naturalDocumentSize(doc, {
-      ...bounds,
-      left: state.visualLeft,
-      top: state.visualTop,
-      right: Math.max(bounds.right, state.visualLeft + state.visualWidth),
-      bottom
-    });
-
-    state.naturalWidth = Math.max(natural.width, state.visualLeft + state.visualWidth, 1);
-    state.naturalHeight = Math.max(natural.height, bottom, 1);
-
-    holder.style.setProperty('width', `${Math.max(1, Math.ceil(state.visualWidth * state.scale))}px`, 'important');
-    holder.style.setProperty('height', `${Math.max(1, Math.ceil(visibleHeight * state.scale))}px`, 'important');
-
-    lockFramePresentation(iframe);
+    state.root = root;
+    state.bounds = bounds;
+    state.scale = scale;
+    state.ready = true;
 
     if (resetScroll) stage.scrollTop = 0;
     return true;
   }
 
-  function syncBodyAttributes(current, next) {
-    if (!current || !next) return;
-    Array.from(current.attributes).forEach((attr) => {
-      if (!next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
-    });
-    Array.from(next.attributes).forEach((attr) => current.setAttribute(attr.name, attr.value));
-  }
+  /* While typing we only grow/shrink the vertical document box.  We do not
+     touch transform/scale/X position, so there is nothing visible to blink. */
+  function updateVerticalExtent(iframe, stage = stageFor(iframe)) {
+    const doc = iframe?.contentDocument;
+    const state = stateFor(iframe);
+    if (!doc?.body || !stage) return false;
+    if (!state.ready) return applyFullFit(iframe, stage, false);
 
-  function syncInlineHeadStyles(doc, parsed) {
-    if (!doc?.head || !parsed?.head) return;
-    const currentStyles = Array.from(doc.head.querySelectorAll('style:not(#dds-v211-preview-inside-css)'));
-    const nextStyles = Array.from(parsed.head.querySelectorAll('style'));
-    nextStyles.forEach((nextStyle, index) => {
-      if (currentStyles[index]) {
-        if (currentStyles[index].textContent !== nextStyle.textContent) {
-          currentStyles[index].textContent = nextStyle.textContent;
-        }
-      } else {
-        doc.head.appendChild(nextStyle.cloneNode(true));
-      }
-    });
+    const root = findVisualRoot(doc);
+    if (!root) return false;
+    state.root = root;
 
-    parsed.head.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-      const href = link.getAttribute('href');
-      if (!href) return;
-      const exists = Array.from(doc.head.querySelectorAll('link[rel="stylesheet"]'))
-        .some((current) => current.getAttribute('href') === href);
-      if (!exists) doc.head.appendChild(link.cloneNode(true));
-    });
-  }
+    let maxBottom = 1;
+    for (const node of visibleNodes(root)) {
+      const rect = node.getBoundingClientRect();
+      maxBottom = Math.max(maxBottom, rect.bottom);
+    }
 
-  function patchLoadedDocument(iframe, source) {
-    const doc = iframe.contentDocument;
-    if (!doc?.body || doc.readyState === 'loading') return false;
+    /* scrollHeight catches long normal-flow text; visible descendants catch
+       absolute-positioned pieces that scrollHeight can miss. */
+    const rootRect = root.getBoundingClientRect();
+    const scaledScrollHeight = Math.max(1, (root.scrollHeight || 0) * (state.scale || 1));
+    maxBottom = Math.max(maxBottom, rootRect.top + scaledScrollHeight);
 
-    const parsed = new DOMParser().parseFromString(String(source || ''), 'text/html');
-    syncInlineHeadStyles(doc, parsed);
-    syncBodyAttributes(doc.body, parsed.body);
-
-    const fragment = doc.createDocumentFragment();
-    Array.from(parsed.body.childNodes).forEach((node) => {
-      fragment.appendChild(doc.importNode(node, true));
-    });
-    doc.body.replaceChildren(fragment);
-    ensureInsideStyle(doc);
+    const height = Math.max(1, Math.ceil(maxBottom));
+    const width = Math.max(1, Math.ceil((state.bounds?.width || rootRect.width || 1) * (state.scale || 1)));
+    setDocumentBox(doc, width, height);
+    applyFrameBox(iframe, width, height);
     return true;
   }
 
-  function nativeNavigate(iframe, source) {
-    const state = stateFor(iframe);
-    state.source = String(source || '');
-    state.loaded = false;
-    state.initialLayoutDone = false;
-    if (nativeSrcdoc?.set) nativeSrcdoc.set.call(iframe, state.source);
-    else state.nativeSetAttribute('srcdoc', state.source);
-  }
-
-  function receiveSource(iframe, source) {
-    const state = stateFor(iframe);
-    const text = String(source || '');
-    state.source = text;
-
-    if (!state.loaded || !iframe.contentDocument?.body || iframe.contentDocument.readyState === 'loading') {
-      nativeNavigate(iframe, text);
-      return true;
+  function syncRootAttributes(currentRoot, nextRoot) {
+    const nextNames = new Set(Array.from(nextRoot.attributes || []).map((attr) => attr.name));
+    for (const attr of Array.from(currentRoot.attributes || [])) {
+      if (attr.name === "style") continue;
+      if (!nextNames.has(attr.name)) currentRoot.removeAttribute(attr.name);
+    }
+    for (const attr of Array.from(nextRoot.attributes || [])) {
+      if (attr.name === "style") continue;
+      if (currentRoot.getAttribute(attr.name) !== attr.value) currentRoot.setAttribute(attr.name, attr.value);
     }
 
-    if (!patchLoadedDocument(iframe, text)) {
-      nativeNavigate(iframe, text);
-      return true;
+    const nextStyleNames = new Set(Array.from(nextRoot.style || []));
+    for (const prop of Array.from(currentRoot.style || [])) {
+      if (protectedRootStyles.has(prop)) continue;
+      if (!nextStyleNames.has(prop)) currentRoot.style.removeProperty(prop);
     }
-
-    // Same iframe, same horizontal scale/center. Only vertical extent updates.
-    requestAnimationFrame(() => layoutFrame(iframe, { initial: false, resetScroll: false }));
-    return true;
+    for (const prop of Array.from(nextRoot.style || [])) {
+      if (protectedRootStyles.has(prop)) continue;
+      currentRoot.style.setProperty(
+        prop,
+        nextRoot.style.getPropertyValue(prop),
+        nextRoot.style.getPropertyPriority(prop)
+      );
+    }
   }
 
-  function installSourceInterceptor(iframe) {
-    const state = stateFor(iframe);
-    if (state.interceptorInstalled) return;
-    state.interceptorInstalled = true;
+  function patchSource(iframe, srcdoc) {
+    const stage = stageFor(iframe);
+    const doc = iframe?.contentDocument;
+    if (!stage || !doc?.body || doc.readyState === "loading") return false;
 
     try {
-      Object.defineProperty(iframe, 'srcdoc', {
+      const parsed = new DOMParser().parseFromString(String(srcdoc || ""), "text/html");
+      const nextRoot = findVisualRoot(parsed);
+      const currentRoot = findVisualRoot(doc);
+
+      if (nextRoot && currentRoot && currentRoot.tagName === nextRoot.tagName) {
+        syncRootAttributes(currentRoot, nextRoot);
+        currentRoot.innerHTML = nextRoot.innerHTML;
+      } else if (parsed.body) {
+        doc.body.innerHTML = parsed.body.innerHTML;
+        const state = stateFor(iframe);
+        state.ready = false;
+        state.root = null;
+        state.rootOriginal = null;
+      }
+
+      ensurePreviewStyle(doc);
+      cancelAnimationFrame(stateFor(iframe).raf);
+      stateFor(iframe).raf = requestAnimationFrame(() => updateVerticalExtent(iframe, stage));
+      return true;
+    } catch (error) {
+      console.warn("[DDS V210 stable preview] patch failed", error);
+      return false;
+    }
+  }
+
+  function nativeWriteSrcdoc(iframe, source) {
+    const state = stateFor(iframe);
+    state.nativeWrite = true;
+    try {
+      if (nativeSrcdoc?.set) {
+        nativeSrcdoc.set.call(iframe, String(source || ""));
+      } else {
+        iframe.setAttribute("srcdoc", String(source || ""));
+      }
+    } finally {
+      state.nativeWrite = false;
+    }
+  }
+
+  function render(iframe, srcdoc) {
+    if (!owns(iframe)) return false;
+    const state = stateFor(iframe);
+    const doc = iframe.contentDocument;
+
+    if (!state.documentLoaded) {
+      state.documentLoaded = true;
+      nativeWriteSrcdoc(iframe, srcdoc);
+      return true;
+    }
+
+    if (!doc || doc.readyState === "loading") {
+      state.pendingSource = String(srcdoc || "");
+      return true;
+    }
+
+    if (patchSource(iframe, srcdoc)) return true;
+    nativeWriteSrcdoc(iframe, srcdoc);
+    return true;
+  }
+
+  /* Intercept srcdoc only on the active EDITOR iframe, never globally.
+     That stops old renderers from reloading the frame on every keystroke. */
+  function installInstanceSrcdocGuard(iframe) {
+    if (!iframe || iframe.dataset.ddsStableSrcdocGuard === "1") return;
+    iframe.dataset.ddsStableSrcdocGuard = "1";
+
+    const state = stateFor(iframe);
+    try {
+      const existing = nativeSrcdoc?.get ? String(nativeSrcdoc.get.call(iframe) || "") : String(iframe.getAttribute("srcdoc") || "");
+      if (existing.trim()) state.documentLoaded = true;
+
+      Object.defineProperty(iframe, "srcdoc", {
         configurable: true,
         enumerable: true,
         get() {
-          if (state.source) return state.source;
-          return nativeSrcdoc?.get ? nativeSrcdoc.get.call(iframe) : state.nativeGetAttribute('srcdoc') || '';
+          return nativeSrcdoc?.get ? nativeSrcdoc.get.call(this) : (this.getAttribute("srcdoc") || "");
         },
         set(value) {
-          receiveSource(iframe, value);
+          const ownState = stateFor(this);
+          if (ownState.nativeWrite || !owns(this)) {
+            nativeWriteSrcdoc(this, value);
+            return;
+          }
+          render(this, value);
         }
       });
-    } catch {}
-
-    const originalSetAttribute = state.nativeSetAttribute;
-    const originalGetAttribute = state.nativeGetAttribute;
-    iframe.setAttribute = function(name, value) {
-      if (String(name).toLowerCase() === 'srcdoc') {
-        receiveSource(iframe, value);
-        return;
-      }
-      return originalSetAttribute(name, value);
-    };
-    iframe.getAttribute = function(name) {
-      if (String(name).toLowerCase() === 'srcdoc' && state.source) return state.source;
-      return originalGetAttribute(name);
-    };
+    } catch (error) {
+      console.warn("[DDS V210 stable preview] srcdoc guard unavailable", error);
+    }
   }
 
-  function installStyleLock(iframe) {
-    const state = stateFor(iframe);
-    if (state.styleObserver) return;
-    state.styleObserver = new MutationObserver(() => {
-      if (!state.initialLayoutDone || state.lockingStyle) return;
-      lockFramePresentation(iframe);
-    });
-    state.styleObserver.observe(iframe, { attributes: true, attributeFilter: ['style', 'class', 'scrolling'] });
-  }
-
-  function watchInitialAssets(iframe) {
-    const state = stateFor(iframe);
-    const doc = iframe.contentDocument;
-    if (!doc || state.assetsWatched) return;
-    state.assetsWatched = true;
-
-    try {
-      doc.fonts?.ready?.then(() => {
-        if (!state.userEditedYet) layoutFrame(iframe, { initial: true, resetScroll: false });
-      });
-    } catch {}
-
-    doc.querySelectorAll('img').forEach((img) => {
-      if (img.complete) return;
-      const settle = () => {
-        if (!state.userEditedYet) layoutFrame(iframe, { initial: true, resetScroll: false });
-      };
-      img.addEventListener('load', settle, { once: true });
-      img.addEventListener('error', settle, { once: true });
-    });
-  }
-
-  function manageFrame(iframe) {
-    if (!iframe || managedFrames.has(iframe) || !editorPanelFor(iframe)) return false;
+  function scheduleNormalize(iframe, full = false, resetScroll = false) {
     const stage = stageFor(iframe);
     if (!stage) return false;
-
-    managedFrames.add(iframe);
-    iframe.classList.add('dds-v211-preview-managed');
     const state = stateFor(iframe);
+    cancelAnimationFrame(state.raf);
+    state.raf = requestAnimationFrame(() => {
+      if (full || !state.ready) applyFullFit(iframe, stage, resetScroll);
+      else updateVerticalExtent(iframe, stage);
+    });
+    return true;
+  }
+
+  function attachPreview(stage) {
+    if (!stage || !editorPanelFor(stage)) return;
+    const iframe = stage.querySelector(IFRAME_SELECTOR) || stage.querySelector("iframe");
+    if (!iframe) return;
+
     setupStage(stage);
-    ensureHolder(iframe, stage);
-    installSourceInterceptor(iframe);
-    installStyleLock(iframe);
+    installInstanceSrcdocGuard(iframe);
 
-    iframe.addEventListener('load', () => {
-      state.loaded = true;
-      state.assetsWatched = false;
-      state.source = state.source || (nativeSrcdoc?.get ? nativeSrcdoc.get.call(iframe) : '');
-      requestAnimationFrame(() => {
-        layoutFrame(iframe, { initial: true, resetScroll: true });
-        watchInitialAssets(iframe);
+    if (!attachedStages.has(stage)) {
+      attachedStages.add(stage);
+      iframe.addEventListener("load", () => {
+        const state = stateFor(iframe);
+        state.documentLoaded = true;
+        state.ready = false;
+        scheduleNormalize(iframe, true, true);
+
+        if (state.pendingSource) {
+          const pending = state.pendingSource;
+          state.pendingSource = "";
+          requestAnimationFrame(() => patchSource(iframe, pending));
+        }
       });
-    });
-
-    if (iframe.contentDocument?.body && iframe.contentDocument.readyState !== 'loading') {
-      state.loaded = true;
-      state.source = state.source || (nativeSrcdoc?.get ? nativeSrcdoc.get.call(iframe) : '');
-      layoutFrame(iframe, { initial: true, resetScroll: true });
-      watchInitialAssets(iframe);
     }
 
-    const panel = editorPanelFor(iframe);
-    if (panel && !panel.dataset.ddsV211TypingBound) {
-      panel.dataset.ddsV211TypingBound = '1';
-      panel.addEventListener('input', () => {
-        panel.querySelectorAll('iframe').forEach((frame) => {
-          if (!managedFrames.has(frame)) return;
-          stateFor(frame).userEditedYet = true;
-        });
-      }, true);
+    if (iframe.contentDocument?.readyState === "complete" && iframe.contentDocument?.body?.childNodes?.length) {
+      const state = stateFor(iframe);
+      state.documentLoaded = true;
+      if (!state.ready) scheduleNormalize(iframe, true, true);
     }
-
-    return true;
   }
 
-  function scanPanel(panel) {
-    if (!isEditorPanel(panel)) return;
-    panel.querySelectorAll('iframe').forEach((iframe) => manageFrame(iframe));
+  function initCentralPreview(root = document) {
+    root.querySelectorAll?.(STAGE_SELECTOR).forEach(attachPreview);
   }
 
-  function scanActiveEditors() {
-    document.querySelectorAll(EDIT_PANEL_SELECTOR).forEach((panel) => {
-      if (isEditorPanel(panel) && panel.classList.contains('is-active')) scanPanel(panel);
-    });
-  }
-
-  function owns(iframe) {
-    if (!iframe || !editorPanelFor(iframe)) return false;
-    manageFrame(iframe);
-    return true;
-  }
-
-  function scheduleFit(iframe) {
-    if (!owns(iframe)) return false;
-    const state = stateFor(iframe);
-    cancelAnimationFrame(state.fitRaf);
-    state.fitRaf = requestAnimationFrame(() => layoutFrame(iframe, { initial: !state.initialLayoutDone, resetScroll: false }));
-    return true;
+  function activateSoon() {
+    requestAnimationFrame(() => requestAnimationFrame(() => initCentralPreview(document)));
   }
 
   function normalize(iframe) {
     if (!owns(iframe)) return false;
-    return layoutFrame(iframe, { initial: !stateFor(iframe).initialLayoutDone, resetScroll: false });
+    installInstanceSrcdocGuard(iframe);
+    return scheduleNormalize(iframe, false, false);
   }
 
-  function render(iframe, source) {
-    if (!owns(iframe)) return false;
-    return receiveSource(iframe, source);
-  }
+  /* Compatibility: V210's older editor modules still ask for V192/V205.
+     Point those names at this single stable central engine instead of letting
+     their old resize/reload paths run again. */
+  window.__ddsCentralEditorPreviewOwnsV192 = owns;
+  window.__ddsCentralEditorScheduleFitV192 = normalize;
+  window.__ddsCentralEditorRenderV192 = render;
+  window.__ddsCentralEditorNormalizeV192 = normalize;
 
-  function exposeAliases() {
-    const versions = [192, 193, 194, 195, 197, 198, 200, 202, 203, 204, 205, 208, 210, 211];
-    versions.forEach((version) => {
-      window[`__ddsCentralEditorPreviewOwnsV${version}`] = owns;
-      window[`__ddsCentralEditorScheduleFitV${version}`] = scheduleFit;
-      window[`__ddsCentralEditorNormalizeV${version}`] = normalize;
-      window[`__ddsCentralEditorRenderV${version}`] = render;
-    });
-  }
+  window.__ddsCentralEditorPreviewOwnsV205 = owns;
+  window.__ddsCentralEditorScheduleFitV205 = normalize;
+  window.__ddsCentralEditorRenderV205 = render;
+  window.__ddsCentralEditorNormalizeV205 = normalize;
 
-  function activateSoon() {
-    requestAnimationFrame(() => requestAnimationFrame(scanActiveEditors));
-  }
+  window.__ddsCentralEditorPreviewOwnsV208 = owns;
+  window.__ddsCentralEditorRenderV208 = render;
+  window.__ddsCentralEditorNormalizeV208 = normalize;
+
+  window.__ddsCentralEditorPreviewOwnsV210 = owns;
+  window.__ddsCentralEditorRenderV210 = render;
+  window.__ddsCentralEditorNormalizeV210 = normalize;
+
+  /* Generic preview modules use this helper.  Keep the original helper for
+     cards/views, but route active editor iframes through the stable renderer. */
+  const previousLoadedUpdater = window.updateLoadedPreviewDocument;
+  window.updateLoadedPreviewDocument = function ddsStableLoadedPreviewUpdate(iframe, srcdoc, resizeFunction) {
+    if (owns(iframe)) {
+      installInstanceSrcdocGuard(iframe);
+      render(iframe, srcdoc);
+      return true;
+    }
+    return typeof previousLoadedUpdater === "function"
+      ? previousLoadedUpdater.call(this, iframe, srcdoc, resizeFunction)
+      : false;
+  };
 
   function boot() {
-    installParentScrollbarCss();
-    exposeAliases();
+    initCentralPreview(document);
 
-    // Fast boot: do not scan every hidden editor at startup.
-    // Direct editor deep-links still initialize immediately.
-    if (/editor/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
-      activateSoon();
-    }
-
-    document.addEventListener('click', (event) => {
+    document.addEventListener("click", (event) => {
       if (event.target?.closest?.(
         '[data-edit-code],[data-edit-profile],[data-edit-review],[data-commission-edit],' +
         '[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],' +
@@ -27215,38 +27029,33 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       )) activateSoon();
     }, true);
 
-    document.addEventListener('focusin', (event) => {
+    document.addEventListener("focusin", (event) => {
       const panel = event.target?.closest?.(EDIT_PANEL_SELECTOR);
-      if (isEditorPanel(panel)) scanPanel(panel);
+      if (isEditorPanel(panel)) initCentralPreview(panel);
     }, true);
 
-    window.addEventListener('hashchange', activateSoon, { passive: true });
-    window.addEventListener('popstate', activateSoon, { passive: true });
+    window.addEventListener("hashchange", activateSoon, { passive: true });
+    window.addEventListener("popstate", activateSoon, { passive: true });
 
     let resizeTimer = 0;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
-        document.querySelectorAll(EDIT_PANEL_SELECTOR).forEach((panel) => {
-          if (!isEditorPanel(panel) || !panel.classList.contains('is-active')) return;
-          panel.querySelectorAll('iframe').forEach((iframe) => {
-            if (!owns(iframe)) return;
-            // Window resize is the only time horizontal fit is allowed to change.
-            stateFor(iframe).initialLayoutDone = false;
-            layoutFrame(iframe, { initial: true, resetScroll: false });
-          });
+        document.querySelectorAll(STAGE_SELECTOR).forEach((stage) => {
+          if (!editorPanelFor(stage)) return;
+          const iframe = stage.querySelector(IFRAME_SELECTOR) || stage.querySelector("iframe");
+          if (iframe) scheduleNormalize(iframe, true, false);
         });
       }, 120);
     }, { passive: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
     boot();
   }
 })();
-
 
 /* =========================================================
    V209 — GGUM VER.EDM PREVIEW RECOVERY
@@ -27344,7 +27153,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     frame.dataset.ddsGgumV209Signature = signature;
     centralRender(frame, buildDocument(code));
-    window.__ddsCentralEditorNormalizeV211?.(frame);
+    [0, 80, 220, 600].forEach((delay) => {
+      window.setTimeout(() => window.__ddsCentralEditorNormalizeV208?.(frame), delay);
+    });
     return true;
   }
 
