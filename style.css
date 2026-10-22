@@ -14656,3 +14656,55 @@ body.dds-y2k-vampire .dds-unified-bbcode-v235 button i.bi,
 body.dds-y2k-vampire .dds-unified-bbcode-v235 label i.bi {display:inline-block !important;visibility:visible !important;opacity:1 !important;}
 body.dds-y2k-vampire .dds-unified-bbcode-v235 button {flex:0 0 auto !important;}
 body.dds-y2k-vampire .dds-word-counter {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+
+/* V237 — Keep the roleplay word counter immediately below the text entry. */
+.dds-v237-roleplay-text { display:block; width:100%; }
+.dds-v237-roleplay-counter {
+  display:flex !important;
+  width:100%;
+  clear:both;
+  position:relative !important;
+  inset:auto !important;
+  transform:none !important;
+  margin:8px 0 0 !important;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  flex-wrap:wrap;
+  order:1000;
+}
+
+
+/* v238 — consistent 150px text-entry fields, red in-field vertical scrollbar.
+   Read-only generated code/hidden storage elements are excluded. */
+body.dds-y2k-vampire textarea:not([readonly]):not(.dds-generated-code),
+body.dds-y2k-vampire [contenteditable="true"][aria-multiline="true"],
+body.dds-y2k-vampire .dds-rich-editor[contenteditable="true"] {
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  resize: none !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #b5162e #14090c !important;
+  overscroll-behavior: contain;
+}
+body.dds-y2k-vampire textarea:not([readonly]):not(.dds-generated-code)::-webkit-scrollbar,
+body.dds-y2k-vampire [contenteditable="true"][aria-multiline="true"]::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-rich-editor[contenteditable="true"]::-webkit-scrollbar {
+  width: 7px !important;
+}
+body.dds-y2k-vampire textarea:not([readonly]):not(.dds-generated-code)::-webkit-scrollbar-track,
+body.dds-y2k-vampire [contenteditable="true"][aria-multiline="true"]::-webkit-scrollbar-track,
+body.dds-y2k-vampire .dds-rich-editor[contenteditable="true"]::-webkit-scrollbar-track {
+  background: #14090c !important;
+}
+body.dds-y2k-vampire textarea:not([readonly]):not(.dds-generated-code)::-webkit-scrollbar-thumb,
+body.dds-y2k-vampire [contenteditable="true"][aria-multiline="true"]::-webkit-scrollbar-thumb,
+body.dds-y2k-vampire .dds-rich-editor[contenteditable="true"]::-webkit-scrollbar-thumb {
+  background: #b5162e !important;
+  border-radius: 4px !important;
+}

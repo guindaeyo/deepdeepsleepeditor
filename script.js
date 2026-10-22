@@ -27582,3 +27582,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+
+/* V237 — Word count under every roleplay content field. No textarea sizing changes. */
+(() => {
+  'use strict';
+  if(window.__DDS_V237_WORDCOUNT_PLACEMENT__) return;
+  window.__DDS_V237_WORDCOUNT_PLACEMENT__=true;
+  function place(){
+    document.querySelectorAll('[data-dds-v236-counter="true"]').forEach(field=>{
+      const sibling=field.nextElementSibling;
+      let counter=sibling?.classList.contains('dds-word-counter') ? sibling : null;
+      if(!counter){
+        const parent=field.parentElement;
+        counter=Array.from(parent?.children||[]).find(el=>el.classList?.contains('dds-word-counter') && (el.hasAttribute('data-code013-word-counter') || el.hasAttribute('data-code014-word-counter') || el.hasAttribute('data-hans-word-counter') || el.hasAttribute('data-jewel-word-counter') || el.hasAttribute('data-eric-word-counter') || el.hasAttribute('data-word-count-number') || parent.querySelectorAll('.dds-word-counter').length===1));
+      }
+      if(!counter) return;
+      field.classList.add('dds-v237-roleplay-text');
+      counter.classList.add('dds-v237-roleplay-counter');
+      if(field.nextElementSibling!==counter) field.insertAdjacentElement('afterend',counter);
+    });
+  }
+  let frame=0;
+  const schedule=()=>{ if(frame) return; frame=requestAnimationFrame(()=>{frame=0;place()}); };
+  const boot=()=>{place(); document.addEventListener('click',schedule,true); window.addEventListener('hashchange',schedule); const root=document.querySelector('.dds-main')||document.body; new MutationObserver(records=>{if(records.some(r=>Array.from(r.addedNodes).some(n=>n.nodeType===1)))schedule()}).observe(root,{childList:true,subtree:true}); setTimeout(place,800);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
