@@ -1,3 +1,2 @@
-V242 - CODE014 stable editor preview
-Changed only CODE014 iframe renderer and its central preview hook in index.html.
-Typing updates contents without resetting width, height, scale or scrollbar.
+V243 — HOME PHOTO REPLACEMENT
+Based on v242. Only HOME content and its scoped CSS were changed. Old home artwork, quotes, and layout removed. Replacement photograph stored at assets/home-photo.jpg.

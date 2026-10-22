@@ -14743,3 +14743,31 @@ body.dds-y2k-vampire .dds-code014-editor.is-active .dds-code014-editor-stage::-w
   width: 0 !important;
   height: 0 !important;
 }
+
+/* V243 — Replace HOME hero entirely with the supplied photograph. */
+body.dds-y2k-vampire [data-panel="home"].dds-home-photo-panel {
+  min-height: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+}
+body.dds-y2k-vampire .dds-home-photo-panel .dds-home-photo-canvas {
+  width: 100%;
+  height: max(540px, calc(100dvh - 170px));
+  min-height: 540px;
+  overflow: hidden;
+  background: #100709;
+}
+body.dds-y2k-vampire .dds-home-photo-panel .dds-home-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+@media (max-width: 760px) {
+  body.dds-y2k-vampire .dds-home-photo-panel .dds-home-photo-canvas {
+    height: max(390px, calc(100dvh - 145px));
+    min-height: 390px;
+  }
+}
