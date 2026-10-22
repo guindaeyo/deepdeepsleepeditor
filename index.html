@@ -6959,6 +6959,140 @@ You were mine forever</textarea>
 
 
 
+
+<script id="dds-v230-commission-history-lock">
+(() => {
+  "use strict";
+
+  const nativeReplaceState = history.replaceState.bind(history);
+  const nativePushState = history.pushState.bind(history);
+
+  function hashFromUrl(url) {
+    if (url == null || url === "") return (location.hash || "").toLowerCase();
+    try {
+      return new URL(String(url), location.href).hash.toLowerCase();
+    } catch (_) {
+      const value = String(url);
+      const index = value.indexOf("#");
+      return (index >= 0 ? value.slice(index) : "").toLowerCase();
+    }
+  }
+
+  function isCommissionChildHash(hash) {
+    if (!hash || hash === "#commission") return false;
+    if (!hash.includes("commission")) return false;
+    return /(?:editor|view|commission-)/i.test(hash);
+  }
+
+  function commissionBaseState(extra = {}) {
+    return {
+      ...(history.state || {}),
+      ...extra,
+      ddsBrowserPage: "commission"
+    };
+  }
+
+  function makeCommissionCheckpoint() {
+    nativeReplaceState(
+      commissionBaseState({ ddsCommissionBase: true, ddsBrowserCheckpoint: false }),
+      "",
+      "#commission"
+    );
+    nativePushState(
+      commissionBaseState({ ddsCommissionCheckpoint: true, ddsBrowserCheckpoint: true }),
+      "",
+      "#commission"
+    );
+  }
+
+  function ensureCommissionCheckpointForAction() {
+    const currentHash = (location.hash || "").toLowerCase();
+    const checkpointReady =
+      currentHash === "#commission" &&
+      (history.state?.ddsCommissionCheckpoint === true || history.state?.ddsBrowserCheckpoint === true);
+
+    if (checkpointReady || isCommissionChildHash(currentHash)) return;
+    makeCommissionCheckpoint();
+  }
+
+  /*
+   * Some legacy Commission VIEW WORK modules keep the URL as #commission
+   * even while a full-screen view is open. Hash-only detection cannot catch
+   * those. Capture every EDIT/VIEW action while the Commission directory is
+   * the source, and create the Back checkpoint before the legacy handler runs.
+   */
+  document.addEventListener("click", (event) => {
+    const control = event.target?.closest?.("button,a");
+    if (!control) return;
+
+    const keys = Object.keys(control.dataset || {});
+    const looksLikeOpenAction =
+      keys.some((key) => /(?:edit|view|open)/i.test(key) && !/preview/i.test(key)) ||
+      /(?:edit code|view work|view code|open editor|แก้ไข|ดูโคด)/i.test(control.textContent || "") ||
+      /(?:commission.*(?:edit|view)|(?:edit|view).*commission)/i.test(control.className || "");
+
+    if (!looksLikeOpenAction) return;
+
+    const commissionPanel = document.querySelector('[data-panel="commission"]');
+    const sourceIsCommission =
+      (location.hash || "").toLowerCase() === "#commission" ||
+      control.closest?.('[data-panel="commission"]') ||
+      control.closest?.('.dds-commission-card') ||
+      !!commissionPanel?.classList.contains("is-active");
+
+    if (sourceIsCommission) ensureCommissionCheckpointForAction();
+  }, true);
+
+  history.replaceState = function(state, title, url) {
+    const targetHash = hashFromUrl(url);
+
+    if (isCommissionChildHash(targetHash)) {
+      const currentHash = (location.hash || "").toLowerCase();
+      const checkpointReady =
+        currentHash === "#commission" &&
+        (history.state?.ddsCommissionCheckpoint === true || history.state?.ddsBrowserCheckpoint === true);
+
+      if (!checkpointReady && !isCommissionChildHash(currentHash)) {
+        makeCommissionCheckpoint();
+      }
+
+      return nativeReplaceState(
+        {
+          ...(state && typeof state === "object" ? state : {}),
+          ddsBrowserPage: "commission",
+          ddsCommissionChild: true
+        },
+        title,
+        url
+      );
+    }
+
+    return nativeReplaceState(state, title, url);
+  };
+
+  /* Direct/deep-linked Commission child pages receive the same Back contract. */
+  function normalizeDirectCommissionChild() {
+    const currentHash = (location.hash || "").toLowerCase();
+    if (!isCommissionChildHash(currentHash) || history.state?.ddsCommissionChild === true) return;
+
+    const targetUrl = location.href;
+    nativeReplaceState(
+      commissionBaseState({ ddsCommissionBase: true, ddsBrowserCheckpoint: false }),
+      "",
+      "#commission"
+    );
+    nativePushState(
+      commissionBaseState({ ddsCommissionChild: true }),
+      "",
+      targetUrl
+    );
+  }
+
+  normalizeDirectCommissionChild();
+})();
+</script>
+
+
 <script id="dds-v223-clean-editor-route-fix">
 (() => {
   "use strict";
