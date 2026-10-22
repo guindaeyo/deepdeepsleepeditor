@@ -24,7 +24,7 @@
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-<link href="./style.css?v=20261022-v241-code014-preview-initial-fix" rel="stylesheet"/>
+<link href="./style.css?v=20261022-v242-code014-stable-preview" rel="stylesheet"/>
 </head>
 <body class="dds-y2k-vampire">
 <div aria-hidden="true" class="dds-noise"></div>
@@ -6231,6 +6231,14 @@ You were mine forever</textarea>
 
   function writeIframe(iframe, code, afterLoad) {
     if (!iframe) return;
+    // CODE014: The shared V210 editor engine owns geometry. Do not reset the
+    // iframe to 1100px or the unscaled canvas on every keystroke.
+    if (window.__ddsCentralEditorPreviewOwnsV210?.(iframe)) {
+      const srcdoc = previewDocument(code);
+      window.__ddsCentralEditorRenderV210(iframe, srcdoc);
+      window.__ddsCentralEditorNormalizeV210?.(iframe);
+      return;
+    }
     iframe.style.setProperty("width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("min-width", `${CANVAS_WIDTH}px`, "important");
     iframe.style.setProperty("max-width", `${CANVAS_WIDTH}px`, "important");
@@ -6269,8 +6277,8 @@ You were mine forever</textarea>
     // CODE014 must obey the single central editor preview engine.
     // Its legacy fitter used to re-add the red scrollbar and move the frame
     // after every edit / delayed refit.
-    if (window.__ddsCentralEditorPreviewOwnsV203?.(iframe)) {
-      window.__ddsCentralEditorNormalizeV203?.(iframe);
+    if (window.__ddsCentralEditorPreviewOwnsV210?.(iframe)) {
+      window.__ddsCentralEditorNormalizeV210?.(iframe);
       return;
     }
 

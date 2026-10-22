@@ -1,1 +1,3 @@
-v241 — CODE014 initial preview position + invisible left scrollbar. Based on v240. Only CODE014 initial preview refit in index.html and scoped scrollbar CSS changed. All other files preserved.
+V242 - CODE014 stable editor preview
+Changed only CODE014 iframe renderer and its central preview hook in index.html.
+Typing updates contents without resetting width, height, scale or scrollbar.
