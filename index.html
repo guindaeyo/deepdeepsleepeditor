@@ -5742,13 +5742,37 @@ You were mine forever</textarea>
    * route can safely replace the duplicate, while Browser Back still lands
    * on the untouched category entry behind it.
    */
-  function addHistoryCheckpoint() {
+  function addHistoryCheckpoint(forcedPage = null) {
     if (checkpointLock) return;
     checkpointLock = true;
-    const page = categoryFromRoute();
-    markCurrentEntry(page);
+    const page = forcedPage && PAGE_META[forcedPage] ? forcedPage : categoryFromRoute();
+    const directoryHash = `#${page}`;
+
+    /*
+     * Every editor must keep its originating directory directly behind it:
+     * ROLEPLAY -> #roleplay, PROFILE -> #profile, REVIEW -> #review,
+     * COMMISSION -> #commission. Legacy editors are free to replace only
+     * the duplicate entry we push on top, so Browser Back returns to the
+     * correct full code directory in one click.
+     */
+    if (forcedPage && PAGE_META[forcedPage]) {
+      try {
+        history.replaceState(
+          { ...(history.state || {}), ddsBrowserPage: page, ddsDirectoryCheckpoint: true },
+          "",
+          directoryHash
+        );
+      } catch (_) {}
+    } else {
+      markCurrentEntry(page);
+    }
+
     try {
-      history.pushState({ ddsBrowserPage: page, ddsBrowserCheckpoint: true }, "", location.href);
+      history.pushState(
+        { ddsBrowserPage: page, ddsBrowserCheckpoint: true },
+        "",
+        forcedPage && PAGE_META[forcedPage] ? directoryHash : location.href
+      );
     } catch (_) {}
     queueMicrotask(() => { checkpointLock = false; });
   }
@@ -5808,7 +5832,34 @@ You were mine forever</textarea>
     const classSuggestsRoute = /(?:edit|view)/i.test(control.className || "");
     const textSuggestsRoute = /(?:edit code|view code|view work|open editor|แก้ไข|ดูโคด)/i.test(control.textContent || "");
 
-    if (opensEditorOrView || classSuggestsRoute || textSuggestsRoute) addHistoryCheckpoint();
+    if (opensEditorOrView || classSuggestsRoute || textSuggestsRoute) {
+      let sourcePage = null;
+
+      if (
+        control.matches?.('[data-edit-code], [data-code013-edit], [data-code014-edit]') ||
+        control.closest?.('[data-panel="roleplay"]')
+      ) {
+        sourcePage = "roleplay";
+      } else if (
+        control.matches?.('[data-edit-profile], [data-lr-profile-edit]') ||
+        control.closest?.('[data-panel="profile"]')
+      ) {
+        sourcePage = "profile";
+      } else if (
+        control.matches?.('[data-edit-review]') ||
+        control.closest?.('[data-panel="review"]')
+      ) {
+        sourcePage = "review";
+      } else if (
+        control.matches?.('[data-edit-protected-commission], [data-edit-food-commission], [data-edit-history-commission], [data-edit-mikael-commission], [data-hans-edit], [data-vmac-edit], [data-view-commission], [data-view-commission-three]') ||
+        control.closest?.('[data-panel="commission"]') ||
+        control.closest?.('.dds-commission-card')
+      ) {
+        sourcePage = "commission";
+      }
+
+      addHistoryCheckpoint(sourcePage);
+    }
   }, true);
 
   function restoreFromHistory(event) {

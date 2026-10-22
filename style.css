@@ -14465,3 +14465,62 @@ body.dds-y2k-vampire.dds-force-editor-mode .dds-browser-chrome {
     display: none !important;
   }
 }
+
+/* ========================================================================
+   V226 — HIDE Y2K BROWSER CHROME IN EVERY EDITOR
+   Directory/category pages keep the browser shell. Any active editor —
+   Roleplay, Profile, Review, static Commission or dynamic Commission —
+   removes the fake browser bar directly from DOM state via :has().
+=========================================================================== */
+
+/* Static editor panels in index.html. */
+body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]) .dds-browser-chrome,
+/* All dynamic commission editors created by script.js. */
+body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-browser-chrome {
+  display: none !important;
+}
+
+@media (min-width: 901px) {
+  body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]),
+  body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]) .dds-app,
+  body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-app {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]) .dds-main,
+  body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-main {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding-top: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]) .dds-editor-heading .dds-back-button,
+  body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-editor-heading .dds-back-button {
+    display: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.dds-y2k-vampire:has(.dds-panel.is-active[data-panel^="editor-"]) .dds-browser-chrome,
+  body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-browser-chrome {
+    display: none !important;
+  }
+}
