@@ -20992,9 +20992,65 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     updatePreview();
   }
 
+  function restoreCode013RoleplayDirectory() {
+    if (location.hash !== "#roleplay") return;
+
+    const clearClasses = [
+      "dds-editor-mode",
+      "dds-force-editor-mode",
+      "dds-commission-editor-mode",
+      "dds-modal-open",
+      "dds-editor-one-screen"
+    ];
+
+    document.documentElement.classList.remove(...clearClasses);
+    document.body.classList.remove(...clearClasses);
+
+    document.documentElement.style.removeProperty("overflow");
+    document.documentElement.style.removeProperty("overflow-y");
+    document.documentElement.style.removeProperty("height");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("overflow-y");
+    document.body.style.removeProperty("height");
+
+    if (panel) panel.classList.remove("is-active");
+
+    document.querySelectorAll("[data-panel]").forEach((candidate) => {
+      candidate.classList.toggle("is-active", candidate.dataset.panel === "roleplay");
+    });
+
+    document.querySelectorAll("[data-page]").forEach((button) => {
+      const active = button.dataset.page === "roleplay";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-current", active ? "page" : "false");
+    });
+
+    document.querySelectorAll("[data-browser-page]").forEach((button) => {
+      const active = button.dataset.browserPage === "roleplay";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+    });
+
+    const chrome = document.querySelector(".dds-browser-chrome");
+    if (chrome) chrome.style.removeProperty("display");
+
+    const address = document.getElementById("ddsBrowserAddress");
+    if (address) address.textContent = "deepdeepsleep.codes/for-roleplay";
+
+    const pageNumber = document.getElementById("currentPageNumber");
+    if (pageNumber) pageNumber.textContent = "01";
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
   function handleHash() {
     if (location.hash === "#editor-code013" && !panel?.classList.contains("is-active")) {
       openEditor();
+      return;
+    }
+
+    if (location.hash === "#roleplay") {
+      requestAnimationFrame(restoreCode013RoleplayDirectory);
     }
   }
 
@@ -21011,6 +21067,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       if (editorFrame && panel?.classList.contains("is-active")) sizeEditorPreviewActual(editorFrame, panel.querySelector(".dds-code013-editor-stage"), 28);
     });
     window.addEventListener("hashchange", handleHash);
+    window.addEventListener("popstate", () => {
+      if (location.hash === "#roleplay") {
+        setTimeout(restoreCode013RoleplayDirectory, 0);
+        requestAnimationFrame(() => requestAnimationFrame(restoreCode013RoleplayDirectory));
+      }
+    }, { passive: true });
     window.setTimeout(handleHash, 300);
   }
 
