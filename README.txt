@@ -1,11 +1,21 @@
-DEEP DEEP SLEEP CODE SHOP — V208
+DEEP DEEP SLEEP CODE SHOP — V210 READY
 
-แก้เฉพาะระบบ Preview ฝั่งซ้ายของหน้า Edit จาก V207:
-- แก้บั๊ก cross-iframe Element detection ที่ทำให้ระบบวัด wrapper แทนตัวโคดจริง
-- Fit จาก visual bounds จริง รวมของที่ยื่นซ้าย/ขวา/ด้านบน เช่น badge, star, barcode
-- ล็อกกึ่งกลางของพื้นที่ Preview 60% แม้พิมพ์ข้อความ
-- ไม่ถอด transform เป็น none ทุก keystroke อีก
-- เริ่มจากบนสุดของ visual code และ iframe สูงตาม visual content จริง
-- Preview ฝั่งซ้ายเลื่อนแนวตั้งได้ด้วย scrollbar ล่องหน
-- RORAIMA / HANS X. FROST ใช้กติกาเดียวกัน
-- ไม่แตะ Controls ฝั่งขวา / COPY CODE / Cloud / Draft / routing / BBCode toolbar
+Use all five files together:
+- index.html
+- style.css
+- script.js
+- cloud-config.js
+- cloud-bridge.js
+
+V210 changes:
+- Replaces the old Central Preview engine instead of stacking another patch.
+- Left editor preview = 60%, right controls = 40%.
+- Centers the actual visible code canvas in the left preview.
+- Fits the full code width inside the left preview.
+- Starts at the top of the code.
+- Long code scrolls vertically in the left preview with invisible scrollbar chrome.
+- Includes RORAIMA/HANS and GGUM visual roots.
+- Keeps V209 GGUM recovery.
+- Right-side controls / COPY CODE / Cloud / Draft are not intentionally changed.
+
+After uploading, hard refresh once (Ctrl+F5).

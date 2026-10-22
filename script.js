@@ -26437,1205 +26437,406 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   REVIEW CODE001 — GGUM VER.EDM / SMOOTH TYPING v179
-   Editor preview only.
+   V210 — CENTRAL PREVIEW FIX
+   - center actual visible canvas
+   - show full width inside LEFT 60% preview
+   - show from top
+   - invisible vertical scroll on LEFT preview
+   - editor previews only; RIGHT controls untouched
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_REVIEW001_SMOOTH_V179__) return;
-  window.__DDS_REVIEW001_SMOOTH_V179__ = true;
+  if (window.__DDS_V210_CENTRAL_PREVIEW__) return;
+  window.__DDS_V210_CENTRAL_PREVIEW__ = true;
 
-  if (
-    typeof window.queuePreviewDocument !== "function"
-  ) {
-    return;
-  }
+  const STAGE_SELECTOR = [
+    ".dds-editor-preview-stage",
+    ".dds-live-preview-stage",
+    ".dds-preview-stage",
+    ".dds-protected-commission-preview-stage",
+    ".dds-code013-editor-stage",
+    ".dds-code014-editor-stage",
+    ".dds-profile-preview-stage",
+    ".dds-moodboard-preview-stage",
+    ".dds-fortyone-preview-stage",
+    ".dds-nothin-preview-stage",
+    '[class*="preview-stage"]'
+  ].join(",");
 
-  const originalQueuePreviewDocument =
-    window.queuePreviewDocument;
-
-  const state = {
-    timer: 0,
-    srcdoc: "",
-    resizeFunction: null
-  };
-
-  function patchFoodEditorPreview(
-    iframe,
-    srcdoc,
-    resizeFunction
-  ) {
-    const previewDocument =
-      iframe?.contentDocument;
-
-    if (
-      !previewDocument ||
-      previewDocument.readyState === "loading" ||
-      typeof window.updateLoadedPreviewDocument !== "function"
-    ) {
-      return false;
-    }
-
-    const shell =
-      previewDocument.querySelector(
-        ".dds-preview-shell"
-      );
-
-    const previousScrollTop =
-      shell?.scrollTop || 0;
-
-    const previewColumn =
-      iframe.closest(
-        ".dds-editor-preview-column"
-      );
-
-    const previousOuterScrollTop =
-      previewColumn?.scrollTop || 0;
-
-    const restorePosition = () => {
-      const currentShell =
-        iframe.contentDocument?.querySelector(
-          ".dds-preview-shell"
-        );
-
-      if (currentShell) {
-        currentShell.scrollTop =
-          previousScrollTop;
-      }
-
-      if (previewColumn) {
-        previewColumn.scrollTop =
-          previousOuterScrollTop;
-      }
-
-      if (
-        typeof resizeFunction === "function"
-      ) {
-        resizeFunction(iframe);
-      }
-
-      requestAnimationFrame(() => {
-        const nextShell =
-          iframe.contentDocument?.querySelector(
-            ".dds-preview-shell"
-          );
-
-        if (nextShell) {
-          nextShell.scrollTop =
-            previousScrollTop;
-        }
-
-        if (previewColumn) {
-          previewColumn.scrollTop =
-            previousOuterScrollTop;
-        }
-      });
-    };
-
-    try {
-      const patched =
-        window.updateLoadedPreviewDocument(
-          iframe,
-          srcdoc,
-          restorePosition
-        );
-
-      if (patched) {
-        restorePosition();
-        return true;
-      }
-    } catch (error) {
-      console.warn(
-        "[DDS REVIEW001] smooth preview patch failed",
-        error
-      );
-    }
-
-    return false;
-  }
-
-  window.queuePreviewDocument =
-    function review001SmoothQueue(
-      iframe,
-      srcdoc,
-      resizeFunction
-    ) {
-      if (iframe?.id !== "foodReviewPreview") {
-        return originalQueuePreviewDocument.call(
-          this,
-          iframe,
-          srcdoc,
-          resizeFunction
-        );
-      }
-
-      state.srcdoc = srcdoc;
-      state.resizeFunction = resizeFunction;
-
-      window.clearTimeout(state.timer);
-
-      /*
-       * Group rapid typing into one visual update.
-       * Generated code can still update immediately;
-       * only the editor preview waits 90ms.
-       */
-      state.timer =
-        window.setTimeout(() => {
-          state.timer = 0;
-
-          if (
-            patchFoodEditorPreview(
-              iframe,
-              state.srcdoc,
-              state.resizeFunction
-            )
-          ) {
-            return;
-          }
-
-          originalQueuePreviewDocument.call(
-            window,
-            iframe,
-            state.srcdoc,
-            state.resizeFunction
-          );
-        }, 90);
-
-      return true;
-    };
-})();
-
-/* =========================================================
-   V208 — LOCKED CENTER + FULL BOUNDS
-   One owner for every Edit-page LEFT preview.
-
-   Contract:
-   - LEFT preview width fits the full code inside the 60% column.
-   - LEFT preview stage is the ONLY vertical scroller; scrollbar chrome hidden.
-   - Iframe grows to the rendered code height, so PROFILE / long codes scroll.
-   - Horizontal position is locked to the exact centre of the preview viewport.
-   - Typing never reloads the visible iframe after first load.
-   - Typing never recalculates horizontal scale / position.
-   - Legacy fitters are short-circuited through compatibility hooks.
-   - RIGHT controls / routing / COPY CODE / cloud / drafts are untouched.
-========================================================= */
-(() => {
-  "use strict";
-
-  if (window.__DDS_V208_CENTRAL_EDITOR__) return;
-  window.__DDS_V208_CENTRAL_EDITOR__ = true;
-
-  const states = new WeakMap();
-  const activeFrames = new Set();
-  const hookedFrames = new WeakSet();
-  const srcdocDescriptor = Object.getOwnPropertyDescriptor(
-    HTMLIFrameElement.prototype,
-    "srcdoc"
-  );
-  const nativeSrcdocGet = srcdocDescriptor?.get;
-  const nativeSrcdocSet = srcdocDescriptor?.set;
+  const IFRAME_SELECTOR = [
+    ".dds-editor-preview-frame",
+    ".dds-live-preview-frame",
+    ".dds-preview-frame",
+    ".dds-protected-commission-preview-frame",
+    'iframe[class*="preview-frame"]'
+  ].join(",");
 
   const EDIT_PANEL_SELECTOR = [
     '.dds-panel[data-panel^="editor-"]',
     '.dds-protected-commission-editor',
     '[class*="protected-commission-editor"]',
     '[class*="editor-panel"]'
-  ].join(',');
+  ].join(",");
 
-  const STAGE_SELECTOR = [
-    '.dds-code014-editor-stage',
-    '.dds-code013-editor-stage',
-    '.dds-profile-preview-stage',
-    '.dds-moodboard-preview-stage',
-    '.dds-fortyone-preview-stage',
-    '.dds-nothin-preview-stage',
-    '.dds-protected-commission-preview-stage',
-    '.dds-editor-preview-stage',
-    '[class*="preview-stage"]'
-  ].join(',');
+  const attachedStages = new WeakSet();
+  const frameStates = new WeakMap();
 
-  function isRealEditorPanel(panel) {
+  function isElement(node) {
+    return !!node && node.nodeType === 1;
+  }
+
+  function isEditorPanel(panel) {
     if (!panel) return false;
-    const name = String(panel.dataset?.panel || '');
-    if (/^view-/i.test(name) || panel.classList.contains('dds-commission-view-panel')) return false;
-    if (!(name.startsWith('editor-') || panel.matches('.dds-protected-commission-editor,[class*="protected-commission-editor"],[class*="editor-panel"]'))) return false;
-    return Boolean(panel.querySelector('iframe') && panel.querySelector('input,textarea,select,[contenteditable="true"],button'));
-  }
-
-  function panelFor(iframe) {
-    if (!(iframe instanceof HTMLIFrameElement)) return null;
-    if (iframe.closest('.dds-roleplay-card-preview,.dds-commission-card,.dds-commission-view-panel')) return null;
-    const panel = iframe.closest(EDIT_PANEL_SELECTOR) || iframe.closest('.dds-panel');
-    return isRealEditorPanel(panel) ? panel : null;
-  }
-
-  function owns(iframe) {
-    return activeFrames.has(iframe) && Boolean(panelFor(iframe));
-  }
-
-  function previewColumnFor(iframe) {
-    const panel = panelFor(iframe);
-    if (!panel) return null;
-    return iframe.closest('.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]') || null;
-  }
-
-  function stageFor(iframe) {
-    const panel = panelFor(iframe);
-    if (!panel) return null;
-    return iframe.closest(STAGE_SELECTOR) || previewColumnFor(iframe);
-  }
-
-  function hostFor(iframe, stage) {
-    let node = iframe.parentElement;
-    if (!node || node === stage) return null;
-    return node;
-  }
-
-  function meaningfulChildren(parent) {
-    return Array.from(parent?.children || []).filter((el) =>
-      !['STYLE','SCRIPT','LINK','META','NOSCRIPT'].includes(el.tagName) &&
-      !el.classList?.contains('dds-preview-loader')
+    const panelName = String(panel.dataset?.panel || "");
+    if (/^view-/i.test(panelName) || panel.classList.contains("dds-commission-view-panel")) return false;
+    return Boolean(
+      panelName.startsWith("editor-") ||
+      panel.matches('.dds-protected-commission-editor,[class*="protected-commission-editor"],[class*="editor-panel"]')
     );
   }
 
-  function locate(doc) {
-    if (!doc?.body) return null;
-    const target = doc.querySelector(
-      '.dds-preview-target,.dds-card-preview-target,[class*="preview-target"],' +
-      '[data-food-preview-positioner],[data-history-preview-positioner],' +
-      '[data-mikael-preview-positioner],[class*="preview-positioner"],' +
-      '.dds-code014-preview-root'
+  function editorPanelFor(node) {
+    const panel = node?.closest?.(EDIT_PANEL_SELECTOR) || null;
+    return isEditorPanel(panel) ? panel : null;
+  }
+
+  function ensurePreviewStyle(doc) {
+    let style = doc.getElementById("dds-central-preview-style-v210");
+    if (style) return;
+
+    style = doc.createElement("style");
+    style.id = "dds-central-preview-style-v210";
+    style.textContent = `
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar,
+      *::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+        background: transparent !important;
+      }
+      * {
+        scrollbar-width: none !important;
+      }
+    `;
+    doc.head?.appendChild(style);
+  }
+
+  function findVisualRoot(doc) {
+    const priority = [
+      ".ddsh-roraima",
+      ".fdpopup-wrap",
+      ".ddsh-sssluv",
+      ".ddsh-bluehour",
+      ".ddsh-loserlover",
+      ".ddsh-higherthanheaven",
+      ".ddsh-fortyonewinks",
+      ".ddsh-nothinboutme",
+      ".ddsh-dumbanddumber",
+      ".ddsh-0x1lovesong",
+      "[data-preview-root]",
+      "[data-preview-canvas]",
+      ".dds-preview-target",
+      ".dds-card-preview-target",
+      ".preview-root",
+      ".preview-canvas",
+      ".roleplay-root",
+      ".profile-root",
+      ".review-root",
+      ".commission-root"
+    ];
+
+    for (const sel of priority) {
+      const el = doc.querySelector(sel);
+      if (el) return el;
+    }
+
+    const bodyChildren = Array.from(doc.body?.children || []).filter((el) =>
+      !["SCRIPT", "STYLE", "LINK", "META", "NOSCRIPT"].includes(el.tagName)
     );
-    if (target) {
-      const shell = target.parentElement && target.parentElement !== doc.body
-        ? target.parentElement
-        : null;
-      return { target, shell, direct: false };
+    return bodyChildren[0] || doc.body;
+  }
+
+  function restoreForMeasurement(root) {
+    const state = frameStates.get(root.ownerDocument.defaultView?.frameElement) || {};
+    if (!state.rootOriginal) {
+      state.rootOriginal = {
+        transform: root.style.transform || "",
+        transformOrigin: root.style.transformOrigin || "",
+        position: root.style.position || "",
+        left: root.style.left || "",
+        top: root.style.top || "",
+        margin: root.style.margin || ""
+      };
     }
-    const direct = meaningfulChildren(doc.body)[0] || null;
-    return direct ? { target: direct, shell: null, direct: true } : null;
+    const original = state.rootOriginal;
+    root.style.transform = original.transform;
+    root.style.transformOrigin = original.transformOrigin;
+    root.style.position = original.position;
+    root.style.left = original.left;
+    root.style.top = original.top;
+    root.style.margin = original.margin;
+    const iframe = root.ownerDocument.defaultView?.frameElement;
+    if (iframe) frameStates.set(iframe, state);
   }
 
-  const V207_ROOT_HINTS = Object.freeze({
-    foodReviewPreview: [".fdreview-wrap"],
-    musicReviewPreview: [".ddsh-revmus-wrap"],
-    movieReviewPreview: [".ddsh-moviereview"]
-  });
+  function getVisibleBounds(root) {
+    restoreForMeasurement(root);
+    const rootRect = root.getBoundingClientRect();
 
-  function v207VisibleElement(el) {
-    // Elements inside preview iframes belong to a different Window realm, so
-    // `el instanceof Element` from the parent page is false. Use nodeType.
-    if (!el || el.nodeType !== 1) return false;
-    const tag = String(el.tagName || "").toUpperCase();
-    if (["STYLE", "SCRIPT", "LINK", "META", "NOSCRIPT"].includes(tag)) return false;
-    const cls = String(el.className || "").toLowerCase();
-    if (cls.includes("credit") || cls.includes("preview-loader")) return false;
-    const doc = el.ownerDocument;
-    const cs = doc?.defaultView?.getComputedStyle?.(el);
-    if (cs && (cs.display === "none" || cs.visibility === "hidden" || Number(cs.opacity) === 0)) return false;
-    const rect = el.getBoundingClientRect?.();
-    return Boolean(rect && rect.width > 1 && rect.height > 1);
-  }
-
-  function v207GenericWrapper(el) {
-    if (!el) return false;
-    const cls = String(el.className || "").toLowerCase();
-    return /(?:preview-(?:target|shell|root|positioner|holder|host|content)|dds-preview|card-preview)/.test(cls);
-  }
-
-  function v207HasOwnPaint(doc, el) {
-    if (!doc || !el || v207GenericWrapper(el)) return false;
-    const cs = doc.defaultView?.getComputedStyle?.(el);
-    if (!cs) return false;
-    const bg = String(cs.backgroundColor || "").replace(/\s+/g, "").toLowerCase();
-    const paintedBg = Boolean(
-      (bg && bg !== "transparent" && bg !== "rgba(0,0,0,0)") ||
-      (cs.backgroundImage && cs.backgroundImage !== "none")
-    );
-    const border = [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth]
-      .some((v) => (Number.parseFloat(v || "0") || 0) > 0);
-    const shadow = Boolean(cs.boxShadow && cs.boxShadow !== "none");
-    return paintedBg || border || shadow;
-  }
-
-  function v207HintedRoot(iframe, parts) {
-    const doc = iframe?.contentDocument;
-    if (!doc || !parts?.target) return null;
-
-    // RORAIMA's 1040px preview shell is only a transport wrapper. The visible
-    // house code is .ddsh-roraima; centring the shell is what made the code
-    // look shifted and also made height measurements start at the wrong place.
-    if (iframe.matches?.("[data-rora-preview]")) {
-      return doc.querySelector(".ddsh-roraima") || doc.querySelector(".dds-rora-preview-shell") || null;
-    }
-
-    for (const selector of V207_ROOT_HINTS[iframe.id] || []) {
-      const found = doc.querySelector(selector);
-      if (found) return found;
-    }
-    return null;
-  }
-
-  function v207PeelWrapper(doc, start) {
-    let node = start;
-    for (let depth = 0; depth < 7; depth += 1) {
-      if (!node || v207HasOwnPaint(doc, node)) break;
-      const kids = meaningfulChildren(node).filter(v207VisibleElement);
-      if (kids.length !== 1) break;
-      const child = kids[0];
-      const nr = node.getBoundingClientRect?.();
-      const cr = child.getBoundingClientRect?.();
-      if (!nr || !cr) break;
-      const generic = v207GenericWrapper(node);
-      const clearlyInner =
-        cr.width < nr.width - 6 ||
-        Math.abs(cr.left - nr.left) > 3 ||
-        Math.abs(cr.right - nr.right) > 3;
-      if (!generic && !clearlyInner) break;
-      node = child;
-    }
-    return node || start;
-  }
-
-  function v207RectUnion(elements) {
     let minLeft = Infinity;
     let minTop = Infinity;
     let maxRight = -Infinity;
     let maxBottom = -Infinity;
-    let count = 0;
-    for (const el of elements) {
-      if (!v207VisibleElement(el)) continue;
-      const rect = el.getBoundingClientRect?.();
-      if (!rect || rect.width <= 1 || rect.height <= 1) continue;
-      minLeft = Math.min(minLeft, rect.left);
-      minTop = Math.min(minTop, rect.top);
-      maxRight = Math.max(maxRight, rect.right);
-      maxBottom = Math.max(maxBottom, rect.bottom);
-      count += 1;
-    }
-    if (!count || !Number.isFinite(minLeft) || !Number.isFinite(maxRight)) return null;
-    return { left:minLeft, top:minTop, right:maxRight, bottom:maxBottom, width:maxRight-minLeft, height:maxBottom-minTop };
-  }
 
-  function v208ElementsForUnion(root) {
-    if (!root) return [];
-    return [root, ...Array.from(root.querySelectorAll?.('*') || [])].filter((el) => {
-      if (!v207VisibleElement(el)) return false;
-      const cls = String(el.className || '').toLowerCase();
-      if (cls.includes('credit') || cls.includes('preview-loader')) return false;
-      const rect = el.getBoundingClientRect?.();
-      if (!rect || rect.width <= 1 || rect.height <= 1) return false;
-      // Ignore accidental browser-sized/fixed overlays; they are not part of the code canvas.
-      if (rect.width > 6000 || rect.height > 30000) return false;
-      const cs = el.ownerDocument?.defaultView?.getComputedStyle?.(el);
-      if (cs?.position === 'fixed') return false;
-      return true;
-    });
-  }
+    const nodes = [root, ...root.querySelectorAll("*")];
 
-  function v208UnionForRoot(root) {
-    return v207RectUnion(v208ElementsForUnion(root));
-  }
+    for (const node of nodes) {
+      if (!isElement(node)) continue;
 
-  function v208VisualSetForTarget(iframe, parts) {
-    const doc = iframe?.contentDocument;
-    const target = parts?.target;
-    if (!doc || !target) return [];
+      const win = node.ownerDocument.defaultView;
+      const cs = win.getComputedStyle(node);
 
-    const hinted = v207HintedRoot(iframe, parts);
-    if (hinted && v207VisibleElement(hinted)) {
-      const root = v207PeelWrapper(doc, hinted);
-      const hintedSet = v208ElementsForUnion(root);
-      if (hintedSet.length) return hintedSet;
+      if (
+        cs.display === "none" ||
+        cs.visibility === "hidden" ||
+        parseFloat(cs.opacity || "1") === 0
+      ) {
+        continue;
+      }
+
+      const r = node.getBoundingClientRect();
+      if (r.width <= 0 && r.height <= 0) continue;
+
+      minLeft = Math.min(minLeft, r.left - rootRect.left);
+      minTop = Math.min(minTop, r.top - rootRect.top);
+      maxRight = Math.max(maxRight, r.right - rootRect.left);
+      maxBottom = Math.max(maxBottom, r.bottom - rootRect.top);
     }
 
-    // Generic preview wrappers are transport only. Measure their visible
-    // descendants, not the 100%-wide wrapper itself, otherwise an off-centre
-    // code appears "centred" only because the wrapper is centred.
-    const descendants = Array.from(target.querySelectorAll('*')).filter((el) => {
-      if (!v207VisibleElement(el)) return false;
-      const cls = String(el.className || '').toLowerCase();
-      if (cls.includes('credit') || cls.includes('preview-loader')) return false;
-      const rect = el.getBoundingClientRect?.();
-      if (!rect || rect.width <= 1 || rect.height <= 1 || rect.width > 6000 || rect.height > 30000) return false;
-      const cs = doc.defaultView?.getComputedStyle?.(el);
-      if (cs?.position === 'fixed') return false;
-      // Keep painted elements, leaves, and non-generic structural code roots.
-      if (v207HasOwnPaint(doc, el)) return true;
-      if (!v207GenericWrapper(el)) return true;
-      return meaningfulChildren(el).length === 0;
-    });
-
-    if (descendants.length) return descendants;
-    return v208ElementsForUnion(target);
-  }
-
-  function v207VisualBounds(iframe, parts) {
-    const target = parts?.target;
-    if (!target) return null;
-    const targetRect = target.getBoundingClientRect?.();
-    if (!targetRect) return null;
-    const union = v207RectUnion(v208VisualSetForTarget(iframe, parts));
-    if (union && union.width > 1) {
+    if (!isFinite(minLeft)) {
       return {
-        left: union.left - targetRect.left,
-        top: union.top - targetRect.top,
-        width: union.width,
-        height: union.height,
-        root: target
+        left: 0,
+        top: 0,
+        width: Math.max(root.scrollWidth, root.offsetWidth, 1),
+        height: Math.max(root.scrollHeight, root.offsetHeight, 1)
       };
     }
-    let width = Math.max(1, targetRect.width || 0, target.offsetWidth || 0);
-    const declared = declaredWidth(iframe);
-    if (declared > 100 && width < 2) width = declared;
-    return { left:0, top:0, width, height:Math.max(1,targetRect.height||target.offsetHeight||0), root:target };
-  }
 
-  function v208CurrentVisualUnion(iframe, parts) {
-    return v207RectUnion(v208VisualSetForTarget(iframe, parts));
-  }
-
-  function v208ApplyCachedTransform(iframe, parts) {
-    const state = states.get(iframe) || {};
-    const target = parts?.target;
-    if (!target || !(state.scale > 0)) return false;
-    target.style.setProperty('transform-origin', 'top left', 'important');
-    target.style.setProperty(
-      'transform',
-      `translate(${Number(state.v208TranslateX || 0)}px, ${Number(state.v208TranslateY || 0)}px) scale(${state.scale})`,
-      'important'
-    );
-    return true;
-  }
-
-  function v208RecenterWithoutRescale(iframe, parts) {
-    const state = states.get(iframe) || {};
-    if (!parts?.target || !(state.scale > 0)) return false;
-
-    // Keep the exact same scale while typing. Only correct the pixel offset
-    // if source CSS/text changed the visual root's internal position.
-    v208ApplyCachedTransform(iframe, parts);
-    const union = v208CurrentVisualUnion(iframe, parts);
-    if (!union) return false;
-
-    const viewport = Math.max(1, iframe.clientWidth || stageFor(iframe)?.clientWidth || previewColumnFor(iframe)?.clientWidth || 1);
-    const desiredCenter = viewport / 2;
-    const actualCenter = (union.left + union.right) / 2;
-    const dx = desiredCenter - actualCenter;
-    const desiredTop = 14;
-    const dy = desiredTop - union.top;
-
-    if (Number.isFinite(dx) && Math.abs(dx) > 0.05) state.v208TranslateX = Number(state.v208TranslateX || 0) + dx;
-    if (Number.isFinite(dy) && Math.abs(dy) > 0.05) state.v208TranslateY = Number(state.v208TranslateY || 0) + dy;
-    states.set(iframe, state);
-    v208ApplyCachedTransform(iframe, parts);
-    updateFrameHeight(iframe);
-    return true;
-  }
-
-  function v207FitEveryPreview(iframe, parts, recalc = false) {
-    if (!parts?.target) return false;
-    const doc = iframe.contentDocument;
-    if (!doc?.body) return false;
-
-    const state = states.get(iframe) || {};
-    const target = parts.target;
-
-    // This is the crucial V208 rule: typing never drops transform to `none`.
-    // Re-centre the already-rendered canvas without touching scale.
-    if (state.fitted && !recalc) {
-      return v208RecenterWithoutRescale(iframe, parts);
-    }
-
-    state.v207VisualWidth = 0;
-    state.v207VisualLeft = 0;
-    state.v207VisualTop = 0;
-    state.scale = 0;
-    state.v208TranslateX = 0;
-    state.v208TranslateY = 0;
-
-    // Neutralise geometry only for the FIRST measurement / explicit resize.
-    target.style.setProperty('position', 'relative', 'important');
-    target.style.setProperty('left', '0', 'important');
-    target.style.setProperty('right', 'auto', 'important');
-    target.style.setProperty('margin-left', '0', 'important');
-    target.style.setProperty('margin-right', '0', 'important');
-    target.style.setProperty('zoom', '1', 'important');
-    target.style.setProperty('transform', 'none', 'important');
-    target.style.setProperty('transform-origin', 'top left', 'important');
-
-    const bounds = v207VisualBounds(iframe, parts);
-    const visualWidth = Math.max(1, bounds?.width || 0);
-    const visualLeft = Number.isFinite(bounds?.left) ? bounds.left : 0;
-    const visualTop = Number.isFinite(bounds?.top) ? bounds.top : 0;
-
-    const viewport = Math.max(1, iframe.clientWidth || stageFor(iframe)?.clientWidth || previewColumnFor(iframe)?.clientWidth || 1);
-    const scale = Math.max(0.05, Math.min(1, (viewport - 28) / Math.max(1, visualWidth)));
-    const translateX = (viewport - visualWidth * scale) / 2 - visualLeft * scale;
-    const translateY = 14 - visualTop * scale;
-
-    state.v207VisualWidth = visualWidth;
-    state.v207VisualLeft = visualLeft;
-    state.v207VisualTop = visualTop;
-    state.scale = scale;
-    state.fitted = true;
-    state.v208TranslateX = translateX;
-    state.v208TranslateY = translateY;
-    states.set(iframe, state);
-
-    target.style.setProperty('left', '0', 'important');
-    target.style.setProperty('right', 'auto', 'important');
-    target.style.setProperty('margin-left', '0', 'important');
-    target.style.setProperty('margin-right', '0', 'important');
-    target.style.setProperty('max-height', 'none', 'important');
-    target.style.setProperty('overflow', 'visible', 'important');
-    target.style.setProperty('opacity', '1', 'important');
-    target.style.setProperty('visibility', 'visible', 'important');
-    target.style.setProperty('transition', 'none', 'important');
-    target.style.setProperty('animation', 'none', 'important');
-    v208ApplyCachedTransform(iframe, parts);
-
-    if (parts.shell) {
-      parts.shell.style.setProperty('width', '100%', 'important');
-      parts.shell.style.setProperty('min-width', '0', 'important');
-      parts.shell.style.setProperty('max-width', 'none', 'important');
-      parts.shell.style.setProperty('height', 'auto', 'important');
-      parts.shell.style.setProperty('min-height', '0', 'important');
-      parts.shell.style.setProperty('max-height', 'none', 'important');
-      parts.shell.style.setProperty('margin', '0', 'important');
-      parts.shell.style.setProperty('padding', '0', 'important');
-      parts.shell.style.setProperty('overflow', 'visible', 'important');
-      parts.shell.style.setProperty('transform', 'none', 'important');
-    }
-
-    updateFrameHeight(iframe);
-    return true;
-  }
-
-  function declaredWidth(iframe) {
-    let width = 0;
-    for (const attr of Array.from(iframe.attributes || [])) {
-      if (!/(?:canvas|preview)[-_]?width/i.test(attr.name)) continue;
-      const value = Number.parseFloat(attr.value);
-      if (Number.isFinite(value) && value > 100 && value < 4000) width = Math.max(width, value);
-    }
-    return width;
-  }
-
-  function declaredHeight(iframe) {
-    let height = 0;
-    for (const attr of Array.from(iframe.attributes || [])) {
-      if (!/(?:canvas|preview)[-_]?height/i.test(attr.name)) continue;
-      const value = Number.parseFloat(attr.value);
-      if (Number.isFinite(value) && value > 100 && value < 20000) height = Math.max(height, value);
-    }
-    return height;
-  }
-
-  function readNaturalWidth(iframe, doc, target) {
-    const state = states.get(iframe) || {};
-    if (state.naturalWidth > 100) return state.naturalWidth;
-
-    const read = (el) => {
-      if (!el) return 0;
-      const cs = doc.defaultView?.getComputedStyle(el);
-      const css = Number.parseFloat(cs?.width || '0') || 0;
-      const max = cs?.maxWidth && cs.maxWidth !== 'none' ? Number.parseFloat(cs.maxWidth) || 0 : 0;
-      const offset = el.offsetWidth || 0;
-      const rect = Math.ceil(el.getBoundingClientRect?.().width || 0);
-      let v = Math.max(css, offset, rect);
-      if (max > 100 && max < 4000 && v > max) v = max;
-      return v > 100 && v < 4000 ? v : 0;
+    return {
+      left: minLeft,
+      top: minTop,
+      width: Math.max(1, maxRight - minLeft),
+      height: Math.max(1, maxBottom - minTop)
     };
-
-    let width = declaredWidth(iframe);
-    width = Math.max(width, read(target));
-
-    const children = meaningfulChildren(target);
-    if (children.length === 1) width = Math.max(width, read(children[0]));
-    if (!(width > 100)) width = Math.max(320, iframe.clientWidth || stageFor(iframe)?.clientWidth || 650);
-
-    state.naturalWidth = width;
-    states.set(iframe, state);
-    return width;
   }
 
-  function escapeHtml(value) {
-    return String(value || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function safeUrl(value) {
-    const raw = String(value || '').trim();
-    return /^https?:\/\//i.test(raw) || /^\/\//.test(raw) ? raw : '';
-  }
-
-  function bbcodeTextToHtml(text) {
-    const raw = String(text || '');
-    if (!/\[(?:b|i|u|s|color|size|align|left|center|right|justify|url|img|video|quote|hide|spoiler|list|hr|\*)/i.test(raw)) return null;
-    let out = escapeHtml(raw);
-
-    out = out.replace(/\[list=1\]([\s\S]*?)\[\/list\]/gi, (_m, body) =>
-      `<ol style="margin:12px 0;padding-left:24px;">${String(body).split(/\[\*\]/g).slice(1).map((x) => `<li>${x}</li>`).join('')}</ol>`
-    );
-    out = out.replace(/\[list\]([\s\S]*?)\[\/list\]/gi, (_m, body) =>
-      `<ul style="margin:12px 0;padding-left:24px;">${String(body).split(/\[\*\]/g).slice(1).map((x) => `<li>${x}</li>`).join('')}</ul>`
-    );
-
-    const pass = (value) => value
-      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<span style="display:block;text-align:$1;">$2</span>')
-      .replace(/\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi, '<span style="display:block;text-align:$1;">$2</span>')
-      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1;">$2</span>')
-      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_m, size, body) => {
-        const sizes = { small: '0.82em', medium: '1em', large: '1.28em' };
-        return `<span style="font-size:${sizes[size] || '1em'};">${body}</span>`;
-      })
-      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, (_m, type, body) => `<details><summary>${type.toUpperCase()}</summary><div>${body}</div></details>`)
-      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<blockquote style="margin:10px 0;padding:8px 12px;border-left:2px solid currentColor;">$1</blockquote>')
-      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>')
-      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>')
-      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>')
-      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, '<s>$1</s>')
-      .replace(/\[hr\]/gi, '<hr>');
-
-    for (let i = 0; i < 6; i += 1) {
-      const next = pass(out);
-      if (next === out) break;
-      out = next;
-    }
-
-    out = out.replace(/\[url=([^\]]*)\]([\s\S]*?)\[\/url\]/gi, (_m, url, label) => {
-      const safe = safeUrl(url.replace(/&amp;/g, '&'));
-      return safe ? `<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">${label || escapeHtml(safe)}</a>` : label;
-    });
-    out = out.replace(/\[img\]([\s\S]*?)\[\/img\]/gi, (_m, url) => {
-      const safe = safeUrl(url.replace(/&amp;/g, '&'));
-      return safe ? `<img src="${escapeHtml(safe)}" alt="" style="max-width:100%;height:auto;">` : '';
-    });
-    out = out.replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, (_m, url) => {
-      const safe = safeUrl(url.replace(/&amp;/g, '&'));
-      return safe ? `<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">▶ YouTube video</a>` : '';
-    });
-    return out;
-  }
-
-  function renderBbcodeInDocument(doc) {
-    if (!doc?.body) return;
-    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
-    const nodes = [];
-    let node;
-    while ((node = walker.nextNode())) {
-      const parent = node.parentElement;
-      if (!parent || parent.closest('script,style,textarea,pre,code')) continue;
-      if (/\[[^\]]+\]/.test(node.nodeValue || '')) nodes.push(node);
-    }
-    nodes.forEach((textNode) => {
-      const html = bbcodeTextToHtml(textNode.nodeValue || '');
-      if (html == null) return;
-      const tpl = doc.createElement('template');
-      tpl.innerHTML = html;
-      textNode.replaceWith(tpl.content.cloneNode(true));
-    });
-  }
-
-  function ensureDocStyle(doc) {
-    if (!doc?.head || !doc.body || !doc.documentElement) return;
-    doc.documentElement.classList.add('dds-v204-preview-html');
-    doc.body.classList.add('dds-v204-preview-body');
-
-    let style = doc.getElementById('dds-v204-preview-style');
-    if (!style) {
-      style = doc.createElement('style');
-      style.id = 'dds-v204-preview-style';
-      doc.head.appendChild(style);
-    }
-    style.textContent = `
-      html.dds-v204-preview-html,
-      body.dds-v204-preview-body {
-        width:100% !important;
-        min-width:0 !important;
-        max-width:none !important;
-        height:auto !important;
-        min-height:0 !important;
-        max-height:none !important;
-        margin:0 !important;
-        padding:0 !important;
-        overflow:hidden !important;
-        background:transparent !important;
-        scroll-behavior:auto !important;
-        scrollbar-width:none !important;
-        -ms-overflow-style:none !important;
-      }
-      html.dds-v204-preview-html::-webkit-scrollbar,
-      body.dds-v204-preview-body::-webkit-scrollbar,
-      html.dds-v204-preview-html *::-webkit-scrollbar,
-      body.dds-v204-preview-body *::-webkit-scrollbar {
-        width:0 !important;
-        height:0 !important;
-        display:none !important;
-      }
-      [class*="preview-shell"] {
-        width:100% !important;
-        min-width:0 !important;
-        max-width:none !important;
-        height:auto !important;
-        min-height:0 !important;
-        max-height:none !important;
-        margin:0 !important;
-        overflow:visible !important;
-      }
-      [class*="preview-target"],
-      [class*="preview-positioner"],
-      .dds-code014-preview-root {
-        max-height:none !important;
-        opacity:1 !important;
-        visibility:visible !important;
-        transition:none !important;
-        animation:none !important;
-        overflow:visible !important;
-      }
-    `;
-  }
-
-  function normalizeOuter(iframe) {
-    const panel = panelFor(iframe);
-    const column = previewColumnFor(iframe);
-    const stage = stageFor(iframe);
-    const host = hostFor(iframe, stage);
-    if (!panel || !column || !stage) return { panel, column, stage, host };
-
-    panel.classList.add('dds-v204-editor-panel');
-    column.classList.add('dds-v204-preview-column');
-    stage.classList.add('dds-v204-preview-stage');
-    if (host) host.classList.add('dds-v204-preview-host');
-
-    const top = column.querySelector(':scope > .dds-editor-preview-top, :scope > [class*="preview-top"]');
-    column.style.setProperty('display', 'flex', 'important');
-    column.style.setProperty('flex-direction', 'column', 'important');
-    column.style.setProperty('height', '100%', 'important');
-    column.style.setProperty('min-height', '0', 'important');
-    column.style.setProperty('overflow', 'hidden', 'important');
-    if (top) {
-      top.style.setProperty('flex', '0 0 auto', 'important');
-      top.style.setProperty('min-height', '0', 'important');
-    }
-
-    stage.style.setProperty('position', 'relative', 'important');
-    stage.style.setProperty('inset', 'auto', 'important');
-    stage.style.setProperty('flex', '1 1 auto', 'important');
-    stage.style.setProperty('width', '100%', 'important');
-    stage.style.setProperty('min-width', '0', 'important');
-    stage.style.setProperty('max-width', 'none', 'important');
-    stage.style.setProperty('height', 'auto', 'important');
-    stage.style.setProperty('min-height', '0', 'important');
-    stage.style.setProperty('max-height', 'none', 'important');
-    stage.style.setProperty('margin', '0', 'important');
-    stage.style.setProperty('padding', '0', 'important');
-    stage.style.setProperty('overflow-x', 'hidden', 'important');
-    stage.style.setProperty('overflow-y', 'auto', 'important');
-    stage.style.setProperty('overscroll-behavior', 'contain', 'important');
-    stage.style.setProperty('scroll-behavior', 'auto', 'important');
-    stage.style.setProperty('scrollbar-width', 'none', 'important');
-    stage.style.setProperty('scrollbar-color', 'transparent transparent', 'important');
-    stage.style.setProperty('-ms-overflow-style', 'none', 'important');
-    stage.style.setProperty('transform', 'none', 'important');
-
-    if (host) {
-      host.style.setProperty('position', 'relative', 'important');
-      host.style.setProperty('inset', 'auto', 'important');
-      host.style.setProperty('width', '100%', 'important');
-      host.style.setProperty('min-width', '0', 'important');
-      host.style.setProperty('max-width', 'none', 'important');
-      host.style.setProperty('height', 'auto', 'important');
-      host.style.setProperty('min-height', '100%', 'important');
-      host.style.setProperty('max-height', 'none', 'important');
-      host.style.setProperty('margin', '0', 'important');
-      host.style.setProperty('padding', '0', 'important');
-      host.style.setProperty('overflow', 'visible', 'important');
-      host.style.setProperty('transform', 'none', 'important');
-    }
-
-    return { panel, column, stage, host };
-  }
-
-  function normalizeFrame(iframe) {
-    const { stage } = normalizeOuter(iframe);
-    iframe.classList.remove('dds-preview-loading');
-    iframe.classList.add('dds-preview-ready', 'dds-v204-editor-preview');
-    const s = iframe.style;
-    s.setProperty('position', 'relative', 'important');
-    s.setProperty('inset', 'auto', 'important');
-    s.setProperty('left', 'auto', 'important');
-    s.setProperty('right', 'auto', 'important');
-    s.setProperty('top', 'auto', 'important');
-    s.setProperty('bottom', 'auto', 'important');
-    s.setProperty('display', 'block', 'important');
-    s.setProperty('width', '100%', 'important');
-    s.setProperty('min-width', '100%', 'important');
-    s.setProperty('max-width', '100%', 'important');
-    s.setProperty('min-height', `${Math.max(1, stage?.clientHeight || 1)}px`, 'important');
-    s.setProperty('max-height', 'none', 'important');
-    s.setProperty('margin', '0', 'important');
-    s.setProperty('padding', '0', 'important');
-    s.setProperty('border', '0', 'important');
-    s.setProperty('transform', 'none', 'important');
-    s.setProperty('zoom', '1', 'important');
-    s.setProperty('opacity', '1', 'important');
-    s.setProperty('visibility', 'visible', 'important');
-    s.setProperty('transition', 'none', 'important');
-    s.setProperty('animation', 'none', 'important');
-    s.setProperty('will-change', 'auto', 'important');
-    s.setProperty('pointer-events', 'auto', 'important');
-    s.setProperty('overflow', 'hidden', 'important');
-    iframe.setAttribute('scrolling', 'no');
-  }
-
-  function applyHorizontalFit(iframe, recalc = false) {
-    if (!owns(iframe)) return false;
-    const doc = iframe.contentDocument;
-    if (!doc?.body || doc.readyState === 'loading') return false;
-    normalizeFrame(iframe);
-    ensureDocStyle(doc);
-    renderBbcodeInDocument(doc);
-    const parts = locate(doc);
-    if (!parts?.target) return false;
-
-    return v207FitEveryPreview(iframe, parts, recalc);
-  }
-
-  function visualContentHeight(iframe) {
-    const doc = iframe.contentDocument;
-    const parts = locate(doc);
-    if (!doc?.body || !parts?.target) return Math.max(1, stageFor(iframe)?.clientHeight || 1);
-
-    // Height includes every visible part of the target (credits included) so
-    // the LEFT stage can scroll from the first painted pixel to the last.
-    const all = [parts.target, ...Array.from(parts.target.querySelectorAll('*'))].filter((el) => {
-      if (!v207VisibleElement(el)) return false;
-      const rect = el.getBoundingClientRect?.();
-      if (!rect || rect.width <= 1 || rect.height <= 1 || rect.height > 30000) return false;
-      const cs = doc.defaultView?.getComputedStyle?.(el);
-      return cs?.position !== 'fixed';
-    });
-    const union = v207RectUnion(all);
-    const declared = declaredHeight(iframe);
-    const state = states.get(iframe) || {};
-    const scale = state.scale || 1;
-    const declaredScaled = declared > 0 ? declared * scale : 0;
-    const bottom = union && Number.isFinite(union.bottom) ? union.bottom : 0;
-    const top = union && Number.isFinite(union.top) ? union.top : 0;
-    const height = union ? Math.max(1, bottom - Math.min(0, top)) : 0;
-    return Math.max(1, Math.ceil(Math.max(bottom + 18, height + 18, declaredScaled + 28)));
-  }
-
-  function updateFrameHeight(iframe) {
-    if (!owns(iframe)) return false;
-    const stage = stageFor(iframe);
-    if (!stage) return false;
-    const height = visualContentHeight(iframe);
-    const viewportHeight = Math.max(1, stage.clientHeight || 1);
-    const finalHeight = Math.max(viewportHeight, height);
-    iframe.style.setProperty('height', `${finalHeight}px`, 'important');
-    iframe.style.setProperty('min-height', `${finalHeight}px`, 'important');
-    iframe.style.setProperty('max-height', 'none', 'important');
-    const host = hostFor(iframe, stage);
-    if (host) {
-      host.style.setProperty('height', `${finalHeight}px`, 'important');
-      host.style.setProperty('min-height', `${finalHeight}px`, 'important');
-      host.style.setProperty('max-height', 'none', 'important');
-    }
-    return true;
-  }
-
-  function syncAttributes(current, next) {
-    Array.from(current.attributes).forEach((attr) => {
-      if (!next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
-    });
-    Array.from(next.attributes).forEach((attr) => {
-      if (current.getAttribute(attr.name) !== attr.value) current.setAttribute(attr.name, attr.value);
-    });
-  }
-
-  function morphNode(current, next, root = false) {
-    if (!current || !next) return;
-    if (current.nodeType !== next.nodeType || current.nodeName !== next.nodeName) {
-      current.replaceWith(next.cloneNode(true));
-      return;
-    }
-    if (current.nodeType === Node.TEXT_NODE || current.nodeType === Node.COMMENT_NODE) {
-      if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
-      return;
-    }
-    if (current.nodeType !== Node.ELEMENT_NODE || current.tagName === 'SCRIPT') return;
-
-    // Root geometry is owned by V204. Sync source attributes first, then the
-    // central geometry is reasserted synchronously before the browser paints.
-    syncAttributes(current, next);
-
-    const a = Array.from(current.childNodes);
-    const b = Array.from(next.childNodes);
-    const shared = Math.min(a.length, b.length);
-    for (let i = 0; i < shared; i += 1) morphNode(a[i], b[i], false);
-    for (let i = a.length - 1; i >= b.length; i -= 1) current.removeChild(current.childNodes[i]);
-    for (let i = a.length; i < b.length; i += 1) current.appendChild(b[i].cloneNode(true));
-  }
-
-  function morphChildren(current, next) {
-    const a = Array.from(current.childNodes);
-    const b = Array.from(next.childNodes);
-    const shared = Math.min(a.length, b.length);
-    for (let i = 0; i < shared; i += 1) morphNode(a[i], b[i], false);
-    for (let i = a.length - 1; i >= b.length; i -= 1) current.removeChild(current.childNodes[i]);
-    for (let i = a.length; i < b.length; i += 1) current.appendChild(b[i].cloneNode(true));
-  }
-
-  function morphDocument(iframe, source) {
-    const doc = iframe.contentDocument;
-    if (!doc?.body || doc.readyState === 'loading') return false;
-    const parsed = new DOMParser().parseFromString(String(source || ''), 'text/html');
-    if (!parsed?.body) return false;
-
-    const live = locate(doc);
-    const next = locate(parsed);
-    const stage = stageFor(iframe);
-    const oldTop = stage?.scrollTop || 0;
-
-    if (live?.target && next?.target) {
-      const nextHasContent = Boolean(String(next.target.innerHTML || '').trim());
-      const liveHasContent = Boolean(String(live.target.innerHTML || '').trim());
-      // Never erase a live rendered preview with an empty script placeholder.
-      if (nextHasContent || !liveHasContent) {
-        if (!live.direct && !next.direct) morphChildren(live.target, next.target);
-        else morphNode(live.target, next.target, true);
-      }
-    } else if (next?.target) {
-      // If a source unexpectedly changes wrapper shape, do not wipe the whole
-      // document. Keep the live preview until the next complete source arrives.
-      return false;
-    }
-
-    ensureDocStyle(doc);
-    renderBbcodeInDocument(doc);
-
-    // Critical: typing never recalculates horizontal geometry. Reassert the
-    // already-cached scale/centre in the same task, then only update height.
-    applyHorizontalFit(iframe, false);
-    updateFrameHeight(iframe);
-    if (stage) stage.scrollTop = Math.min(oldTop, Math.max(0, stage.scrollHeight - stage.clientHeight));
-    return true;
-  }
-
-  function hasDocument(iframe) {
-    const doc = iframe.contentDocument;
-    return Boolean(doc && doc.readyState !== 'loading' && doc.body && (doc.body.children.length || String(doc.body.textContent || '').trim()));
-  }
-
-  function queueMorph(iframe) {
-    const state = states.get(iframe) || {};
-    if (state.raf) return;
-    state.raf = requestAnimationFrame(() => {
-      const current = states.get(iframe) || state;
-      current.raf = 0;
-      if (current.latest != null && hasDocument(iframe)) {
-        current.loaded = true;
-        morphDocument(iframe, current.latest);
-      }
-      states.set(iframe, current);
-    });
-    states.set(iframe, state);
-  }
-
-  function afterFirstLoad(iframe) {
-    const current = states.get(iframe) || {};
-    current.loading = false;
-    current.loaded = true;
-    states.set(iframe, current);
-    normalizeFrame(iframe);
-    ensureDocStyle(iframe.contentDocument);
-    renderBbcodeInDocument(iframe.contentDocument);
-    applyHorizontalFit(iframe, true);
-    const firstStage = stageFor(iframe);
-    if (firstStage) firstStage.scrollTop = 0;
-
-    // External fonts/images may alter only vertical content height. They never
-    // change horizontal scale while the user types.
-    const heightOnly = () => updateFrameHeight(iframe);
-    [80, 220, 600, 1200].forEach((delay) => setTimeout(heightOnly, delay));
-    try { iframe.contentDocument?.fonts?.ready?.then(heightOnly); } catch {}
+  function stopLegacyPreviewScripts(win) {
     try {
-      iframe.contentDocument?.querySelectorAll('img').forEach((img) => {
-        if (!img.complete) {
-          img.addEventListener('load', heightOnly, { once: true });
-          img.addEventListener('error', heightOnly, { once: true });
-        }
-      });
-    } catch {}
+      win.fitEditorPreview = () => {};
+      win.fitPreview = () => {};
+      win.resizePreview = () => {};
+      win.updatePreviewScale = () => {};
+      win.__DDS_CENTRAL_PREVIEW_ACTIVE__ = true;
+    } catch (e) {}
   }
 
-  function render(iframe, rawSource) {
-    if (!owns(iframe)) return false;
-    normalizeFrame(iframe);
-    const source = String(rawSource ?? '');
-    const state = states.get(iframe) || {};
-    state.latest = source;
-    states.set(iframe, state);
+  function applyCenteredLayout(iframe, stage, resetScroll = false) {
+    const doc = iframe?.contentDocument;
+    const win = iframe?.contentWindow;
+    if (!doc || !win || !editorPanelFor(stage)) return false;
 
-    if (state.loaded || hasDocument(iframe)) {
-      state.loaded = true;
-      states.set(iframe, state);
-      queueMorph(iframe);
-      return true;
-    }
+    ensurePreviewStyle(doc);
+    stopLegacyPreviewScripts(win);
 
-    if (!state.loading) {
-      state.loading = true;
-      states.set(iframe, state);
-      iframe.addEventListener('load', () => {
-        afterFirstLoad(iframe);
-        const current = states.get(iframe) || {};
-        if (current.latest && current.latest !== source) queueMorph(iframe);
-      }, { once: true });
-      if (nativeSrcdocSet) nativeSrcdocSet.call(iframe, source);
-      else HTMLIFrameElement.prototype.setAttribute.call(iframe, 'srcdoc', source);
-    }
+    const root = findVisualRoot(doc);
+    if (!root) return false;
+
+    const bounds = getVisibleBounds(root);
+    const stageWidth = Math.max(1, stage.clientWidth - 24);
+    const scale = Math.min(1, stageWidth / Math.max(1, bounds.width));
+
+    root.style.setProperty("transform-origin", "top left", "important");
+    root.style.setProperty("position", "relative", "important");
+    root.style.setProperty("left", "0", "important");
+    root.style.setProperty("top", "0", "important");
+    root.style.setProperty("margin", "0", "important");
+    root.style.setProperty(
+      "transform",
+      `translate(${-bounds.left}px, ${-bounds.top}px) scale(${scale})`,
+      "important"
+    );
+
+    const scaledWidth = Math.max(1, Math.ceil(bounds.width * scale));
+    const scaledHeight = Math.max(1, Math.ceil(bounds.height * scale));
+
+    doc.documentElement.style.setProperty("width", `${scaledWidth}px`, "important");
+    doc.documentElement.style.setProperty("height", `${scaledHeight}px`, "important");
+    doc.body.style.setProperty("width", `${scaledWidth}px`, "important");
+    doc.body.style.setProperty("height", `${scaledHeight}px`, "important");
+    doc.body.style.setProperty("min-height", `${scaledHeight}px`, "important");
+
+    iframe.style.setProperty("display", "block", "important");
+    iframe.style.setProperty("width", `${scaledWidth}px`, "important");
+    iframe.style.setProperty("min-width", `${scaledWidth}px`, "important");
+    iframe.style.setProperty("max-width", `${scaledWidth}px`, "important");
+    iframe.style.setProperty("height", `${scaledHeight}px`, "important");
+    iframe.style.setProperty("min-height", `${scaledHeight}px`, "important");
+    iframe.style.setProperty("max-height", "none", "important");
+    iframe.style.setProperty("border", "0", "important");
+    iframe.style.setProperty("margin-left", "auto", "important");
+    iframe.style.setProperty("margin-right", "auto", "important");
+    iframe.style.setProperty("position", "relative", "important");
+    iframe.style.setProperty("left", "auto", "important");
+    iframe.style.setProperty("right", "auto", "important");
+    iframe.style.setProperty("top", "auto", "important");
+    iframe.style.setProperty("bottom", "auto", "important");
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("zoom", "1", "important");
+    iframe.style.setProperty("pointer-events", "none", "important");
+    iframe.style.setProperty("background", "transparent", "important");
+
+    stage.style.setProperty("overflow-y", "auto", "important");
+    stage.style.setProperty("overflow-x", "hidden", "important");
+    stage.style.setProperty("display", "block", "important");
+    stage.style.setProperty("position", "relative", "important");
+    stage.style.setProperty("scrollbar-width", "none", "important");
+    stage.style.setProperty("-ms-overflow-style", "none", "important");
+
+    const state = frameStates.get(iframe) || {};
+    state.root = root;
+    state.bounds = bounds;
+    state.scale = scale;
+    state.ready = true;
+    frameStates.set(iframe, state);
+
+    if (resetScroll) stage.scrollTop = 0;
     return true;
   }
 
-  function hookFrame(iframe) {
-    if (hookedFrames.has(iframe)) return;
-    if (!panelFor(iframe)) return;
+  function setupStage(stage) {
+    if (!stage || !editorPanelFor(stage)) return;
 
-    hookedFrames.add(iframe);
-    activeFrames.add(iframe);
-    normalizeFrame(iframe);
+    stage.style.setProperty("overflow-y", "auto", "important");
+    stage.style.setProperty("overflow-x", "hidden", "important");
+    stage.style.setProperty("scrollbar-width", "none", "important");
+    stage.style.setProperty("-ms-overflow-style", "none", "important");
+  }
 
-    const nativeSetAttribute = iframe.setAttribute.bind(iframe);
-    const nativeGetAttribute = iframe.getAttribute.bind(iframe);
-    const initialSource = nativeSrcdocGet ? nativeSrcdocGet.call(iframe) : nativeGetAttribute('srcdoc') || '';
-    const state = states.get(iframe) || {};
-    if (initialSource && state.latest == null) state.latest = initialSource;
-    if (hasDocument(iframe)) state.loaded = true;
-    states.set(iframe, state);
+  function attachPreview(stage) {
+    if (!stage || attachedStages.has(stage) || !editorPanelFor(stage)) return;
 
-    if (srcdocDescriptor?.configurable && typeof nativeSrcdocSet === 'function') {
-      Object.defineProperty(iframe, 'srcdoc', {
-        configurable: true,
-        enumerable: srcdocDescriptor.enumerable,
-        get() {
-          const st = states.get(iframe);
-          return st?.latest ?? (nativeSrcdocGet ? nativeSrcdocGet.call(iframe) : nativeGetAttribute('srcdoc') || '');
-        },
-        set(value) { render(iframe, value); }
+    const iframe = stage.querySelector(IFRAME_SELECTOR) || stage.querySelector("iframe");
+    if (!iframe) return;
+
+    attachedStages.add(stage);
+    setupStage(stage);
+
+    let loadedOnce = false;
+    let raf = 0;
+
+    function run(resetScroll = false) {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        try {
+          applyCenteredLayout(iframe, stage, resetScroll);
+        } catch (e) {
+          console.warn("[DDS V210] preview layout failed", e);
+        }
       });
     }
 
-    iframe.setAttribute = function(name, value) {
-      const key = String(name).toLowerCase();
-      if (key === 'srcdoc') { render(iframe, value); return; }
-      if (key === 'scrolling') return nativeSetAttribute('scrolling', 'no');
-      return nativeSetAttribute(name, value);
-    };
-    iframe.getAttribute = function(name) {
-      if (String(name).toLowerCase() === 'srcdoc') {
-        const st = states.get(iframe);
-        if (st?.latest != null) return st.latest;
-      }
-      return nativeGetAttribute(name);
-    };
-    nativeSetAttribute('scrolling', 'no');
+    iframe.addEventListener("load", () => {
+      loadedOnce = true;
+      run(true);
+    });
 
-    if (state.loaded) {
-      afterFirstLoad(iframe);
+    if (iframe.contentDocument && iframe.contentDocument.readyState === "complete") {
+      loadedOnce = true;
+      run(true);
+    }
+
+    const editPanel = editorPanelFor(stage);
+    if (editPanel) {
+      editPanel.addEventListener("input", () => {
+        if (!loadedOnce) return;
+        run(false);
+      }, { passive: true });
+      editPanel.addEventListener("change", () => {
+        if (!loadedOnce) return;
+        run(false);
+      }, { passive: true });
     }
   }
 
-  function activeEditor() {
-    return Array.from(document.querySelectorAll(
-      '.dds-panel.is-active,.dds-protected-commission-editor.is-active,[class*="editor-panel"].is-active'
-    )).find(isRealEditorPanel) || null;
-  }
-
-  function activatePanel(panel) {
-    if (!isRealEditorPanel(panel)) return;
-    panel.classList.add('dds-v204-editor-panel');
-    panel.querySelectorAll('iframe').forEach((iframe) => {
-      if (!iframe.closest('.dds-commission-card,.dds-roleplay-card-preview,.dds-commission-view-panel')) {
-        const wasHooked = hookedFrames.has(iframe);
-        hookFrame(iframe);
-        if (!wasHooked) {
-          const stage = stageFor(iframe);
-          if (stage) stage.scrollTop = 0;
-        }
-      }
-    });
+  function initCentralPreview(root = document) {
+    root.querySelectorAll?.(STAGE_SELECTOR).forEach(attachPreview);
   }
 
   function activateSoon() {
-    const run = () => activatePanel(activeEditor());
-    queueMicrotask(run);
-    requestAnimationFrame(run);
-    [40, 120, 300, 700, 1200].forEach((delay) => setTimeout(run, delay));
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => initCentralPreview(document));
+    });
   }
 
-  const previousQueue = window.queuePreviewDocument;
-  if (typeof previousQueue === 'function') {
-    window.queuePreviewDocument = function(iframe, srcdoc, resizeFunction) {
-      if (activeFrames.has(iframe)) return render(iframe, srcdoc);
-      return previousQueue.call(this, iframe, srcdoc, resizeFunction);
-    };
+  // Compatibility used by V209 GGUM recovery and legacy editor renderers.
+  function owns(iframe) {
+    const stage = iframe?.closest?.(STAGE_SELECTOR);
+    return Boolean(stage && editorPanelFor(stage));
   }
 
-  const previousUpdate = window.updateLoadedPreviewDocument;
-  if (typeof previousUpdate === 'function') {
-    window.updateLoadedPreviewDocument = function(iframe, srcdoc, resizeFunction) {
-      if (activeFrames.has(iframe)) return render(iframe, srcdoc);
-      return previousUpdate.call(this, iframe, srcdoc, resizeFunction);
-    };
-  }
-
-  function legacyFitRequest(iframe) {
+  function render(iframe, srcdoc) {
     if (!owns(iframe)) return false;
-    normalizeFrame(iframe);
-    const state = states.get(iframe) || {};
-    if (!state.fitted) return applyHorizontalFit(iframe, true);
-    updateFrameHeight(iframe);
-    return true;
+    const stage = iframe.closest(STAGE_SELECTOR);
+    const state = frameStates.get(iframe) || {};
+
+    // First document load is allowed. Subsequent sources keep the same frame.
+    if (!state.documentLoaded || !iframe.contentDocument || iframe.contentDocument.readyState === "loading") {
+      state.documentLoaded = true;
+      frameStates.set(iframe, state);
+      iframe.srcdoc = String(srcdoc || "");
+      return true;
+    }
+
+    try {
+      const parsed = new DOMParser().parseFromString(String(srcdoc || ""), "text/html");
+      const nextRoot = findVisualRoot(parsed);
+      const currentRoot = findVisualRoot(iframe.contentDocument);
+      if (nextRoot && currentRoot) {
+        currentRoot.innerHTML = nextRoot.innerHTML;
+      } else if (parsed.body && iframe.contentDocument.body) {
+        iframe.contentDocument.body.innerHTML = parsed.body.innerHTML;
+      }
+      requestAnimationFrame(() => applyCenteredLayout(iframe, stage, false));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  // Compatibility names used by all existing editor renderers.
-  window.__ddsCentralEditorPreviewOwnsV192 = owns;
-  window.__ddsCentralEditorScheduleFitV192 = legacyFitRequest;
-  window.__ddsCentralEditorRenderV192 = render;
-  window.__ddsCentralEditorPreviewOwnsV193 = owns;
-  window.__ddsCentralEditorScheduleFitV193 = legacyFitRequest;
-  window.__ddsCentralEditorRenderV193 = render;
-  window.__ddsCentralEditorPreviewOwnsV200 = owns;
-  window.__ddsCentralEditorRenderV200 = render;
-  window.__ddsCentralEditorPreviewOwnsV202 = owns;
-  window.__ddsCentralEditorRenderV202 = render;
-  window.__ddsCentralEditorPreviewOwnsV203 = owns;
-  window.__ddsCentralEditorRenderV203 = render;
-  window.__ddsCentralEditorNormalizeV203 = (iframe) => legacyFitRequest(iframe);
-  window.__ddsCentralEditorPreviewOwnsV204 = owns;
-  window.__ddsCentralEditorRenderV204 = render;
-  window.__ddsCentralEditorPreviewOwnsV205 = owns;
-  window.__ddsCentralEditorRenderV205 = render;
-  window.__ddsCentralEditorNormalizeV205 = (iframe) => legacyFitRequest(iframe);
-  window.__ddsCentralEditorPreviewOwnsV207 = owns;
-  window.__ddsCentralEditorRenderV207 = render;
-  window.__ddsCentralEditorNormalizeV207 = (iframe) => legacyFitRequest(iframe);
   window.__ddsCentralEditorPreviewOwnsV208 = owns;
   window.__ddsCentralEditorRenderV208 = render;
-  window.__ddsCentralEditorNormalizeV208 = (iframe) => legacyFitRequest(iframe);
+  window.__ddsCentralEditorNormalizeV208 = (iframe) => {
+    const stage = iframe?.closest?.(STAGE_SELECTOR);
+    return stage ? applyCenteredLayout(iframe, stage, false) : false;
+  };
+  window.__ddsCentralEditorPreviewOwnsV210 = owns;
+  window.__ddsCentralEditorRenderV210 = render;
+  window.__ddsCentralEditorNormalizeV210 = window.__ddsCentralEditorNormalizeV208;
 
   function boot() {
-    document.body?.classList.add('dds-v204-central-preview');
+    initCentralPreview(document);
 
-    document.addEventListener('click', (event) => {
+    document.addEventListener("click", (event) => {
       if (event.target?.closest?.(
         '[data-edit-code],[data-edit-profile],[data-edit-review],[data-commission-edit],' +
         '[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],' +
@@ -27643,32 +26844,162 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       )) activateSoon();
     }, true);
 
-    document.addEventListener('focusin', (event) => {
+    document.addEventListener("focusin", (event) => {
       const panel = event.target?.closest?.(EDIT_PANEL_SELECTOR);
-      if (isRealEditorPanel(panel)) activatePanel(panel);
+      if (isEditorPanel(panel)) initCentralPreview(panel);
     }, true);
 
-    window.addEventListener('hashchange', activateSoon, { passive: true });
-    window.addEventListener('popstate', activateSoon, { passive: true });
+    window.addEventListener("hashchange", activateSoon, { passive: true });
+    window.addEventListener("popstate", activateSoon, { passive: true });
 
     let resizeTimer = 0;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        for (const iframe of Array.from(activeFrames)) {
-          if (!iframe.isConnected) { activeFrames.delete(iframe); continue; }
-          const state = states.get(iframe) || {};
-          state.naturalWidth = 0;
-          state.scale = 0;
-          state.fitted = false;
-          states.set(iframe, state);
-          applyHorizontalFit(iframe, true);
-        }
+      resizeTimer = window.setTimeout(() => {
+        document.querySelectorAll(STAGE_SELECTOR).forEach((stage) => {
+          if (!editorPanelFor(stage)) return;
+          const iframe = stage.querySelector(IFRAME_SELECTOR) || stage.querySelector("iframe");
+          if (iframe) applyCenteredLayout(iframe, stage, false);
+        });
       }, 120);
     }, { passive: true });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
-  else boot();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
 })();
 
+
+/* =========================================================
+   V209 — GGUM VER.EDM PREVIEW RECOVERY
+   REVIEW CODE001 only.
+   Source of truth = #generatedFoodReviewCode (same code COPY CODE uses).
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_GGUM_PREVIEW_RECOVERY_V209__) return;
+  window.__DDS_GGUM_PREVIEW_RECOVERY_V209__ = true;
+
+  const PANEL_SELECTOR = '[data-panel="editor-review001"]';
+  const IFRAME_ID = 'foodReviewPreview';
+  const GENERATED_ID = 'generatedFoodReviewCode';
+  let timer = 0;
+  let retryTimer = 0;
+
+  function panel() {
+    return document.querySelector(PANEL_SELECTOR);
+  }
+
+  function iframe() {
+    return document.getElementById(IFRAME_ID);
+  }
+
+  function generated() {
+    return document.getElementById(GENERATED_ID);
+  }
+
+  function hashText(value) {
+    const text = String(value || '');
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `${text.length}:${hash >>> 0}`;
+  }
+
+  function buildDocument(code) {
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=1300"><link href="https://guindaeyo.github.io/deepdshop/ddsh-revfoodie.css" rel="stylesheet"><style>
+      html,body{margin:0!important;padding:0!important;width:1300px!important;min-width:1300px!important;max-width:1300px!important;min-height:920px!important;height:auto!important;overflow:visible!important;background:transparent!important;}
+      body{position:relative!important;}
+      .dds-preview-shell{position:relative!important;width:1300px!important;min-width:1300px!important;max-width:1300px!important;height:auto!important;min-height:920px!important;margin:0!important;padding:0!important;overflow:visible!important;}
+      .dds-preview-target{position:relative!important;width:1300px!important;min-width:1300px!important;max-width:1300px!important;height:auto!important;min-height:920px!important;margin:0!important;padding:0!important;overflow:visible!important;transform:none;transform-origin:top left;}
+      .fdpopup-wrap{width:1300px!important;min-width:1300px!important;max-width:1300px!important;margin:0!important;}
+      html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
+      html,body,*{scrollbar-width:none!important;}
+    </style></head><body><div class="dds-preview-shell"><div class="dds-preview-target">${code}</div></div></body></html>`;
+  }
+
+  function centralRender(frame, source) {
+    const owns = window.__ddsCentralEditorPreviewOwnsV208?.(frame);
+    const render = window.__ddsCentralEditorRenderV208;
+    if (owns && typeof render === 'function') {
+      return render(frame, source);
+    }
+    frame.srcdoc = source;
+    return true;
+  }
+
+  function forceCoreRefresh(editorPanel) {
+    const target = editorPanel?.querySelector(
+      '#reviewMenuName, #reviewDescription, textarea:not(.dds-generated-code), input:not([type="range"]):not([type="color"])'
+    );
+    if (!target) return false;
+    try {
+      target.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function renderNow(force = false) {
+    const editorPanel = panel();
+    const frame = iframe();
+    const output = generated();
+    if (!editorPanel || !frame || !output || !editorPanel.classList.contains('is-active')) return false;
+
+    const code = String(output.value || '').trim();
+    if (!code) {
+      forceCoreRefresh(editorPanel);
+      clearTimeout(retryTimer);
+      retryTimer = window.setTimeout(() => renderNow(force), 80);
+      return false;
+    }
+
+    const signature = hashText(code);
+    if (!force && frame.dataset.ddsGgumV209Signature === signature) {
+      window.__ddsCentralEditorNormalizeV208?.(frame);
+      return true;
+    }
+
+    frame.dataset.ddsGgumV209Signature = signature;
+    centralRender(frame, buildDocument(code));
+    [0, 80, 220, 600].forEach((delay) => {
+      window.setTimeout(() => window.__ddsCentralEditorNormalizeV208?.(frame), delay);
+    });
+    return true;
+  }
+
+  function schedule(force = false) {
+    clearTimeout(timer);
+    timer = window.setTimeout(() => renderNow(force), 0);
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!event.target?.closest?.('[data-edit-review="review001"]')) return;
+    [0, 40, 120, 260, 600].forEach((delay) => window.setTimeout(() => renderNow(true), delay));
+  }, true);
+
+  document.addEventListener('input', (event) => {
+    const editorPanel = event.target?.closest?.(PANEL_SELECTOR);
+    if (!editorPanel || event.target?.id === GENERATED_ID) return;
+    requestAnimationFrame(() => schedule(false));
+  }, true);
+
+  document.addEventListener('change', (event) => {
+    const editorPanel = event.target?.closest?.(PANEL_SELECTOR);
+    if (!editorPanel || event.target?.id === GENERATED_ID) return;
+    requestAnimationFrame(() => schedule(false));
+  }, true);
+
+  window.addEventListener('hashchange', () => {
+    if (panel()?.classList.contains('is-active')) {
+      [0, 80, 220].forEach((delay) => window.setTimeout(() => renderNow(true), delay));
+    }
+  }, { passive: true });
+})();
