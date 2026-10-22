@@ -6803,11 +6803,28 @@ You were mine forever</textarea>
       pageNumber.textContent = "01";
     }
 
-    history.replaceState(
-      null,
-      "",
-      "#editor-code014"
-    );
+    /* CODE014 only: preserve the FOR ROLEPLAY directory as the real
+       browser-history entry immediately behind this editor. The CODE014
+       click handler stops propagation, so the shared checkpoint handler
+       does not run for this card. */
+    if (location.hash !== "#editor-code014") {
+      history.replaceState(
+        { ...(history.state || {}), ddsBrowserPage: "roleplay", ddsDirectoryCheckpoint: true },
+        "",
+        "#roleplay"
+      );
+      history.pushState(
+        { ddsCode014Editor: true, ddsBrowserFrom: "roleplay" },
+        "",
+        "#editor-code014"
+      );
+    } else {
+      history.replaceState(
+        { ...(history.state || {}), ddsCode014Editor: true, ddsBrowserFrom: "roleplay" },
+        "",
+        "#editor-code014"
+      );
+    }
 
     window.scrollTo(0, 0);
 

@@ -1,1 +1,3 @@
-V239 — Based on V238. Only left live-preview scrollbars hidden from first render; scrolling still enabled. Input text-area red scrollbars, word counters and other features unchanged.\n
+Deep Deep Sleep Code Shop — V240 CODE014 Browser Back Fix
+Based on v239. Only index.html CODE014 openEditor history route changed.
+Opening CODE014 preserves #roleplay underneath #editor-code014 so the real browser Back returns to FOR ROLEPLAY in one click. Other modules unchanged.
