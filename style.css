@@ -14325,3 +14325,103 @@ body.dds-y2k-vampire :is(
   height: 0 !important;
   display: none !important;
 }
+
+/* ========================================================================
+   V220 — EDITOR FULL-HEIGHT MODE
+   Directory pages keep the Y2K browser shell. All Edit pages hide the
+   simulated browser chrome and use the real browser Back/Forward controls.
+   Presentation only: no save/cloud/editor data contracts are changed.
+=========================================================================== */
+@media (min-width: 901px) {
+  /* The fake Y2K browser belongs to directory pages only. */
+  body.dds-y2k-vampire.dds-editor-mode .dds-browser-chrome {
+    display: none !important;
+  }
+
+  /* Give the editor the whole browser viewport back. */
+  html.dds-editor-mode {
+    scroll-padding-top: 0 !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode .dds-app {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode .dds-main {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: 100dvh !important;
+    padding: 0 14px 10px !important;
+    overflow: hidden !important;
+  }
+
+  /* User will use the real browser Back button, so reclaim this space too. */
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading {
+    grid-template-columns: minmax(0,1fr) !important;
+    gap: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 7px !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading .dds-back-button,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading .dds-back-button {
+    display: none !important;
+  }
+
+  /* Heading content now spans the complete row. */
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading > div,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading > div {
+    width: 100% !important;
+    grid-column: 1 !important;
+  }
+
+  /* Preserve the two-line compact heading, then let the 60/40 editor use
+     every remaining pixel from immediately below it to the viewport bottom. */
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-panel[data-panel^="editor-"].is-active:not(.dds-commission-view-panel),
+    .dds-protected-commission-editor.is-active,
+    [class*="protected-commission-editor"].is-active,
+    [class*="editor-panel"].is-active:not(.dds-commission-view-panel)
+  ) {
+    height: 100% !important;
+    max-height: 100% !important;
+    padding-top: 0 !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-panel[data-panel^="editor-"].is-active:not(.dds-commission-view-panel),
+    .dds-protected-commission-editor.is-active,
+    [class*="protected-commission-editor"].is-active,
+    [class*="editor-panel"].is-active:not(.dds-commission-view-panel)
+  ) > :is(.dds-editor-layout,.dds-protected-commission-layout,[class*="editor-layout"],[class*="commission-layout"]) {
+    padding-top: 2px !important;
+  }
+}
+
+/* Mobile/tablet: when an editor route uses editor-mode, hide only the fake
+   browser shell. The existing responsive editor stacking remains untouched. */
+@media (max-width: 900px) {
+  body.dds-y2k-vampire.dds-editor-mode .dds-browser-chrome {
+    display: none !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode {
+    padding-top: 0 !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading .dds-back-button,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading .dds-back-button {
+    display: none !important;
+  }
+}
