@@ -11738,3 +11738,200 @@ body.dds-v193-central-preview .dds-v193-bbcode-toolbar label i{
     max-height:760px !important;
   }
 }
+
+
+/* =========================================================
+   V197 — CENTRAL EDITOR LAYOUT
+   One rule for FOR ROLEPLAY / PROFILE / REVIEW / COMMISSION.
+   60% preview + 40% controls. Preview fills the editor viewport.
+   Horizontal content always fits; vertical content scrolls invisibly.
+========================================================= */
+body.dds-v197-layout .dds-v197-editor-panel{
+  --dds-v197-editor-height:calc(100dvh - 155px);
+}
+
+body.dds-v197-layout .dds-v197-editor-panel > :is(
+  .dds-editor-layout,
+  .dds-protected-commission-layout,
+  [class*="editor-layout"],
+  [class*="commission-layout"]
+){
+  width:100% !important;
+  max-width:none !important;
+  height:var(--dds-v197-editor-height) !important;
+  min-height:620px !important;
+  max-height:none !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,3fr) minmax(340px,2fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  align-items:stretch !important;
+  gap:24px !important;
+  overflow:hidden !important;
+}
+
+/* PREVIEW = 60% */
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+){
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) !important;
+  align-self:stretch !important;
+  position:relative !important;
+  top:auto !important;
+  bottom:auto !important;
+  overflow:hidden !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+)::-webkit-scrollbar,
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-stage,
+  .dds-protected-commission-preview-stage,
+  [class*="preview-stage"],
+  [class*="preview-holder"],
+  [class*="preview-canvas-host"]
+)::-webkit-scrollbar{
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+  background:transparent !important;
+}
+
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-stage,
+  .dds-protected-commission-preview-stage,
+  [class*="preview-stage"],
+  [class*="preview-holder"],
+  [class*="preview-canvas-host"]
+){
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  position:relative !important;
+  inset:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  transform:none !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+
+body.dds-v197-layout .dds-v197-editor-panel iframe.dds-v193-editor-preview,
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-frame,
+  .dds-protected-commission-preview-frame
+){
+  width:100% !important;
+  min-width:100% !important;
+  max-width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  position:relative !important;
+  inset:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  transform:none !important;
+  transition:none !important;
+  animation:none !important;
+  will-change:auto !important;
+  background:#202020 !important;
+}
+
+/* CONTROLS = 40%; scroll only on the editor side. */
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-controls,
+  .dds-editor-tools-column,
+  .dds-protected-commission-controls-column,
+  [class*="controls-column"]
+){
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  align-self:stretch !important;
+}
+
+body.dds-v197-layout .dds-v197-editor-panel > .dds-editor-layout > .dds-editor-controls,
+body.dds-v197-layout .dds-v197-editor-panel .dds-protected-commission-controls-column{
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* Prevent old per-template scaling/position rules from fighting the central engine. */
+body.dds-v197-layout .dds-v197-editor-panel :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"],
+  [class*="preview-stage"],
+  [class*="preview-holder"],
+  [class*="preview-canvas-host"]
+) > iframe{
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  transform:none !important;
+  transform-origin:top center !important;
+}
+
+@media (max-width:1100px){
+  body.dds-v197-layout .dds-v197-editor-panel{
+    --dds-v197-editor-height:auto;
+  }
+  body.dds-v197-layout .dds-v197-editor-panel > :is(
+    .dds-editor-layout,
+    .dds-protected-commission-layout,
+    [class*="editor-layout"],
+    [class*="commission-layout"]
+  ){
+    height:auto !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    overflow:visible !important;
+  }
+  body.dds-v197-layout .dds-v197-editor-panel :is(
+    .dds-editor-preview-column,
+    .dds-protected-commission-preview-column,
+    [class*="preview-column"]
+  ){
+    height:68vh !important;
+    min-height:440px !important;
+  }
+  body.dds-v197-layout .dds-v197-editor-panel :is(
+    .dds-editor-controls,
+    .dds-editor-tools-column,
+    .dds-protected-commission-controls-column,
+    [class*="controls-column"]
+  ){
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+}

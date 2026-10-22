@@ -1,16 +1,18 @@
-DEEP DEEP SLEEP EDITOR — V196 HOTFIX
+DEEP DEEP SLEEP EDITOR — V197
 
-แก้เฉพาะบั๊ก V195 ที่ index.html ชี้ไฟล์ local ผิดชื่อ
-
-ไฟล์ที่ถูกต้อง:
+Use all five main files together:
+- index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-วิธีใช้:
-1) สำรองชุดเดิม
-2) อัปโหลดไฟล์ทั้งหมดใน ZIP นี้ทับชุด V195
-3) กด Ctrl + F5
+V197 changes:
+- central 60/40 editor layout (preview / controls)
+- preview fills editor viewport height
+- preview content stays horizontally fitted and centered
+- vertical scrolling stays available but scrollbar is invisible
+- typing morphs content only; no refit/zoom on each keystroke
+- existing BBCode/cloud/draft behavior preserved
 
-V196 ไม่ได้เพิ่มระบบพรีวิวใหม่ และไม่เปลี่ยน logic จาก V195
+After upload: hard refresh (Ctrl+F5).

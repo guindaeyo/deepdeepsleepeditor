@@ -26587,7 +26587,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V195 — LIGHTWEIGHT CENTRAL EDITOR PREVIEW ENGINE
+   V197 — STABLE 60/40 CENTRAL EDITOR PREVIEW ENGINE
    Zero global iframe prototype overrides.
    Nothing scans the site at startup.
    The engine activates only for the editor panel the user opens.
@@ -26595,8 +26595,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 (() => {
   "use strict";
 
-  if (window.__DDS_V195_CENTRAL_EDITOR__) return;
-  window.__DDS_V195_CENTRAL_EDITOR__ = true;
+  if (window.__DDS_V197_CENTRAL_EDITOR__) return;
+  window.__DDS_V197_CENTRAL_EDITOR__ = true;
 
   const stateMap = new WeakMap();
   const activeFrames = new Set();
@@ -26667,10 +26667,36 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     let style=doc.getElementById('dds-v195-preview-style');
     if(!style){style=doc.createElement('style');style.id='dds-v195-preview-style';doc.head.appendChild(style);}
     style.textContent=`
-      html,body{margin-top:0!important;margin-bottom:0!important;min-height:0!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important;overscroll-behavior:contain!important;}
-      html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
-      html{transform:none!important;transform-origin:top left!important;}
-      body{transform:none!important;transform-origin:top left!important;}
+      html,body{
+        margin:0!important;
+        min-width:0!important;
+        min-height:100%!important;
+        max-height:none!important;
+        overflow-x:hidden!important;
+        overflow-y:auto!important;
+        scrollbar-width:none!important;
+        -ms-overflow-style:none!important;
+        overscroll-behavior:contain!important;
+        scroll-behavior:auto!important;
+      }
+      html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{
+        width:0!important;height:0!important;display:none!important;background:transparent!important;
+      }
+      html,body{transform:none!important;transform-origin:top center!important;}
+      .dds-preview-shell,.dds-card-preview-shell{
+        width:100%!important;min-width:0!important;max-width:none!important;
+        min-height:100%!important;
+        display:flex!important;align-items:flex-start!important;justify-content:center!important;
+        overflow:visible!important;
+      }
+      .dds-preview-target,.dds-card-preview-target{
+        flex:0 0 auto!important;
+        margin-left:auto!important;margin-right:auto!important;
+        transform-origin:top center!important;
+      }
+      body > :not(script):not(style):not(link):not(meta){
+        margin-left:auto!important;margin-right:auto!important;
+      }
     `;
   }
 
@@ -26720,8 +26746,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const doc=iframe.contentDocument; if(!doc?.body||doc.readyState==='loading')return false;
     const parsed=new DOMParser().parseFromString(source,'text/html'); if(!parsed?.body)return false;
     const scroll=doc.scrollingElement||doc.documentElement||doc.body,top=scroll?.scrollTop||0;
-    syncAttrs(doc.body,parsed.body); morph(doc.body,parsed.body); ensureDocStyle(doc); fit(iframe,false);
-    if(scroll)scroll.scrollTop=top; return true;
+    syncAttrs(doc.body,parsed.body);
+    morph(doc.body,parsed.body);
+    ensureDocStyle(doc);
+    // IMPORTANT: never refit/rezooom while typing. Width is fitted only once
+    // when the editor opens (and again only when the browser viewport resizes).
+    if(scroll) scroll.scrollTop=top;
+    return true;
   }
   function hasDoc(iframe){const d=iframe.contentDocument;return Boolean(d&&d.readyState!=='loading'&&d.body&&(d.body.children.length||String(d.body.textContent||'').trim()));}
   function scheduleMorph(iframe){
@@ -26744,7 +26775,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const s=iframe.style;
     s.setProperty('position','relative','important');s.setProperty('inset','auto','important');s.setProperty('display','block','important');
     s.setProperty('width','100%','important');s.setProperty('min-width','100%','important');s.setProperty('max-width','100%','important');
-    s.setProperty('height','clamp(480px,72vh,860px)','important');s.setProperty('min-height','480px','important');s.setProperty('max-height','86vh','important');
+    s.setProperty('height','100%','important');s.setProperty('min-height','0','important');s.setProperty('max-height','none','important');
     s.setProperty('margin','0','important');s.setProperty('transform','none','important');s.setProperty('opacity','1','important');s.setProperty('visibility','visible','important');
     s.setProperty('transition','none','important');s.setProperty('animation','none','important');s.setProperty('pointer-events','auto','important');
   }
@@ -26769,6 +26800,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function activatePanel(panel){
     if(!panel)return;
+    panel.classList.add('dds-v197-editor-panel');
     panel.querySelectorAll('iframe').forEach(hookFrame);
     installBbcode(panel);
   }
@@ -26784,15 +26816,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const prevUpdate=window.updateLoadedPreviewDocument;
   if(typeof prevUpdate==='function')window.updateLoadedPreviewDocument=function(iframe,srcdoc,resize){if(activeFrames.has(iframe))return render(iframe,srcdoc);return prevUpdate.call(this,iframe,srcdoc,resize);};
 
+  function legacyFitRequest(iframe){
+    if(!owns(iframe)) return false;
+    const st=stateMap.get(iframe)||{};
+    // Legacy editors call this on every keystroke. Once width is known, do
+    // nothing so typing cannot cause scale/layout jumps.
+    return st.width ? true : fit(iframe,true);
+  }
   window.__ddsCentralEditorPreviewOwnsV192=owns;
-  window.__ddsCentralEditorScheduleFitV192=(iframe)=>fit(iframe,false);
+  window.__ddsCentralEditorScheduleFitV192=legacyFitRequest;
   window.__ddsCentralEditorRenderV192=render;
   window.__ddsCentralEditorPreviewOwnsV193=owns;
-  window.__ddsCentralEditorScheduleFitV193=(iframe)=>fit(iframe,false);
+  window.__ddsCentralEditorScheduleFitV193=legacyFitRequest;
   window.__ddsCentralEditorRenderV193=render;
 
   function boot(){
-    document.body?.classList.add('dds-v193-central-preview','dds-v195-fast-boot');
+    document.body?.classList.add('dds-v193-central-preview','dds-v195-fast-boot','dds-v197-layout');
     // No startup scan, observer, iframe prototype patch, or idle scan.
     document.addEventListener('click',(e)=>{
       if(e.target?.closest?.('[data-edit-code],[data-edit-review],[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],[data-code014-edit],.dds-roleplay-edit'))activateSoon();
