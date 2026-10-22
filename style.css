@@ -11561,3 +11561,27 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     height:0 !important;
   }
 }
+
+/* =========================================================
+   V186 — STEADY EDITOR LIVE PREVIEW / NO FLICKER
+   Keep editor preview visible while typing. Catalogue cards
+   retain their existing loading/ready effects.
+========================================================= */
+.dds-panel[data-panel*="editor"] .dds-editor-preview-frame,
+.dds-protected-commission-editor .dds-editor-preview-frame,
+.dds-editor-preview-column .dds-editor-preview-frame {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important;
+}
+
+.dds-panel[data-panel*="editor"] .dds-editor-preview-frame.dds-preview-loading,
+.dds-panel[data-panel*="editor"] .dds-editor-preview-frame.dds-preview-ready,
+.dds-protected-commission-editor .dds-editor-preview-frame.dds-preview-loading,
+.dds-protected-commission-editor .dds-editor-preview-frame.dds-preview-ready,
+.dds-editor-preview-column .dds-editor-preview-frame.dds-preview-loading,
+.dds-editor-preview-column .dds-editor-preview-frame.dds-preview-ready {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important;
+}

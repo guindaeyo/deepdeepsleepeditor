@@ -27195,7 +27195,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V185 — BBCode TOOLBAR VISIBILITY + EDITOR LIVE PREVIEW FIX
+   V185/V186 — BBCODE + STEADY EDITOR LIVE PREVIEW FIX
    Final late patch for the 2026-10-22 V184 bundle.
    - Keeps all existing V184 systems intact.
    - Restores buttons that V184 hid with font-size:0 when an
@@ -27641,9 +27641,54 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
             return descriptor.get.call(this);
           },
           set(value) {
-            const nextValue = isEditorPreviewIframe(this)
+            const editorPreview = isEditorPreviewIframe(this);
+            const nextValue = editorPreview
               ? renderBbcode(value)
               : value;
+
+            /*
+             * V186: once an editor iframe is already loaded, patch the
+             * existing preview DOM instead of navigating srcdoc again.
+             * This keeps the current pixels visible while typing and
+             * removes the white/transparent flash between keystrokes.
+             */
+            if (
+              editorPreview &&
+              this.contentDocument &&
+              this.contentDocument.readyState !== "loading" &&
+              typeof window.updateLoadedPreviewDocument === "function"
+            ) {
+              try {
+                const patched = window.updateLoadedPreviewDocument(
+                  this,
+                  nextValue
+                );
+
+                if (patched) {
+                  this.classList.remove("dds-preview-loading");
+                  this.classList.add("dds-preview-ready");
+
+                  /*
+                   * Some editor modules attach a one-shot load listener
+                   * immediately before assigning srcdoc to resize the frame.
+                   * A synthetic load preserves that contract without a real
+                   * document reload.
+                   */
+                  queueMicrotask(() => {
+                    try {
+                      this.dispatchEvent(new Event("load"));
+                    } catch {}
+                  });
+                  return;
+                }
+              } catch (error) {
+                console.warn(
+                  "[DDS V186] steady preview patch failed; falling back to srcdoc reload",
+                  error
+                );
+              }
+            }
+
             descriptor.set.call(this, nextValue);
           }
         }
