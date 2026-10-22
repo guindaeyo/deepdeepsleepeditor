@@ -1,14 +1,13 @@
-DEEP DEEP SLEEP CODE SHOP — V202
+DEEP DEEP SLEEP EDITOR — V204 CENTRAL LEFT PREVIEW
 
-ฐาน: V200 (เพื่อคง routing / COPY CODE / controls / draft / cloud ครบ)
+Use all five main files together:
+- index.html
+- style.css
+- script.js
+- cloud-config.js
+- cloud-bridge.js
 
-V202 แก้เฉพาะระบบ Preview ฝั่งซ้ายของหน้า Edit:
-- 60% Preview / 40% Controls
-- โค้ด Preview อยู่กึ่งกลางแนวนอน
-- Fit แนวกว้างครั้งเดียว
-- โค้ดยาวเลื่อนขึ้นลงใน iframe ได้
-- scrollbar ฝั่งซ้ายล่องหนทุกชั้น
-- ฝั่งขวายัง scroll และเห็น scrollbar ตามปกติ
-- หลัง iframe โหลดครั้งแรก การพิมพ์ใช้ DOM morph เท่านั้น ไม่ reload
-- ปิดสิทธิ์ legacy v161/v165 ไม่ให้ re-zoom/re-transform ตอนพิมพ์
-- ไม่ลบ route, COPY CODE, VIEW WORK หรือ utility block ของ editor
+V204 changes only the shared Edit-page preview/layout system.
+LEFT: 60%, full-width fit, exact horizontal centre, long code scrolls in the LEFT stage with invisible scrollbar.
+RIGHT: 40%, normal visible scrolling.
+Typing updates the existing iframe DOM without reloading or recalculating horizontal scale.
