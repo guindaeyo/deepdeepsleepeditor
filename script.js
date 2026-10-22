@@ -11587,25 +11587,12 @@ ${stylesheetLinks}
     );
   }
 
-  const observer = new MutationObserver(syncCommissionEditorMode);
-
   function installCommissionEditorModeSync() {
-    observer.observe(document.body, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ["class"]
-    });
-
-    document.addEventListener(
-      "click",
-      () => requestAnimationFrame(syncCommissionEditorMode),
-      true
-    );
-    window.addEventListener(
-      "hashchange",
-      () => requestAnimationFrame(syncCommissionEditorMode)
-    );
+    const queue = () => requestAnimationFrame(syncCommissionEditorMode);
+    document.addEventListener("click", queue, true);
+    document.addEventListener("focusin", queue, true);
+    window.addEventListener("hashchange", queue, { passive: true });
+    window.addEventListener("popstate", queue, { passive: true });
     syncCommissionEditorMode();
   }
 
@@ -25987,6 +25974,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     const { cfg, stage, host, iframe } = parts;
 
+    if (window.__ddsCentralEditorPreviewOwnsV192?.(iframe)) {
+      window.__ddsCentralEditorScheduleFitV192?.(iframe);
+      return true;
+    }
+
     if (
       stage.clientWidth < 30 ||
       stage.clientHeight < 30
@@ -26595,39 +26587,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V193/V194 — ONE TRUE CENTRAL EDITOR PREVIEW ENGINE + LAZY BOOT
-   Applies to every EDIT page:
-   FOR ROLEPLAY / FOR PROFILE / FOR REVIEW / COMMISSION & ACTIVITY
-
-   Core rule:
-   - first preview render may navigate once
-   - every later srcdoc write is intercepted and morphed into the live DOM
-   - width is measured once and kept stable while typing
-   - no zoom reset / no scale pulse on keystrokes
-   - vertical overflow scrolls inside the preview with invisible scrollbars
-   - BBCode is rendered before the DOM morph
+   V195 — LIGHTWEIGHT CENTRAL EDITOR PREVIEW ENGINE
+   Zero global iframe prototype overrides.
+   Nothing scans the site at startup.
+   The engine activates only for the editor panel the user opens.
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_V193_CENTRAL_EDITOR__) return;
-  window.__DDS_V193_CENTRAL_EDITOR__ = true;
+  if (window.__DDS_V195_CENTRAL_EDITOR__) return;
+  window.__DDS_V195_CENTRAL_EDITOR__ = true;
 
-  const frameState = new WeakMap();
-  const frameResizeObservers = new WeakMap();
-  const outerStyleObservers = new WeakMap();
-  const normalizingOuter = new WeakSet();
-  let scanFrame = 0;
-
-  const srcdocDescriptor = Object.getOwnPropertyDescriptor(
-    HTMLIFrameElement.prototype,
-    "srcdoc"
-  );
+  const stateMap = new WeakMap();
+  const activeFrames = new Set();
+  const hookedFrames = new WeakSet();
+  const srcdocDescriptor = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype,"srcdoc");
   const nativeSrcdocGet = srcdocDescriptor?.get;
   const nativeSrcdocSet = srcdocDescriptor?.set;
-  const nativeSetAttribute = Element.prototype.setAttribute;
 
-  const EDITOR_PANEL_SELECTOR = [
+  const PANEL_SELECTOR = [
     '.dds-panel[data-panel^="editor-"]',
     '.dds-panel[data-panel*="editor"]',
     '.dds-protected-commission-editor',
@@ -26635,840 +26613,193 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     '[class*="editor-panel"]'
   ].join(',');
 
-  function editorPanelFor(iframe) {
+  function panelFor(iframe) {
     if (!(iframe instanceof HTMLIFrameElement)) return null;
     if (iframe.closest('.dds-roleplay-card-preview,.dds-commission-card')) return null;
-
-    const panel = iframe.closest(EDITOR_PANEL_SELECTOR) || iframe.closest('.dds-panel');
+    const panel = iframe.closest(PANEL_SELECTOR) || iframe.closest('.dds-panel');
     if (!panel) return null;
-
     const name = String(panel.dataset?.panel || '');
-    if (
-      panel.classList.contains('dds-commission-view-panel') ||
-      /^view-/i.test(name) ||
-      /(?:^|-)view(?:-|$)/i.test(name)
-    ) return null;
-
-    // The central engine owns every iframe inside an actual editor panel.
-    // We intentionally do not depend on per-code preview class names anymore.
+    if (panel.classList.contains('dds-commission-view-panel') || /^view-/i.test(name)) return null;
     if (!panel.querySelector('input,textarea,[contenteditable="true"],select')) return null;
     return panel;
   }
 
-  function isEditorPreview(iframe) {
-    return Boolean(editorPanelFor(iframe));
+  function owns(iframe) {
+    return activeFrames.has(iframe) && Boolean(panelFor(iframe));
   }
 
-  /* ------------------------- BBCode renderer ------------------------- */
   function safeUrl(value) {
-    const raw = String(value || '').trim();
-    if (!raw) return '';
-    if (/^\/\//.test(raw)) return raw;
-    if (/^https?:\/\//i.test(raw)) return raw;
-    return '';
+    const raw=String(value||'').trim();
+    return /^https?:\/\//i.test(raw)||/^\/\//.test(raw) ? raw : '';
   }
-
-  function escAttr(value) {
-    return String(value || '')
-      .replace(/&/g,'&amp;')
-      .replace(/"/g,'&quot;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;');
+  function esc(value) {
+    return String(value||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
-
-  function renderLists(source, ordered) {
-    const pattern = ordered
-      ? /\[list=1\]([\s\S]*?)\[\/list\]/gi
-      : /\[list\]([\s\S]*?)\[\/list\]/gi;
-    const tag = ordered ? 'ol' : 'ul';
-    return source.replace(pattern, (_all, body) => {
-      const chunks = String(body || '').split(/\[\*\]/g).slice(1);
-      if (!chunks.length) return '';
-      const items = chunks.map((item) => `<li>${item}</li>`).join('');
-      return `<${tag} style="margin:12px 0;padding-left:24px;">${items}</${tag}>`;
-    });
-  }
-
   function renderBbcode(source) {
-    let output = String(source ?? '');
-    if (!/\[(?:b|i|u|s|color|size|align|left|center|right|justify|url|img|video|quote|code|hide|spoiler|list|hr|\*)/i.test(output)) {
-      return output;
-    }
-
-    output = renderLists(output, true);
-    output = renderLists(output, false);
-
-    const pass = (value) => value
-      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi, '<div style="text-align:$1;">$2</div>')
-      .replace(/\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi, '<div style="text-align:$1;">$2</div>')
-      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi, '<span style="color:$1;">$2</span>')
-      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi, (_m,size,body) => {
-        const sizes = {small:'0.82em',medium:'1em',large:'1.28em'};
-        return `<span style="font-size:${sizes[size] || '1em'};">${body}</span>`;
-      })
-      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi, (_m,type,body) =>
-        `<details style="margin:10px 0;border:1px solid rgba(127,127,127,.28);padding:10px 12px;"><summary style="cursor:pointer;font-weight:700;">${type.toUpperCase()}</summary><div style="margin-top:10px;">${body}</div></details>`
-      )
-      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi, '<blockquote style="margin:10px 0;padding:8px 12px;border-left:2px solid currentColor;">$1</blockquote>')
-      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi, '<code style="white-space:pre-wrap;">$1</code>')
-      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>')
-      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>')
-      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>')
-      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, '<s>$1</s>')
-      .replace(/\[hr\]/gi, '<hr style="margin:18px 0;border:0;border-top:1px solid rgba(127,127,127,.35);">');
-
-    for (let i=0; i<6; i+=1) {
-      const next = pass(output);
-      if (next === output) break;
-      output = next;
-    }
-
-    output = output.replace(/\[url=([^\]]*)\]([\s\S]*?)\[\/url\]/gi, (_m,url,label) => {
-      const href = safeUrl(url);
-      return href ? `<a href="${escAttr(href)}" target="_blank" rel="noopener noreferrer">${label || href}</a>` : label;
-    });
-    output = output.replace(/\[img\]([\s\S]*?)\[\/img\]/gi, (_m,url) => {
-      const src = safeUrl(url);
-      return src ? `<img src="${escAttr(src)}" alt="" style="display:block;max-width:100%;height:auto;">` : '';
-    });
-    output = output.replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi, (_m,url) => {
-      const href = safeUrl(url);
-      return href ? `<a href="${escAttr(href)}" target="_blank" rel="noopener noreferrer">▶ YouTube video</a>` : '';
-    });
-
-    return output;
+    let out=String(source??'');
+    if (!/\[(?:b|i|u|s|color|size|align|left|center|right|justify|url|img|video|quote|code|hide|spoiler|list|hr|\*)/i.test(out)) return out;
+    out=out.replace(/\[list=1\]([\s\S]*?)\[\/list\]/gi,(_m,b)=>`<ol style="margin:12px 0;padding-left:24px;">${String(b).split(/\[\*\]/g).slice(1).map(x=>`<li>${x}</li>`).join('')}</ol>`);
+    out=out.replace(/\[list\]([\s\S]*?)\[\/list\]/gi,(_m,b)=>`<ul style="margin:12px 0;padding-left:24px;">${String(b).split(/\[\*\]/g).slice(1).map(x=>`<li>${x}</li>`).join('')}</ul>`);
+    const pass=(v)=>v
+      .replace(/\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi,'<div style="text-align:$1;">$2</div>')
+      .replace(/\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi,'<div style="text-align:$1;">$2</div>')
+      .replace(/\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi,'<span style="color:$1;">$2</span>')
+      .replace(/\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi,(_m,s,b)=>`<span style="font-size:${({small:'0.82em',medium:'1em',large:'1.28em'})[s]||'1em'};">${b}</span>`)
+      .replace(/\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi,(_m,t,b)=>`<details><summary>${t.toUpperCase()}</summary><div>${b}</div></details>`)
+      .replace(/\[quote\]([\s\S]*?)\[\/quote\]/gi,'<blockquote style="margin:10px 0;padding:8px 12px;border-left:2px solid currentColor;">$1</blockquote>')
+      .replace(/\[code\]([\s\S]*?)\[\/code\]/gi,'<code style="white-space:pre-wrap;">$1</code>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/gi,'<strong>$1</strong>')
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/gi,'<em>$1</em>')
+      .replace(/\[u\]([\s\S]*?)\[\/u\]/gi,'<u>$1</u>')
+      .replace(/\[s\]([\s\S]*?)\[\/s\]/gi,'<s>$1</s>')
+      .replace(/\[hr\]/gi,'<hr>');
+    for(let i=0;i<5;i+=1){const n=pass(out);if(n===out)break;out=n;}
+    out=out.replace(/\[url=([^\]]*)\]([\s\S]*?)\[\/url\]/gi,(_m,u,l)=>{const h=safeUrl(u);return h?`<a href="${esc(h)}" target="_blank" rel="noopener noreferrer">${l||h}</a>`:l;});
+    out=out.replace(/\[img\]([\s\S]*?)\[\/img\]/gi,(_m,u)=>{const s=safeUrl(u);return s?`<img src="${esc(s)}" alt="" style="max-width:100%;height:auto;">`:'';});
+    out=out.replace(/\[video=youtube\]([\s\S]*?)\[\/video\]/gi,(_m,u)=>{const h=safeUrl(u);return h?`<a href="${esc(h)}" target="_blank" rel="noopener noreferrer">▶ YouTube video</a>`:'';});
+    return out;
   }
-  window.__ddsRenderBbcodePreviewV193 = renderBbcode;
-  // Backward alias for legacy helpers inserted in V192.
-  window.__ddsRenderBbcodePreviewV192 = renderBbcode;
+  window.__ddsRenderBbcodePreviewV192=renderBbcode;
+  window.__ddsRenderBbcodePreviewV193=renderBbcode;
 
-  /* ------------------------- DOM morph: never reload while typing ------------------------- */
-  function syncAttributes(current, next) {
-    Array.from(current.attributes).forEach((attr) => {
-      if (!next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
-    });
-    Array.from(next.attributes).forEach((attr) => {
-      if (current.getAttribute(attr.name) !== attr.value) current.setAttribute(attr.name, attr.value);
-    });
-  }
-
-  function morphNode(current, next) {
-    if (!current || !next) return;
-    if (current.nodeType !== next.nodeType || current.nodeName !== next.nodeName) {
-      current.replaceWith(next.cloneNode(true));
-      return;
-    }
-    if (current.nodeType === Node.TEXT_NODE || current.nodeType === Node.COMMENT_NODE) {
-      if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
-      return;
-    }
-    if (current.nodeType !== Node.ELEMENT_NODE) return;
-
-    // Never restart scripts that are already running inside a preview document.
-    if (current.tagName === 'SCRIPT') return;
-
-    syncAttributes(current, next);
-    const cur = Array.from(current.childNodes);
-    const nxt = Array.from(next.childNodes);
-    const shared = Math.min(cur.length, nxt.length);
-    for (let i=0; i<shared; i+=1) morphNode(cur[i], nxt[i]);
-    for (let i=cur.length-1; i>=nxt.length; i-=1) current.removeChild(current.childNodes[i]);
-    for (let i=cur.length; i<nxt.length; i+=1) current.appendChild(nxt[i].cloneNode(true));
-  }
-
-  function syncHead(currentDoc, nextDoc) {
-    const currentStyles = Array.from(currentDoc.head?.querySelectorAll('style:not(#dds-v193-preview-document-style)') || []);
-    const nextStyles = Array.from(nextDoc.head?.querySelectorAll('style') || []);
-    nextStyles.forEach((nextStyle,index) => {
-      const currentStyle = currentStyles[index];
-      if (currentStyle) {
-        if (currentStyle.textContent !== nextStyle.textContent) currentStyle.textContent = nextStyle.textContent;
-      } else {
-        currentDoc.head?.appendChild(nextStyle.cloneNode(true));
-      }
-    });
-
-    const currentLinks = Array.from(currentDoc.head?.querySelectorAll('link[rel="stylesheet"]') || []);
-    const nextLinks = Array.from(nextDoc.head?.querySelectorAll('link[rel="stylesheet"]') || []);
-    nextLinks.forEach((nextLink,index) => {
-      const currentLink = currentLinks[index];
-      if (!currentLink) {
-        currentDoc.head?.appendChild(nextLink.cloneNode(true));
-        return;
-      }
-      syncAttributes(currentLink,nextLink);
-    });
-  }
-
-  const PREVIEW_DOCUMENT_CSS = `
-    html,body{
-      margin-top:0!important;
-      margin-bottom:0!important;
-      min-height:0!important;
-      max-height:none!important;
-      overflow-x:hidden!important;
-      overflow-y:auto!important;
-      scrollbar-width:none!important;
-      -ms-overflow-style:none!important;
-      overscroll-behavior:contain!important;
-    }
-    html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{
-      width:0!important;
-      height:0!important;
-      display:none!important;
-    }
-    html{
-      transform:none!important;
-      transform-origin:top left!important;
-    }
-    body{
-      zoom:1!important;
-      transform:none!important;
-      transform-origin:top left!important;
-    }
-    .dds-preview-shell,
-    .dds-card-preview-shell,
-    [class*="preview-shell"],
-    [class*="preview-positioner"],
-    .dds-preview-target,
-    [class*="preview-target"]{
-      height:auto!important;
-      min-height:0!important;
-      max-height:none!important;
-      overflow:visible!important;
-    }
-    [class*="preview-positioner"],
-    .dds-preview-target,
-    [class*="preview-target"]{
-      position:relative!important;
-      inset:auto!important;
-      top:auto!important;
-      right:auto!important;
-      bottom:auto!important;
-      left:auto!important;
-      transform:none!important;
-      transform-origin:top left!important;
-    }
-  `;
-
-  function ensureDocumentStyle(doc) {
+  function ensureDocStyle(doc) {
     if (!doc?.head) return;
-    let style = doc.getElementById('dds-v193-preview-document-style');
-    if (!style) {
-      style = doc.createElement('style');
-      style.id = 'dds-v193-preview-document-style';
-      doc.head.appendChild(style);
+    let style=doc.getElementById('dds-v195-preview-style');
+    if(!style){style=doc.createElement('style');style.id='dds-v195-preview-style';doc.head.appendChild(style);}
+    style.textContent=`
+      html,body{margin-top:0!important;margin-bottom:0!important;min-height:0!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important;overscroll-behavior:contain!important;}
+      html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
+      html{transform:none!important;transform-origin:top left!important;}
+      body{transform:none!important;transform-origin:top left!important;}
+    `;
+  }
+
+  function declaredWidth(iframe) {
+    let w=0;
+    for(const a of Array.from(iframe.attributes||[])){
+      if(!/(?:canvas|preview)[-_]?width/i.test(a.name)) continue;
+      const n=parseFloat(a.value); if(Number.isFinite(n)) w=Math.max(w,n);
     }
-    if (style.textContent !== PREVIEW_DOCUMENT_CSS) style.textContent = PREVIEW_DOCUMENT_CSS;
+    return w;
+  }
+  function naturalWidth(iframe,doc) {
+    let w=declaredWidth(iframe);
+    const nodes=[doc.body,...Array.from(doc.body?.children||[]).slice(0,16)];
+    for(const el of nodes){ if(!el) continue; const c=parseFloat(getComputedStyle(el).width)||0; w=Math.max(w,el.offsetWidth||0,c); }
+    return Math.max(1,w||iframe.clientWidth||1);
+  }
+  function fit(iframe,reprobe=false) {
+    if(!owns(iframe)) return false;
+    const doc=iframe.contentDocument;
+    if(!doc?.body||doc.readyState==='loading') return false;
+    ensureDocStyle(doc);
+    const st=stateMap.get(iframe)||{};
+    if(!st.width||reprobe) st.width=naturalWidth(iframe,doc);
+    const viewport=Math.max(1,iframe.clientWidth||iframe.parentElement?.clientWidth||1);
+    const scale=Math.max(.05,Math.min(1,(viewport-2)/Math.max(1,st.width)));
+    if(Math.abs((st.scale??-1)-scale)>.001){doc.documentElement.style.setProperty('zoom',String(scale),'important');st.scale=scale;}
+    st.viewport=viewport; stateMap.set(iframe,st); return true;
   }
 
-  function declaredCanvasWidth(iframe) {
-    if (!iframe) return 0;
-    let width = 0;
-    Array.from(iframe.attributes || []).forEach((attr) => {
-      if (!/(?:canvas|preview)[-_]?width/i.test(attr.name)) return;
-      const n = parseFloat(attr.value);
-      if (Number.isFinite(n) && n > width) width = n;
-    });
-    return width;
+  function syncAttrs(cur,next){
+    Array.from(cur.attributes).forEach(a=>{if(!next.hasAttribute(a.name))cur.removeAttribute(a.name);});
+    Array.from(next.attributes).forEach(a=>{if(cur.getAttribute(a.name)!==a.value)cur.setAttribute(a.name,a.value);});
   }
-
-  function candidateElements(doc) {
-    const out = [];
-    const add = (el) => {
-      if (el instanceof Element && !out.includes(el)) out.push(el);
-    };
-    add(doc?.body);
-    Array.from(doc?.body?.children || []).slice(0,24).forEach(add);
-    doc?.querySelectorAll?.(
-      '.dds-preview-target,[class*="preview-root"],[class*="preview-positioner"],[class*="preview-target"],[class*="preview-shell"],[class*="preview-content"]'
-    ).forEach((el,index) => { if (index < 60) add(el); });
-    return out;
+  function morph(cur,next){
+    if(!cur||!next)return;
+    if(cur.nodeType!==next.nodeType||cur.nodeName!==next.nodeName){cur.replaceWith(next.cloneNode(true));return;}
+    if(cur.nodeType===Node.TEXT_NODE||cur.nodeType===Node.COMMENT_NODE){if(cur.nodeValue!==next.nodeValue)cur.nodeValue=next.nodeValue;return;}
+    if(cur.nodeType!==Node.ELEMENT_NODE||cur.tagName==='SCRIPT')return;
+    syncAttrs(cur,next);
+    const a=Array.from(cur.childNodes),b=Array.from(next.childNodes),m=Math.min(a.length,b.length);
+    for(let i=0;i<m;i++)morph(a[i],b[i]);
+    for(let i=a.length-1;i>=b.length;i--)cur.removeChild(cur.childNodes[i]);
+    for(let i=a.length;i<b.length;i++)cur.appendChild(b[i].cloneNode(true));
   }
-
-  function probeNaturalWidth(iframe, doc) {
-    let width = declaredCanvasWidth(iframe);
-    candidateElements(doc).forEach((el) => {
-      const style = getComputedStyle(el);
-      const computed = parseFloat(style.width) || 0;
-      // offsetWidth is layout width and does not require us to visibly reset zoom.
-      width = Math.max(width, Number(el.offsetWidth || 0), computed);
-    });
-    if (width < 100) {
-      width = Math.max(
-        Number(doc?.body?.offsetWidth || 0),
-        Number(doc?.documentElement?.clientWidth || 0),
-        Number(iframe.clientWidth || 0),
-        1
-      );
-    }
-    return Math.max(1,width);
+  function morphDoc(iframe,source){
+    const doc=iframe.contentDocument; if(!doc?.body||doc.readyState==='loading')return false;
+    const parsed=new DOMParser().parseFromString(source,'text/html'); if(!parsed?.body)return false;
+    const scroll=doc.scrollingElement||doc.documentElement||doc.body,top=scroll?.scrollTop||0;
+    syncAttrs(doc.body,parsed.body); morph(doc.body,parsed.body); ensureDocStyle(doc); fit(iframe,false);
+    if(scroll)scroll.scrollTop=top; return true;
   }
-
-  function measureContentHeight(doc) {
-    let height = Math.max(
-      Number(doc?.body?.scrollHeight || 0),
-      Number(doc?.body?.offsetHeight || 0),
-      Number(doc?.documentElement?.scrollHeight || 0),
-      1
-    );
-    candidateElements(doc).forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      height = Math.max(
-        height,
-        Number(el.scrollHeight || 0),
-        Number(el.offsetHeight || 0),
-        Number(rect.height || 0)
-      );
-    });
-    return Math.max(1,Math.ceil(height));
+  function hasDoc(iframe){const d=iframe.contentDocument;return Boolean(d&&d.readyState!=='loading'&&d.body&&(d.body.children.length||String(d.body.textContent||'').trim()));}
+  function scheduleMorph(iframe){
+    const st=stateMap.get(iframe)||{}; if(st.raf)return;
+    st.raf=requestAnimationFrame(()=>{const s=stateMap.get(iframe)||st;s.raf=0;if(s.latest!=null&&hasDoc(iframe)){s.loaded=true;morphDoc(iframe,s.latest);}stateMap.set(iframe,s);});
+    stateMap.set(iframe,st);
   }
-
-  function applyStableLayout(iframe, options = {}) {
-    if (!isEditorPreview(iframe)) return;
-    const doc = iframe.contentDocument;
-    if (!doc?.body || doc.readyState === 'loading') return;
-
-    ensureDocumentStyle(doc);
-    const state = frameState.get(iframe) || {};
-    const scrollEl = doc.scrollingElement || doc.documentElement || doc.body;
-    const savedTop = options.scrollTop == null
-      ? Number(scrollEl?.scrollTop || 0)
-      : Number(options.scrollTop || 0);
-
-    // Width is probed once. It is NEVER recomputed from text on normal keystrokes.
-    if (!state.naturalWidth || options.reprobeWidth) {
-      const probed = probeNaturalWidth(iframe,doc);
-      if (!state.naturalWidth || options.reprobeWidth) state.naturalWidth = probed;
-    }
-
-    const viewport = Math.max(1,iframe.clientWidth || iframe.parentElement?.clientWidth || 1);
-    const width = Math.max(1,state.naturalWidth || viewport);
-    const nextScale = Math.max(0.05,Math.min(1,(viewport - 2) / width));
-
-    // Put the central scale on <html>, not <body>. Body attributes are morphed
-    // from the generated code on every edit; keeping scale on html prevents the
-    // scale from disappearing for one frame and then coming back (the flicker).
-    if (!Number.isFinite(state.scale) || Math.abs(state.scale - nextScale) > 0.001) {
-      doc.documentElement.style.setProperty('zoom',String(nextScale),'important');
-      state.scale = nextScale;
-    }
-    state.viewportWidth = viewport;
-
-    // Long/absolute layouts need a real scrollable extent. Remove the previous
-    // central min-height and remeasure synchronously, so shrinking text does not
-    // leave stale blank space and there is still no intermediate painted frame.
-    doc.body.style.removeProperty('min-height');
-    const naturalHeight = measureContentHeight(doc);
-    doc.body.style.setProperty('min-height',`${naturalHeight}px`,'important');
-    doc.documentElement.dataset.ddsPreviewScale = String(state.scale || nextScale);
-    doc.documentElement.dataset.ddsPreviewNaturalHeight = String(naturalHeight);
-    frameState.set(iframe,state);
-
-    requestAnimationFrame(() => {
-      const el = doc.scrollingElement || doc.documentElement || doc.body;
-      if (!el) return;
-      el.scrollTop = Math.min(savedTop,Math.max(0,(el.scrollHeight || 0) - (el.clientHeight || 0)));
-    });
-  }
-
-  function scheduleFit(iframe, scrollTop = null, reprobeWidth = false) {
-    const state = frameState.get(iframe) || {};
-    if (state.fitFrame) cancelAnimationFrame(state.fitFrame);
-    state.fitFrame = requestAnimationFrame(() => {
-      state.fitFrame = 0;
-      applyStableLayout(iframe,{scrollTop,reprobeWidth});
-    });
-    frameState.set(iframe,state);
-  }
-
-  function hasLoadedDocument(iframe) {
-    const doc = iframe?.contentDocument;
-    if (!doc || doc.readyState === 'loading') return false;
-    return Boolean(doc.body && (doc.body.children.length || String(doc.body.textContent || '').trim()));
-  }
-
-  function morphDocument(iframe, source) {
-    const doc = iframe?.contentDocument;
-    if (!doc?.body || doc.readyState === 'loading') return false;
-    const parsed = new DOMParser().parseFromString(source,'text/html');
-    if (!parsed?.body) return false;
-
-    const scrollEl = doc.scrollingElement || doc.documentElement || doc.body;
-    const scrollTop = Number(scrollEl?.scrollTop || 0);
-
-    syncHead(doc,parsed);
-    syncAttributes(doc.body,parsed.body);
-    morphNode(doc.body,parsed.body);
-
-    // Critical: restore the stable layout synchronously before the browser gets
-    // a chance to paint. No requestAnimationFrame scale reset on typing.
-    ensureDocumentStyle(doc);
-    applyStableLayout(iframe,{scrollTop,reprobeWidth:false});
+  function render(iframe,raw){
+    if(!owns(iframe))return false;
+    const source=renderBbcode(raw),st=stateMap.get(iframe)||{};st.latest=source;stateMap.set(iframe,st);
+    if(st.loaded||hasDoc(iframe)){st.loaded=true;stateMap.set(iframe,st);scheduleMorph(iframe);return true;}
+    if(!st.loading){st.loading=true;stateMap.set(iframe,st);iframe.addEventListener('load',()=>{const s=stateMap.get(iframe)||{};s.loading=false;s.loaded=true;stateMap.set(iframe,s);ensureDocStyle(iframe.contentDocument);fit(iframe,true);if(s.latest&&s.latest!==source)scheduleMorph(iframe);},{once:true});if(nativeSrcdocSet)nativeSrcdocSet.call(iframe,source);else iframe.setAttribute('srcdoc',source);}
     return true;
   }
 
-  function attachDocumentListeners(iframe) {
-    const doc = iframe.contentDocument;
-    if (!doc || doc.__ddsV193Listeners) return;
-    doc.__ddsV193Listeners = true;
-
-    // Natural width stays locked after the first completed iframe load.
-    // Late images/fonts may change vertical length, so refresh only scrollable
-    // height; never recalculate horizontal scale and never pulse while typing.
-    const refreshHeightOnly = () => scheduleFit(iframe,null,false);
-    doc.addEventListener('load',refreshHeightOnly,true);
-    doc.fonts?.ready?.then(refreshHeightOnly).catch?.(() => {});
+  function normalizeFrame(iframe){
+    iframe.setAttribute('scrolling','auto');
+    iframe.classList.remove('dds-preview-loading');
+    iframe.classList.add('dds-preview-ready','dds-v193-editor-preview');
+    const s=iframe.style;
+    s.setProperty('position','relative','important');s.setProperty('inset','auto','important');s.setProperty('display','block','important');
+    s.setProperty('width','100%','important');s.setProperty('min-width','100%','important');s.setProperty('max-width','100%','important');
+    s.setProperty('height','clamp(480px,72vh,860px)','important');s.setProperty('min-height','480px','important');s.setProperty('max-height','86vh','important');
+    s.setProperty('margin','0','important');s.setProperty('transform','none','important');s.setProperty('opacity','1','important');s.setProperty('visibility','visible','important');
+    s.setProperty('transition','none','important');s.setProperty('animation','none','important');s.setProperty('pointer-events','auto','important');
   }
 
-  function scheduleMorph(iframe) {
-    const state = frameState.get(iframe) || {};
-    if (state.morphFrame) return;
-    state.morphFrame = requestAnimationFrame(() => {
-      const latestState = frameState.get(iframe) || state;
-      latestState.morphFrame = 0;
-      const latest = latestState.latestSource;
-      if (latest == null || !hasLoadedDocument(iframe)) {
-        frameState.set(iframe,latestState);
-        return;
-      }
-      latestState.loadedSource = latest;
-      frameState.set(iframe,latestState);
-      morphDocument(iframe,latest);
-    });
-    frameState.set(iframe,state);
-  }
-
-  function finishFirstLoad(iframe) {
-    const state = frameState.get(iframe) || {};
-    state.loading = false;
-    state.loaded = true;
-    frameState.set(iframe,state);
-    normalizeOuter(iframe);
-    attachDocumentListeners(iframe);
-    ensureDocumentStyle(iframe.contentDocument);
-    // Initial load may calculate width once; typing never triggers a width probe.
-    applyStableLayout(iframe,{scrollTop:0,reprobeWidth:true});
-
-    if (state.latestSource && state.latestSource !== state.loadedSource) scheduleMorph(iframe);
-  }
-
-  function centralRender(iframe, rawSource) {
-    if (!isEditorPreview(iframe)) return false;
-    registerFrame(iframe);
-
-    const source = renderBbcode(rawSource);
-    const state = frameState.get(iframe) || {};
-    state.latestSource = source;
-    frameState.set(iframe,state);
-
-    if (state.loaded && hasLoadedDocument(iframe)) {
-      scheduleMorph(iframe);
-      return true;
+  function hookFrame(iframe){
+    if(hookedFrames.has(iframe))return;
+    hookedFrames.add(iframe);activeFrames.add(iframe);normalizeFrame(iframe);
+    if(srcdocDescriptor?.configurable&&typeof nativeSrcdocSet==='function'){
+      Object.defineProperty(iframe,'srcdoc',{configurable:true,enumerable:srcdocDescriptor.enumerable,get(){const s=stateMap.get(iframe);return s?.latest??(nativeSrcdocGet?nativeSrcdocGet.call(iframe):iframe.getAttribute('srcdoc')||'');},set(v){render(iframe,v);}});
     }
-
-    if (hasLoadedDocument(iframe)) {
-      state.loaded = true;
-      state.loading = false;
-      frameState.set(iframe,state);
-      scheduleMorph(iframe);
-      return true;
-    }
-
-    // Exactly one real navigation for this editor iframe.
-    if (!state.loading) {
-      state.loading = true;
-      state.loadedSource = source;
-      frameState.set(iframe,state);
-      iframe.addEventListener('load',() => finishFirstLoad(iframe),{once:true});
-      if (nativeSrcdocSet) nativeSrcdocSet.call(iframe,source);
-      else nativeSetAttribute.call(iframe,'srcdoc',source);
-    }
-    return true;
+    const st=stateMap.get(iframe)||{};
+    if(hasDoc(iframe)){st.loaded=true;stateMap.set(iframe,st);ensureDocStyle(iframe.contentDocument);fit(iframe,!st.width);}
   }
 
-  window.__ddsCentralEditorPreviewOwnsV193 = isEditorPreview;
-  window.__ddsCentralEditorScheduleFitV193 = scheduleFit;
-  window.__ddsCentralEditorRenderV193 = centralRender;
-  // Keep V192 aliases because older resize guards in this same file call them.
-  window.__ddsCentralEditorPreviewOwnsV192 = isEditorPreview;
-  window.__ddsCentralEditorScheduleFitV192 = (iframe) => scheduleFit(iframe,null,false);
-  window.__ddsCentralEditorRenderV192 = centralRender;
-
-  /* ------------------------- outer editor viewport ------------------------- */
-  function previewAncestors(iframe) {
-    const out = [];
-    let node = iframe.parentElement;
-    const panel = editorPanelFor(iframe);
-    while (node && node !== panel?.parentElement) {
-      const cls = String(node.className || '');
-      if (/preview-(?:stage|holder|canvas-host|column)/i.test(cls) || node.classList?.contains('dds-editor-preview-column')) out.push(node);
-      if (node === panel) break;
-      node = node.parentElement;
-    }
-    return out;
+  function removeTargets(root){root?.querySelectorAll?.('.dds-bbcode-toolbar-target,[data-bbcode-toolbar-target],[class*="toolbar-target"]').forEach(el=>el.remove());}
+  function installBbcode(root){
+    const install=window.__ddsInstallBbcodeToolbarForTarget;if(typeof install!=='function')return;
+    const fields=[];root?.querySelectorAll?.('textarea,[contenteditable="true"],input[type="text"],input:not([type])').forEach(f=>fields.push(f));
+    for(const field of fields){if(field.matches('[readonly],[disabled],.dds-generated-code,[data-named-save-name],[data-bbcode-color]'))continue;let ok=field.tagName==='TEXTAREA'||field.matches('[contenteditable="true"]');if(!ok){const sig=[field.id,field.name,field.placeholder,field.closest('label')?.textContent].filter(Boolean).join(' ');ok=/(หมายเหตุ|note|prefix|roleplay|rp\b|เนื้อหาโรลเพลย์)/i.test(sig);}if(!ok)continue;field.removeAttribute('data-dds-no-bbcode');delete field.dataset.ddsNoBbcode;install(field);}
+    removeTargets(root);
   }
 
-  function normalizeOuter(iframe) {
-    if (!isEditorPreview(iframe) || normalizingOuter.has(iframe)) return;
-    normalizingOuter.add(iframe);
-    try {
-      iframe.setAttribute('scrolling','auto');
-      iframe.classList.remove('dds-preview-loading');
-      iframe.classList.add('dds-preview-ready','dds-v193-editor-preview');
-
-      const s = iframe.style;
-      s.setProperty('position','relative','important');
-      s.setProperty('inset','auto','important');
-      s.setProperty('top','auto','important');
-      s.setProperty('right','auto','important');
-      s.setProperty('bottom','auto','important');
-      s.setProperty('left','auto','important');
-      s.setProperty('display','block','important');
-      s.setProperty('width','100%','important');
-      s.setProperty('min-width','100%','important');
-      s.setProperty('max-width','100%','important');
-      s.setProperty('height','clamp(480px,72vh,860px)','important');
-      s.setProperty('min-height','480px','important');
-      s.setProperty('max-height','86vh','important');
-      s.setProperty('margin','0','important');
-      s.setProperty('transform','none','important');
-      s.setProperty('transform-origin','top left','important');
-      s.setProperty('opacity','1','important');
-      s.setProperty('visibility','visible','important');
-      s.setProperty('transition','none','important');
-      s.setProperty('animation','none','important');
-      s.setProperty('will-change','auto','important');
-
-      previewAncestors(iframe).forEach((el) => {
-        const cs = String(el.className || '');
-        if (/preview-column/i.test(cs) || el.classList.contains('dds-editor-preview-column')) {
-          el.style.setProperty('min-width','0','important');
-          el.style.setProperty('max-width','100%','important');
-          el.style.setProperty('overflow','hidden','important');
-          return;
-        }
-        if (/preview-stage/i.test(cs)) {
-          el.style.setProperty('position','relative','important');
-          el.style.setProperty('width','100%','important');
-          el.style.setProperty('min-width','0','important');
-          el.style.setProperty('max-width','100%','important');
-          el.style.setProperty('height','clamp(480px,72vh,860px)','important');
-          el.style.setProperty('min-height','480px','important');
-          el.style.setProperty('max-height','86vh','important');
-          el.style.setProperty('overflow','hidden','important');
-          el.style.setProperty('transform','none','important');
-          return;
-        }
-        if (/preview-(?:holder|canvas-host)/i.test(cs)) {
-          el.style.setProperty('position','relative','important');
-          el.style.setProperty('inset','auto','important');
-          el.style.setProperty('width','100%','important');
-          el.style.setProperty('min-width','0','important');
-          el.style.setProperty('max-width','100%','important');
-          el.style.setProperty('height','100%','important');
-          el.style.setProperty('min-height','0','important');
-          el.style.setProperty('max-height','none','important');
-          el.style.setProperty('margin','0','important');
-          el.style.setProperty('transform','none','important');
-          el.style.setProperty('overflow','hidden','important');
-        }
-      });
-    } finally {
-      normalizingOuter.delete(iframe);
-    }
+  function activatePanel(panel){
+    if(!panel)return;
+    panel.querySelectorAll('iframe').forEach(hookFrame);
+    installBbcode(panel);
+  }
+  function activeEditor(){const p=document.querySelector(`${PANEL_SELECTOR}.is-active`);return p||null;}
+  function activateSoon(){
+    const run=()=>activatePanel(activeEditor());
+    queueMicrotask(run);requestAnimationFrame(run);setTimeout(run,80);setTimeout(run,220);
   }
 
-  function observeOuterGeometry(iframe) {
-    if (outerStyleObservers.has(iframe)) return;
-    const targets = [iframe,...previewAncestors(iframe)];
-    const observer = new MutationObserver((records) => {
-      if (normalizingOuter.has(iframe)) return;
-      if (!records.some((r) => r.type === 'attributes' && (r.attributeName === 'style' || r.attributeName === 'class'))) return;
-      normalizeOuter(iframe);
-      // No width reprobe here. Legacy style churn cannot change preview scale.
-      scheduleFit(iframe,null,false);
-    });
-    targets.forEach((target) => observer.observe(target,{attributes:true,attributeFilter:['style','class']}));
-    outerStyleObservers.set(iframe,observer);
-  }
+  // Cheap global wrappers: they only check a Set; no DOM scan/prototype interception.
+  const prevQueue=window.queuePreviewDocument;
+  if(typeof prevQueue==='function')window.queuePreviewDocument=function(iframe,srcdoc,resize){if(activeFrames.has(iframe))return render(iframe,srcdoc);return prevQueue.call(this,iframe,srcdoc,resize);};
+  const prevUpdate=window.updateLoadedPreviewDocument;
+  if(typeof prevUpdate==='function')window.updateLoadedPreviewDocument=function(iframe,srcdoc,resize){if(activeFrames.has(iframe))return render(iframe,srcdoc);return prevUpdate.call(this,iframe,srcdoc,resize);};
 
-  function observeFrameSize(iframe) {
-    if (!('ResizeObserver' in window) || frameResizeObservers.has(iframe)) return;
-    const observer = new ResizeObserver(() => {
-      const state = frameState.get(iframe) || {};
-      const width = Number(iframe.clientWidth || 0);
-      if (Math.abs(width - Number(state.viewportWidth || 0)) > 2) scheduleFit(iframe,null,false);
-    });
-    observer.observe(iframe);
-    frameResizeObservers.set(iframe,observer);
-  }
+  window.__ddsCentralEditorPreviewOwnsV192=owns;
+  window.__ddsCentralEditorScheduleFitV192=(iframe)=>fit(iframe,false);
+  window.__ddsCentralEditorRenderV192=render;
+  window.__ddsCentralEditorPreviewOwnsV193=owns;
+  window.__ddsCentralEditorScheduleFitV193=(iframe)=>fit(iframe,false);
+  window.__ddsCentralEditorRenderV193=render;
 
-  function registerFrame(iframe) {
-    if (!isEditorPreview(iframe)) return;
-    normalizeOuter(iframe);
-    observeOuterGeometry(iframe);
-    observeFrameSize(iframe);
-
-    const state = frameState.get(iframe) || {};
-    if (!state.loaded && hasLoadedDocument(iframe)) {
-      state.loaded = true;
-      state.loading = false;
-      frameState.set(iframe,state);
-      attachDocumentListeners(iframe);
-      ensureDocumentStyle(iframe.contentDocument);
-      scheduleFit(iframe,null,!state.naturalWidth);
-    }
-  }
-
-  function scanFrames(root = document) {
-    const frames = [];
-    if (root instanceof HTMLIFrameElement) frames.push(root);
-    root.querySelectorAll?.('iframe').forEach((iframe) => frames.push(iframe));
-    frames.forEach(registerFrame);
-  }
-
-  /* ------------------------- BBCode toolbar coverage ------------------------- */
-  const ICONS = {
-    b:'bi-type-bold',bold:'bi-type-bold',
-    i:'bi-type-italic',italic:'bi-type-italic',
-    u:'bi-type-underline',underline:'bi-type-underline',
-    s:'bi-type-strikethrough',strikeThrough:'bi-type-strikethrough',
-    'size-small':'bi-type','size-medium':'bi-fonts','size-large':'bi-type-h1',
-    'align-left':'bi-text-left','align-center':'bi-text-center','align-right':'bi-text-right','align-justify':'bi-justify',
-    url:'bi-link-45deg',img:'bi-image',video:'bi-play-btn',
-    quote:'bi-quote',code:'bi-code-slash',hide:'bi-eye-slash',spoiler:'bi-eye',
-    list:'bi-list-ul','list-1':'bi-list-ol','list-item':'bi-list',hr:'bi-dash-lg',
-    clear:'bi-eraser',removeFormat:'bi-eraser'
-  };
-
-  function ensureIconFont() {
-    if (document.querySelector('link[data-dds-bbcode-icons="v193"]')) return;
-    const existing = document.querySelector('link[href*="bootstrap-icons"]');
-    if (existing) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
-    link.dataset.ddsBbcodeIcons = 'v193';
-    document.head?.appendChild(link);
-  }
-
-  function bbcodeKey(button) {
-    if (!button) return '';
-    if (button.dataset.bbcode) return button.dataset.bbcode;
-    if (button.dataset.command) return button.dataset.command;
-    for (const attr of Array.from(button.attributes || [])) {
-      if (/^data-[a-z0-9-]*bbcode$/i.test(attr.name) && attr.value) return attr.value;
-      if (/^data-[a-z0-9-]*clear$/i.test(attr.name)) return 'clear';
-    }
-    return '';
-  }
-
-  function removeToolbarTargetLabels(root) {
-    if (!root) return;
-    root.querySelectorAll?.('.dds-bbcode-toolbar-target,[data-bbcode-toolbar-target],[class*="toolbar-target"]').forEach((el) => el.remove());
-
-    const toolbars = [];
-    if (root instanceof Element && root.matches?.('.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]')) toolbars.push(root);
-    root.querySelectorAll?.('.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]').forEach((el) => toolbars.push(el));
-    toolbars.forEach((toolbar) => {
-      const target = String(toolbar.dataset.toolbarFor || toolbar.dataset.historyTarget || toolbar.dataset.target || '').trim();
-      Array.from(toolbar.childNodes).forEach((node) => {
-        if (node.nodeType !== Node.TEXT_NODE) return;
-        const text = String(node.nodeValue || '').trim();
-        if (text && (text === target || /^dds-bbcode-target-\d+$/i.test(text) || /(?:Roleplay|Review|Note|Text)Editor$/i.test(text))) node.remove();
-      });
-      Array.from(toolbar.children).forEach((el) => {
-        if (el.matches('button,label,input,.dds-bbcode-group')) return;
-        const text = String(el.textContent || '').trim();
-        if (text && (text === target || /^dds-bbcode-target-\d+$/i.test(text) || /(?:Roleplay|Review|Note|Text)Editor$/i.test(text))) el.remove();
-      });
-    });
-  }
-
-  function decorateToolbar(toolbar) {
-    if (!toolbar) return;
-    removeToolbarTargetLabels(toolbar);
-    ensureIconFont();
-    toolbar.classList.add('dds-v193-bbcode-toolbar');
-    toolbar.querySelectorAll('button').forEach((button) => {
-      const key = bbcodeKey(button);
-      const icon = ICONS[key];
-      if (icon) button.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
-      else if (!String(button.textContent || '').trim()) button.textContent = String(key || '•').toUpperCase();
-    });
-    toolbar.querySelectorAll('label.dds-bbcode-color>span,label.dds-rich-color>span').forEach((span) => {
-      span.innerHTML = '<i class="bi bi-palette" aria-hidden="true"></i>';
-    });
-  }
-
-  function installToolbarCoverage(root = document) {
-    const installer = window.__ddsInstallBbcodeToolbarForTarget;
-    if (typeof installer !== 'function') return;
-
-    const fields = [];
-    if (root instanceof Element && root.matches?.('textarea,[contenteditable="true"],input[type="text"],input:not([type])')) fields.push(root);
-    root.querySelectorAll?.('textarea,[contenteditable="true"],input[type="text"],input:not([type])').forEach((el) => fields.push(el));
-
-    fields.forEach((field) => {
-      const panel = field.closest(EDITOR_PANEL_SELECTOR) || field.closest('.dds-panel');
-      if (!panel || !panel.querySelector('iframe')) return;
-      if (field.matches('[readonly],[disabled],.dds-generated-code,[data-named-save-name],[data-bbcode-color]')) return;
-
-      let eligible = field.tagName === 'TEXTAREA' || field.matches('[contenteditable="true"]');
-      if (!eligible) {
-        const kind = window.__ddsGetNoteBbcodeKind?.(field);
-        const signature = [field.id,field.getAttribute('name'),field.getAttribute('placeholder'),field.closest('label')?.textContent]
-          .filter(Boolean).join(' ').toLowerCase();
-        eligible = Boolean(kind || /(หมายเหตุ|note|prefix|roleplay|rp\b|เนื้อหาโรลเพลย์)/i.test(signature));
-      }
-      if (!eligible) return;
-
-      field.removeAttribute('data-dds-no-bbcode');
-      delete field.dataset.ddsNoBbcode;
-      installer(field);
-      const toolbar = field.previousElementSibling?.classList?.contains('dds-rich-toolbar')
-        ? field.previousElementSibling
-        : (field.id ? panel.querySelector(`[data-toolbar-for="${CSS.escape(field.id)}"]`) : null);
-      if (toolbar) decorateToolbar(toolbar);
-    });
-
-    root.querySelectorAll?.('.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]').forEach((toolbar) => {
-      if ((toolbar.closest(EDITOR_PANEL_SELECTOR) || toolbar.closest('.dds-panel'))?.querySelector('iframe')) decorateToolbar(toolbar);
-    });
-  }
-
-  function scanInserted(root) {
-    scanFrames(root);
-    installToolbarCoverage(root);
-    removeToolbarTargetLabels(root);
-  }
-
-  function scheduleActiveScan() {
-    if (scanFrame) cancelAnimationFrame(scanFrame);
-    scanFrame = requestAnimationFrame(() => {
-      scanFrame = 0;
-      const active = document.querySelector(`${EDITOR_PANEL_SELECTOR}.is-active`) || document.querySelector('.dds-panel.is-active') || document;
-      scanInserted(active);
-    });
-  }
-
-  /* ------------------------- hook every preview write ------------------------- */
-  function installSrcdocHook() {
-    if (srcdocDescriptor?.configurable && typeof nativeSrcdocSet === 'function') {
-      Object.defineProperty(HTMLIFrameElement.prototype,'srcdoc',{
-        configurable:srcdocDescriptor.configurable,
-        enumerable:srcdocDescriptor.enumerable,
-        get() {
-          const state = frameState.get(this);
-          if (state?.latestSource != null) return state.latestSource;
-          return nativeSrcdocGet ? nativeSrcdocGet.call(this) : this.getAttribute('srcdoc') || '';
-        },
-        set(value) {
-          if (isEditorPreview(this)) {
-            centralRender(this,value);
-            return;
-          }
-          nativeSrcdocSet.call(this,value);
-        }
-      });
-    }
-
-    const previousSetAttribute = HTMLIFrameElement.prototype.setAttribute;
-    HTMLIFrameElement.prototype.setAttribute = function(name,value) {
-      if (String(name).toLowerCase() === 'srcdoc' && isEditorPreview(this)) {
-        centralRender(this,value);
-        return;
-      }
-      return previousSetAttribute.call(this,name,value);
-    };
-  }
-
-  function installQueueHooks() {
-    const previousQueue = window.queuePreviewDocument;
-    if (typeof previousQueue === 'function') {
-      window.queuePreviewDocument = function(iframe,srcdoc,resizeFunction) {
-        if (isEditorPreview(iframe)) return centralRender(iframe,srcdoc);
-        return previousQueue.call(this,iframe,srcdoc,resizeFunction);
-      };
-    }
-
-    const previousUpdate = window.updateLoadedPreviewDocument;
-    if (typeof previousUpdate === 'function') {
-      window.updateLoadedPreviewDocument = function(iframe,srcdoc,resizeFunction) {
-        if (isEditorPreview(iframe)) return centralRender(iframe,srcdoc);
-        return previousUpdate.call(this,iframe,srcdoc,resizeFunction);
-      };
-    }
-  }
-
-  function activeEditorPanel() {
-    const direct = document.querySelector(`${EDITOR_PANEL_SELECTOR}.is-active`);
-    if (direct) return direct;
-    const panel = document.querySelector('.dds-panel.is-active');
-    return panel && panel.matches?.(EDITOR_PANEL_SELECTOR) ? panel : null;
-  }
-
-  function scanActiveEditorOnly() {
-    const active = activeEditorPanel();
-    if (!active) return;
-    scanInserted(active);
-  }
-
-  function scheduleLazyEditorScan() {
-    requestAnimationFrame(scanActiveEditorOnly);
-    // Dynamic commission editors are sometimes inserted a little after the click.
-    // These delayed scans inspect only the currently active editor, never the site.
-    setTimeout(scanActiveEditorOnly,90);
-    setTimeout(scanActiveEditorOnly,260);
-  }
-
-  function boot() {
-    document.body?.classList.remove('dds-v192-central-preview');
-    document.body?.classList.add('dds-v193-central-preview','dds-v194-fast-boot');
-
-    // Keep startup almost free: install only the hooks. Do NOT scan every iframe,
-    // input, textarea or toolbar on the home page. The central srcdoc hook catches
-    // an editor preview automatically the moment that editor actually renders.
-    installSrcdocHook();
-    installQueueHooks();
-
-    document.addEventListener('click',(event) => {
-      if (!event.target?.closest?.('[data-edit-code],[data-edit-review],[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],[data-code014-edit],[class*="commission-card"] button')) return;
-      scheduleLazyEditorScan();
+  function boot(){
+    document.body?.classList.add('dds-v193-central-preview','dds-v195-fast-boot');
+    // No startup scan, observer, iframe prototype patch, or idle scan.
+    document.addEventListener('click',(e)=>{
+      if(e.target?.closest?.('[data-edit-code],[data-edit-review],[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],[data-code014-edit],.dds-roleplay-edit'))activateSoon();
     },true);
-
-    // Lazy BBCode/preview setup: touch only the field the user actually enters.
-    document.addEventListener('focusin',(event) => {
-      const field = event.target?.closest?.('textarea,[contenteditable="true"],input[type="text"],input:not([type]),select');
-      if (!field) return;
-      const panel = field.closest(EDITOR_PANEL_SELECTOR) || field.closest('.dds-panel');
-      if (!panel || !panel.matches?.(EDITOR_PANEL_SELECTOR) || !panel.querySelector('iframe')) return;
-      installToolbarCoverage(field);
-      removeToolbarTargetLabels(panel);
-      panel.querySelectorAll('iframe').forEach(registerFrame);
-    },true);
-
-    // Support a direct/deep link into an editor without blocking first paint.
-    const idleScan = () => scanActiveEditorOnly();
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(idleScan,{timeout:900});
-    } else {
-      setTimeout(idleScan,500);
-    }
-
-    let resizeTimer = 0;
-    window.addEventListener('resize',() => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const active = activeEditorPanel();
-        active?.querySelectorAll('iframe').forEach((iframe) => {
-          if (isEditorPreview(iframe)) scheduleFit(iframe,null,false);
-        });
-      },80);
-    },{passive:true});
+    document.addEventListener('focusin',(e)=>{const panel=e.target?.closest?.(PANEL_SELECTOR);if(panel)activatePanel(panel);},true);
+    let timer=0;window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(()=>{for(const iframe of Array.from(activeFrames)){if(!iframe.isConnected){activeFrames.delete(iframe);continue;}fit(iframe,false);}},100);},{passive:true});
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+
