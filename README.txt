@@ -1,10 +1,10 @@
-DEEP DEEP SLEEP CODE SHOP — V214
+DEEP DEEP SLEEP CODE SHOP — V215
 
-Fix only: V213 lazy-loader EDIT click race.
-- Landing page stays fast; local script.js is still lazy-loaded.
-- First EDIT click is held until script.js finishes loading and handlers are bound.
-- The original click is replayed automatically once.
-- Commission EDIT waits for deferred commission installers before replay.
+แก้เฉพาะ startup / EDIT click:
+- ไม่โหลด/parse local script 1.2MB ใน pointerdown หรือเฟรมคลิกหมวด
+- CODE001-009 / PROFILE / REVIEW ปล่อย core handler เปิดทันที ไม่ถูก click-gate ขวาง
+- local-only editors (CODE010-014 และ Commission custom) รอ local bundle แล้ว replay click อัตโนมัติ
+- category navigation โหลด enhancement หลัง paint/idle
+- หน้าแรกไม่ fetch local script 1.2MB เลยจนกว่าจะเข้าโหมดที่ต้องใช้
 
-Replace the five main files: index.html, style.css, script.js, cloud-config.js, cloud-bridge.js
-Then Ctrl+F5 once.
+Preview / Cloud / Draft / BBCode logic ไม่ได้แก้ในรอบนี้
