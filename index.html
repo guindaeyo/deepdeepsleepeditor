@@ -22,7 +22,7 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=P261022-v215-nonblocking-loader" rel="stylesheet"/>
+<link href="./style.css?v=P261022-v216-explicit-editor-only" rel="stylesheet"/>
 </head>
 <body>
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5661,21 +5661,20 @@ You were mine forever</textarea>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
-<script id="dds-local-enhancements-loader-v215">
+<script id="dds-local-enhancements-loader-v216">
 (() => {
   "use strict";
 
-  if (window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V215__) return;
-  window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V215__ = true;
+  if (window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V216__) return;
+  window.__DDS_LOCAL_ENHANCEMENTS_LOADER_V216__ = true;
 
   let loaded = false;
   let loadPromise = null;
   let replaying = false;
-  let idleTicket = 0;
 
   function needsEnhancementsFromHash() {
     const hash = String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || "");
-    return /#(?:editor-(?:code01[0-4]|commission)|protected-|view-commission)/i.test(hash);
+    return /#(?:editor-(?:code01[0-3]|commission)|protected-|view-commission)/i.test(hash);
   }
 
   function loadEnhancements() {
@@ -5684,9 +5683,9 @@ You were mine forever</textarea>
 
     loadPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "./script.js?v=P261022-v215-nonblocking-loader";
+      script.src = "./script.js?v=P261022-v216-explicit-editor-only";
       script.async = true;
-      script.dataset.ddsLocalEnhancements = "v215";
+      script.dataset.ddsLocalEnhancements = "v216";
       script.onload = () => {
         loaded = true;
         window.dispatchEvent(new CustomEvent("dds-local-enhancements-ready"));
@@ -5694,7 +5693,7 @@ You were mine forever</textarea>
       };
       script.onerror = () => {
         loadPromise = null;
-        console.error("[DDS V215] local enhancements failed to load");
+        console.error("[DDS V216] local enhancements failed to load");
         reject(new Error("DDS local enhancements failed to load"));
       };
       document.head.appendChild(script);
@@ -5703,41 +5702,18 @@ You were mine forever</textarea>
     return loadPromise;
   }
 
-  function scheduleEnhancements() {
-    if (loaded || loadPromise || idleTicket) return;
-
-    const run = () => {
-      idleTicket = 0;
-      loadEnhancements().catch(() => {});
-    };
-
-    // Let navigation/paint happen first. Do not parse the 1.2 MB patch in the click frame.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if ("requestIdleCallback" in window) {
-          idleTicket = window.requestIdleCallback(run, { timeout: 900 });
-        } else {
-          idleTicket = window.setTimeout(run, 180);
-        }
-      });
-    });
-  }
-
-  const categorySelector = [
-    '[data-page="roleplay"]', '[data-page="profile"]',
-    '[data-page="review"]', '[data-page="commission"]',
-    '[data-go="roleplay"]', '[data-go="profile"]',
-    '[data-go="review"]', '[data-go="commission"]'
-  ].join(",");
-
-  // Only these editors actually depend on the local 1.2 MB enhancement bundle.
-  // Normal CODE001-009 / PROFILE / REVIEW buttons are never blocked.
+  /*
+   * IMPORTANT PERFORMANCE RULE:
+   * Category navigation NEVER loads the 1.2 MB local enhancement bundle.
+   * The base/core site is allowed to navigate and paint immediately.
+   * Only editor implementations that actually live in the local bundle
+   * are gated below.
+   */
   const localOnlyEditSelector = [
     '[data-edit-code="code010"]',
     '[data-edit-code="code011"]',
     '[data-edit-code="code012"]',
     '[data-code013-edit]',
-    '[data-code014-edit]',
     '[data-edit-protected-commission]',
     '[data-commission-edit]',
     '[data-protected-commission-edit]',
@@ -5769,13 +5745,6 @@ You were mine forever</textarea>
     });
   }
 
-  // Category navigation must stay instant. Load the enhancement bundle only after paint/idle.
-  document.addEventListener("click", (event) => {
-    if (event.target?.closest?.(categorySelector)) scheduleEnhancements();
-  }, false);
-
-  // Standard editor buttons are intentionally NOT intercepted.
-  // Gate only editors whose implementation lives in the local bundle.
   document.addEventListener("click", async (event) => {
     const target = event.target?.closest?.(localOnlyEditSelector);
     if (!target || loaded || replaying) return;
@@ -5783,7 +5752,6 @@ You were mine forever</textarea>
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-
     target.setAttribute("aria-busy", "true");
 
     try {
@@ -5799,7 +5767,7 @@ You were mine forever</textarea>
       replaying = true;
       target.click();
     } catch (error) {
-      console.error("[DDS V215] could not open local editor", error);
+      console.error("[DDS V216] could not open local editor", error);
     } finally {
       target.removeAttribute("aria-busy");
       requestAnimationFrame(() => { replaying = false; });
@@ -5808,9 +5776,8 @@ You were mine forever</textarea>
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
-    const localTarget = event.target?.closest?.(localOnlyEditSelector);
-    if (localTarget && !loaded) loadEnhancements().catch(() => {});
-    else if (event.target?.closest?.(categorySelector)) scheduleEnhancements();
+    const target = event.target?.closest?.(localOnlyEditSelector);
+    if (target && !loaded) loadEnhancements().catch(() => {});
   }, true);
 
   window.addEventListener("hashchange", () => {

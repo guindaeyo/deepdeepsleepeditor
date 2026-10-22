@@ -1,10 +1,12 @@
-DEEP DEEP SLEEP CODE SHOP — V215
+DEEP DEEP SLEEP CODE SHOP — V216
 
-แก้เฉพาะ startup / EDIT click:
-- ไม่โหลด/parse local script 1.2MB ใน pointerdown หรือเฟรมคลิกหมวด
-- CODE001-009 / PROFILE / REVIEW ปล่อย core handler เปิดทันที ไม่ถูก click-gate ขวาง
-- local-only editors (CODE010-014 และ Commission custom) รอ local bundle แล้ว replay click อัตโนมัติ
-- category navigation โหลด enhancement หลัง paint/idle
-- หน้าแรกไม่ fetch local script 1.2MB เลยจนกว่าจะเข้าโหมดที่ต้องใช้
+Performance hotfix from V215.
 
-Preview / Cloud / Draft / BBCode logic ไม่ได้แก้ในรอบนี้
+Changed only the local enhancement loader:
+- Category navigation (Roleplay/Profile/Review/Commission) never loads the 1.2 MB local bundle.
+- Normal navigation and core editors are not blocked.
+- Local bundle loads only when an editor that actually depends on it is clicked, or when opening a direct editor hash.
+- Preview/layout/BBCode/Cloud/Draft code is unchanged from V215.
+
+Replace index.html, style.css, script.js, cloud-config.js, cloud-bridge.js together.
+Then hard refresh once (Ctrl+F5).
