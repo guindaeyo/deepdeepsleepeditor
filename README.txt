@@ -1,17 +1,12 @@
-DEEP DEEP SLEEP CODE SHOP — V217 Y2K VAMPIRE UI
+Deep Deep Sleep Code Shop — V218 Browser Vampire UI
 
-Base: V210 Copy Dock Hotfix
+UI-only redesign based on V217 / V210 data layer.
+- Y2K Web-browser shell, black/red vampire palette
+- Browser-style tabs: Home / Roleplay / Profile / Review / Commission
+- Browser back / forward / reload controls with Bootstrap Icons
+- Existing category pages and code directories remain in the DOM
+- Editor layout remains Preview 60% / Controls 40% on desktop
+- Existing editor data IDs, local save/autosave, Cloud Save and cloud bridge are preserved
+- script.js, cloud-config.js and cloud-bridge.js are unchanged from V217
 
-This build changes the presentation layer only:
-- index.html: body theme marker + theme-color + stylesheet version
-- style.css: appended Y2K vampire UI theme
-
-Intentionally unchanged byte-for-byte from the base:
-- script.js
-- cloud-config.js
-- cloud-bridge.js
-
-Therefore existing editor IDs, localStorage keys, autosave behavior, Cloud Save bridge,
-and saved editor data contracts are preserved.
-
-Desktop editor layout remains Preview 60% / Controls 40%.
+Replace the five main files together: index.html, style.css, script.js, cloud-config.js, cloud-bridge.js.

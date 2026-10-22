@@ -23,13 +23,37 @@
 <link href="//s12.gifyu.com" rel="dns-prefetch"/>
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
-<link href="./style.css?v=20261022-v217-y2k-vampire-ui" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+<link href="./style.css?v=20261022-v218-browser-vampire-ui" rel="stylesheet"/>
 </head>
 <body class="dds-y2k-vampire">
 <div aria-hidden="true" class="dds-noise"></div>
 <div aria-hidden="true" class="dds-glow dds-glow-one"></div>
 <div aria-hidden="true" class="dds-glow dds-glow-two"></div>
 <div class="dds-app">
+<div class="dds-browser-chrome" data-dds-browser-chrome>
+  <div class="dds-browser-tabs" role="tablist" aria-label="Deep Deep Sleep pages">
+    <button class="dds-browser-tab is-active" data-browser-page="home" type="button"><i class="bi bi-house-door" aria-hidden="true"></i><span>Home</span></button>
+    <button class="dds-browser-tab" data-browser-page="roleplay" type="button"><i class="bi bi-chat-square-heart" aria-hidden="true"></i><span>Roleplay</span></button>
+    <button class="dds-browser-tab" data-browser-page="profile" type="button"><i class="bi bi-person-badge" aria-hidden="true"></i><span>Profile</span></button>
+    <button class="dds-browser-tab" data-browser-page="review" type="button"><i class="bi bi-star-half" aria-hidden="true"></i><span>Review</span></button>
+    <button class="dds-browser-tab" data-browser-page="commission" type="button"><i class="bi bi-envelope-paper-heart" aria-hidden="true"></i><span>Commission</span></button>
+    <div class="dds-browser-window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div>
+  <div class="dds-browser-toolbar">
+    <div class="dds-browser-history">
+      <button type="button" data-browser-action="back" aria-label="Back" title="Back"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+      <button type="button" data-browser-action="forward" aria-label="Forward" title="Forward"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+      <button type="button" data-browser-action="reload" aria-label="Reload" title="Reload"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i></button>
+    </div>
+    <div class="dds-browser-address" role="group" aria-label="Current page">
+      <span class="dds-browser-address-prefix">dds://</span>
+      <span id="ddsBrowserAddress">deepdeepsleep.codes/home</span>
+      <span class="dds-browser-address-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+    </div>
+    <div class="dds-browser-window-buttons" aria-hidden="true"><span><i class="bi bi-dash-lg"></i></span><span><i class="bi bi-x-lg"></i></span></div>
+  </div>
+</div>
 <main class="dds-main">
 <header class="dds-topbar">
 <div class="dds-topbar-left">
@@ -58,7 +82,7 @@
             </p>
 <div class="dds-home-buttons">
 <button class="dds-primary-button" data-go="roleplay" type="button">
-                EXPLORE CODE <span>↗</span>
+                EXPLORE CODE <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
 </button>
 <button class="dds-text-button" data-go="commission" type="button">
                 VIEW COMMISSION
@@ -5622,6 +5646,171 @@ You were mine forever</textarea>
 <span>!</span>
 <p id="siteToastText">ดำเนินการเรียบร้อยแล้ว</p>
 </div>
+<script id="dds-browser-vampire-navigation-v218">
+(() => {
+  "use strict";
+
+  const PAGE_META = {
+    home: { label: "home", number: "00" },
+    roleplay: { label: "for-roleplay", number: "01" },
+    profile: { label: "for-profile", number: "02" },
+    review: { label: "for-review", number: "03" },
+    commission: { label: "commission-activity", number: "04" }
+  };
+
+  let syntheticNavigation = false;
+  let checkpointLock = false;
+
+  const activePanel = () =>
+    document.querySelector(".dds-panel.is-active[data-panel]")?.dataset.panel || "home";
+
+  function categoryFromRoute() {
+    const hash = (location.hash || "").toLowerCase();
+    const panel = (activePanel() || "").toLowerCase();
+
+    if (hash === "#home" || panel === "home") return "home";
+    if (hash.includes("commission") || panel.includes("commission")) return "commission";
+    if (hash.includes("review") || panel.includes("review")) return "review";
+    if (hash.includes("profile") || panel.includes("profile")) return "profile";
+    if (hash.includes("editor-code") || panel.includes("editor-code") || panel === "roleplay") return "roleplay";
+    if (hash === "#roleplay") return "roleplay";
+    if (hash === "#profile") return "profile";
+    if (hash === "#review") return "review";
+    if (hash === "#commission") return "commission";
+    return "home";
+  }
+
+  function routeLabel() {
+    const category = categoryFromRoute();
+    const panel = activePanel();
+    const cleanPanel = panel && panel !== category && panel !== "home"
+      ? `/${panel.replace(/^editor-/, "edit-")}`
+      : "";
+    return `deepdeepsleep.codes/${PAGE_META[category].label}${cleanPanel}`;
+  }
+
+  function syncChrome() {
+    const category = categoryFromRoute();
+    document.querySelectorAll("[data-browser-page]").forEach((button) => {
+      const active = button.dataset.browserPage === category;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    const address = document.getElementById("ddsBrowserAddress");
+    if (address) address.textContent = routeLabel();
+  }
+
+  function legacyPageButton(page) {
+    return document.querySelector(`.dds-sidebar [data-page="${page}"]`)
+      || document.querySelector(`[data-page="${page}"]`);
+  }
+
+  function markCurrentEntry(page = categoryFromRoute()) {
+    try {
+      history.replaceState(
+        { ...(history.state || {}), ddsBrowserPage: page },
+        "",
+        location.href
+      );
+    } catch (_) {}
+  }
+
+  /*
+   * Existing editor routes use history.replaceState(). Before a forward
+   * navigation we create one duplicate of the current entry. The legacy
+   * route can safely replace the duplicate, while Browser Back still lands
+   * on the untouched category entry behind it.
+   */
+  function addHistoryCheckpoint() {
+    if (checkpointLock) return;
+    checkpointLock = true;
+    const page = categoryFromRoute();
+    markCurrentEntry(page);
+    try {
+      history.pushState({ ddsBrowserPage: page, ddsBrowserCheckpoint: true }, "", location.href);
+    } catch (_) {}
+    queueMicrotask(() => { checkpointLock = false; });
+  }
+
+  function openCategory(page, { checkpoint = true, writeHash = true } = {}) {
+    if (!PAGE_META[page]) return;
+    if (checkpoint && categoryFromRoute() !== page) addHistoryCheckpoint();
+
+    const original = legacyPageButton(page);
+    syntheticNavigation = true;
+    try { original?.click(); }
+    finally { syntheticNavigation = false; }
+
+    if (writeHash) {
+      try {
+        history.replaceState({ ddsBrowserPage: page }, "", `#${page}`);
+      } catch (_) {}
+    }
+
+    requestAnimationFrame(() => {
+      syncChrome();
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }
+
+  document.querySelectorAll("[data-browser-page]").forEach((button) => {
+    button.addEventListener("click", () => openCategory(button.dataset.browserPage));
+  });
+
+  document.querySelector('[data-browser-action="back"]')?.addEventListener("click", () => history.back());
+  document.querySelector('[data-browser-action="forward"]')?.addEventListener("click", () => history.forward());
+  document.querySelector('[data-browser-action="reload"]')?.addEventListener("click", () => location.reload());
+
+  /* Capture forward navigation before legacy handlers replace the hash. */
+  document.addEventListener("click", (event) => {
+    if (syntheticNavigation) return;
+    const control = event.target?.closest?.("button,a");
+    if (!control || control.closest(".dds-browser-chrome")) return;
+
+    const page = control.dataset?.go || control.dataset?.page;
+    if (page && PAGE_META[page]) {
+      if (categoryFromRoute() !== page) addHistoryCheckpoint();
+      return;
+    }
+
+    const datasetKeys = Object.keys(control.dataset || {});
+    const opensEditorOrView = datasetKeys.some((key) =>
+      /(?:edit|view|open)/i.test(key) && !/preview/i.test(key)
+    );
+    const classSuggestsRoute = /(?:edit|view)/i.test(control.className || "");
+    const textSuggestsRoute = /(?:edit code|view code|view work|open editor|แก้ไข|ดูโคด)/i.test(control.textContent || "");
+
+    if (opensEditorOrView || classSuggestsRoute || textSuggestsRoute) addHistoryCheckpoint();
+  }, true);
+
+  function restoreFromHistory(event) {
+    const statePage = event?.state?.ddsBrowserPage;
+    const hash = (location.hash || "").replace(/^#/, "").toLowerCase();
+    const hashPage = PAGE_META[hash] ? hash : null;
+    const page = statePage && PAGE_META[statePage] ? statePage : hashPage;
+
+    if (page) {
+      openCategory(page, { checkpoint: false, writeHash: false });
+      return;
+    }
+
+    /* Editor/view entries keep their own hash handlers. */
+    requestAnimationFrame(syncChrome);
+  }
+
+  window.addEventListener("hashchange", () => requestAnimationFrame(syncChrome), { passive: true });
+  window.addEventListener("popstate", restoreFromHistory, { passive: true });
+  window.addEventListener("pageshow", syncChrome, { passive: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    markCurrentEntry(categoryFromRoute());
+    syncChrome();
+  }, { once: true });
+
+  markCurrentEntry(categoryFromRoute());
+  syncChrome();
+})();
+
+</script>
 <!-- ระบบหลักเวอร์ชันล็อก + ชุดรวม COMMISSION / ACTIVITY / DRAFT / BBCODE / WORD COUNTER -->
 <!-- CODE005 / CODE006 stable editor width v159 -->
 <style id="dds-code005006-stable-width-v159">
