@@ -14557,3 +14557,41 @@ body.dds-y2k-vampire .dds-commission-view-panel.is-active
   max-height: none !important;
   border: 0 !important;
 }
+
+
+/* V233 — VIEW WORK ONLY: centered scrollable canvas, invisible scrollbar.
+   The viewer retains the original fit calculations (full width/height). */
+body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: calc(100dvh - 135px) !important;
+  min-height: 320px !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: safe center !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  padding: 16px !important;
+}
+body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport > :is(.dds-commission-preview-stage, [class*="-view-stage"]) {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  margin-inline: auto !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 700px) {
+  body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport {
+    height: calc(100dvh - 95px) !important;
+    padding: 10px !important;
+  }
+}

@@ -27319,3 +27319,52 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }, { passive: true });
 })();
+
+
+/* V233 — wrap only COMMISSION & ACTIVITY VIEW WORK canvas.
+   Native vertical scroll is retained, but its track is invisible. */
+(() => {
+  "use strict";
+  if (window.__DDS_VIEW_WORK_SCROLL_V233__) return;
+  window.__DDS_VIEW_WORK_SCROLL_V233__ = true;
+
+  function enhance(panel) {
+    if (!(panel instanceof HTMLElement) ||
+        !panel.classList.contains("dds-commission-view-panel")) return;
+    const stages = Array.from(panel.querySelectorAll(
+      '.dds-commission-preview-stage, [class*="-view-stage"]'
+    ));
+    for (const stage of stages) {
+      if (stage.closest('.dds-view-scroll-viewport')) continue;
+      // Do not wrap a nested stage within another canvas.
+      if (stages.some(other => other !== stage && other.contains(stage))) continue;
+      const viewport = document.createElement('div');
+      viewport.className = 'dds-view-scroll-viewport';
+      viewport.setAttribute('role', 'region');
+      viewport.setAttribute('aria-label', 'เลื่อนดูผลงานทั้งหมด');
+      viewport.tabIndex = 0;
+      stage.before(viewport);
+      viewport.appendChild(stage);
+    }
+  }
+
+  function scan(root = document) {
+    if (root.nodeType !== 1 && root.nodeType !== 9) return;
+    if (root.matches?.('.dds-commission-view-panel')) enhance(root);
+    root.querySelectorAll?.('.dds-commission-view-panel').forEach(enhance);
+  }
+
+  function init() {
+    scan();
+    const main = document.querySelector('.dds-main');
+    if (!main) return;
+    new MutationObserver(records => {
+      for (const record of records) {
+        for (const node of record.addedNodes) scan(node);
+      }
+    }).observe(main, {childList: true, subtree: true});
+  }
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', init, {once: true});
+  else init();
+})();
