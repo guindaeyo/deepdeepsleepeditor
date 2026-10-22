@@ -27407,7 +27407,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const EDITORS = '[data-panel^="editor-"], .dds-protected-commission-editor, [class*="commission-editor"], [class*="-editor-panel"]';
   const TEXTS = 'textarea, input[type="text"], input:not([type]), [contenteditable="true"]';
   const ICONS = {
-    'b':'type-bold','i':'type-italic','u':'underline','s':'type-strikethrough',
+    'b':'type-bold','i':'type-italic','u':'type-underline','s':'type-strikethrough',
     'align-left':'text-left','align-center':'text-center','align-right':'text-right','align-justify':'justify',
     'left':'text-left','center':'text-center','right':'text-right','justify':'justify',
     'url':'link-45deg','link':'link-45deg','img':'image','image':'image','video':'youtube','youtube':'youtube',
@@ -27455,7 +27455,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       }
       const key=action.replace(/^(?:bbcode-|insert-)/,'');
       if (ICONS[key]) {
-        if (key.startsWith('size-')) { b.innerHTML='<i class="bi bi-type" aria-hidden="true"></i><small>'+({ 'size-small':'−','size-medium':'','size-large':'+' }[key])+'</small>'; }
+        if (['b','i','u','s'].includes(key)) { b.innerHTML='<span class="dds-bbcode-letter dds-bbcode-letter-'+key+'">'+key.toUpperCase()+'</span>'; }
+        else if (key.startsWith('size-')) { b.innerHTML='<i class="bi bi-type" aria-hidden="true"></i><small>'+({ 'size-small':'−','size-medium':'','size-large':'+' }[key])+'</small>'; }
         else b.innerHTML='<i class="bi bi-'+ICONS[key]+'" aria-hidden="true"></i>';
         b.setAttribute('aria-label', b.getAttribute('aria-label') || NAMES[key] || b.title || key);
       } else if (/^clear$/i.test(b.textContent.trim())) {
@@ -27495,4 +27496,89 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(scan,650);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+
+
+/* V236 — Complete icon visibility and universal RP word counts. */
+(() => {
+  'use strict';
+  if (window.__DDS_V236_BBCODE_COUNTER__) return;
+  window.__DDS_V236_BBCODE_COUNTER__ = true;
+  const panels = '[data-panel^="editor-"], .dds-protected-commission-editor, [class*="commission-editor"], [class*="-editor-panel"]';
+  const editorFields = 'textarea,input[type="text"],input:not([type]),[contenteditable="true"]';
+  const iconFromAction = {b:'B',i:'I',u:'U',s:'S','align-left':'☰','align-center':'≡','align-right':'☰','align-justify':'▤',list:'☷','list-1':'1.', 'list-item':'•',hr:'—',clear:'⌫'};
+  function decorateMissingIcons(root) {
+    root.querySelectorAll('.dds-unified-bbcode-v235 button').forEach(button => {
+      const i = button.querySelector('i.bi');
+      if (!i) return;
+      // Keep original accessible Bootstrap icons; text makes formatting buttons immune to missing glyphs.
+      const action = Object.keys(button.dataset).find(k=>/bbcode|action/i.test(k));
+      const key = action ? String(button.dataset[action]).toLowerCase().replace(/^bbcode-/,'') : '';
+      if (['b','i','u','s'].includes(key)) {
+        button.innerHTML='<span class="dds-bbcode-letter dds-bbcode-letter-'+key+'">'+key.toUpperCase()+'</span>';
+      }
+    });
+  }
+  function isRp(field) {
+    if (!field.matches(editorFields) || field.closest('.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-named-save-library')) return false;
+    const label=field.closest('label');
+    const name=(label?.querySelector(':scope > span,:scope > strong')?.textContent||'');
+    const heading=field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent||'';
+    const id=[field.id,field.name,Object.entries(field.dataset).filter(([k])=>/field|key|roleplay|rich/i.test(k)).map(([,v])=>v).join(' ')].join(' ');
+    if (/โรลเพลย์|role\s*play|roleplay|rp(?:text|body|content)|rp-text/i.test(name+' '+id)) return true;
+    return /เนื้อหาโรลเพลย์|roleplay content/i.test(heading) && !/หมายเหตุ|note|prefix|ชื่อ|title/i.test(name);
+  }
+  const segmenter = typeof Intl.Segmenter==='function' ? new Intl.Segmenter('th',{granularity:'word'}) : null;
+  function count(value) {
+    const clean=String(value||'').replace(/\[(?:\/?)[a-z*][^\]\r\n]*\]/gi,' ').replace(/<[^>]*>/g,' ').replace(/&nbsp;|&#160;/gi,' ').trim();
+    if(!clean) return 0;
+    if(segmenter) return Array.from(segmenter.segment(clean)).filter(x=>x.isWordLike).length;
+    return (clean.match(/[\u0E00-\u0E7F]+|[A-Za-z]+(?:['’-][A-Za-z]+)*|\d+(?:[.,]\d+)*/g)||[]).length;
+  }
+  function currentValue(field) {return field.isContentEditable ? field.innerText : field.value;}
+  function install(field) {
+    if(field.dataset.ddsV236Counter==='true') return;
+    field.dataset.ddsV236Counter='true';
+    let counter=field.nextElementSibling?.classList.contains('dds-word-counter') ? field.nextElementSibling : null;
+    if(!counter) {
+      counter=document.createElement('div');
+      counter.className='dds-word-counter';
+      counter.innerHTML='<span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small>';
+      field.insertAdjacentElement('afterend',counter);
+    }
+    const numeral=counter.querySelector('[data-word-count-number], [data-hans-word-count-number], [data-jewel-word-count-number], [data-code013-word-count-number], [data-food-word-count-number], [data-music-review-word-count-number]') || counter.querySelector('strong span');
+    function update() {
+      const result=count(currentValue(field));
+      if(numeral) numeral.textContent=result.toLocaleString('th-TH');
+      counter.dataset.empty=String(result===0);
+    }
+    field.addEventListener('input',update);
+    field.addEventListener('change',update);
+    field.addEventListener('paste',()=>setTimeout(update,0));
+    field.addEventListener('keyup',update);
+    update();
+    // Stored drafts often arrive asynchronously when opening a code editor.
+    setTimeout(update,100);
+    setTimeout(update,600);
+  }
+  let scheduled=false;
+  function scan(){
+    scheduled=false;
+    document.querySelectorAll(panels).forEach(panel=>{
+      panel.querySelectorAll(editorFields).forEach(field=>{if(isRp(field)) install(field)});
+      decorateMissingIcons(panel);
+    });
+  }
+  function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(scan)}
+  function init(){
+    scan();
+    document.addEventListener('click',queue,true);
+    document.addEventListener('input',e=>{if(e.target?.dataset?.ddsV236Counter==='true') return; queue()},true);
+    window.addEventListener('hashchange',queue);
+    const main=document.querySelector('.dds-main')||document.body;
+    new MutationObserver(records=>{
+      if(records.some(r=>Array.from(r.addedNodes).some(n=>n.nodeType===1&&!n.closest?.('.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-word-counter'))))queue();
+    }).observe(main,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

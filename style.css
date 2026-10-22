@@ -14637,3 +14637,22 @@ body.dds-y2k-vampire .dds-unified-bbcode-v235 button small {font-size:10px !impo
 body.dds-y2k-vampire .dds-unified-bbcode-v235 label input[type='color'] {position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;opacity:0 !important;cursor:pointer !important;}
 /* Previously hidden Code012 note controls must now be visible. */
 [data-panel='editor-code012'] .dds-rich-toolbar[data-toolbar-for='chocoloveNote'] {display:flex !important;}
+
+
+/* V236 — BBCode buttons: visible and aligned in every editor. */
+body.dds-y2k-vampire .dds-unified-bbcode-v235 button .dds-bbcode-letter {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  color: inherit !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+body.dds-y2k-vampire .dds-unified-bbcode-v235 .dds-bbcode-letter-i {font-style:italic !important;}
+body.dds-y2k-vampire .dds-unified-bbcode-v235 .dds-bbcode-letter-u {text-decoration:underline !important;}
+body.dds-y2k-vampire .dds-unified-bbcode-v235 .dds-bbcode-letter-s {text-decoration:line-through !important;}
+body.dds-y2k-vampire .dds-unified-bbcode-v235 button i.bi,
+body.dds-y2k-vampire .dds-unified-bbcode-v235 label i.bi {display:inline-block !important;visibility:visible !important;opacity:1 !important;}
+body.dds-y2k-vampire .dds-unified-bbcode-v235 button {flex:0 0 auto !important;}
+body.dds-y2k-vampire .dds-word-counter {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
