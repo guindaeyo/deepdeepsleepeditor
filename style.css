@@ -14595,3 +14595,19 @@ body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport > :is(
     padding: 10px !important;
   }
 }
+
+/* V234 — VIEW WORK canvas reaches the bottom of the visible browser window.
+   JS measures the actual top of each viewer, avoiding fixed header guesses. */
+body.dds-y2k-vampire .dds-commission-view-panel.is-active {
+  padding-bottom: 0 !important;
+}
+body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport {
+  height: calc(100dvh - var(--dds-view-scroll-top, 135px)) !important;
+  min-height: 0 !important;
+  margin-bottom: 0 !important;
+}
+@media (max-width: 700px) {
+  body.dds-y2k-vampire .dds-commission-view-panel .dds-view-scroll-viewport {
+    height: calc(100dvh - var(--dds-view-scroll-top, 95px)) !important;
+  }
+}

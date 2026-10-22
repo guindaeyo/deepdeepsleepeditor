@@ -27354,14 +27354,42 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     root.querySelectorAll?.('.dds-commission-view-panel').forEach(enhance);
   }
 
+  // Keep the canvas bottom flush with the viewport even if the browser
+  // header, device size, or responsive layout changes.
+  let resizeQueued = false;
+  function updateCanvasBottom() {
+    resizeQueued = false;
+    document.querySelectorAll('.dds-commission-view-panel.is-active .dds-view-scroll-viewport')
+      .forEach(viewport => {
+        const top = Math.max(0, viewport.getBoundingClientRect().top);
+        viewport.style.setProperty('--dds-view-scroll-top', `${top}px`);
+      });
+  }
+  function scheduleCanvasBottom() {
+    if (resizeQueued) return;
+    resizeQueued = true;
+    requestAnimationFrame(updateCanvasBottom);
+  }
+
   function init() {
     scan();
+    scheduleCanvasBottom();
+    window.addEventListener('resize', scheduleCanvasBottom, { passive: true });
+    window.addEventListener('hashchange', () => {
+      scheduleCanvasBottom();
+      requestAnimationFrame(scheduleCanvasBottom);
+    }, { passive: true });
+    window.addEventListener('popstate', scheduleCanvasBottom, { passive: true });
+    document.addEventListener('click', () => {
+      requestAnimationFrame(scheduleCanvasBottom);
+    }, { passive: true });
     const main = document.querySelector('.dds-main');
     if (!main) return;
     new MutationObserver(records => {
       for (const record of records) {
         for (const node of record.addedNodes) scan(node);
       }
+      scheduleCanvasBottom();
     }).observe(main, {childList: true, subtree: true});
   }
   if (document.readyState === 'loading')

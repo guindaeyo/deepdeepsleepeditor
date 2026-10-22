@@ -1,1 +1,1 @@
-V233 — VIEW WORK only: centered canvas + invisible native scrolling for long works. Browser Back stays in use. Editor and Cloud untouched.
+V234 — View Work canvas reaches viewport bottom. Based on v233; only view-work CSS, its sizing JS, and cache-busting HTML references changed. Invisible vertical scroll and centered previews retained.
