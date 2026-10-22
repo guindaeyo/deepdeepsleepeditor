@@ -26595,25 +26595,23 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V192 — ONE CENTRAL EDITOR PREVIEW ENGINE
-   Applies to every EDIT page only:
+   V193 — ONE TRUE CENTRAL EDITOR PREVIEW ENGINE
+   Applies to every EDIT page:
    FOR ROLEPLAY / FOR PROFILE / FOR REVIEW / COMMISSION & ACTIVITY
 
-   Goals:
-   - one preview pipeline (no stacked per-version preview patches)
-   - no iframe navigation/reload while typing after first load
-   - full code width always fits the left preview (no horizontal scroll)
-   - long code scrolls vertically inside the preview
-   - scrollbars stay invisible
-   - BBCode is rendered in preview
-   - BBCode toolbar is installed for editor textareas / notes
-   - catalogue cards and VIEW WORK pages keep their own renderers
+   Core rule:
+   - first preview render may navigate once
+   - every later srcdoc write is intercepted and morphed into the live DOM
+   - width is measured once and kept stable while typing
+   - no zoom reset / no scale pulse on keystrokes
+   - vertical overflow scrolls inside the preview with invisible scrollbars
+   - BBCode is rendered before the DOM morph
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_V192_CENTRAL_EDITOR__) return;
-  window.__DDS_V192_CENTRAL_EDITOR__ = true;
+  if (window.__DDS_V193_CENTRAL_EDITOR__) return;
+  window.__DDS_V193_CENTRAL_EDITOR__ = true;
 
   const frameState = new WeakMap();
   const frameResizeObservers = new WeakMap();
@@ -26633,13 +26631,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     '.dds-panel[data-panel^="editor-"]',
     '.dds-panel[data-panel*="editor"]',
     '.dds-protected-commission-editor',
-    '[class*="commission-editor"]'
-  ].join(',');
-
-  const PREVIEW_COLUMN_SELECTOR = [
-    '.dds-editor-preview-column',
-    '.dds-protected-commission-preview-column',
-    '[class*="preview-column"]'
+    '[class*="commission-editor"]',
+    '[class*="editor-panel"]'
   ].join(',');
 
   function editorPanelFor(iframe) {
@@ -26656,17 +26649,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       /(?:^|-)view(?:-|$)/i.test(name)
     ) return null;
 
-    const inPreviewArea = Boolean(
-      iframe.closest(PREVIEW_COLUMN_SELECTOR) ||
-      iframe.classList.contains('dds-editor-preview-frame') ||
-      iframe.classList.contains('dds-protected-commission-preview-frame')
-    );
-    if (!inPreviewArea) return null;
-
-    // Editor panels contain fields/controls. VIEW WORK panels normally do not.
-    if (!panel.matches(EDITOR_PANEL_SELECTOR) && !panel.querySelector('input,textarea,[contenteditable="true"]')) {
-      return null;
-    }
+    // The central engine owns every iframe inside an actual editor panel.
+    // We intentionally do not depend on per-code preview class names anymore.
+    if (!panel.querySelector('input,textarea,[contenteditable="true"],select')) return null;
     return panel;
   }
 
@@ -26732,7 +26717,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, '<s>$1</s>')
       .replace(/\[hr\]/gi, '<hr style="margin:18px 0;border:0;border-top:1px solid rgba(127,127,127,.35);">');
 
-    // A few passes make nested tags such as [b][i]text[/i][/b] deterministic.
     for (let i=0; i<6; i+=1) {
       const next = pass(output);
       if (next === output) break;
@@ -26754,17 +26738,17 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     return output;
   }
+  window.__ddsRenderBbcodePreviewV193 = renderBbcode;
+  // Backward alias for legacy helpers inserted in V192.
   window.__ddsRenderBbcodePreviewV192 = renderBbcode;
 
-  /* ------------------------- DOM morph (no reload) ------------------------- */
+  /* ------------------------- DOM morph: never reload while typing ------------------------- */
   function syncAttributes(current, next) {
     Array.from(current.attributes).forEach((attr) => {
       if (!next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
     });
     Array.from(next.attributes).forEach((attr) => {
-      if (current.getAttribute(attr.name) !== attr.value) {
-        current.setAttribute(attr.name, attr.value);
-      }
+      if (current.getAttribute(attr.name) !== attr.value) current.setAttribute(attr.name, attr.value);
     });
   }
 
@@ -26780,7 +26764,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     if (current.nodeType !== Node.ELEMENT_NODE) return;
 
-    // Keep already-running preview scripts alive. User-facing content lives elsewhere.
+    // Never restart scripts that are already running inside a preview document.
     if (current.tagName === 'SCRIPT') return;
 
     syncAttributes(current, next);
@@ -26793,7 +26777,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function syncHead(currentDoc, nextDoc) {
-    const currentStyles = Array.from(currentDoc.head?.querySelectorAll('style:not(#dds-v192-preview-document-style)') || []);
+    const currentStyles = Array.from(currentDoc.head?.querySelectorAll('style:not(#dds-v193-preview-document-style)') || []);
     const nextStyles = Array.from(nextDoc.head?.querySelectorAll('style') || []);
     nextStyles.forEach((nextStyle,index) => {
       const currentStyle = currentStyles[index];
@@ -26820,7 +26804,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     html,body{
       margin-top:0!important;
       margin-bottom:0!important;
-      height:auto!important;
       min-height:0!important;
       max-height:none!important;
       overflow-x:hidden!important;
@@ -26834,7 +26817,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       height:0!important;
       display:none!important;
     }
+    html{
+      transform:none!important;
+      transform-origin:top left!important;
+    }
     body{
+      zoom:1!important;
       transform:none!important;
       transform-origin:top left!important;
     }
@@ -26865,10 +26853,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function ensureDocumentStyle(doc) {
     if (!doc?.head) return;
-    let style = doc.getElementById('dds-v192-preview-document-style');
+    let style = doc.getElementById('dds-v193-preview-document-style');
     if (!style) {
       style = doc.createElement('style');
-      style.id = 'dds-v192-preview-document-style';
+      style.id = 'dds-v193-preview-document-style';
       doc.head.appendChild(style);
     }
     if (style.textContent !== PREVIEW_DOCUMENT_CSS) style.textContent = PREVIEW_DOCUMENT_CSS;
@@ -26885,109 +26873,111 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return width;
   }
 
-  function measureNaturalSize(iframe, doc) {
-    const body = doc?.body;
-    if (!body) return {width:1,height:1};
-
-    // Measure at 1:1. Remove the previous central min-height first so content
-    // can both grow and shrink correctly when the user edits text.
-    body.style.setProperty('zoom','1','important');
-    body.style.removeProperty('min-height');
-
-    const candidates = [];
+  function candidateElements(doc) {
+    const out = [];
     const add = (el) => {
-      if (el instanceof Element && !candidates.includes(el)) candidates.push(el);
+      if (el instanceof Element && !out.includes(el)) out.push(el);
     };
-    add(body);
-    Array.from(body.children).slice(0,20).forEach(add);
-    doc.querySelectorAll?.(
-      '.dds-preview-target,[class*="preview-root"],[class*="preview-positioner"],[class*="preview-target"],[class*="preview-shell"]'
-    ).forEach((el,index) => { if (index < 40) add(el); });
+    add(doc?.body);
+    Array.from(doc?.body?.children || []).slice(0,24).forEach(add);
+    doc?.querySelectorAll?.(
+      '.dds-preview-target,[class*="preview-root"],[class*="preview-positioner"],[class*="preview-target"],[class*="preview-shell"],[class*="preview-content"]'
+    ).forEach((el,index) => { if (index < 60) add(el); });
+    return out;
+  }
 
+  function probeNaturalWidth(iframe, doc) {
     let width = declaredCanvasWidth(iframe);
-    let height = 1;
-
-    candidates.forEach((el) => {
-      const rect = el.getBoundingClientRect();
+    candidateElements(doc).forEach((el) => {
       const style = getComputedStyle(el);
-      const ow = Number(el.offsetWidth || 0);
-      const oh = Number(el.offsetHeight || 0);
-      const rw = Number(rect.width || 0);
-      const rh = Number(rect.height || 0);
-      const cw = parseFloat(style.width) || 0;
-      const ch = parseFloat(style.height) || 0;
-      const sh = Number(el.scrollHeight || 0);
-
-      // Deliberately do NOT use scrollWidth here. Long text/URLs must never
-      // make the entire design shrink while typing.
-      width = Math.max(width,ow,rw,cw);
-      // scrollHeight is required for long roleplay/review text and absolute
-      // layouts whose visible content extends past their nominal height.
-      height = Math.max(height,oh,rh,ch,sh);
+      const computed = parseFloat(style.width) || 0;
+      // offsetWidth is layout width and does not require us to visibly reset zoom.
+      width = Math.max(width, Number(el.offsetWidth || 0), computed);
     });
-
-    height = Math.max(
-      height,
-      Number(body.scrollHeight || 0),
-      Number(doc.documentElement?.scrollHeight || 0),
-      1
-    );
-
     if (width < 100) {
       width = Math.max(
-        Number(body.offsetWidth || 0),
-        Number(body.clientWidth || 0),
-        Number(doc.documentElement?.clientWidth || 0),
+        Number(doc?.body?.offsetWidth || 0),
+        Number(doc?.documentElement?.clientWidth || 0),
         Number(iframe.clientWidth || 0),
         1
       );
     }
-
-    return {width:Math.max(1,width),height:Math.max(1,height)};
+    return Math.max(1,width);
   }
 
-  function fitDocument(iframe, restoreScrollTop = null) {
+  function measureContentHeight(doc) {
+    let height = Math.max(
+      Number(doc?.body?.scrollHeight || 0),
+      Number(doc?.body?.offsetHeight || 0),
+      Number(doc?.documentElement?.scrollHeight || 0),
+      1
+    );
+    candidateElements(doc).forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      height = Math.max(
+        height,
+        Number(el.scrollHeight || 0),
+        Number(el.offsetHeight || 0),
+        Number(rect.height || 0)
+      );
+    });
+    return Math.max(1,Math.ceil(height));
+  }
+
+  function applyStableLayout(iframe, options = {}) {
     if (!isEditorPreview(iframe)) return;
     const doc = iframe.contentDocument;
     if (!doc?.body || doc.readyState === 'loading') return;
 
     ensureDocumentStyle(doc);
-    const scrollElement = doc.scrollingElement || doc.documentElement || doc.body;
-    const savedTop = restoreScrollTop == null ? Number(scrollElement?.scrollTop || 0) : Number(restoreScrollTop || 0);
-    const measured = measureNaturalSize(iframe,doc);
     const state = frameState.get(iframe) || {};
+    const scrollEl = doc.scrollingElement || doc.documentElement || doc.body;
+    const savedTop = options.scrollTop == null
+      ? Number(scrollEl?.scrollTop || 0)
+      : Number(options.scrollTop || 0);
 
-    // Keep one stable natural width for the code. It may grow once when a
-    // stylesheet finishes loading, but ordinary text edits cannot make it
-    // oscillate. That removes the scale-jump/stutter seen in CHOCOLATE LOVE.
-    if (!state.naturalWidth || measured.width > state.naturalWidth + 2) {
-      state.naturalWidth = measured.width;
+    // Width is probed once. It is NEVER recomputed from text on normal keystrokes.
+    if (!state.naturalWidth || options.reprobeWidth) {
+      const probed = probeNaturalWidth(iframe,doc);
+      if (!state.naturalWidth || options.reprobeWidth) state.naturalWidth = probed;
     }
-    const width = Math.max(1,state.naturalWidth || measured.width);
-    const height = Math.max(1,measured.height);
-    frameState.set(iframe,state);
 
     const viewport = Math.max(1,iframe.clientWidth || iframe.parentElement?.clientWidth || 1);
-    const scale = Math.max(0.05,Math.min(1,(viewport - 2) / width));
+    const width = Math.max(1,state.naturalWidth || viewport);
+    const nextScale = Math.max(0.05,Math.min(1,(viewport - 2) / width));
 
-    // Full natural height remains scrollable; only horizontal width is fitted.
-    doc.body.style.setProperty('min-height',`${Math.ceil(height)}px`,'important');
-    doc.body.style.setProperty('zoom',String(scale),'important');
-    doc.documentElement.dataset.ddsPreviewScale = String(scale);
-    doc.documentElement.dataset.ddsPreviewNaturalHeight = String(Math.ceil(height));
+    // Put the central scale on <html>, not <body>. Body attributes are morphed
+    // from the generated code on every edit; keeping scale on html prevents the
+    // scale from disappearing for one frame and then coming back (the flicker).
+    if (!Number.isFinite(state.scale) || Math.abs(state.scale - nextScale) > 0.001) {
+      doc.documentElement.style.setProperty('zoom',String(nextScale),'important');
+      state.scale = nextScale;
+    }
+    state.viewportWidth = viewport;
+
+    // Long/absolute layouts need a real scrollable extent. Remove the previous
+    // central min-height and remeasure synchronously, so shrinking text does not
+    // leave stale blank space and there is still no intermediate painted frame.
+    doc.body.style.removeProperty('min-height');
+    const naturalHeight = measureContentHeight(doc);
+    doc.body.style.setProperty('min-height',`${naturalHeight}px`,'important');
+    doc.documentElement.dataset.ddsPreviewScale = String(state.scale || nextScale);
+    doc.documentElement.dataset.ddsPreviewNaturalHeight = String(naturalHeight);
+    frameState.set(iframe,state);
 
     requestAnimationFrame(() => {
       const el = doc.scrollingElement || doc.documentElement || doc.body;
-      if (el) el.scrollTop = Math.min(savedTop,Math.max(0,(el.scrollHeight || 0) - (el.clientHeight || 0)));
+      if (!el) return;
+      el.scrollTop = Math.min(savedTop,Math.max(0,(el.scrollHeight || 0) - (el.clientHeight || 0)));
     });
   }
 
-  function scheduleFit(iframe, scrollTop = null) {
+  function scheduleFit(iframe, scrollTop = null, reprobeWidth = false) {
     const state = frameState.get(iframe) || {};
     if (state.fitFrame) cancelAnimationFrame(state.fitFrame);
     state.fitFrame = requestAnimationFrame(() => {
       state.fitFrame = 0;
-      fitDocument(iframe,scrollTop);
+      applyStableLayout(iframe,{scrollTop,reprobeWidth});
     });
     frameState.set(iframe,state);
   }
@@ -27004,22 +26994,31 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const parsed = new DOMParser().parseFromString(source,'text/html');
     if (!parsed?.body) return false;
 
-    const scrollElement = doc.scrollingElement || doc.documentElement || doc.body;
-    const scrollTop = Number(scrollElement?.scrollTop || 0);
+    const scrollEl = doc.scrollingElement || doc.documentElement || doc.body;
+    const scrollTop = Number(scrollEl?.scrollTop || 0);
+
     syncHead(doc,parsed);
     syncAttributes(doc.body,parsed.body);
     morphNode(doc.body,parsed.body);
+
+    // Critical: restore the stable layout synchronously before the browser gets
+    // a chance to paint. No requestAnimationFrame scale reset on typing.
     ensureDocumentStyle(doc);
-    scheduleFit(iframe,scrollTop);
+    applyStableLayout(iframe,{scrollTop,reprobeWidth:false});
     return true;
   }
 
   function attachDocumentListeners(iframe) {
     const doc = iframe.contentDocument;
-    if (!doc || doc.__ddsV192Listeners) return;
-    doc.__ddsV192Listeners = true;
-    doc.addEventListener('load',() => scheduleFit(iframe),true);
-    doc.fonts?.ready?.then(() => scheduleFit(iframe)).catch?.(() => {});
+    if (!doc || doc.__ddsV193Listeners) return;
+    doc.__ddsV193Listeners = true;
+
+    // Natural width stays locked after the first completed iframe load.
+    // Late images/fonts may change vertical length, so refresh only scrollable
+    // height; never recalculate horizontal scale and never pulse while typing.
+    const refreshHeightOnly = () => scheduleFit(iframe,null,false);
+    doc.addEventListener('load',refreshHeightOnly,true);
+    doc.fonts?.ready?.then(refreshHeightOnly).catch?.(() => {});
   }
 
   function scheduleMorph(iframe) {
@@ -27048,11 +27047,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     normalizeOuter(iframe);
     attachDocumentListeners(iframe);
     ensureDocumentStyle(iframe.contentDocument);
-    scheduleFit(iframe,0);
+    // Initial load may calculate width once; typing never triggers a width probe.
+    applyStableLayout(iframe,{scrollTop:0,reprobeWidth:true});
 
-    if (state.latestSource && state.latestSource !== state.loadedSource) {
-      scheduleMorph(iframe);
-    }
+    if (state.latestSource && state.latestSource !== state.loadedSource) scheduleMorph(iframe);
   }
 
   function centralRender(iframe, rawSource) {
@@ -27077,8 +27075,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       return true;
     }
 
-    // Only the first render navigates the iframe. All later edits morph the
-    // already-loaded document, so typing never produces a white flash.
+    // Exactly one real navigation for this editor iframe.
     if (!state.loading) {
       state.loading = true;
       state.loadedSource = source;
@@ -27090,10 +27087,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return true;
   }
 
-  // Public bridge for legacy per-code resize helpers. They all yield to this
-  // engine on EDIT pages, while catalogue cards / VIEW WORK remain unchanged.
+  window.__ddsCentralEditorPreviewOwnsV193 = isEditorPreview;
+  window.__ddsCentralEditorScheduleFitV193 = scheduleFit;
+  window.__ddsCentralEditorRenderV193 = centralRender;
+  // Keep V192 aliases because older resize guards in this same file call them.
   window.__ddsCentralEditorPreviewOwnsV192 = isEditorPreview;
-  window.__ddsCentralEditorScheduleFitV192 = scheduleFit;
+  window.__ddsCentralEditorScheduleFitV192 = (iframe) => scheduleFit(iframe,null,false);
   window.__ddsCentralEditorRenderV192 = centralRender;
 
   /* ------------------------- outer editor viewport ------------------------- */
@@ -27103,9 +27102,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const panel = editorPanelFor(iframe);
     while (node && node !== panel?.parentElement) {
       const cls = String(node.className || '');
-      if (/preview-(?:stage|holder|canvas-host|column)/i.test(cls) || node.classList?.contains('dds-editor-preview-column')) {
-        out.push(node);
-      }
+      if (/preview-(?:stage|holder|canvas-host|column)/i.test(cls) || node.classList?.contains('dds-editor-preview-column')) out.push(node);
       if (node === panel) break;
       node = node.parentElement;
     }
@@ -27118,7 +27115,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     try {
       iframe.setAttribute('scrolling','auto');
       iframe.classList.remove('dds-preview-loading');
-      iframe.classList.add('dds-preview-ready','dds-v192-editor-preview');
+      iframe.classList.add('dds-preview-ready','dds-v193-editor-preview');
 
       const s = iframe.style;
       s.setProperty('position','relative','important');
@@ -27127,6 +27124,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       s.setProperty('right','auto','important');
       s.setProperty('bottom','auto','important');
       s.setProperty('left','auto','important');
+      s.setProperty('display','block','important');
       s.setProperty('width','100%','important');
       s.setProperty('min-width','100%','important');
       s.setProperty('max-width','100%','important');
@@ -27140,6 +27138,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       s.setProperty('visibility','visible','important');
       s.setProperty('transition','none','important');
       s.setProperty('animation','none','important');
+      s.setProperty('will-change','auto','important');
 
       previewAncestors(iframe).forEach((el) => {
         const cs = String(el.className || '');
@@ -27185,17 +27184,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const targets = [iframe,...previewAncestors(iframe)];
     const observer = new MutationObserver((records) => {
       if (normalizingOuter.has(iframe)) return;
-      if (!records.some((r) => r.type === 'attributes' && r.attributeName === 'style')) return;
+      if (!records.some((r) => r.type === 'attributes' && (r.attributeName === 'style' || r.attributeName === 'class'))) return;
       normalizeOuter(iframe);
-      scheduleFit(iframe);
+      // No width reprobe here. Legacy style churn cannot change preview scale.
+      scheduleFit(iframe,null,false);
     });
-    targets.forEach((target) => observer.observe(target,{attributes:true,attributeFilter:['style']}));
+    targets.forEach((target) => observer.observe(target,{attributes:true,attributeFilter:['style','class']}));
     outerStyleObservers.set(iframe,observer);
   }
 
   function observeFrameSize(iframe) {
     if (!('ResizeObserver' in window) || frameResizeObservers.has(iframe)) return;
-    const observer = new ResizeObserver(() => scheduleFit(iframe));
+    const observer = new ResizeObserver(() => {
+      const state = frameState.get(iframe) || {};
+      const width = Number(iframe.clientWidth || 0);
+      if (Math.abs(width - Number(state.viewportWidth || 0)) > 2) scheduleFit(iframe,null,false);
+    });
     observer.observe(iframe);
     frameResizeObservers.set(iframe,observer);
   }
@@ -27213,7 +27217,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       frameState.set(iframe,state);
       attachDocumentListeners(iframe);
       ensureDocumentStyle(iframe.contentDocument);
-      scheduleFit(iframe);
+      scheduleFit(iframe,null,!state.naturalWidth);
     }
   }
 
@@ -27239,11 +27243,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   };
 
   function ensureIconFont() {
-    if (document.querySelector('link[data-dds-bbcode-icons="v192"]')) return;
+    if (document.querySelector('link[data-dds-bbcode-icons="v193"]')) return;
+    const existing = document.querySelector('link[href*="bootstrap-icons"]');
+    if (existing) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
-    link.dataset.ddsBbcodeIcons = 'v192';
+    link.dataset.ddsBbcodeIcons = 'v193';
     document.head?.appendChild(link);
   }
 
@@ -27284,15 +27290,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!toolbar) return;
     removeToolbarTargetLabels(toolbar);
     ensureIconFont();
-    toolbar.classList.add('dds-v192-bbcode-toolbar');
+    toolbar.classList.add('dds-v193-bbcode-toolbar');
     toolbar.querySelectorAll('button').forEach((button) => {
       const key = bbcodeKey(button);
       const icon = ICONS[key];
-      if (icon) {
-        button.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
-      } else if (!String(button.textContent || '').trim()) {
-        button.textContent = String(key || '•').toUpperCase();
-      }
+      if (icon) button.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
+      else if (!String(button.textContent || '').trim()) button.textContent = String(key || '•').toUpperCase();
     });
     toolbar.querySelectorAll('label.dds-bbcode-color>span,label.dds-rich-color>span').forEach((span) => {
       span.innerHTML = '<i class="bi bi-palette" aria-hidden="true"></i>';
@@ -27308,12 +27311,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     root.querySelectorAll?.('textarea,[contenteditable="true"],input[type="text"],input:not([type])').forEach((el) => fields.push(el));
 
     fields.forEach((field) => {
-      const panel = field.closest(EDITOR_PANEL_SELECTOR);
-      if (!panel) return;
+      const panel = field.closest(EDITOR_PANEL_SELECTOR) || field.closest('.dds-panel');
+      if (!panel || !panel.querySelector('iframe')) return;
       if (field.matches('[readonly],[disabled],.dds-generated-code,[data-named-save-name],[data-bbcode-color]')) return;
 
-      // All editor textareas/contenteditables get BBCode. Text inputs only get it
-      // when the existing note classifier says they are NOTE/PREFIX/long text.
       let eligible = field.tagName === 'TEXTAREA' || field.matches('[contenteditable="true"]');
       if (!eligible) {
         const kind = window.__ddsGetNoteBbcodeKind?.(field);
@@ -27328,12 +27329,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       installer(field);
       const toolbar = field.previousElementSibling?.classList?.contains('dds-rich-toolbar')
         ? field.previousElementSibling
-        : panel.querySelector(`[data-toolbar-for="${CSS.escape(field.id || '')}"]`);
+        : (field.id ? panel.querySelector(`[data-toolbar-for="${CSS.escape(field.id)}"]`) : null);
       if (toolbar) decorateToolbar(toolbar);
     });
 
     root.querySelectorAll?.('.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]').forEach((toolbar) => {
-      if (toolbar.closest(EDITOR_PANEL_SELECTOR)) decorateToolbar(toolbar);
+      if ((toolbar.closest(EDITOR_PANEL_SELECTOR) || toolbar.closest('.dds-panel'))?.querySelector('iframe')) decorateToolbar(toolbar);
     });
   }
 
@@ -27347,30 +27348,31 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (scanFrame) cancelAnimationFrame(scanFrame);
     scanFrame = requestAnimationFrame(() => {
       scanFrame = 0;
-      const active = document.querySelector(`${EDITOR_PANEL_SELECTOR}.is-active`) || document;
+      const active = document.querySelector(`${EDITOR_PANEL_SELECTOR}.is-active`) || document.querySelector('.dds-panel.is-active') || document;
       scanInserted(active);
     });
   }
 
   /* ------------------------- hook every preview write ------------------------- */
   function installSrcdocHook() {
-    if (!srcdocDescriptor?.configurable || typeof nativeSrcdocSet !== 'function') return;
-    Object.defineProperty(HTMLIFrameElement.prototype,'srcdoc',{
-      configurable:srcdocDescriptor.configurable,
-      enumerable:srcdocDescriptor.enumerable,
-      get() {
-        const state = frameState.get(this);
-        if (state?.latestSource != null) return state.latestSource;
-        return nativeSrcdocGet ? nativeSrcdocGet.call(this) : this.getAttribute('srcdoc') || '';
-      },
-      set(value) {
-        if (isEditorPreview(this)) {
-          centralRender(this,value);
-          return;
+    if (srcdocDescriptor?.configurable && typeof nativeSrcdocSet === 'function') {
+      Object.defineProperty(HTMLIFrameElement.prototype,'srcdoc',{
+        configurable:srcdocDescriptor.configurable,
+        enumerable:srcdocDescriptor.enumerable,
+        get() {
+          const state = frameState.get(this);
+          if (state?.latestSource != null) return state.latestSource;
+          return nativeSrcdocGet ? nativeSrcdocGet.call(this) : this.getAttribute('srcdoc') || '';
+        },
+        set(value) {
+          if (isEditorPreview(this)) {
+            centralRender(this,value);
+            return;
+          }
+          nativeSrcdocSet.call(this,value);
         }
-        nativeSrcdocSet.call(this,value);
-      }
-    });
+      });
+    }
 
     const previousSetAttribute = HTMLIFrameElement.prototype.setAttribute;
     HTMLIFrameElement.prototype.setAttribute = function(name,value) {
@@ -27401,7 +27403,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function boot() {
-    document.body?.classList.add('dds-v192-central-preview');
+    document.body?.classList.remove('dds-v192-central-preview');
+    document.body?.classList.add('dds-v193-central-preview');
     ensureIconFont();
     installSrcdocHook();
     installQueueHooks();
@@ -27421,8 +27424,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       observer.observe(main,{childList:true,subtree:true});
     }
 
-    // Editors are normally shown/created by click. Scan only the active panel,
-    // never the whole document on every keystroke.
     document.addEventListener('click',(event) => {
       if (!event.target?.closest?.('[data-edit-code],[data-edit-review],[data-commission-edit],[data-protected-commission-edit],[data-edit-protected-commission],[data-code013-edit],[data-code014-edit],[class*="commission-card"] button')) return;
       requestAnimationFrame(scheduleActiveScan);
@@ -27430,15 +27431,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     },true);
 
     window.addEventListener('resize',() => {
-      document.querySelectorAll(`${EDITOR_PANEL_SELECTOR}.is-active iframe`).forEach((iframe) => {
-        if (isEditorPreview(iframe)) scheduleFit(iframe);
+      document.querySelectorAll('iframe').forEach((iframe) => {
+        if (isEditorPreview(iframe)) scheduleFit(iframe,null,false);
       });
     },{passive:true});
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded',boot,{once:true});
-  } else {
-    boot();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
