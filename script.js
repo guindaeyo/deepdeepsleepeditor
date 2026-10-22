@@ -20961,8 +20961,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     delete restored.control;
     setValues(restored);
     setDraftStatus(draft?.savedAt || 0);
+
+    /* CODE013 only: make real browser Back return to FOR ROLEPLAY. */
+    if (location.hash !== "#editor-code013") {
+      try {
+        history.replaceState(
+          { ...(history.state || {}), ddsBrowserPage: "roleplay", ddsCode013Return: true },
+          "",
+          "#roleplay"
+        );
+        history.pushState(
+          { ddsCode013Editor: true, ddsBrowserFrom: "roleplay" },
+          "",
+          "#editor-code013"
+        );
+      } catch (_) {
+        location.hash = "#editor-code013";
+      }
+    } else {
+      try {
+        history.replaceState(
+          { ...(history.state || {}), ddsCode013Editor: true, ddsBrowserFrom: "roleplay" },
+          "",
+          "#editor-code013"
+        );
+      } catch (_) {}
+    }
+
     showPanel(PANEL_NAME);
-    history.replaceState(null, "", "#editor-code013");
     updatePreview();
   }
 
