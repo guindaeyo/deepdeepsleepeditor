@@ -14428,15 +14428,13 @@ body.dds-y2k-vampire :is(
 
 
 /* ========================================================================
-   V221 — FORCE HIDE BROWSER CHROME IN EDITORS + BACK TO DIRECTORY TOP
-   Keeps directory pages unchanged. Edit pages hide the fake browser shell
-   unconditionally, even when a legacy editor forgets to keep body/html
-   classes in sync. Also lets the directory page reopen at the top.
+   V223 — clean editor shell state
+   No observers; browser chrome is hidden only while an editor is active.
 =========================================================================== */
+body.dds-y2k-vampire.dds-force-editor-mode .dds-browser-chrome {
+  display: none !important;
+}
 @media (min-width: 901px) {
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-browser-chrome {
-    display: none !important;
-  }
   body.dds-y2k-vampire.dds-force-editor-mode {
     width: 100% !important;
     height: 100dvh !important;
@@ -14457,34 +14455,10 @@ body.dds-y2k-vampire :is(
   body.dds-y2k-vampire.dds-force-editor-mode .dds-main {
     width: 100% !important;
     height: 100dvh !important;
-    min-height: 0 !important;
     max-height: 100dvh !important;
+    min-height: 0 !important;
     padding: 0 14px 10px !important;
     overflow: hidden !important;
-  }
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-editor-heading,
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-protected-commission-editor.is-active .dds-editor-heading {
-    grid-template-columns: minmax(0,1fr) !important;
-    gap: 0 !important;
-    padding-top: 8px !important;
-    padding-bottom: 7px !important;
-  }
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-editor-heading .dds-back-button,
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-protected-commission-editor.is-active .dds-editor-heading .dds-back-button {
-    display: none !important;
-  }
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-editor-heading > div,
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-protected-commission-editor.is-active .dds-editor-heading > div {
-    width: 100% !important;
-    grid-column: 1 !important;
-  }
-}
-@media (max-width: 900px) {
-  body.dds-y2k-vampire.dds-force-editor-mode .dds-browser-chrome {
-    display: none !important;
-  }
-  body.dds-y2k-vampire.dds-force-editor-mode {
-    padding-top: 0 !important;
   }
   body.dds-y2k-vampire.dds-force-editor-mode .dds-editor-heading .dds-back-button,
   body.dds-y2k-vampire.dds-force-editor-mode .dds-protected-commission-editor.is-active .dds-editor-heading .dds-back-button {
