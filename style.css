@@ -12618,3 +12618,933 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
     z-index:5 !important;
   }
 }
+
+/* ========================================================================== 
+   V217 — Y2K VAMPIRE UI
+   Presentation layer only. Storage IDs / editor IDs / cloud contracts untouched.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
+
+body.dds-y2k-vampire {
+  --dds-black: #060506;
+  --dds-black-soft: #0b080a;
+  --dds-card: #100b0d;
+  --dds-red: #72000d;
+  --dds-red-bright: #f0192e;
+  --dds-red-deep: #350008;
+  --dds-blood: #a80719;
+  --dds-pink: #ff7183;
+  --dds-white: #f7f2f3;
+  --dds-gray: #aa9da1;
+  --dds-line: rgba(255, 255, 255, 0.095);
+  --dds-line-red: rgba(240, 25, 46, 0.34);
+  --dds-metal: #b9b0b3;
+  --dds-sidebar-width: 286px;
+  --dds-font-pixel: "DotGothic16", "Bai Jamjuree", sans-serif;
+  min-height: 100vh;
+  color: var(--dds-white);
+  background:
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px),
+    radial-gradient(circle at 14% 0%, rgba(184, 0, 24, .25), transparent 30%),
+    radial-gradient(circle at 85% 85%, rgba(93, 0, 13, .13), transparent 28%),
+    linear-gradient(145deg, #130307 0%, #070607 42%, #030303 100%);
+  background-size: 22px 22px, 22px 22px, auto, auto, auto;
+}
+
+body.dds-y2k-vampire::before {
+  content: "";
+  position: fixed;
+  z-index: 9998;
+  inset: 0;
+  pointer-events: none;
+  opacity: .12;
+  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(255,255,255,.025) 4px);
+  mix-blend-mode: screen;
+}
+
+body.dds-y2k-vampire::after {
+  content: "BLOODNET // 2000 ✦ ONLINE";
+  position: fixed;
+  z-index: 9999;
+  right: 18px;
+  top: 14px;
+  pointer-events: none;
+  color: rgba(255,255,255,.28);
+  font: 9px/1 var(--dds-font-pixel);
+  letter-spacing: .13em;
+}
+
+body.dds-y2k-vampire .dds-noise { opacity: .055; }
+body.dds-y2k-vampire .dds-glow-one { background: rgba(255, 0, 37, .13); }
+body.dds-y2k-vampire .dds-glow-two { background: rgba(116, 0, 21, .16); }
+
+/* APP / CHROME ------------------------------------------------------------ */
+body.dds-y2k-vampire .dds-app {
+  grid-template-columns: minmax(0, 1fr) var(--dds-sidebar-width) !important;
+  min-height: 100vh;
+}
+
+body.dds-y2k-vampire .dds-main {
+  padding: 0 clamp(22px, 3.4vw, 58px) 34px !important;
+}
+
+body.dds-y2k-vampire .dds-topbar {
+  min-height: 54px !important;
+  margin: 0 -8px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(240,25,46,.28) !important;
+  color: rgba(255,255,255,.56) !important;
+  font-family: var(--dds-font-pixel);
+  letter-spacing: .18em !important;
+}
+
+body.dds-y2k-vampire .dds-topbar::before {
+  content: "✦ DDS.EXE";
+  margin-right: auto;
+  color: var(--dds-red-bright);
+  font-size: 9px;
+}
+
+body.dds-y2k-vampire .dds-topbar-left { margin-right: auto; }
+body.dds-y2k-vampire .dds-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--dds-red-bright);
+  box-shadow: 0 0 0 1px #5b000b, 0 0 18px rgba(240,25,46,.75);
+}
+
+/* SIDEBAR ----------------------------------------------------------------- */
+body.dds-y2k-vampire .dds-sidebar {
+  border-left: 1px solid rgba(240,25,46,.25) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 16%),
+    linear-gradient(180deg, rgba(25,2,6,.98), rgba(5,5,5,.99)) !important;
+  box-shadow: -22px 0 45px rgba(0,0,0,.3);
+}
+
+body.dds-y2k-vampire .dds-sidebar::before,
+body.dds-y2k-vampire .dds-sidebar::after {
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255,70,91,.38), transparent);
+}
+body.dds-y2k-vampire .dds-sidebar::before { top: 14px; }
+body.dds-y2k-vampire .dds-sidebar::after { bottom: 14px; }
+
+body.dds-y2k-vampire .dds-sidebar-inner {
+  padding: 28px 22px 24px !important;
+}
+
+body.dds-y2k-vampire .dds-brand {
+  position: relative;
+  padding: 18px 16px 22px;
+  border: 1px solid rgba(255,255,255,.1);
+  background:
+    linear-gradient(135deg, rgba(240,25,46,.1), transparent 42%),
+    rgba(0,0,0,.16);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.8);
+}
+
+body.dds-y2k-vampire .dds-brand::before {
+  content: "[ VAMPIRE ARCHIVE ]";
+  display: block;
+  margin-bottom: 14px;
+  color: var(--dds-red-bright);
+  font: 8px/1 var(--dds-font-pixel);
+  letter-spacing: .18em;
+}
+
+body.dds-y2k-vampire .dds-brand strong {
+  font-size: 38px !important;
+  line-height: .75 !important;
+  text-shadow: 1px 0 0 rgba(255,35,63,.55), -1px 0 0 rgba(100,0,10,.65);
+}
+
+body.dds-y2k-vampire .dds-brand-www,
+body.dds-y2k-vampire .dds-brand-bottom {
+  font-family: var(--dds-font-pixel);
+}
+
+body.dds-y2k-vampire .dds-navigation {
+  gap: 7px;
+  margin-top: 15px !important;
+}
+
+body.dds-y2k-vampire .dds-nav-button {
+  min-height: 58px;
+  grid-template-columns: 34px minmax(0,1fr) 22px !important;
+  padding: 10px 11px !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  background: rgba(255,255,255,.014) !important;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease !important;
+}
+
+body.dds-y2k-vampire .dds-nav-button::before {
+  inset: 4px auto 4px 4px !important;
+  width: 2px !important;
+  height: auto !important;
+  background: var(--dds-red-bright) !important;
+}
+
+body.dds-y2k-vampire .dds-nav-button:hover,
+body.dds-y2k-vampire .dds-nav-button.is-active {
+  transform: translateX(-4px);
+  border-color: rgba(240,25,46,.35) !important;
+  background: linear-gradient(90deg, rgba(164,0,21,.2), rgba(255,255,255,.02)) !important;
+}
+
+body.dds-y2k-vampire .dds-nav-number,
+body.dds-y2k-vampire .dds-nav-text small,
+body.dds-y2k-vampire .dds-sidebar-meta span {
+  font-family: var(--dds-font-pixel);
+}
+
+body.dds-y2k-vampire .dds-nav-number { color: var(--dds-red-bright) !important; }
+body.dds-y2k-vampire .dds-sidebar-footer {
+  padding: 18px 14px 0 !important;
+  border-top: 1px dashed rgba(255,255,255,.11);
+}
+
+/* PANEL / PAGE HEADERS ---------------------------------------------------- */
+body.dds-y2k-vampire .dds-panel {
+  min-height: calc(100vh - 92px) !important;
+  animation: none !important;
+}
+
+body.dds-y2k-vampire .dds-page-intro {
+  min-height: 190px !important;
+  grid-template-columns: 1fr auto !important;
+  padding: 48px 0 32px !important;
+  border-bottom: 1px solid rgba(240,25,46,.25) !important;
+}
+
+body.dds-y2k-vampire .dds-page-intro::after {
+  content: "✦ archive window / select a file to edit";
+  align-self: end;
+  color: rgba(255,255,255,.33);
+  font: 9px/1.6 var(--dds-font-pixel);
+  letter-spacing: .08em;
+}
+
+body.dds-y2k-vampire .dds-page-intro h1 {
+  font-size: clamp(54px, 6vw, 92px) !important;
+  line-height: .78 !important;
+  text-transform: uppercase;
+  text-shadow: 2px 0 0 rgba(240,25,46,.28);
+}
+
+body.dds-y2k-vampire .dds-eyebrow {
+  margin-bottom: 10px !important;
+  color: var(--dds-red-bright) !important;
+  font: 9px/1 var(--dds-font-pixel) !important;
+  letter-spacing: .2em !important;
+}
+
+/* HOME ------------------------------------------------------------------- */
+body.dds-y2k-vampire .dds-home-hero {
+  min-height: calc(100vh - 78px) !important;
+  grid-template-columns: minmax(320px,.8fr) minmax(460px,1.2fr) !important;
+  gap: clamp(28px, 4vw, 70px) !important;
+  padding: 46px 0 !important;
+}
+
+body.dds-y2k-vampire .dds-home-copy {
+  position: relative;
+  padding: 28px 0 28px 28px;
+  border-left: 1px solid rgba(240,25,46,.35);
+}
+
+body.dds-y2k-vampire .dds-home-copy::before {
+  content: "♥ 0001 // ENTRY_GRANTED";
+  display: block;
+  margin-bottom: 24px;
+  color: rgba(255,255,255,.38);
+  font: 9px/1 var(--dds-font-pixel);
+  letter-spacing: .12em;
+}
+
+body.dds-y2k-vampire .dds-home-copy h1 {
+  font-size: clamp(62px, 7.3vw, 122px) !important;
+  line-height: .66 !important;
+  letter-spacing: -.055em !important;
+  text-shadow: 2px 1px 0 rgba(240,25,46,.33);
+}
+
+body.dds-y2k-vampire .dds-home-copy h1 span {
+  color: transparent !important;
+  -webkit-text-stroke: 1px rgba(255,255,255,.78);
+  text-shadow: 3px 2px 0 rgba(154,0,19,.65);
+}
+
+body.dds-y2k-vampire .dds-home-description {
+  max-width: 440px !important;
+  margin-top: 32px !important;
+  color: rgba(255,255,255,.58) !important;
+}
+
+body.dds-y2k-vampire .dds-primary-button,
+body.dds-y2k-vampire .dds-text-button,
+body.dds-y2k-vampire .dds-roleplay-edit,
+body.dds-y2k-vampire .dds-copy-button,
+body.dds-y2k-vampire .dds-reset-button,
+body.dds-y2k-vampire .dds-protected-commission-copy button,
+body.dds-y2k-vampire .dds-protected-commission-draft button {
+  border-radius: 0 !important;
+  font-family: var(--dds-font-pixel) !important;
+  letter-spacing: .1em !important;
+}
+
+body.dds-y2k-vampire .dds-primary-button,
+body.dds-y2k-vampire .dds-copy-button,
+body.dds-y2k-vampire .dds-protected-commission-copy [data-commission-copy],
+body.dds-y2k-vampire .dds-protected-commission-copy [data-code014-copy] {
+  border: 1px solid #ff4056 !important;
+  background: linear-gradient(180deg, #c50d25, #72000f) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 0 22px rgba(199,0,28,.12);
+}
+
+body.dds-y2k-vampire .dds-main-preview {
+  border: 1px solid rgba(255,70,91,.35) !important;
+  background: rgba(0,0,0,.48) !important;
+  box-shadow: 15px 15px 0 rgba(72,0,10,.28), 0 22px 70px rgba(0,0,0,.46) !important;
+}
+
+body.dds-y2k-vampire .dds-preview-browser {
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 0 !important;
+}
+
+body.dds-y2k-vampire .dds-preview-browser-top {
+  background: linear-gradient(180deg, #b10a20, #5a000c) !important;
+  border-bottom-color: rgba(255,255,255,.14) !important;
+}
+
+body.dds-y2k-vampire .dds-preview-browser-top > span {
+  border-radius: 2px !important;
+}
+
+body.dds-y2k-vampire .dds-floating-card {
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 0 !important;
+  background: rgba(10,5,7,.88) !important;
+  box-shadow: 6px 6px 0 rgba(110,0,14,.34) !important;
+}
+
+/* ARCHIVE GRIDS / CARDS -------------------------------------------------- */
+body.dds-y2k-vampire .dds-roleplay-grid,
+body.dds-y2k-vampire .dds-profile-grid,
+body.dds-y2k-vampire .dds-review-grid,
+body.dds-y2k-vampire .dds-commission-grid {
+  gap: 16px !important;
+  padding-top: 22px !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-card,
+body.dds-y2k-vampire .dds-profile-card,
+body.dds-y2k-vampire .dds-review-card,
+body.dds-y2k-vampire .dds-commission-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(146,0,18,.07), transparent 38%),
+    #090708 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.55);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-card::before,
+body.dds-y2k-vampire .dds-profile-card::before,
+body.dds-y2k-vampire .dds-review-card::before,
+body.dds-y2k-vampire .dds-commission-card::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 3px;
+  background: var(--dds-red-bright);
+  pointer-events: none;
+}
+
+body.dds-y2k-vampire .dds-roleplay-card:hover,
+body.dds-y2k-vampire .dds-profile-card:hover,
+body.dds-y2k-vampire .dds-review-card:hover,
+body.dds-y2k-vampire .dds-commission-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(240,25,46,.4) !important;
+  box-shadow: 7px 7px 0 rgba(76,0,10,.26) !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-card-preview,
+body.dds-y2k-vampire .dds-profile-card-preview,
+body.dds-y2k-vampire .dds-review-card-preview,
+body.dds-y2k-vampire .dds-commission-card-preview {
+  background: #050505 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-preview-badge {
+  top: 10px !important;
+  right: 10px !important;
+  border: 1px solid rgba(255,65,88,.45) !important;
+  border-radius: 0 !important;
+  color: #fff !important;
+  background: rgba(100,0,13,.84) !important;
+  font-family: var(--dds-font-pixel) !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-card-body,
+body.dds-y2k-vampire .dds-profile-card-body,
+body.dds-y2k-vampire .dds-review-card-body,
+body.dds-y2k-vampire .dds-commission-card-body {
+  padding: 17px 17px 18px !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-index,
+body.dds-y2k-vampire .dds-profile-index,
+body.dds-y2k-vampire .dds-review-index,
+body.dds-y2k-vampire .dds-commission-card-type {
+  color: var(--dds-red-bright) !important;
+  font-family: var(--dds-font-pixel) !important;
+  letter-spacing: .14em !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-edit,
+body.dds-y2k-vampire .dds-profile-edit,
+body.dds-y2k-vampire .dds-review-edit,
+body.dds-y2k-vampire .dds-commission-protected-edit {
+  border: 1px solid rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.025) !important;
+}
+
+body.dds-y2k-vampire .dds-roleplay-edit:hover,
+body.dds-y2k-vampire .dds-profile-edit:hover,
+body.dds-y2k-vampire .dds-review-edit:hover,
+body.dds-y2k-vampire .dds-commission-protected-edit:hover {
+  border-color: rgba(255,45,69,.55) !important;
+  background: #7d0011 !important;
+}
+
+/* EDITOR HEADER ----------------------------------------------------------- */
+body.dds-y2k-vampire .dds-editor-heading,
+body.dds-y2k-vampire .dds-protected-commission-editor .dds-editor-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr);
+  gap: 18px;
+  align-items: end;
+  padding: 28px 0 22px !important;
+  border-bottom: 1px solid rgba(240,25,46,.28) !important;
+}
+
+body.dds-y2k-vampire .dds-editor-heading::after {
+  content: "FILE://EDIT_MODE  •  AUTOSAVE_READY";
+  position: absolute;
+  right: 0;
+  bottom: 11px;
+  color: rgba(255,255,255,.27);
+  font: 8px/1 var(--dds-font-pixel);
+  letter-spacing: .1em;
+}
+
+body.dds-y2k-vampire .dds-back-button {
+  width: 42px;
+  height: 42px;
+  margin: 0 0 2px !important;
+  display: grid;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.02) !important;
+  color: #fff !important;
+  font-size: 0 !important;
+}
+
+body.dds-y2k-vampire .dds-back-button::before {
+  content: "←";
+  font: 18px/1 var(--dds-font-pixel);
+}
+
+body.dds-y2k-vampire .dds-back-button:hover {
+  border-color: var(--dds-red-bright) !important;
+  background: rgba(145,0,19,.25) !important;
+}
+
+body.dds-y2k-vampire .dds-editor-heading h1 {
+  font-size: clamp(44px, 5vw, 76px) !important;
+  line-height: .8 !important;
+  letter-spacing: -.04em;
+  text-shadow: 2px 0 0 rgba(240,25,46,.3);
+}
+
+body.dds-y2k-vampire .dds-editor-heading > div > p:last-child {
+  margin-top: 12px !important;
+  max-width: 650px !important;
+}
+
+/* EDITOR 60 / 40 --------------------------------------------------------- */
+body.dds-y2k-vampire .dds-editor-layout,
+body.dds-y2k-vampire .dds-protected-commission-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 3fr) minmax(380px, 2fr) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+  height: calc(100vh - 176px) !important;
+  min-height: 640px !important;
+  padding: 14px 0 18px !important;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-column,
+body.dds-y2k-vampire .dds-protected-commission-preview-column {
+  position: relative !important;
+  top: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  background: #080808 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.8) !important;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-column::before,
+body.dds-y2k-vampire .dds-protected-commission-preview-column::before {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border: 1px solid rgba(240,25,46,.08);
+  pointer-events: none;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-top,
+body.dds-y2k-vampire .dds-fortyone-preview-top,
+body.dds-y2k-vampire .dds-moodboard-preview-top,
+body.dds-y2k-vampire .dds-nothin-preview-top,
+body.dds-y2k-vampire .dds-polaroid-preview-top {
+  flex: 0 0 40px !important;
+  min-height: 40px !important;
+  padding: 0 13px !important;
+  border-bottom: 1px solid rgba(240,25,46,.22) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.008)) !important;
+  color: rgba(255,255,255,.42) !important;
+  font-family: var(--dds-font-pixel) !important;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-top::before {
+  content: "● ● ●";
+  margin-right: 10px;
+  color: #b50c22;
+  letter-spacing: .18em;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-top strong { color: #ff3b53 !important; }
+
+body.dds-y2k-vampire .dds-editor-preview-stage,
+body.dds-y2k-vampire .dds-live-preview-stage,
+body.dds-y2k-vampire .dds-preview-stage,
+body.dds-y2k-vampire .dds-profile-preview-stage,
+body.dds-y2k-vampire .dds-fortyone-preview-stage,
+body.dds-y2k-vampire .dds-moodboard-preview-stage,
+body.dds-y2k-vampire .dds-nothin-preview-stage,
+body.dds-y2k-vampire .dds-commission-preview-stage,
+body.dds-y2k-vampire .dds-protected-commission-preview-stage,
+body.dds-y2k-vampire .dds-code014-editor-stage {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(130,0,16,.06), transparent 36%),
+    #1b1b1b !important;
+}
+
+body.dds-y2k-vampire .dds-editor-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-live-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-profile-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-fortyone-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-moodboard-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-nothin-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-commission-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-protected-commission-preview-stage::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-code014-editor-stage::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Right side: Draft / Scroll Controls / Copy Dock */
+body.dds-y2k-vampire .dds-editor-controls,
+body.dds-y2k-vampire .dds-protected-commission-controls-column {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 9px !important;
+  overflow: hidden !important;
+}
+
+body.dds-y2k-vampire .dds-draft-manager,
+body.dds-y2k-vampire .dds-protected-commission-draft {
+  flex: 0 0 auto !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  background: linear-gradient(90deg, rgba(120,0,16,.12), rgba(255,255,255,.012)) !important;
+}
+
+body.dds-y2k-vampire .dds-editor-controls > .dds-control-section:not(.dds-copy-section),
+body.dds-y2k-vampire .dds-editor-controls > .dds-controls-scroll,
+body.dds-y2k-vampire .dds-protected-commission-scroll {
+  min-width: 0 !important;
+}
+
+body.dds-y2k-vampire .dds-controls-scroll,
+body.dds-y2k-vampire .dds-protected-commission-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #a20b20 #090708 !important;
+}
+
+body.dds-y2k-vampire .dds-controls-scroll::-webkit-scrollbar,
+body.dds-y2k-vampire .dds-protected-commission-scroll::-webkit-scrollbar {
+  width: 6px !important;
+}
+body.dds-y2k-vampire .dds-controls-scroll::-webkit-scrollbar-track,
+body.dds-y2k-vampire .dds-protected-commission-scroll::-webkit-scrollbar-track { background: #090708 !important; }
+body.dds-y2k-vampire .dds-controls-scroll::-webkit-scrollbar-thumb,
+body.dds-y2k-vampire .dds-protected-commission-scroll::-webkit-scrollbar-thumb { background: #a20b20 !important; }
+
+body.dds-y2k-vampire .dds-copy-section,
+body.dds-y2k-vampire .dds-editor-actions,
+body.dds-y2k-vampire .dds-protected-commission-copy {
+  flex: 0 0 auto !important;
+}
+
+/* CONTROL WINDOWS -------------------------------------------------------- */
+body.dds-y2k-vampire .dds-control-section,
+body.dds-y2k-vampire .dds-protected-commission-section,
+body.dds-y2k-vampire .dds-copy-section {
+  padding: 18px !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(111,0,14,.06), transparent 40%),
+    #0a0809 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.018) !important;
+}
+
+body.dds-y2k-vampire .dds-control-title {
+  margin-bottom: 15px !important;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(255,255,255,.09);
+}
+
+body.dds-y2k-vampire .dds-control-title > span {
+  width: 27px;
+  color: var(--dds-red-bright) !important;
+  font: 15px/1 var(--dds-font-pixel) !important;
+}
+body.dds-y2k-vampire .dds-control-title h2 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+body.dds-y2k-vampire .dds-color-field > span,
+body.dds-y2k-vampire .dds-field > span,
+body.dds-y2k-vampire label > span {
+  color: rgba(255,255,255,.6);
+}
+
+body.dds-y2k-vampire input[type="text"],
+body.dds-y2k-vampire input[type="url"],
+body.dds-y2k-vampire input[type="number"],
+body.dds-y2k-vampire select,
+body.dds-y2k-vampire textarea,
+body.dds-y2k-vampire [contenteditable="true"] {
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 0 !important;
+  color: #f8f3f4 !important;
+  background: #0c0a0b !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.55) !important;
+}
+
+body.dds-y2k-vampire input[type="text"]:focus,
+body.dds-y2k-vampire input[type="url"]:focus,
+body.dds-y2k-vampire input[type="number"]:focus,
+body.dds-y2k-vampire select:focus,
+body.dds-y2k-vampire textarea:focus,
+body.dds-y2k-vampire [contenteditable="true"]:focus {
+  border-color: rgba(255,52,76,.58) !important;
+  outline: none !important;
+  box-shadow: inset 0 0 0 1px rgba(255,0,36,.11), 0 0 0 1px rgba(255,0,36,.08) !important;
+}
+
+body.dds-y2k-vampire input[type="color"] {
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background: #060506 !important;
+}
+
+body.dds-y2k-vampire input[type="range"] { accent-color: var(--dds-red-bright); }
+
+body.dds-y2k-vampire .dds-rich-toolbar,
+body.dds-y2k-vampire [class*="toolbar"] {
+  border-color: rgba(255,255,255,.1) !important;
+  background: #090708 !important;
+}
+
+body.dds-y2k-vampire .dds-rich-toolbar button,
+body.dds-y2k-vampire [class*="toolbar"] button {
+  border-radius: 0 !important;
+}
+
+body.dds-y2k-vampire .dds-rich-toolbar button:hover,
+body.dds-y2k-vampire [class*="toolbar"] button:hover {
+  border-color: rgba(255,45,69,.5) !important;
+  background: rgba(128,0,17,.3) !important;
+}
+
+/* DRAFT / COPY ----------------------------------------------------------- */
+body.dds-y2k-vampire .dds-draft-manager {
+  padding: 10px 12px !important;
+}
+body.dds-y2k-vampire .dds-draft-manager strong,
+body.dds-y2k-vampire .dds-draft-manager-copy strong {
+  font-family: var(--dds-font-pixel);
+  font-size: 11px !important;
+}
+body.dds-y2k-vampire .dds-draft-status { color: rgba(255,255,255,.42) !important; }
+
+body.dds-y2k-vampire .dds-editor-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+body.dds-y2k-vampire .dds-copy-button,
+body.dds-y2k-vampire .dds-reset-button {
+  min-height: 44px !important;
+}
+
+body.dds-y2k-vampire .dds-reset-button {
+  border: 1px solid rgba(255,255,255,.13) !important;
+  background: #0a0809 !important;
+}
+
+/* FOOTER / TOAST --------------------------------------------------------- */
+body.dds-y2k-vampire .dds-footer {
+  margin-top: 28px !important;
+  border-top: 1px solid rgba(240,25,46,.2) !important;
+  font-family: var(--dds-font-pixel);
+}
+
+body.dds-y2k-vampire .dds-toast {
+  border: 1px solid rgba(255,65,88,.45) !important;
+  border-radius: 0 !important;
+  background: rgba(18,5,8,.96) !important;
+  box-shadow: 8px 8px 0 rgba(72,0,10,.35) !important;
+}
+
+/* Commission dynamic editor parity ------------------------------------- */
+body.dds-y2k-vampire .dds-protected-commission-layout {
+  grid-template-columns: minmax(0,3fr) minmax(380px,2fr) !important;
+}
+body.dds-y2k-vampire .dds-protected-commission-controls-column {
+  display: flex !important;
+  flex-direction: column !important;
+}
+body.dds-y2k-vampire .dds-protected-commission-draft,
+body.dds-y2k-vampire .dds-protected-commission-copy {
+  border-color: rgba(255,255,255,.1) !important;
+  background: #0a0809 !important;
+}
+
+/* Preserve code preview content: only container chrome changes. */
+body.dds-y2k-vampire iframe[class*="preview"] {
+  border: 0 !important;
+}
+
+/* RESPONSIVE ------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  body.dds-y2k-vampire { --dds-sidebar-width: 230px; }
+  body.dds-y2k-vampire .dds-editor-layout,
+  body.dds-y2k-vampire .dds-protected-commission-layout {
+    grid-template-columns: minmax(0, 58fr) minmax(340px, 42fr) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.dds-y2k-vampire .dds-app { grid-template-columns: 1fr !important; }
+  body.dds-y2k-vampire .dds-sidebar {
+    position: static !important;
+    border-left: 0 !important;
+    border-top: 1px solid rgba(240,25,46,.25) !important;
+  }
+  body.dds-y2k-vampire .dds-sidebar-inner { min-height: auto !important; }
+  body.dds-y2k-vampire .dds-home-hero { grid-template-columns: 1fr !important; }
+  body.dds-y2k-vampire .dds-editor-layout,
+  body.dds-y2k-vampire .dds-protected-commission-layout {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+  body.dds-y2k-vampire .dds-editor-preview-column,
+  body.dds-y2k-vampire .dds-protected-commission-preview-column {
+    min-height: 70vh !important;
+  }
+  body.dds-y2k-vampire .dds-editor-controls,
+  body.dds-y2k-vampire .dds-protected-commission-controls-column {
+    height: 76vh !important;
+  }
+}
+
+/* V217 compatibility lock: preserve the working V210 Copy Dock behavior. */
+@media (min-width:901px){
+  body.dds-y2k-vampire :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:9px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+    align-self:stretch !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-draft-manager{
+    grid-row:1 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-editor-controls{
+    grid-row:2 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    padding-right:4px !important;
+    padding-bottom:8px !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#a20b20 #090708 !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-editor-copy-dock{
+    grid-row:3 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    position:relative !important;
+    z-index:7 !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:9px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > .dds-protected-commission-draft{
+    grid-row:1 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > :is(.dds-protected-commission-scroll,[class*="controls-scroll"]){
+    grid-row:2 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#a20b20 #090708 !important;
+  }
+
+  body.dds-y2k-vampire :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > :is(.dds-protected-commission-copy,.dds-copy-section){
+    grid-row:3 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    overflow:visible !important;
+    align-self:end !important;
+    position:relative !important;
+    z-index:7 !important;
+  }
+}
