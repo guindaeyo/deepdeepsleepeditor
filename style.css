@@ -14535,3 +14535,25 @@ body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-browse
 .dds-commission-view-panel .dds-back-button {
   display: none !important;
 }
+
+
+/* V232 — VIEW WORK full canvas, centered, never cropped.
+   Scoped exclusively to the COMMISSION & ACTIVITY work viewers. */
+body.dds-y2k-vampire .dds-commission-view-panel.is-active {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+body.dds-y2k-vampire .dds-commission-view-panel.is-active
+:is(.dds-commission-preview-stage, [class*="-view-stage"]) {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  overflow: visible !important;
+  background: #242424;
+}
+body.dds-y2k-vampire .dds-commission-view-panel.is-active
+:is(.dds-commission-preview-stage, [class*="-view-stage"]) iframe {
+  max-height: none !important;
+  border: 0 !important;
+}

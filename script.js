@@ -24623,13 +24623,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         const name =
           String(panel.dataset.panel || "");
 
-        /*
-         * ไม่แตะ ACTIVITY / MY OWN CODE
-         */
-        return (
-          !name.startsWith("view-activity") &&
-          !name.startsWith("view-my-own-code")
-        );
+        return Boolean(name);
       }) || null;
   }
 
@@ -24816,9 +24810,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       visualBounds(doc, root);
 
     let naturalWidth =
-      datasetWidth ||
+      Math.max(datasetWidth, bounds.width) ||
       inlineWidth ||
-      bounds.width ||
       computedWidth;
 
     naturalWidth =
@@ -24862,7 +24855,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const naturalHeight =
       Math.max(
         1,
-        finalBounds.height
+        finalBounds.height,
+        doc.documentElement.scrollHeight || 0,
+        doc.body.scrollHeight || 0
       );
 
     const padding = 20;
@@ -24887,6 +24882,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         naturalHeight * scale
       );
 
+    // Canvas is at least as tall as the remaining viewport; taller
+    // works expand the page normally instead of being clipped.
+    const availableViewportHeight = Math.max(
+      0,
+      window.innerHeight - Math.max(0, stage.getBoundingClientRect().top) - 24
+    );
+    const canvasHeight = Math.max(
+      scaledHeight + padding * 2,
+      availableViewportHeight
+    );
+    const centeredTop = Math.max(padding, (canvasHeight - scaledHeight) / 2);
+
     /*
      * VIEW WORK ไม่ใช่ Editor:
      * คืน page scroll ปกติและให้ panel ยาวตามงาน
@@ -24907,7 +24914,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     panel.style.setProperty(
       "min-height",
-      `${scaledHeight + 80}px`,
+      `${canvasHeight + 24}px`,
       "important"
     );
 
@@ -24946,13 +24953,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     stage.style.setProperty(
       "height",
-      `${scaledHeight + padding * 2}px`,
+      `${canvasHeight}px`,
       "important"
     );
 
     stage.style.setProperty(
       "min-height",
-      `${scaledHeight + padding * 2}px`,
+      `${canvasHeight}px`,
       "important"
     );
 
@@ -24983,13 +24990,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
       holder.style.setProperty(
         "height",
-        `${scaledHeight}px`,
+        `${canvasHeight}px`,
         "important"
       );
 
       holder.style.setProperty(
         "min-height",
-        `${scaledHeight}px`,
+        `${canvasHeight}px`,
         "important"
       );
 
@@ -25020,7 +25027,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     iframe.style.setProperty(
       "top",
-      `${padding}px`,
+      `${centeredTop}px`,
       "important"
     );
 

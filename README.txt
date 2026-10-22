@@ -1,12 +1,3 @@
-Deep Deep Sleep Code Shop — V231 VIEW WORK BACK BUTTON PATCH
-
-Change only:
-- Hide the internal Back button and its entire toolbar in every
-  .dds-commission-view-panel (including dynamically generated views).
-- Applies to COMMISSION & SHOWCASE, ACTIVITY and MY OWN CODE VIEW WORK.
-- Use the native browser Back button instead.
-- EDIT CODE and all unrelated behavior remain untouched.
-
-Deploy all six runtime files together:
-index.html, style.css, script.js, cloud-config.js, cloud-bridge.js
-(README files are informational.)
+V232 — VIEW WORK canvas center / full contents
+Based on supplied V231 files.
+Changes limited to VIEW WORK sizing: center both axes, fit complete code width, allow page to grow vertically, no clipping. Preserve Browser Back-only UI and Editors.
