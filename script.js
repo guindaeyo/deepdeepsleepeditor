@@ -6101,13 +6101,13 @@ ${stylesheetLinks}
     return target.id;
   }
 
-  function isNoteBbcodeTarget(target) {
+  function getNoteBbcodeKind(target) {
     if (
       !target?.matches?.(
         "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
       )
     ) {
-      return false;
+      return "";
     }
 
     if (
@@ -6118,7 +6118,7 @@ ${stylesheetLinks}
         "[data-named-save-name], [data-bbcode-color]"
       )
     ) {
-      return false;
+      return "";
     }
 
     const label =
@@ -6128,6 +6128,15 @@ ${stylesheetLinks}
       label?.querySelector?.(":scope > span")?.textContent ||
       label?.querySelector?.(":scope > strong")?.textContent ||
       label?.textContent ||
+      "";
+
+    const section =
+      target.closest?.(".dds-control-section");
+
+    const sectionTitle =
+      section?.querySelector?.(
+        ".dds-control-title h2, .dds-control-title h3"
+      )?.textContent ||
       "";
 
     const keyText = [
@@ -6149,34 +6158,71 @@ ${stylesheetLinks}
         .replace(/\s+/g, " ")
         .trim();
 
+    const sectionText =
+      String(sectionTitle || "")
+        .replace(/\s+/g, " ")
+        .trim();
+
     const excludedVisible =
-      /สี|color|คำหน้า|label|สัญลักษณ์|symbol|icon|ขอบ|border|พื้น(?:หลัง)?|background|topnote/i
+      /สี|color|สัญลักษณ์|symbol|icon|ขอบ|border|พื้น(?:หลัง)?|background|topnote/i
         .test(visibleText);
 
     const excludedKey =
-      /(?:notelabel|note-label|notecolor|note-color|noteborder|note-border|topnote|noteicon|note-icon)/i
+      /(?:notecolor|note-color|noteborder|note-border|topnote|noteicon|note-icon)/i
         .test(keyText);
 
     if (
       excludedVisible ||
       excludedKey
     ) {
-      return false;
+      return "";
     }
 
-    const visibleIsNote =
+    const prefixByVisible =
+      /คำหน้า\s*(?:หมายเหตุ|note)|(?:หมายเหตุ|note)\s*(?:label|prefix)/i
+        .test(visibleText);
+
+    const prefixByKey =
+      /(?:notelabel|note-label|noteprefix|note-prefix)/i
+        .test(keyText);
+
+    if (
+      prefixByVisible ||
+      prefixByKey
+    ) {
+      return "prefix";
+    }
+
+    const contentByVisible =
       /ข้อความ\s*(?:หมายเหตุ|note)|^(?:หมายเหตุ|note)$/i
         .test(visibleText);
 
-    const keyIsNote =
+    const contentByKey =
       /(?:^|[\s_-])note(?:text|content)?(?:$|[\s_-])/i
         .test(keyText) ||
       /(?:notetext|notecontent)$/i
         .test(keyText);
 
+    const contentBySection =
+      /^(?:หมายเหตุ|note)$/i
+        .test(sectionText) &&
+      !prefixByVisible &&
+      !prefixByKey;
+
+    if (
+      contentByVisible ||
+      contentByKey ||
+      contentBySection
+    ) {
+      return "content";
+    }
+
+    return "";
+  }
+
+  function isNoteBbcodeTarget(target) {
     return Boolean(
-      visibleIsNote ||
-      keyIsNote
+      getNoteBbcodeKind(target)
     );
   }
 
@@ -6660,14 +6706,38 @@ ${stylesheetLinks}
     });
 
     if (isNoteBbcodeTarget(target)) {
+      const noteKind =
+        getNoteBbcodeKind(target) ||
+        "content";
+
       target.dataset.ddsNoteBbcode = "true";
-      target
-        .closest("label")
-        ?.classList.add(
-          "dds-note-bbcode-field"
-        );
+      target.dataset.ddsNoteBbcodeKind =
+        noteKind;
+
+      const noteLabel =
+        target.closest("label");
+
+      noteLabel?.classList.add(
+        "dds-note-bbcode-field",
+        `dds-note-bbcode-${noteKind}`
+      );
+
+      toolbar.classList.add(
+        "dds-note-bbcode-toolbar"
+      );
+
+      toolbar.dataset.noteBbcodeKind =
+        noteKind;
+
+      window.__ddsDecorateNoteBbcodeToolbar?.(
+        toolbar,
+        target
+      );
     }
   }
+
+  window.__ddsGetNoteBbcodeKind =
+    getNoteBbcodeKind;
 
   window.__ddsIsNoteBbcodeTarget =
     isNoteBbcodeTarget;
@@ -26431,22 +26501,325 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   ALL EDITORS — NOTE BBCode AUTO-INSTALL v182
-   Uses the existing BBCode toolbar on every real NOTE text field.
+   ALL EDITORS — NOTE / NOTE PREFIX BBCode LAYOUT v183
 ========================================================= */
 (() => {
   "use strict";
 
   if (
-    window.__DDS_NOTE_BBCODE_ALL_EDITORS_V182__
+    window.__DDS_NOTE_BBCODE_LAYOUT_V183__
   ) {
     return;
   }
 
-  window.__DDS_NOTE_BBCODE_ALL_EDITORS_V182__ =
+  window.__DDS_NOTE_BBCODE_LAYOUT_V183__ =
     true;
 
   let scanFrame = 0;
+
+  function ensureIconFont() {
+    if (
+      document.querySelector(
+        'link[data-dds-note-bbcode-icons="v183"]'
+      )
+    ) {
+      return;
+    }
+
+    const link =
+      document.createElement("link");
+
+    link.rel = "stylesheet";
+    link.href =
+      "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css";
+    link.dataset.ddsNoteBbcodeIcons =
+      "v183";
+
+    document.head?.appendChild(link);
+  }
+
+  function ensureLayoutCss() {
+    if (
+      document.getElementById(
+        "ddsNoteBbcodeLayoutV183"
+      )
+    ) {
+      return;
+    }
+
+    const style =
+      document.createElement("style");
+
+    style.id =
+      "ddsNoteBbcodeLayoutV183";
+
+    style.textContent = `
+      .dds-note-bbcode-field{
+        grid-column:1 / -1 !important;
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        gap:6px !important;
+        box-sizing:border-box !important;
+      }
+
+      .dds-note-bbcode-field > .dds-rich-toolbar,
+      .dds-note-bbcode-field > .dds-bbcode-toolbar{
+        order:2 !important;
+        width:100% !important;
+        box-sizing:border-box !important;
+        margin:0 !important;
+      }
+
+      .dds-note-bbcode-field > input,
+      .dds-note-bbcode-field > textarea,
+      .dds-note-bbcode-field > [contenteditable="true"]{
+        order:3 !important;
+        width:100% !important;
+        max-width:100% !important;
+        box-sizing:border-box !important;
+      }
+
+      .dds-note-bbcode-field > span:first-child,
+      .dds-note-bbcode-field > strong:first-child{
+        order:1 !important;
+      }
+
+      .dds-note-bbcode-toolbar{
+        display:flex !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        gap:5px !important;
+      }
+
+      .dds-note-bbcode-toolbar
+      .dds-bbcode-group{
+        display:flex !important;
+        align-items:center !important;
+        gap:3px !important;
+      }
+
+      .dds-note-bbcode-toolbar button{
+        width:30px !important;
+        min-width:30px !important;
+        height:30px !important;
+        min-height:30px !important;
+        padding:0 !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+
+      .dds-note-bbcode-toolbar button i{
+        font-size:14px !important;
+        line-height:1 !important;
+        pointer-events:none !important;
+      }
+
+      .dds-note-bbcode-toolbar
+      label.dds-bbcode-color,
+      .dds-note-bbcode-toolbar
+      label.dds-rich-color{
+        min-width:30px !important;
+        height:30px !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        gap:0 !important;
+        padding:0 !important;
+      }
+
+      .dds-note-bbcode-toolbar
+      label.dds-bbcode-color > span,
+      .dds-note-bbcode-toolbar
+      label.dds-rich-color > span{
+        font-size:0 !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+
+      .dds-note-bbcode-toolbar
+      label.dds-bbcode-color > span i,
+      .dds-note-bbcode-toolbar
+      label.dds-rich-color > span i{
+        font-size:14px !important;
+      }
+
+      .dds-note-bbcode-toolbar
+      input[type="color"]{
+        width:13px !important;
+        height:13px !important;
+        padding:0 !important;
+        border:0 !important;
+      }
+
+      .dds-control-section.dds-note-bbcode-section
+      > .dds-note-bbcode-toolbar{
+        margin-bottom:7px !important;
+      }
+    `;
+
+    document.head?.appendChild(style);
+  }
+
+  const ICONS = {
+    b: "bi-type-bold",
+    bold: "bi-type-bold",
+    i: "bi-type-italic",
+    italic: "bi-type-italic",
+    u: "bi-type-underline",
+    underline: "bi-type-underline",
+    s: "bi-type-strikethrough",
+    strikeThrough: "bi-type-strikethrough",
+
+    "size-small": "bi-type",
+    "size-medium": "bi-fonts",
+    "size-large": "bi-type-h1",
+
+    "align-left": "bi-text-left",
+    "align-center": "bi-text-center",
+    "align-right": "bi-text-right",
+    "align-justify": "bi-justify",
+
+    url: "bi-link-45deg",
+    img: "bi-image",
+    video: "bi-play-btn",
+    quote: "bi-quote",
+    code: "bi-code-slash",
+    hide: "bi-eye-slash",
+    spoiler: "bi-eye",
+
+    list: "bi-list-ul",
+    "list-1": "bi-list-ol",
+    "list-item": "bi-list",
+
+    hr: "bi-dash-lg",
+    clear: "bi-eraser",
+    removeFormat: "bi-eraser"
+  };
+
+  function iconKey(button) {
+    return (
+      button.dataset.bbcode ||
+      button.dataset.command ||
+      (
+        button.hasAttribute(
+          "data-eric-clear"
+        )
+          ? "clear"
+          : ""
+      ) ||
+      ""
+    );
+  }
+
+  function decorateToolbar(
+    toolbar,
+    target
+  ) {
+    if (
+      !toolbar ||
+      !target
+    ) {
+      return;
+    }
+
+    ensureIconFont();
+    ensureLayoutCss();
+
+    const kind =
+      window.__ddsGetNoteBbcodeKind?.(
+        target
+      ) ||
+      target.dataset.ddsNoteBbcodeKind ||
+      "content";
+
+    target.dataset.ddsNoteBbcode =
+      "true";
+
+    target.dataset.ddsNoteBbcodeKind =
+      kind;
+
+    toolbar.classList.add(
+      "dds-note-bbcode-toolbar"
+    );
+
+    toolbar.dataset.noteBbcodeKind =
+      kind;
+
+    const label =
+      target.closest("label");
+
+    if (label) {
+      label.classList.add(
+        "dds-note-bbcode-field",
+        `dds-note-bbcode-${kind}`
+      );
+
+      if (
+        toolbar.parentElement !== label ||
+        toolbar.nextElementSibling !== target
+      ) {
+        label.insertBefore(
+          toolbar,
+          target
+        );
+      }
+    } else {
+      target
+        .closest(".dds-control-section")
+        ?.classList.add(
+          "dds-note-bbcode-section"
+        );
+    }
+
+    toolbar
+      .querySelectorAll("button")
+      .forEach((button) => {
+        const icon =
+          ICONS[iconKey(button)];
+
+        if (
+          !icon ||
+          button.dataset.ddsNoteIconV183 ===
+            "1"
+        ) {
+          return;
+        }
+
+        button.dataset.ddsNoteIconV183 =
+          "1";
+
+        button.innerHTML =
+          `<i class="bi ${icon}" aria-hidden="true"></i>`;
+      });
+
+    toolbar
+      .querySelectorAll(
+        "label.dds-bbcode-color > span, label.dds-rich-color > span"
+      )
+      .forEach((span) => {
+        if (
+          span.dataset.ddsNoteIconV183 ===
+          "1"
+        ) {
+          return;
+        }
+
+        span.dataset.ddsNoteIconV183 =
+          "1";
+
+        span.innerHTML =
+          '<i class="bi bi-palette" aria-hidden="true"></i>';
+      });
+  }
+
+  window.__ddsDecorateNoteBbcodeToolbar =
+    decorateToolbar;
 
   function isInsideEditor(target) {
     return Boolean(
@@ -26462,9 +26835,47 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     );
   }
 
+  function findToolbar(target) {
+    if (!target) {
+      return null;
+    }
+
+    const previous =
+      target.previousElementSibling;
+
+    if (
+      previous?.classList?.contains(
+        "dds-rich-toolbar"
+      )
+    ) {
+      return previous;
+    }
+
+    if (target.id) {
+      const escaped =
+        window.CSS?.escape
+          ? CSS.escape(target.id)
+          : target.id.replace(
+              /["\\]/g,
+              "\\$&"
+            );
+
+      return target
+        .closest(
+          ".dds-control-section, .dds-panel, .dds-protected-commission-editor"
+        )
+        ?.querySelector(
+          `[data-toolbar-for="${escaped}"]`
+        ) ||
+        null;
+    }
+
+    return null;
+  }
+
   function scan(root = document) {
     const classify =
-      window.__ddsIsNoteBbcodeTarget;
+      window.__ddsGetNoteBbcodeKind;
 
     const install =
       window.__ddsInstallBbcodeToolbarForTarget;
@@ -26475,6 +26886,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     ) {
       return;
     }
+
+    ensureLayoutCss();
 
     const candidates = [];
 
@@ -26492,14 +26905,19 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
       )
       .forEach(
-        (target) => candidates.push(target)
+        (target) =>
+          candidates.push(target)
       );
 
     candidates.forEach((target) => {
-      if (
-        !isInsideEditor(target) ||
-        !classify(target)
-      ) {
+      if (!isInsideEditor(target)) {
+        return;
+      }
+
+      const kind =
+        classify(target);
+
+      if (!kind) {
         return;
       }
 
@@ -26510,19 +26928,35 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       target.dataset.ddsNoteBbcode =
         "true";
 
+      target.dataset.ddsNoteBbcodeKind =
+        kind;
+
       target
         .closest("label")
         ?.classList.add(
-          "dds-note-bbcode-field"
+          "dds-note-bbcode-field",
+          `dds-note-bbcode-${kind}`
         );
 
       install(target);
+
+      const toolbar =
+        findToolbar(target);
+
+      if (toolbar) {
+        decorateToolbar(
+          toolbar,
+          target
+        );
+      }
     });
   }
 
   function scheduleScan(root = document) {
     if (scanFrame) {
-      cancelAnimationFrame(scanFrame);
+      cancelAnimationFrame(
+        scanFrame
+      );
     }
 
     scanFrame =
@@ -26548,19 +26982,24 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const observer =
         new MutationObserver(
           (records) => {
-            for (const record of records) {
+            for (
+              const record of records
+            ) {
               if (
-                record.type !== "childList" ||
+                record.type !==
+                  "childList" ||
                 !record.addedNodes.length
               ) {
                 continue;
               }
 
               for (
-                const node of record.addedNodes
+                const node of
+                  record.addedNodes
               ) {
                 if (
-                  node instanceof Element
+                  node instanceof
+                  Element
                 ) {
                   scheduleScan(node);
                 }
@@ -26635,3 +27074,4 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     boot();
   }
 })();
+
