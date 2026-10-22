@@ -14771,3 +14771,31 @@ body.dds-y2k-vampire .dds-home-photo-panel .dds-home-photo {
     min-height: 390px;
   }
 }
+
+/* v245 — HOME: keep the original shop title, description, buttons on the left.
+   Replace ONLY the right-hand visual with the supplied photograph. */
+body.dds-y2k-vampire [data-panel="home"] .dds-home-hero {
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-visual {
+  min-width: 0;
+  min-height: 530px;
+  position: relative;
+  overflow: hidden;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-visual::before {
+  content: none !important;
+  display: none !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {
+  display: block;
+  width: 100%;
+  height: 530px;
+  object-fit: cover;
+  object-position: center;
+}
+@media (max-width: 900px) {
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-hero {grid-template-columns: 1fr;}
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-visual {min-height: 360px;}
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {height: min(70vh, 530px);min-height:360px;}
+}

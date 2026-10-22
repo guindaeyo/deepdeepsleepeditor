@@ -1,2 +1,1 @@
-V244 — HOME PHOTO EMBEDDED
-The HOME image is embedded directly in index.html, so no assets folder is required. Based on V243; other site functionality unchanged.
+v245 — HOME right photo only. Restores the original left shop title, description and buttons from v242; keeps the supplied image embedded on the right. Other pages and scripts unchanged.
