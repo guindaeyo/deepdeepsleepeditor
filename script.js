@@ -11678,7 +11678,7 @@ ${stylesheetLinks}
 
   function handleCommissionBack(event) {
     const button = event.target.closest(
-      "[data-food-back], [data-protected-commission-back], [data-vmac-back], [data-vmac-view-back]"
+      ".dds-commission-view-toolbar .dds-back-button, [data-food-back], [data-protected-commission-back], [data-vmac-back], [data-vmac-view-back]"
     );
 
     if (!button) return;
