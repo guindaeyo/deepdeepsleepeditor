@@ -24,7 +24,7 @@
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-<link href="./style.css?v=20261022-v218-browser-vampire-ui" rel="stylesheet"/>
+<link href="./style.css?v=20261022-v219-browser-vampire-compact" rel="stylesheet"/>
 </head>
 <body class="dds-y2k-vampire">
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5705,6 +5705,27 @@ You were mine forever</textarea>
       || document.querySelector(`[data-page="${page}"]`);
   }
 
+  function leaveEditorModeForDirectory() {
+    const classes = [
+      "dds-editor-mode",
+      "dds-commission-editor-mode",
+      "dds-modal-open",
+      "dds-alan-view-mode",
+      "dds-editor-one-screen"
+    ];
+    document.body.classList.remove(...classes);
+    document.documentElement.classList.remove(...classes);
+
+    // Some editor/modal modules lock page scrolling inline. Directory pages
+    // must always return to normal document scrolling.
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("overflow-y");
+    document.body.style.removeProperty("height");
+    document.documentElement.style.removeProperty("overflow");
+    document.documentElement.style.removeProperty("overflow-y");
+    document.documentElement.style.removeProperty("height");
+  }
+
   function markCurrentEntry(page = categoryFromRoute()) {
     try {
       history.replaceState(
@@ -5736,10 +5757,12 @@ You were mine forever</textarea>
     if (!PAGE_META[page]) return;
     if (checkpoint && categoryFromRoute() !== page) addHistoryCheckpoint();
 
+    leaveEditorModeForDirectory();
     const original = legacyPageButton(page);
     syntheticNavigation = true;
     try { original?.click(); }
     finally { syntheticNavigation = false; }
+    leaveEditorModeForDirectory();
 
     if (writeHash) {
       try {
@@ -5770,6 +5793,11 @@ You were mine forever</textarea>
     const page = control.dataset?.go || control.dataset?.page;
     if (page && PAGE_META[page]) {
       if (categoryFromRoute() !== page) addHistoryCheckpoint();
+      // The legacy back/category handlers are inconsistent about clearing
+      // editor-mode from <html> and inline body overflow. Always normalize
+      // after any navigation back to a directory page.
+      queueMicrotask(leaveEditorModeForDirectory);
+      requestAnimationFrame(leaveEditorModeForDirectory);
       return;
     }
 

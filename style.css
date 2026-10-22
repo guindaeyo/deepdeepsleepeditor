@@ -14052,3 +14052,276 @@ body.dds-y2k-vampire .dds-browser-address-icon{display:grid;place-items:center;f
 body.dds-y2k-vampire .dds-browser-address-icon i{font-size:14px;}
 body.dds-y2k-vampire .dds-primary-button i,
 body.dds-y2k-vampire .dds-text-button i{font-size:13px;line-height:1;}
+
+/* ========================================================================
+   V219 — COMPACT BROWSER EDITOR / DIRECTORY SCROLL FIX
+   Presentation + navigation-only hotfix on V218. Storage/editor IDs untouched.
+=========================================================================== */
+
+/* 1) Theme every visible website scrollbar in the browser shell. */
+html,
+body.dds-y2k-vampire,
+body.dds-y2k-vampire * {
+  scrollbar-width: thin;
+  scrollbar-color: #b5162e #090506;
+}
+html::-webkit-scrollbar,
+body.dds-y2k-vampire::-webkit-scrollbar,
+body.dds-y2k-vampire *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html::-webkit-scrollbar-track,
+body.dds-y2k-vampire::-webkit-scrollbar-track,
+body.dds-y2k-vampire *::-webkit-scrollbar-track {
+  background: #090506;
+  border-left: 1px solid #2b080e;
+}
+html::-webkit-scrollbar-thumb,
+body.dds-y2k-vampire::-webkit-scrollbar-thumb,
+body.dds-y2k-vampire *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,#d2203d,#760b1d);
+  border: 2px solid #090506;
+  border-radius: 999px;
+}
+html::-webkit-scrollbar-thumb:hover,
+body.dds-y2k-vampire::-webkit-scrollbar-thumb:hover,
+body.dds-y2k-vampire *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,#ef3350,#941029);
+}
+
+/* Directory pages must always use normal document scrolling after leaving Edit. */
+html:not(.dds-editor-mode),
+body.dds-y2k-vampire:not(.dds-editor-mode) {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+body.dds-y2k-vampire:not(.dds-editor-mode) .dds-app {
+  height: auto !important;
+  min-height: calc(100dvh - 32px) !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+body.dds-y2k-vampire:not(.dds-editor-mode) .dds-main,
+body.dds-y2k-vampire:not(.dds-editor-mode) .dds-panel.is-active {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 2) Slightly shorter browser chrome = more room for the actual editor. */
+@media (min-width: 901px) {
+  body.dds-y2k-vampire .dds-browser-tabs {
+    min-height: 41px !important;
+    padding-top: 7px !important;
+  }
+  body.dds-y2k-vampire .dds-browser-tab {
+    height: 33px !important;
+    min-width: 112px !important;
+    padding-inline: 14px !important;
+    font-size: 12px !important;
+  }
+  body.dds-y2k-vampire .dds-browser-window-dots { padding-bottom: 6px !important; }
+  body.dds-y2k-vampire .dds-browser-window-dots i { width: 14px !important; height: 14px !important; }
+  body.dds-y2k-vampire .dds-browser-toolbar {
+    min-height: 48px !important;
+    padding: 6px 12px 8px !important;
+  }
+  body.dds-y2k-vampire .dds-browser-address { height: 34px !important; }
+  body.dds-y2k-vampire .dds-browser-history button,
+  body.dds-y2k-vampire .dds-browser-window-buttons span { width: 31px !important; height: 31px !important; }
+}
+
+/* 3) Every editor header is exactly two compact visual rows on desktop:
+      ROW 1 = EDITOR TYPE : CODE NAME
+      ROW 2 = description / instant-preview / COPY CODE instruction. */
+@media (min-width: 901px) {
+  body.dds-y2k-vampire.dds-editor-mode .dds-main {
+    height: calc(100dvh - 121px) !important;
+    min-height: 0 !important;
+    padding: 0 18px 12px !important;
+    overflow: hidden !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-panel[data-panel^="editor-"].is-active:not(.dds-commission-view-panel),
+    .dds-protected-commission-editor.is-active,
+    [class*="protected-commission-editor"].is-active,
+    [class*="editor-panel"].is-active:not(.dds-commission-view-panel)
+  ) {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    padding: 4px 0 0 !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0,1fr) !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 7px 2px 8px !important;
+    margin: 0 !important;
+    grid-template-columns: 34px minmax(0,1fr) !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading .dds-back-button,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading .dds-back-button {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    margin: 0 !important;
+    align-self: center !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading > div,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading > div {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: max-content minmax(0,1fr) !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 8px !important;
+    row-gap: 2px !important;
+    align-items: baseline !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading .dds-eyebrow,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading .dds-eyebrow {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    font: 700 9px/1.2 var(--dds-browser-mono) !important;
+    letter-spacing: .08em !important;
+    color: #d74359 !important;
+    white-space: nowrap !important;
+  }
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading .dds-eyebrow::after,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading .dds-eyebrow::after {
+    content: " :" !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading h1,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading h1 {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: clamp(18px,1.7vw,26px) !important;
+    line-height: 1 !important;
+    letter-spacing: -.02em !important;
+    text-shadow: 1px 0 0 rgba(240,25,46,.24) !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading > div > p:last-child,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading > div > p:last-child {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    color: rgba(242,223,223,.55) !important;
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Hide old decorative editor-status line to reclaim vertical space. */
+  body.dds-y2k-vampire.dds-editor-mode .dds-editor-heading::after,
+  body.dds-y2k-vampire .dds-protected-commission-editor.is-active .dds-editor-heading::after {
+    display: none !important;
+  }
+
+  /* 4) Preview + controls begin immediately below the compact 2-line heading
+        and consume every remaining pixel of the viewport. */
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-panel[data-panel^="editor-"].is-active:not(.dds-commission-view-panel),
+    .dds-protected-commission-editor.is-active,
+    [class*="protected-commission-editor"].is-active,
+    [class*="editor-panel"].is-active:not(.dds-commission-view-panel)
+  ) > :is(.dds-editor-layout,.dds-protected-commission-layout,[class*="editor-layout"],[class*="commission-layout"]) {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 4px 0 0 !important;
+    grid-template-columns: minmax(0,3fr) minmax(340px,2fr) !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+    align-items: stretch !important;
+  }
+
+  /* Right side: Draft + scrollable fields + COPY dock must fit in this one page. */
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ).is-active .dds-editor-tools-column,
+  body.dds-y2k-vampire.dds-editor-mode :is(
+    .dds-protected-commission-editor.is-active,
+    [class*="protected-commission-editor"].is-active,
+    .dds-code013-editor.is-active,
+    .dds-code014-editor.is-active
+  ) .dds-protected-commission-controls-column {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-draft-manager,
+  body.dds-y2k-vampire.dds-editor-mode .dds-protected-commission-draft {
+    padding-block: 7px !important;
+    min-height: 0 !important;
+  }
+
+  body.dds-y2k-vampire.dds-editor-mode .dds-copy-section,
+  body.dds-y2k-vampire.dds-editor-mode .dds-protected-commission-copy {
+    margin: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+}
+
+/* Mobile/tablet: preserve readable wrapping; still compact. */
+@media (max-width: 900px) {
+  body.dds-y2k-vampire .dds-editor-heading h1 { font-size: clamp(24px,7vw,38px) !important; }
+  body.dds-y2k-vampire .dds-editor-heading > div > p:last-child {
+    margin-top: 5px !important;
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+}
+
+/* 5) Important exception: left Preview scrollbars remain invisible while
+      wheel/touchpad vertical scrolling still works, as requested earlier. */
+body.dds-y2k-vampire :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-protected-commission-preview-stage,.dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,.dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-v210-auto-stage,[class*="preview-stage"]
+) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+body.dds-y2k-vampire :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-protected-commission-preview-stage,.dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,.dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-v210-auto-stage,[class*="preview-stage"]
+)::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
