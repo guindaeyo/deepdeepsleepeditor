@@ -1,8 +1,9 @@
-V210 Stable Preview — Border / Copy / Profile Width Hotfix
-Base: deepdeepsleep-editor-v210-stable-preview-ready.zip
-Changes only:
-- Fix preview bottom border by making the preview stage flex into the remaining height below LIVE PREVIEW.
-- Add a missing preview stage automatically for editor iframes that were direct children (e.g. REVIEW CODE002).
-- Keep COPY CODE reachable at the bottom of the right controls scroll area.
-- FOR PROFILE preview fitting honors each profile canvas width so the full left/right edges fit inside the left preview; long content scrolls vertically.
-No V211–V216 loading/lazy-loader changes included.
+Deep Deep Sleep Code Shop — V210 Copy Dock One-Page Hotfix
+Base: V210 Border + Profile Preview Hotfix
+
+Changed only the right-side editor layout:
+- Draft stays at the top.
+- Editable controls use only the remaining middle height and scroll vertically.
+- Copy Code / Reset stays visible at the bottom of the same editor page.
+- Applied to Roleplay, Profile, Review, Commission, CODE013 and CODE014.
+- Left preview behavior was not changed in this hotfix.

@@ -12462,3 +12462,159 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   flex:0 0 auto !important;
   margin-bottom:18px !important;
 }
+
+/* =========================================================
+   V210 COPY DOCK ONE-PAGE HOTFIX
+   RIGHT side must always fit inside the editor viewport:
+   Draft(auto) + editable controls(scroll) + COPY CODE(auto).
+   This intentionally overrides V204's blanket height:100% rule on nested
+   right-side scroll regions; preview behavior is untouched.
+========================================================= */
+@media (min-width:901px){
+  /* Legacy Roleplay / Profile / Review editors, after Draft Manager wraps
+     .dds-editor-controls in .dds-editor-tools-column. */
+  :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:8px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+    align-self:stretch !important;
+    position:relative !important;
+    top:auto !important;
+  }
+
+  :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-draft-manager{
+    grid-row:1 !important;
+    min-height:0 !important;
+    flex:none !important;
+  }
+
+  :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-editor-controls{
+    grid-row:2 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    align-self:stretch !important;
+    padding-bottom:8px !important;
+  }
+
+  :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-tools-column > .dds-editor-copy-dock{
+    grid-row:3 !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    flex:none !important;
+    position:relative !important;
+    z-index:5 !important;
+  }
+
+  :is(
+    .dds-panel[data-panel^="editor-code"],
+    .dds-panel[data-panel^="editor-profile"],
+    .dds-panel[data-panel^="editor-review"]
+  ) .dds-editor-copy-dock > .dds-copy-section{
+    margin:0 !important;
+  }
+
+  /* Commission / protected / CODE013 / CODE014 already have three siblings:
+     draft + scroll + copy. Keep only the middle child scrollable. */
+  :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:8px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+    align-self:stretch !important;
+  }
+
+  :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > .dds-protected-commission-draft{
+    grid-row:1 !important;
+    min-height:0 !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > :is(
+    .dds-protected-commission-scroll,
+    [class*="controls-scroll"]
+  ){
+    grid-row:2 !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    align-self:stretch !important;
+  }
+
+  :is(
+    .dds-protected-commission-editor,
+    .dds-code013-editor,
+    .dds-code014-editor,
+    [class*="protected-commission-editor"]
+  ) .dds-protected-commission-controls-column > :is(
+    .dds-protected-commission-copy,
+    .dds-copy-section
+  ){
+    grid-row:3 !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    overflow:visible !important;
+    align-self:end !important;
+    position:relative !important;
+    z-index:5 !important;
+  }
+}
