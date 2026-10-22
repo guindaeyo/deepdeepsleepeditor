@@ -5475,17 +5475,104 @@ ${stylesheetLinks}
   }
 
 
+
+  /* =========================================================
+     V212 — FAST BOOT / LAZY COMMISSION INSTALLERS
+     Keep the landing page interactive. Heavy commission cards,
+     modals and preview installers are created only when the user
+     actually enters COMMISSION & ACTIVITY or opens a commission link.
+     ========================================================= */
+  (() => {
+    if (window.__DDS_V212_COMMISSION_BOOT_GATE__) return;
+    window.__DDS_V212_COMMISSION_BOOT_GATE__ = true;
+
+    const queue = [];
+    let active = false;
+    let scheduled = false;
+
+    function commissionHash(value = window.location.hash) {
+      return /commission/i.test(String(value || ""));
+    }
+
+    function runChunk() {
+      scheduled = false;
+      if (!active || !queue.length) return;
+
+      // Keep each frame small so navigation remains clickable/smooth.
+      let count = 0;
+      while (queue.length && count < 3) {
+        const installer = queue.shift();
+        try { installer(); }
+        catch (error) { console.warn("[DDS V212] deferred commission installer failed", error); }
+        count += 1;
+      }
+
+      if (queue.length) schedule();
+    }
+
+    function schedule() {
+      if (scheduled || !active || !queue.length) return;
+      scheduled = true;
+      requestAnimationFrame(runChunk);
+    }
+
+    function activate() {
+      if (!active) active = true;
+      schedule();
+    }
+
+    window.__ddsDeferCommissionInstallerV212 = function (installer) {
+      if (typeof installer !== "function") return;
+      queue.push(installer);
+      if (active) schedule();
+    };
+
+    window.__ddsActivateCommissionInstallersV212 = activate;
+
+    document.addEventListener("click", (event) => {
+      const target = event.target?.closest?.([
+        '[data-page="commission"]',
+        '[data-go="commission"]',
+        '[data-work-tab="commission"]',
+        '[data-commission-edit]',
+        '[data-protected-commission-edit]',
+        '[data-edit-protected-commission]',
+        '[data-rora-edit]',
+        '[data-hans-edit]',
+        '[data-jewel-edit]',
+        '[data-landon-file-edit]',
+        '[data-alan-edit]',
+        '[data-mhp-edit]',
+        '.dds-commission-card button'
+      ].join(','));
+      if (target) activate();
+    }, true);
+
+    window.addEventListener("hashchange", () => {
+      if (commissionHash()) activate();
+    }, { passive: true });
+
+    const initialHash = String(window.__DDS_INITIAL_DEEP_LINK_HASH__ || window.location.hash || "");
+    if (commissionHash(initialHash)) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", activate, { once: true });
+      } else {
+        activate();
+      }
+    }
+  })();
+
   installLivePreviewPerformanceFix();
   installNewRulesWebsiteImageFix();
-  installCommissionActivityLayout();
-  installActivityTopMovies();
-  installActivityTopMoviesReply();
-  installCommissionThreeHouse();
-  installMyOwnCodeCommission();
-  installMyOwnCodeHistory();
-  installMyOwnCodeTopicHeader();
+  window.__ddsDeferCommissionInstallerV212(installCommissionActivityLayout);
+  window.__ddsDeferCommissionInstallerV212(installActivityTopMovies);
+  window.__ddsDeferCommissionInstallerV212(installActivityTopMoviesReply);
+  window.__ddsDeferCommissionInstallerV212(installCommissionThreeHouse);
+  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeCommission);
+  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeHistory);
+  window.__ddsDeferCommissionInstallerV212(installMyOwnCodeTopicHeader);
   normalizeShowcaseCardLabels();
-  installThreeColumnShowcaseGrids();
+  window.__ddsDeferCommissionInstallerV212(installThreeColumnShowcaseGrids);
   installBlankEditorFormsAndBbcodeTools();
   installStaticCataloguePreviewFix();
   installStaticFoodReviewCataloguePreviewFix();
@@ -10736,11 +10823,7 @@ ${stylesheetLinks}
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, { once: true });
-  } else {
-    install();
-  }
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -11561,11 +11644,7 @@ ${stylesheetLinks}
     window.addEventListener("resize", fitPreview);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, { once: true });
-  } else {
-    install();
-  }
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -12477,11 +12556,7 @@ ${stylesheetLinks}
     window.addEventListener("resize", fitPreview);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, { once: true });
-  } else {
-    install();
-  }
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -13146,11 +13221,7 @@ ${stylesheetLinks}
     }, 100);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, { once: true });
-  } else {
-    install();
-  }
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -13824,8 +13895,7 @@ ${stylesheetLinks}
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -15026,8 +15096,7 @@ ${stylesheetLinks}
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -15574,8 +15643,7 @@ ${stylesheetLinks}
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -16424,8 +16492,7 @@ ${stylesheetLinks}
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -17325,8 +17392,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -17656,7 +17722,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const stage=frame?.closest(".dds-roleplay-card-preview");warmRoraPreviewAssets();if(frame){frame.style.setProperty("visibility","hidden","important");frame.style.setProperty("opacity","0","important")}const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};render();if("ResizeObserver" in window&&stage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitCardPreview()));observer.observe(stage)}[0,100,260,600,1100,1900].forEach(delay=>window.setTimeout(()=>fitCardPreview(),delay));return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -19221,8 +19287,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 250);
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once: true });
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -20185,11 +20250,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 250);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, { once: true });
-  } else {
-    install();
-  }
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -21821,8 +21882,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash,250);
   }
 
-  if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",install,{once:true});
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 /* =========================================================
@@ -23346,8 +23406,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     setTimeout(handleHash, 260);
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, { once:true });
-  else install();
+  window.__ddsDeferCommissionInstallerV212(install);
 })();
 
 
@@ -27096,7 +27155,12 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function boot() {
     installParentScrollbarCss();
     exposeAliases();
-    scanActiveEditors();
+
+    // Fast boot: do not scan every hidden editor at startup.
+    // Direct editor deep-links still initialize immediately.
+    if (/editor/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
+      activateSoon();
+    }
 
     document.addEventListener('click', (event) => {
       if (event.target?.closest?.(

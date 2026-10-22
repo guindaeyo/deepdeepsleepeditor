@@ -1,20 +1,16 @@
-DEEP DEEP SLEEP CODE SHOP — V211
+DEEP DEEP SLEEP CODE SHOP — V212 FAST BOOT
 
-วางไฟล์ทั้ง 5 ตัวทับชุดเดิม:
+ใช้ไฟล์ 5 ตัวนี้วางทับชุดเดิม:
 - index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V211 แก้เฉพาะระบบ Preview ฝั่งซ้ายของหน้า Edit:
-- ไม่ reload iframe ตอนพิมพ์หลังโหลดครั้งแรก
-- compatibility กับ preview logic รุ่น V192/V203/V205
-- ล็อกตำแหน่งกึ่งกลางและ scale แนวนอนระหว่างพิมพ์
-- วัดความสูงจริงถึงขอบล่าง รวม element แบบ absolute และ credit
-- stage ฝั่งซ้ายเป็น vertical scroll viewport
-- scrollbar ฝั่งซ้ายล่องหน แต่ยัง scroll ได้
-- GGUM ใช้ Central Preview เดียวกัน
-- HANS/RORAIMA แสดง full-length preview ผ่าน Central Preview
+V212 เปลี่ยนเฉพาะการบูตหน้าเว็บ:
+- Commission/Activity editors ไม่สร้างทั้งหมดตั้งแต่หน้าแรกอีก
+- ค่อยติดตั้งเมื่อเข้า COMMISSION & ACTIVITY หรือเปิด deep link ของ Commission
+- ตัดการสแกน editor ที่ซ่อนทั้งหมดจาก Central Preview ตอน startup
+- ระบบ Preview V211, GGUM, HANS, scrollbar และ Cloud/Draft คงไว้
 
-ฝั่งขวา / COPY CODE / Draft / Cloud ไม่ได้แก้ในรอบนี้
+หลังวางไฟล์ให้กด Ctrl+F5 หนึ่งครั้ง
