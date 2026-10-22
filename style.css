@@ -12358,3 +12358,107 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   animation:none !important;
   will-change:auto !important;
 }
+
+
+/* =========================================================
+   V210 STABLE PREVIEW — BORDER / COPY / PROFILE WIDTH HOTFIX
+   Scope: editor preview + controls only.
+========================================================= */
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  [class*="preview-column"]
+) {
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+
+/* The LIVE PREVIEW bar takes its own height. The stage must fill only the
+   remainder; height:100% here was what pushed the bottom border out. */
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-stage,
+  .dds-live-preview-stage,
+  .dds-preview-stage,
+  .dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,
+  .dds-code014-editor-stage,
+  .dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,
+  .dds-nothin-preview-stage,
+  .dds-v210-auto-stage,
+  [class*="preview-stage"]
+) {
+  flex:1 1 0 !important;
+  height:auto !important;
+  min-height:0 !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-preview-stage,
+  .dds-live-preview-stage,
+  .dds-preview-stage,
+  .dds-protected-commission-preview-stage,
+  .dds-profile-preview-stage,
+  .dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,
+  .dds-nothin-preview-stage,
+  .dds-v210-auto-stage,
+  [class*="preview-stage"]
+)::-webkit-scrollbar {
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+}
+
+/* Keep the final COPY CODE section reachable inside the right scroll column. */
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(
+  .dds-editor-controls,
+  .dds-editor-tools-column,
+  .dds-protected-commission-controls-column,
+  .dds-protected-commission-scroll,
+  [class*="controls-column"],
+  [class*="controls-scroll"]
+) {
+  box-sizing:border-box !important;
+  scroll-padding-bottom:18px !important;
+}
+
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) .dds-copy-section:last-child {
+  flex:0 0 auto !important;
+  margin-bottom:18px !important;
+}

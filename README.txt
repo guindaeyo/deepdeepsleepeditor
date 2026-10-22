@@ -1,16 +1,8 @@
-Deep Deep Sleep Code Shop — V210 Stable Preview Hotfix
-Base: deepdeepsleep-editor-v210-ready.zip
-
-Changed only editor preview behavior:
-1. Active editor iframe no longer reloads on every keystroke after its first document load.
-2. Central preview no longer removes/reapplies transform/scale on every input.
-3. Older V192/V205 editor preview hooks route to the V210 central preview engine.
-4. Preview iframe height follows the complete rendered content so long code can scroll vertically in the left preview.
-5. HANS X. FROST RORAIMA house-thread uses the complete .dds-rora-preview-shell, including its top and bottom, instead of measuring only .ddsh-roraima.
-
-Unchanged from V210:
-- style.css
-- cloud-config.js
-- cloud-bridge.js
-- navigation/loading architecture
-- right-side editor controls
+V210 Stable Preview — Border / Copy / Profile Width Hotfix
+Base: deepdeepsleep-editor-v210-stable-preview-ready.zip
+Changes only:
+- Fix preview bottom border by making the preview stage flex into the remaining height below LIVE PREVIEW.
+- Add a missing preview stage automatically for editor iframes that were direct children (e.g. REVIEW CODE002).
+- Keep COPY CODE reachable at the bottom of the right controls scroll area.
+- FOR PROFILE preview fitting honors each profile canvas width so the full left/right edges fit inside the left preview; long content scrolls vertically.
+No V211–V216 loading/lazy-loader changes included.

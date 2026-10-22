@@ -26528,8 +26528,26 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function stageFor(iframe) {
-    const stage = iframe?.closest?.(STAGE_SELECTOR) || null;
-    return stage && editorPanelFor(stage) ? stage : null;
+    if (!iframe) return null;
+    let stage = iframe.closest?.(STAGE_SELECTOR) || null;
+    if (stage && editorPanelFor(stage)) return stage;
+
+    /* Some V210 editors (including REVIEW CODE002) place the iframe directly
+       under the preview column, so there is no scroll stage for the central
+       engine to own. Create only that missing stage; do not touch editors
+       that already have one. */
+    const column = iframe.parentElement;
+    if (
+      column?.matches?.('.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]') &&
+      editorPanelFor(column)
+    ) {
+      stage = document.createElement('div');
+      stage.className = 'dds-editor-preview-stage dds-v210-auto-stage';
+      column.insertBefore(stage, iframe);
+      stage.appendChild(iframe);
+      return stage;
+    }
+    return null;
   }
 
   function owns(iframe) {
@@ -26728,6 +26746,23 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     doc.body.style.setProperty("min-height", h, "important");
   }
 
+  function declaredCanvasWidth(iframe) {
+    if (!iframe) return 0;
+    const names = [
+      'profileCanvasWidth',
+      'moodboardCanvasWidth',
+      'fortyoneCanvasWidth',
+      'nothinCanvasWidth',
+      'reviewDesktopWidth',
+      'commissionCanvasWidth'
+    ];
+    for (const name of names) {
+      const value = parseFloat(iframe.dataset?.[name] || '');
+      if (Number.isFinite(value) && value > 0) return value;
+    }
+    return 0;
+  }
+
   function applyFullFit(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || !editorPanelFor(stage) || stage.clientWidth < 40) return false;
@@ -26739,6 +26774,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (!root) return false;
 
     const bounds = naturalBounds(iframe, root);
+    const canvasWidth = declaredCanvasWidth(iframe);
+    if (canvasWidth > 0) bounds.width = Math.max(bounds.width, canvasWidth);
     const availableWidth = Math.max(1, stage.clientWidth - 24);
     const scale = Math.min(1, availableWidth / Math.max(1, bounds.width));
 
