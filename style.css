@@ -11563,131 +11563,58 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 }
 
 /* =========================================================
-   V186 — STEADY EDITOR LIVE PREVIEW / NO FLICKER
-   Keep editor preview visible while typing. Catalogue cards
-   retain their existing loading/ready effects.
+   V191 — ONE CENTRAL EDITOR PREVIEW VIEWPORT
+   Horizontal: always fit inside one preview page.
+   Vertical: scroll inside the iframe; scrollbar is invisible.
 ========================================================= */
-.dds-panel[data-panel*="editor"] .dds-editor-preview-frame,
-.dds-protected-commission-editor .dds-editor-preview-frame,
-.dds-editor-preview-column .dds-editor-preview-frame {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transition: none !important;
-}
-
-.dds-panel[data-panel*="editor"] .dds-editor-preview-frame.dds-preview-loading,
-.dds-panel[data-panel*="editor"] .dds-editor-preview-frame.dds-preview-ready,
-.dds-protected-commission-editor .dds-editor-preview-frame.dds-preview-loading,
-.dds-protected-commission-editor .dds-editor-preview-frame.dds-preview-ready,
-.dds-editor-preview-column .dds-editor-preview-frame.dds-preview-loading,
-.dds-editor-preview-column .dds-editor-preview-frame.dds-preview-ready {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transition: none !important;
-}
-
-
-/* =========================================================
-   V188 — GLOBAL EDITOR PREVIEW: NEVER FLASH WHILE TYPING
-========================================================= */
-.dds-panel[data-panel*="editor"] iframe,
-.dds-panel[data-panel^="editor-"] iframe,
-.dds-protected-commission-editor iframe,
-[class*="commission-editor"] iframe {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transition: none !important;
-  animation: none !important;
-}
-
-.dds-panel[data-panel*="editor"] iframe.dds-preview-loading,
-.dds-panel[data-panel^="editor-"] iframe.dds-preview-loading,
-.dds-protected-commission-editor iframe.dds-preview-loading,
-[class*="commission-editor"] iframe.dds-preview-loading,
-.dds-panel[data-panel*="editor"] iframe.dds-preview-ready,
-.dds-panel[data-panel^="editor-"] iframe.dds-preview-ready,
-.dds-protected-commission-editor iframe.dds-preview-ready,
-[class*="commission-editor"] iframe.dds-preview-ready {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transition: none !important;
-  animation: none !important;
-}
-
-/* Landon file commission: the holder represents the visible code rather than
-   the intentionally wider source canvas, so it stays centered and readable. */
-.dds-landon-file-preview-holder,
-.dds-landon-file-view-holder {
-  overflow: visible !important;
-}
-
-/* V189 FAST BOOT: no visual changes; loading work moved to lazy/on-demand JS. */
-
-/* =========================================================
-   V190 — EVERY EDITOR PREVIEW = STEADY SCROLLABLE VIEWPORT
-   One rule for every normal + protected commission editor.
-   - never fade while typing
-   - never scale/translate the iframe itself
-   - preview gets its own stable viewport
-   - long / wide code scrolls inside the preview
-========================================================= */
-
-/* Preview columns must stay inside the editor grid. */
-.dds-panel[data-panel*="editor"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
-.dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
-.dds-protected-commission-editor :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
-[class*="commission-editor"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]){
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+:is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]){
   min-width:0 !important;
   max-width:100% !important;
   overflow:hidden !important;
 }
 
-/* Every editor stage is a predictable viewport.  The iframe itself owns the
-   scrollbars; old per-editor overflow rules must not crop it. */
-.dds-panel[data-panel*="editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-.dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-.dds-protected-commission-editor :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-[class*="commission-editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]){
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+:is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]){
   position:relative !important;
   width:100% !important;
   min-width:0 !important;
   max-width:100% !important;
-  height:clamp(430px,72vh,820px) !important;
-  min-height:430px !important;
-  max-height:82vh !important;
+  height:clamp(480px,72vh,860px) !important;
+  min-height:480px !important;
+  max-height:86vh !important;
   margin:0 !important;
   padding:0 !important;
   overflow:hidden !important;
+  transform:none !important;
   overscroll-behavior:contain !important;
-  background:#202020 !important;
 }
 
-/* Old holders/canvases used different scaling systems.  In the editor they
-   are only viewport hosts now; the actual code remains untouched in iframe. */
-.dds-panel[data-panel*="editor"] :is([class*="preview-holder"],[class*="preview-canvas-host"]),
-.dds-panel[data-panel^="editor-"] :is([class*="preview-holder"],[class*="preview-canvas-host"]),
-.dds-protected-commission-editor :is([class*="preview-holder"],[class*="preview-canvas-host"]),
-[class*="commission-editor"] :is([class*="preview-holder"],[class*="preview-canvas-host"]){
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+:is([class*="preview-holder"],[class*="preview-canvas-host"]){
   position:relative !important;
   inset:auto !important;
   width:100% !important;
   min-width:0 !important;
   max-width:100% !important;
-  height:auto !important;
+  height:100% !important;
   min-height:0 !important;
   max-height:none !important;
   margin:0 !important;
   padding:0 !important;
-  overflow:visible !important;
+  overflow:hidden !important;
   transform:none !important;
 }
 
-/* Critical: every iframe in an EDITOR is a stable viewport.  This intentionally
-   overrides per-commission inline left/top/width/height/scale calculations. */
-.dds-panel[data-panel*="editor"] iframe,
-.dds-panel[data-panel^="editor-"] iframe,
-.dds-protected-commission-editor iframe,
-[class*="commission-editor"] iframe{
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+iframe.dds-v191-editor-preview,
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+:is(.dds-editor-preview-frame,.dds-protected-commission-preview-frame){
   position:relative !important;
   inset:auto !important;
   top:auto !important;
@@ -11698,9 +11625,9 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   width:100% !important;
   min-width:100% !important;
   max-width:100% !important;
-  height:clamp(430px,72vh,820px) !important;
-  min-height:430px !important;
-  max-height:82vh !important;
+  height:clamp(480px,72vh,860px) !important;
+  min-height:480px !important;
+  max-height:86vh !important;
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
@@ -11714,12 +11641,7 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   background:#202020 !important;
 }
 
-/* Loading/ready classes from legacy renderers are never allowed to blink an
-   editor preview. Catalogue cards are outside the selectors above. */
-.dds-panel[data-panel*="editor"] iframe:is(.dds-preview-loading,.dds-preview-ready),
-.dds-panel[data-panel^="editor-"] iframe:is(.dds-preview-loading,.dds-preview-ready),
-.dds-protected-commission-editor iframe:is(.dds-preview-loading,.dds-preview-ready),
-[class*="commission-editor"] iframe:is(.dds-preview-loading,.dds-preview-ready){
+body.dds-v191-central-preview iframe:is(.dds-preview-loading,.dds-preview-ready).dds-v191-editor-preview{
   opacity:1 !important;
   visibility:visible !important;
   transform:none !important;
@@ -11727,15 +11649,88 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   animation:none !important;
 }
 
+/* Unified BBCode toolbar. Unknown legacy buttons fall back to visible text. */
+body.dds-v191-central-preview
+:is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+:is(.dds-rich-toolbar,.dds-bbcode-toolbar,[class*="bbcode-toolbar"]){
+  width:100% !important;
+  max-width:100% !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:5px !important;
+  box-sizing:border-box !important;
+}
+
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar .dds-bbcode-group{
+  display:flex !important;
+  align-items:center !important;
+  gap:3px !important;
+}
+
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar button{
+  min-width:30px !important;
+  height:30px !important;
+  padding:0 7px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
+  color:rgba(255,255,255,.78) !important;
+  font-family:"Bai Jamjuree",sans-serif !important;
+  font-size:9px !important;
+  font-style:normal !important;
+  font-weight:600 !important;
+  line-height:1 !important;
+  text-decoration:none !important;
+}
+
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar button i{
+  font-size:14px !important;
+  line-height:1 !important;
+  pointer-events:none !important;
+}
+
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar label.dds-bbcode-color,
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar label.dds-rich-color{
+  width:30px !important;
+  min-width:30px !important;
+  height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 !important;
+}
+
+body.dds-v191-central-preview .dds-v191-bbcode-toolbar label i{
+  font-size:14px !important;
+  pointer-events:none !important;
+}
+
+.dds-bbcode-toolbar-target{display:none !important;}
+
+.dds-note-bbcode-field{
+  grid-column:1 / -1 !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:6px !important;
+  box-sizing:border-box !important;
+}
+.dds-note-bbcode-field > .dds-rich-toolbar{order:2 !important;width:100% !important;margin:0 !important;}
+.dds-note-bbcode-field > input,
+.dds-note-bbcode-field > textarea,
+.dds-note-bbcode-field > [contenteditable="true"]{order:3 !important;width:100% !important;max-width:100% !important;box-sizing:border-box !important;}
+.dds-note-bbcode-field > span:first-child,
+.dds-note-bbcode-field > strong:first-child{order:1 !important;}
+
 @media (max-width:1100px){
-  .dds-panel[data-panel*="editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-  .dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-  .dds-protected-commission-editor :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-  [class*="commission-editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
-  .dds-panel[data-panel*="editor"] iframe,
-  .dds-panel[data-panel^="editor-"] iframe,
-  .dds-protected-commission-editor iframe,
-  [class*="commission-editor"] iframe{
+  body.dds-v191-central-preview
+  :is(.dds-panel[data-panel^="editor-"],.dds-panel[data-panel*="editor"],.dds-protected-commission-editor,[class*="commission-editor"])
+  :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"],iframe.dds-v191-editor-preview,.dds-editor-preview-frame,.dds-protected-commission-preview-frame){
     height:65vh !important;
     min-height:380px !important;
     max-height:760px !important;
