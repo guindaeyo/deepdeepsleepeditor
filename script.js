@@ -5573,7 +5573,30 @@ ${stylesheetLinks}
   window.__ddsDeferCommissionInstallerV212(installMyOwnCodeTopicHeader);
   normalizeShowcaseCardLabels();
   window.__ddsDeferCommissionInstallerV212(installThreeColumnShowcaseGrids);
-  installBlankEditorFormsAndBbcodeTools();
+  const activateBlankEditorToolsV213 = () => {
+    installBlankEditorFormsAndBbcodeTools();
+  };
+
+  const blankEditorTriggerV213 = [
+    "[data-edit-code]", "[data-edit-profile]", "[data-edit-review]",
+    "[data-commission-edit]", "[data-protected-commission-edit]",
+    "[data-edit-protected-commission]", "[data-code013-edit]", "[data-code014-edit]",
+    "[data-rora-edit]", "[data-hans-edit]", "[data-jewel-edit]",
+    "[data-landon-file-edit]", "[data-alan-edit]", "[data-mhp-edit]",
+    ".dds-roleplay-edit", ".dds-profile-edit", ".dds-review-edit",
+    ".dds-commission-card button"
+  ].join(",");
+
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target?.closest?.(blankEditorTriggerV213)) {
+      activateBlankEditorToolsV213();
+    }
+  }, true);
+
+  if (/#(?:editor-|protected-)/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
+    activateBlankEditorToolsV213();
+  }
+
   installStaticCataloguePreviewFix();
   installStaticFoodReviewCataloguePreviewFix();
   window.__DDS_PERFORMANCE_BUILD_READY__ = true;
@@ -7081,45 +7104,67 @@ ${stylesheetLinks}
     installOfficialCardPreviewProtection();
     installLivePreviewPerformanceFix();
 
-    const panels = Array.from(document.querySelectorAll(EDITOR_PANEL_SELECTOR));
-    panels.forEach((panel) => {
-      getPanelState(panel);
-      installDraftManager(panel);
-      installBbcodeToolbars(panel);
-      installRoleplayWordCounters(panel);
-    });
+    const initializedPanels = new Set();
 
-    const activateCurrentPanel = () => {
-      const activePanel = panels.find((panel) => panel.classList.contains("is-active"));
-      if (activePanel) {
-        activatePanel(activePanel);
+    function ensurePanel(panel) {
+      if (!panel || !isEditorPanel(panel)) return;
+
+      if (!initializedPanels.has(panel)) {
+        getPanelState(panel);
+        installDraftManager(panel);
+        installBbcodeToolbars(panel);
+        installRoleplayWordCounters(panel);
+        initializedPanels.add(panel);
       }
-    };
 
-    activateCurrentPanel();
+      activatePanel(panel);
+    }
 
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === "class" &&
-          mutation.target.classList.contains("is-active") &&
-          isEditorPanel(mutation.target)
-        ) {
-          activatePanel(mutation.target);
-        }
-      }
-    });
+    function activeEditorPanel() {
+      return Array.from(document.querySelectorAll(EDITOR_PANEL_SELECTOR))
+        .find((panel) => panel.classList.contains("is-active")) || null;
+    }
 
-    panels.forEach((panel) => {
-      observer.observe(panel, {
-        attributes: true,
-        attributeFilter: ["class"]
+    let activationFrame = 0;
+    function scheduleActivePanel() {
+      cancelAnimationFrame(activationFrame);
+      activationFrame = requestAnimationFrame(() => {
+        activationFrame = requestAnimationFrame(() => {
+          activationFrame = 0;
+          const panel = activeEditorPanel();
+          if (panel) ensurePanel(panel);
+        });
       });
-    });
+    }
+
+    const editorTrigger = [
+      "[data-edit-code]", "[data-edit-profile]", "[data-edit-review]",
+      "[data-commission-edit]", "[data-protected-commission-edit]",
+      "[data-edit-protected-commission]", "[data-code013-edit]", "[data-code014-edit]",
+      "[data-rora-edit]", "[data-hans-edit]", "[data-jewel-edit]",
+      "[data-landon-file-edit]", "[data-alan-edit]", "[data-mhp-edit]",
+      ".dds-roleplay-edit", ".dds-profile-edit", ".dds-review-edit",
+      ".dds-commission-card button"
+    ].join(",");
+
+    document.addEventListener("pointerdown", (event) => {
+      if (event.target?.closest?.(editorTrigger)) scheduleActivePanel();
+    }, true);
+
+    document.addEventListener("focusin", (event) => {
+      const panel = event.target?.closest?.(EDITOR_PANEL_SELECTOR);
+      if (panel && isEditorPanel(panel)) ensurePanel(panel);
+    }, true);
+
+    window.addEventListener("hashchange", scheduleActivePanel, { passive: true });
+    window.addEventListener("popstate", scheduleActivePanel, { passive: true });
+
+    if (/#(?:editor-|protected-)/i.test(String(window.location.hash || window.__DDS_INITIAL_DEEP_LINK_HASH__ || ""))) {
+      scheduleActivePanel();
+    }
 
     window.addEventListener("beforeunload", () => {
-      panels.forEach((panel) => {
+      initializedPanels.forEach((panel) => {
         const state = getPanelState(panel);
         if (state.initialized) {
           window.clearTimeout(state.saveTimer);

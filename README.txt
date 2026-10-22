@@ -1,16 +1,17 @@
-DEEP DEEP SLEEP CODE SHOP — V212 FAST BOOT
+DEEP DEEP SLEEP CODE SHOP — V213 INTERACTIVE-FIRST
 
-ใช้ไฟล์ 5 ตัวนี้วางทับชุดเดิม:
+Files to upload/replace:
 - index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V212 เปลี่ยนเฉพาะการบูตหน้าเว็บ:
-- Commission/Activity editors ไม่สร้างทั้งหมดตั้งแต่หน้าแรกอีก
-- ค่อยติดตั้งเมื่อเข้า COMMISSION & ACTIVITY หรือเปิด deep link ของ Commission
-- ตัดการสแกน editor ที่ซ่อนทั้งหมดจาก Central Preview ตอน startup
-- ระบบ Preview V211, GGUM, HANS, scrollbar และ Cloud/Draft คงไว้
+What changed in V213 (performance only):
+- The 1.2 MB local enhancement script is no longer executed on the home page at startup.
+- It loads on the first Roleplay / Profile / Review / Commission / Edit interaction.
+- Direct editor/protected/view deep-links still load the enhancement script immediately.
+- Draft/BBCode/word-counter setup is lazy per active editor instead of scanning every editor at startup.
+- Existing V212 preview behavior and cloud files are retained.
 
-หลังวางไฟล์ให้กด Ctrl+F5 หนึ่งครั้ง
+After replacing files, hard refresh once (Ctrl+F5).
