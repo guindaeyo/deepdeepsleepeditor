@@ -14728,3 +14728,18 @@ body.dds-y2k-vampire :is(
   .dds-code014-editor-stage,.dds-v210-auto-stage,
   [class*="preview-stage"]
 )::-webkit-scrollbar { display:none !important; width:0 !important; height:0 !important; }
+
+
+/* v241 — CODE014 only: keep the live-preview scroll functional but invisible
+   from the first paint, including legacy inline scrollbar styling. */
+body.dds-y2k-vampire .dds-code014-editor.is-active .dds-code014-editor-stage {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+body.dds-y2k-vampire .dds-code014-editor.is-active .dds-code014-editor-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}

@@ -24,7 +24,7 @@
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-<link href="./style.css?v=20261022-v239-invisible-preview-scroll" rel="stylesheet"/>
+<link href="./style.css?v=20261022-v241-code014-preview-initial-fix" rel="stylesheet"/>
 </head>
 <body class="dds-y2k-vampire">
 <div aria-hidden="true" class="dds-noise"></div>
@@ -6294,10 +6294,10 @@ You were mine forever</textarea>
     stage.style.setProperty("max-height", "100%", "important");
     stage.style.setProperty("overflow-y", "auto", "important");
     stage.style.setProperty("overflow-x", "hidden", "important");
-    stage.style.setProperty("scrollbar-width", "thin", "important");
+    stage.style.setProperty("scrollbar-width", "none", "important");
     stage.style.setProperty(
       "scrollbar-color",
-      "#c11724 #090909",
+      "transparent transparent",
       "important"
     );
     stage.style.setProperty(
@@ -6833,6 +6833,17 @@ You were mine forever</textarea>
         updatePreview();
       });
     });
+
+    // CODE014: run the same preview sizing pass once the editor is fully
+    // laid out, without requiring a user to edit a field first.
+    [180, 520].forEach((delay) => window.setTimeout(() => {
+      if (!target.classList.contains("is-active")) return;
+      const frame = target.querySelector("[data-code014-editor-preview]");
+      const stage = target.querySelector(".dds-code014-editor-stage");
+      if (!frame || !stage) return;
+      sizeEditorPreviewActual(frame, stage, 28);
+      if (delay === 180) stage.scrollTop = 0;
+    }, delay));
   }
 
   window.__ddsOpenCode014FixedV172 =

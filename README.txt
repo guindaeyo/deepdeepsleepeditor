@@ -1,3 +1,1 @@
-Deep Deep Sleep Code Shop — V240 CODE014 Browser Back Fix
-Based on v239. Only index.html CODE014 openEditor history route changed.
-Opening CODE014 preserves #roleplay underneath #editor-code014 so the real browser Back returns to FOR ROLEPLAY in one click. Other modules unchanged.
+v241 — CODE014 initial preview position + invisible left scrollbar. Based on v240. Only CODE014 initial preview refit in index.html and scoped scrollbar CSS changed. All other files preserved.
