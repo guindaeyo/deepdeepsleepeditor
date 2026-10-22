@@ -27194,4 +27194,529 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 })();
 
+/* =========================================================
+   V185 — BBCode TOOLBAR VISIBILITY + EDITOR LIVE PREVIEW FIX
+   Final late patch for the 2026-10-22 V184 bundle.
+   - Keeps all existing V184 systems intact.
+   - Restores buttons that V184 hid with font-size:0 when an
+     alternate data-* BBCode attribute was used.
+   - Renders BBCode in editor-side iframe previews, including
+     fast DOM patch paths and direct srcdoc writes.
+========================================================= */
+(() => {
+  "use strict";
 
+  if (window.__DDS_BBCODE_V185_FIX__) return;
+  window.__DDS_BBCODE_V185_FIX__ = true;
+
+  const ICONS = {
+    b: "bi-type-bold",
+    bold: "bi-type-bold",
+    i: "bi-type-italic",
+    italic: "bi-type-italic",
+    u: "bi-type-underline",
+    underline: "bi-type-underline",
+    s: "bi-type-strikethrough",
+    strike: "bi-type-strikethrough",
+    strikethrough: "bi-type-strikethrough",
+    "size-small": "bi-type",
+    "size-medium": "bi-fonts",
+    "size-large": "bi-type-h1",
+    "align-left": "bi-text-left",
+    "align-center": "bi-text-center",
+    "align-right": "bi-text-right",
+    "align-justify": "bi-justify",
+    left: "bi-text-left",
+    center: "bi-text-center",
+    right: "bi-text-right",
+    justify: "bi-justify",
+    url: "bi-link-45deg",
+    img: "bi-image",
+    image: "bi-image",
+    video: "bi-play-btn",
+    youtube: "bi-youtube",
+    quote: "bi-quote",
+    code: "bi-code-slash",
+    hide: "bi-eye-slash",
+    spoiler: "bi-eye",
+    list: "bi-list-ul",
+    "list-1": "bi-list-ol",
+    list1: "bi-list-ol",
+    "list-item": "bi-list",
+    hr: "bi-dash-lg",
+    clear: "bi-eraser",
+    removeformat: "bi-eraser"
+  };
+
+  function ensureCss() {
+    if (document.getElementById("ddsBbcodeV185FixStyles")) return;
+
+    const style = document.createElement("style");
+    style.id = "ddsBbcodeV185FixStyles";
+    style.textContent = `
+      .dds-panel[data-panel*="editor"] .dds-rich-toolbar button.dds-bbcode-v185-text,
+      .dds-protected-commission-editor .dds-rich-toolbar button.dds-bbcode-v185-text {
+        width:auto !important;
+        min-width:30px !important;
+        max-width:none !important;
+        padding:0 7px !important;
+        font-size:8px !important;
+        font-weight:600 !important;
+        letter-spacing:.02em !important;
+      }
+
+      .dds-panel[data-panel*="editor"] .dds-rich-toolbar button.dds-bbcode-v185-icon,
+      .dds-protected-commission-editor .dds-rich-toolbar button.dds-bbcode-v185-icon {
+        font-size:0 !important;
+      }
+
+      .dds-panel[data-panel*="editor"] .dds-rich-toolbar button.dds-bbcode-v185-icon > i.bi,
+      .dds-protected-commission-editor .dds-rich-toolbar button.dds-bbcode-v185-icon > i.bi {
+        display:inline-block !important;
+        font-size:14px !important;
+        line-height:1 !important;
+      }
+    `;
+    document.head?.appendChild(style);
+  }
+
+  function ensureIcons() {
+    if (document.querySelector('link[data-dds-bbcode-v185-icons]')) return;
+    if (document.querySelector('link[href*="bootstrap-icons"]')) return;
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css";
+    link.dataset.ddsBbcodeV185Icons = "true";
+    document.head?.appendChild(link);
+  }
+
+  function normalizeAction(value) {
+    let action = String(value || "").trim();
+    if (!action) return "";
+
+    action = action
+      .replace(/^align=(left|center|right|justify)$/i, "align-$1")
+      .replace(/^size=(small|medium|large)$/i, "size-$1")
+      .replace(/^list=1$/i, "list-1")
+      .replace(/^removeFormat$/i, "removeformat");
+
+    return action.toLowerCase();
+  }
+
+  function actionFromOpenTag(value) {
+    const open = String(value || "").trim().toLowerCase();
+
+    const simple = open.match(/^\[(b|i|u|s|quote|code|hide|spoiler|url|img|hr)\]/i);
+    if (simple) return normalizeAction(simple[1]);
+
+    const align = open.match(/^\[(?:align=)?(left|center|right|justify)\]/i);
+    if (align) return `align-${align[1].toLowerCase()}`;
+
+    const size = open.match(/^\[size=(small|medium|large)\]/i);
+    if (size) return `size-${size[1].toLowerCase()}`;
+
+    if (/^\[list=1\]/i.test(open)) return "list-1";
+    if (/^\[list\]/i.test(open)) return "list";
+    if (/^\[\*\]/i.test(open)) return "list-item";
+    if (/^\[video=youtube\]/i.test(open)) return "video";
+
+    return "";
+  }
+
+  function toolbarAction(button) {
+    if (!button) return "";
+
+    const preferred = [
+      button.dataset.bbcode,
+      button.dataset.command,
+      button.dataset.foodBbcode,
+      button.dataset.historyBbcode,
+      button.dataset.hansBbcode,
+      button.dataset.jewelBbcode,
+      button.dataset.code013Bbcode,
+      button.dataset.code014Bbcode,
+      button.dataset.ddsBbcode
+    ];
+
+    for (const value of preferred) {
+      const action = normalizeAction(value);
+      if (action) return action;
+    }
+
+    for (const [key, value] of Object.entries(button.dataset || {})) {
+      if (/bbcode$/i.test(key) && value) {
+        const action = normalizeAction(value);
+        if (action) return action;
+      }
+    }
+
+    if (button.hasAttribute("data-eric-clear")) return "clear";
+
+    const openAction =
+      actionFromOpenTag(button.dataset.ericOpen) ||
+      actionFromOpenTag(button.dataset.open) ||
+      actionFromOpenTag(button.dataset.bbcodeOpen);
+
+    if (openAction) return openAction;
+
+    const title = String(button.getAttribute("title") || "");
+    const titleTag = title.match(/\[(b|i|u|s|quote|code|hide|spoiler|url|img|hr)\]/i);
+    if (titleTag) return normalizeAction(titleTag[1]);
+
+    if (/\[video=youtube\]/i.test(title)) return "video";
+    if (/\[list=1\]/i.test(title)) return "list-1";
+    if (/\[list\]/i.test(title)) return "list";
+
+    return "";
+  }
+
+  function decorateToolbar(toolbar) {
+    if (!toolbar) return;
+
+    ensureCss();
+    ensureIcons();
+
+    toolbar.querySelectorAll("button").forEach((button) => {
+      const action = toolbarAction(button);
+      const icon = ICONS[action];
+
+      button.classList.remove(
+        "dds-bbcode-v185-text",
+        "dds-bbcode-v185-icon"
+      );
+
+      if (icon) {
+        const existing = button.querySelector(":scope > i.bi");
+        if (!existing || !existing.classList.contains(icon)) {
+          button.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
+        }
+        button.classList.add("dds-bbcode-v185-icon");
+        return;
+      }
+
+      // Never leave a V184 font-size:0 button visibly blank.
+      button.classList.add("dds-bbcode-v185-text");
+
+      if (!String(button.textContent || "").trim()) {
+        const fallback =
+          action ||
+          button.getAttribute("aria-label") ||
+          button.getAttribute("title") ||
+          "•";
+        button.textContent = fallback;
+      }
+    });
+  }
+
+  function scanToolbars(root = document) {
+    const selectors = [
+      '.dds-panel[data-panel*="editor"] .dds-rich-toolbar',
+      '.dds-protected-commission-editor .dds-rich-toolbar'
+    ].join(",");
+
+    if (root instanceof Element && root.matches?.(".dds-rich-toolbar")) {
+      decorateToolbar(root);
+    }
+
+    root.querySelectorAll?.(selectors).forEach(decorateToolbar);
+  }
+
+  function safeUrl(value) {
+    const text = String(value || "").trim();
+    return /^(https?:)?\/\//i.test(text) ? text : "";
+  }
+
+  function escAttr(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function renderList(source, ordered) {
+    const tag = ordered ? "ol" : "ul";
+    const pattern = ordered
+      ? /\[list=1\]([\s\S]*?)\[\/list\]/gi
+      : /\[list\](?!\s*=)([\s\S]*?)\[\/list\]/gi;
+
+    return source.replace(pattern, (_match, body) => {
+      const items = String(body || "")
+        .split(/\[\*\]/i)
+        .slice(1)
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      return items
+        ? `<${tag} style="margin:12px 0;padding-left:24px;">${items}</${tag}>`
+        : "";
+    });
+  }
+
+  function renderBbcode(source) {
+    let output = String(source ?? "");
+
+    // Repeat a few passes so nested tags also settle correctly.
+    for (let pass = 0; pass < 3; pass += 1) {
+      const before = output;
+
+      output = renderList(output, true);
+      output = renderList(output, false);
+
+      output = output
+        .replace(
+          /\[align=(left|center|right|justify)\]([\s\S]*?)\[\/align\]/gi,
+          '<div style="text-align:$1;">$2</div>'
+        )
+        .replace(
+          /\[(left|center|right|justify)\]([\s\S]*?)\[\/\1\]/gi,
+          '<div style="text-align:$1;">$2</div>'
+        )
+        .replace(
+          /\[(hide|spoiler)\]([\s\S]*?)\[\/\1\]/gi,
+          (_m, type, body) =>
+            `<details class="dds-bbcode-${type}" style="margin:10px 0;border:1px solid rgba(127,127,127,.28);padding:10px 12px;"><summary style="cursor:pointer;font-weight:700;">${type.toUpperCase()}</summary><div style="margin-top:10px;">${body}</div></details>`
+        )
+        .replace(
+          /\[video=youtube\]([\s\S]*?)\[\/video\]/gi,
+          (_m, url) => {
+            const clean = safeUrl(url);
+            return clean
+              ? `<a href="${escAttr(clean)}" target="_blank" rel="noopener noreferrer">▶ YouTube</a>`
+              : "";
+          }
+        )
+        .replace(
+          /\[img\]([\s\S]*?)\[\/img\]/gi,
+          (_m, url) => {
+            const clean = safeUrl(url);
+            return clean
+              ? `<img src="${escAttr(clean)}" alt="" style="display:block;max-width:100%;height:auto;margin:12px auto;">`
+              : "";
+          }
+        )
+        .replace(
+          /\[url=([^\]]*)\]([\s\S]*?)\[\/url\]/gi,
+          (_m, url, label) => {
+            const clean = safeUrl(url);
+            return clean
+              ? `<a href="${escAttr(clean)}" target="_blank" rel="noopener noreferrer">${label || clean}</a>`
+              : label;
+          }
+        )
+        .replace(
+          /\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi,
+          '<span style="color:$1;">$2</span>'
+        )
+        .replace(
+          /\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi,
+          (_m, size, body) => {
+            const sizes = { small: ".82em", medium: "1em", large: "1.28em" };
+            return `<span style="font-size:${sizes[String(size).toLowerCase()] || "1em"};">${body}</span>`;
+          }
+        )
+        .replace(
+          /\[quote\]([\s\S]*?)\[\/quote\]/gi,
+          '<blockquote style="margin:10px 0;padding:8px 12px;border-left:2px solid currentColor;">$1</blockquote>'
+        )
+        .replace(
+          /\[code\]([\s\S]*?)\[\/code\]/gi,
+          '<code style="white-space:pre-wrap;">$1</code>'
+        )
+        .replace(
+          /\[hr\]/gi,
+          '<hr style="margin:18px 0;border:0;border-top:1px solid rgba(127,127,127,.35);">'
+        )
+        .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
+        .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
+        .replace(/\[u\]([\s\S]*?)\[\/u\]/gi, "<u>$1</u>")
+        .replace(/\[s\]([\s\S]*?)\[\/s\]/gi, "<s>$1</s>");
+
+      if (output === before) break;
+    }
+
+    return output;
+  }
+
+  window.__ddsRenderBbcodePreviewV185 = renderBbcode;
+
+  function isEditorPreviewIframe(iframe) {
+    if (!iframe) return false;
+
+    return Boolean(
+      iframe.classList?.contains("dds-editor-preview-frame") ||
+      iframe.closest?.(
+        [
+          ".dds-editor-preview-column",
+          '.dds-panel[data-panel*="editor"]',
+          ".dds-protected-commission-editor"
+        ].join(",")
+      )
+    );
+  }
+
+  // Fast preview path.
+  if (
+    typeof window.updateLoadedPreviewDocument === "function" &&
+    !window.updateLoadedPreviewDocument.__ddsBbcodeV185
+  ) {
+    const originalUpdateLoadedPreviewDocument =
+      window.updateLoadedPreviewDocument;
+
+    const wrappedUpdateLoadedPreviewDocument = function(
+      iframe,
+      srcdoc,
+      resizeFunction
+    ) {
+      const nextSrcdoc = isEditorPreviewIframe(iframe)
+        ? renderBbcode(srcdoc)
+        : srcdoc;
+
+      return originalUpdateLoadedPreviewDocument.call(
+        this,
+        iframe,
+        nextSrcdoc,
+        resizeFunction
+      );
+    };
+
+    wrappedUpdateLoadedPreviewDocument.__ddsBbcodeV185 = true;
+    window.updateLoadedPreviewDocument =
+      wrappedUpdateLoadedPreviewDocument;
+  }
+
+  // Normal queued preview path.
+  if (
+    typeof window.queuePreviewDocument === "function" &&
+    !window.queuePreviewDocument.__ddsBbcodeV185
+  ) {
+    const originalQueuePreviewDocument =
+      window.queuePreviewDocument;
+
+    const wrappedQueuePreviewDocument = function(
+      iframe,
+      srcdoc,
+      resizeFunction
+    ) {
+      const nextSrcdoc = isEditorPreviewIframe(iframe)
+        ? renderBbcode(srcdoc)
+        : srcdoc;
+
+      return originalQueuePreviewDocument.call(
+        this,
+        iframe,
+        nextSrcdoc,
+        resizeFunction
+      );
+    };
+
+    wrappedQueuePreviewDocument.__ddsBbcodeV185 = true;
+    window.queuePreviewDocument =
+      wrappedQueuePreviewDocument;
+  }
+
+  // Catch editor modules which write iframe.srcdoc directly.
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      HTMLIFrameElement.prototype,
+      "srcdoc"
+    );
+
+    if (
+      descriptor?.get &&
+      descriptor?.set &&
+      descriptor.configurable &&
+      !HTMLIFrameElement.prototype.__ddsBbcodeSrcdocV185
+    ) {
+      Object.defineProperty(
+        HTMLIFrameElement.prototype,
+        "srcdoc",
+        {
+          configurable: descriptor.configurable,
+          enumerable: descriptor.enumerable,
+          get() {
+            return descriptor.get.call(this);
+          },
+          set(value) {
+            const nextValue = isEditorPreviewIframe(this)
+              ? renderBbcode(value)
+              : value;
+            descriptor.set.call(this, nextValue);
+          }
+        }
+      );
+
+      Object.defineProperty(
+        HTMLIFrameElement.prototype,
+        "__ddsBbcodeSrcdocV185",
+        {
+          configurable: true,
+          value: true
+        }
+      );
+    }
+  } catch (error) {
+    console.warn("[DDS V185] srcdoc preview guard was not installed", error);
+  }
+
+  function boot() {
+    ensureCss();
+    ensureIcons();
+    scanToolbars(document);
+
+    [0, 80, 200, 500, 1000].forEach((delay) => {
+      window.setTimeout(() => scanToolbars(document), delay);
+    });
+
+    const root = document.querySelector(".dds-main") || document.body;
+
+    if (root && "MutationObserver" in window) {
+      const observer = new MutationObserver((records) => {
+        for (const record of records) {
+          if (record.addedNodes?.length) {
+            scanToolbars(document);
+            break;
+          }
+        }
+      });
+
+      observer.observe(root, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target?.closest?.(
+            [
+              "[data-edit-code]",
+              "[data-edit-review]",
+              "[data-code013-edit]",
+              "[data-code014-edit]",
+              "[data-commission-edit]",
+              "[data-protected-commission-edit]",
+              ".dds-commission-card button"
+            ].join(",")
+          )
+        ) {
+          [0, 80, 220].forEach((delay) => {
+            window.setTimeout(() => scanToolbars(document), delay);
+          });
+        }
+      },
+      true
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+})();
