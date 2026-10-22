@@ -1,8 +1,8 @@
-DEEP DEEP SLEEP CODE SHOP — V205 TARGETED PREVIEW FIX
+DEEP DEEP SLEEP CODE SHOP — V207
 
-ฐาน: V204
-แก้เฉพาะ:
-- จัดกึ่งกลาง preview: 0X1=LOVESONG, DUMB AND DUMBER, HIGHER THAN HEAVEN, FORTYONEWINKS, NOTHIN’ ’BOUT ME, LO$ER=LO♡ER, blue hour
-- กู้/จัด visual root ของ GGUM VER.EDM
-- HANS X. FROST / RORAIMA house thread: แสดงความสูงโคดครบใน preview ฝั่งซ้าย
-- ไม่แก้ controls ฝั่งขวา / COPY CODE / Cloud / Draft / routing
+แก้เฉพาะ Preview ฝั่งซ้ายของหน้า Edit:
+- ทุกโคดจัดกึ่งกลางจาก visual bounds ของตัวโคดจริง ไม่ใช่ wrapper เปล่า
+- ทุกโคดเริ่มที่บนสุดเมื่อเปิด Preview ครั้งแรก
+- iframe สูงตามความยาวโคดจริงทั้งหมด และ stage ฝั่งซ้าย scroll ต่อได้
+- RORAIMA / HANS X. FROST วัดจาก .ddsh-roraima และความยาวทั้งโคด
+- ไม่แตะ Controls ฝั่งขวา / COPY CODE / Cloud / Draft / routing / BBCode toolbar
