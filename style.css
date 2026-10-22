@@ -11622,3 +11622,122 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 }
 
 /* V189 FAST BOOT: no visual changes; loading work moved to lazy/on-demand JS. */
+
+/* =========================================================
+   V190 — EVERY EDITOR PREVIEW = STEADY SCROLLABLE VIEWPORT
+   One rule for every normal + protected commission editor.
+   - never fade while typing
+   - never scale/translate the iframe itself
+   - preview gets its own stable viewport
+   - long / wide code scrolls inside the preview
+========================================================= */
+
+/* Preview columns must stay inside the editor grid. */
+.dds-panel[data-panel*="editor"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
+.dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
+.dds-protected-commission-editor :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
+[class*="commission-editor"] :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]){
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+
+/* Every editor stage is a predictable viewport.  The iframe itself owns the
+   scrollbars; old per-editor overflow rules must not crop it. */
+.dds-panel[data-panel*="editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+.dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+.dds-protected-commission-editor :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+[class*="commission-editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]){
+  position:relative !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  height:clamp(430px,72vh,820px) !important;
+  min-height:430px !important;
+  max-height:82vh !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  overscroll-behavior:contain !important;
+  background:#202020 !important;
+}
+
+/* Old holders/canvases used different scaling systems.  In the editor they
+   are only viewport hosts now; the actual code remains untouched in iframe. */
+.dds-panel[data-panel*="editor"] :is([class*="preview-holder"],[class*="preview-canvas-host"]),
+.dds-panel[data-panel^="editor-"] :is([class*="preview-holder"],[class*="preview-canvas-host"]),
+.dds-protected-commission-editor :is([class*="preview-holder"],[class*="preview-canvas-host"]),
+[class*="commission-editor"] :is([class*="preview-holder"],[class*="preview-canvas-host"]){
+  position:relative !important;
+  inset:auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:visible !important;
+  transform:none !important;
+}
+
+/* Critical: every iframe in an EDITOR is a stable viewport.  This intentionally
+   overrides per-commission inline left/top/width/height/scale calculations. */
+.dds-panel[data-panel*="editor"] iframe,
+.dds-panel[data-panel^="editor-"] iframe,
+.dds-protected-commission-editor iframe,
+[class*="commission-editor"] iframe{
+  position:relative !important;
+  inset:auto !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  display:block !important;
+  width:100% !important;
+  min-width:100% !important;
+  max-width:100% !important;
+  height:clamp(430px,72vh,820px) !important;
+  min-height:430px !important;
+  max-height:82vh !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  transform:none !important;
+  transform-origin:top left !important;
+  transition:none !important;
+  animation:none !important;
+  will-change:auto !important;
+  background:#202020 !important;
+}
+
+/* Loading/ready classes from legacy renderers are never allowed to blink an
+   editor preview. Catalogue cards are outside the selectors above. */
+.dds-panel[data-panel*="editor"] iframe:is(.dds-preview-loading,.dds-preview-ready),
+.dds-panel[data-panel^="editor-"] iframe:is(.dds-preview-loading,.dds-preview-ready),
+.dds-protected-commission-editor iframe:is(.dds-preview-loading,.dds-preview-ready),
+[class*="commission-editor"] iframe:is(.dds-preview-loading,.dds-preview-ready){
+  opacity:1 !important;
+  visibility:visible !important;
+  transform:none !important;
+  transition:none !important;
+  animation:none !important;
+}
+
+@media (max-width:1100px){
+  .dds-panel[data-panel*="editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+  .dds-panel[data-panel^="editor-"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+  .dds-protected-commission-editor :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+  [class*="commission-editor"] :is(.dds-editor-preview-stage,.dds-protected-commission-preview-stage,[class*="preview-stage"]),
+  .dds-panel[data-panel*="editor"] iframe,
+  .dds-panel[data-panel^="editor-"] iframe,
+  .dds-protected-commission-editor iframe,
+  [class*="commission-editor"] iframe{
+    height:65vh !important;
+    min-height:380px !important;
+    max-height:760px !important;
+  }
+}

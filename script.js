@@ -28254,3 +28254,493 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     boot();
   }
 })();
+
+/* =========================================================
+   V190 — GLOBAL NO-RELOAD EDITOR PREVIEW + SCROLL VIEWPORT
+   Final late patch.  After an editor iframe has loaded once,
+   every update morphs the existing DOM.  No real srcdoc
+   navigation is allowed while typing, so no commission editor
+   can flash even if its legacy renderer asks for a reload.
+========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_V190_PREVIEW_SYSTEM__) return;
+  window.__DDS_V190_PREVIEW_SYSTEM__ = true;
+
+  const virtualSource = new WeakMap();
+  const initializedFrames = new WeakSet();
+  const INTERNAL_STYLE_ID = "dds-v190-editor-preview-viewport";
+
+  function looksLikePreviewFrame(iframe) {
+    if (!(iframe instanceof HTMLIFrameElement)) return false;
+
+    // Never touch catalogue/showcase cards.
+    if (
+      iframe.classList.contains("dds-roleplay-card-preview-frame") &&
+      iframe.closest(".dds-roleplay-card")
+    ) {
+      return false;
+    }
+
+    const panel = iframe.closest(
+      '[data-panel], .dds-protected-commission-editor, [class*="commission-editor"], [class*="editor-panel"]'
+    );
+    if (!panel) return false;
+
+    const hasEditingControls = Boolean(
+      panel.querySelector(
+        'textarea, input:not([type="hidden"]), select, [contenteditable="true"], .dds-protected-commission-controls-column, .dds-editor-controls-column'
+      )
+    );
+    if (!hasEditingControls) return false;
+
+    const attrText = Array.from(iframe.attributes || [])
+      .map((attribute) => `${attribute.name} ${attribute.value}`)
+      .join(" ")
+      .toLowerCase();
+
+    const previewish =
+      /preview|ตัวอย่าง/.test(attrText) ||
+      Boolean(
+        iframe.closest(
+          '.dds-editor-preview-column, .dds-protected-commission-preview-column, [class*="preview-stage"], [class*="preview-holder"], [class*="preview-column"]'
+        )
+      );
+
+    return previewish;
+  }
+
+  function renderBbcode(value) {
+    const source = String(value ?? "");
+    const renderer = window.__ddsRenderBbcodePreviewV185;
+    if (typeof renderer !== "function") return source;
+    try {
+      return renderer(source);
+    } catch {
+      return source;
+    }
+  }
+
+  function hasMeaningfulDocument(iframe) {
+    let doc;
+    try {
+      doc = iframe.contentDocument;
+    } catch {
+      return false;
+    }
+
+    if (!doc?.documentElement || !doc.body || doc.readyState === "loading") {
+      return false;
+    }
+
+    if (initializedFrames.has(iframe) || virtualSource.has(iframe)) {
+      return true;
+    }
+
+    const href = (() => {
+      try { return String(doc.location?.href || ""); }
+      catch { return ""; }
+    })();
+
+    const meaningfulBody = Boolean(
+      doc.body.children.length || String(doc.body.textContent || "").trim()
+    );
+
+    if (href === "about:srcdoc" && meaningfulBody) {
+      initializedFrames.add(iframe);
+      return true;
+    }
+
+    return false;
+  }
+
+  function importClone(ownerDocument, node) {
+    try {
+      return ownerDocument.importNode(node, true);
+    } catch {
+      return node.cloneNode(true);
+    }
+  }
+
+  function syncAttributes(currentElement, nextElement) {
+    Array.from(currentElement.attributes || []).forEach((attribute) => {
+      if (!nextElement.hasAttribute(attribute.name)) {
+        currentElement.removeAttribute(attribute.name);
+      }
+    });
+    Array.from(nextElement.attributes || []).forEach((attribute) => {
+      if (currentElement.getAttribute(attribute.name) !== attribute.value) {
+        currentElement.setAttribute(attribute.name, attribute.value);
+      }
+    });
+  }
+
+  function morphNode(currentNode, nextNode) {
+    if (!currentNode || !nextNode) return;
+
+    if (
+      currentNode.nodeType !== nextNode.nodeType ||
+      currentNode.nodeName !== nextNode.nodeName
+    ) {
+      currentNode.replaceWith(
+        importClone(currentNode.ownerDocument || document, nextNode)
+      );
+      return;
+    }
+
+    if (
+      currentNode.nodeType === Node.TEXT_NODE ||
+      currentNode.nodeType === Node.COMMENT_NODE
+    ) {
+      if (currentNode.nodeValue !== nextNode.nodeValue) {
+        currentNode.nodeValue = nextNode.nodeValue;
+      }
+      return;
+    }
+
+    if (currentNode.nodeType !== Node.ELEMENT_NODE) return;
+
+    syncAttributes(currentNode, nextNode);
+
+    // Keep existing script instances alive.  Their resize observers/listeners
+    // must not restart on each keystroke.
+    if (currentNode.nodeName === "SCRIPT") return;
+
+    const currentChildren = Array.from(currentNode.childNodes);
+    const nextChildren = Array.from(nextNode.childNodes);
+    const sharedLength = Math.min(currentChildren.length, nextChildren.length);
+
+    for (let index = 0; index < sharedLength; index += 1) {
+      morphNode(currentChildren[index], nextChildren[index]);
+    }
+
+    for (
+      let index = currentChildren.length - 1;
+      index >= nextChildren.length;
+      index -= 1
+    ) {
+      currentNode.removeChild(currentNode.childNodes[index]);
+    }
+
+    for (
+      let index = currentChildren.length;
+      index < nextChildren.length;
+      index += 1
+    ) {
+      currentNode.appendChild(
+        importClone(currentNode.ownerDocument || document, nextChildren[index])
+      );
+    }
+  }
+
+  function ensureInternalViewportStyle(iframe) {
+    if (!looksLikePreviewFrame(iframe)) return;
+
+    let doc;
+    try {
+      doc = iframe.contentDocument;
+    } catch {
+      return;
+    }
+    if (!doc?.head || !doc.documentElement || !doc.body) return;
+
+    let style = doc.getElementById(INTERNAL_STYLE_ID);
+    if (!style) {
+      style = doc.createElement("style");
+      style.id = INTERNAL_STYLE_ID;
+      doc.head.appendChild(style);
+    }
+
+    style.textContent = `
+      html, body {
+        overflow: auto !important;
+        overscroll-behavior: contain !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: #c11724 #090909 !important;
+      }
+      html { scroll-behavior: auto !important; }
+      body { min-height: 100% !important; }
+      ::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+      ::-webkit-scrollbar-track { background: #090909 !important; }
+      ::-webkit-scrollbar-thumb { background: #c11724 !important; border-radius: 999px !important; }
+      ::-webkit-scrollbar-thumb:hover { background: #df2632 !important; }
+    `;
+
+    iframe.setAttribute("scrolling", "auto");
+    iframe.classList.remove("dds-preview-loading");
+    iframe.classList.add("dds-preview-ready");
+    iframe.style.setProperty("opacity", "1", "important");
+    iframe.style.setProperty("visibility", "visible", "important");
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("transition", "none", "important");
+    iframe.style.setProperty("animation", "none", "important");
+  }
+
+  function patchHead(currentDocument, nextDocument) {
+    // Inline styles are where most editor previews store their generated CSS.
+    const currentStyles = Array.from(
+      currentDocument.head?.querySelectorAll("style:not(#" + INTERNAL_STYLE_ID + ")") || []
+    );
+    const nextStyles = Array.from(nextDocument.head?.querySelectorAll("style") || []);
+
+    const shared = Math.min(currentStyles.length, nextStyles.length);
+    for (let index = 0; index < shared; index += 1) {
+      if (currentStyles[index].textContent !== nextStyles[index].textContent) {
+        currentStyles[index].textContent = nextStyles[index].textContent;
+      }
+    }
+
+    // Most external stylesheets/fonts do not change while typing. If a source
+    // really changes them, mirror href/media without recreating the document.
+    const currentLinks = Array.from(currentDocument.head?.querySelectorAll('link[rel="stylesheet"]') || []);
+    const nextLinks = Array.from(nextDocument.head?.querySelectorAll('link[rel="stylesheet"]') || []);
+    const linkShared = Math.min(currentLinks.length, nextLinks.length);
+    for (let index = 0; index < linkShared; index += 1) {
+      syncAttributes(currentLinks[index], nextLinks[index]);
+    }
+  }
+
+  function softPatch(iframe, source) {
+    if (!looksLikePreviewFrame(iframe) || !hasMeaningfulDocument(iframe)) {
+      return false;
+    }
+
+    let doc;
+    try {
+      doc = iframe.contentDocument;
+    } catch {
+      return false;
+    }
+    if (!doc?.documentElement || !doc.body || doc.readyState === "loading") {
+      return false;
+    }
+
+    const rendered = renderBbcode(source);
+    const parsed = new DOMParser().parseFromString(rendered, "text/html");
+    if (!parsed?.documentElement || !parsed.body) return false;
+
+    const scrollElement = doc.scrollingElement || doc.documentElement;
+    const previousScrollTop = scrollElement?.scrollTop || 0;
+    const previousScrollLeft = scrollElement?.scrollLeft || 0;
+
+    try {
+      patchHead(doc, parsed);
+      syncAttributes(doc.documentElement, parsed.documentElement);
+      syncAttributes(doc.body, parsed.body);
+      morphNode(doc.body, parsed.body);
+
+      initializedFrames.add(iframe);
+      virtualSource.set(iframe, rendered);
+      ensureInternalViewportStyle(iframe);
+
+      requestAnimationFrame(() => {
+        try {
+          const nextScrollElement = doc.scrollingElement || doc.documentElement;
+          nextScrollElement.scrollTop = previousScrollTop;
+          nextScrollElement.scrollLeft = previousScrollLeft;
+        } catch {}
+
+        // Legacy editors attach resize logic to these events. Synthetic events
+        // preserve that contract without loading a new iframe document.
+        try { iframe.contentWindow?.dispatchEvent(new Event("resize")); } catch {}
+        try { iframe.dispatchEvent(new Event("load")); } catch {}
+        ensureInternalViewportStyle(iframe);
+      });
+
+      return true;
+    } catch (error) {
+      console.warn("[DDS V190] editor preview DOM morph failed", error);
+
+      // Last-resort soft replacement: still use the SAME document so the user
+      // never sees an about:blank/srcdoc navigation flash.
+      try {
+        const nextChildren = Array.from(parsed.body.childNodes).map((node) =>
+          importClone(doc, node)
+        );
+        doc.body.replaceChildren(...nextChildren);
+        syncAttributes(doc.body, parsed.body);
+        initializedFrames.add(iframe);
+        virtualSource.set(iframe, rendered);
+        ensureInternalViewportStyle(iframe);
+        return true;
+      } catch (replacementError) {
+        console.warn("[DDS V190] editor preview soft replacement failed", replacementError);
+        return false;
+      }
+    }
+  }
+
+  function markLoaded(iframe) {
+    if (!looksLikePreviewFrame(iframe)) return;
+    initializedFrames.add(iframe);
+    ensureInternalViewportStyle(iframe);
+  }
+
+  function installSrcdocGuard() {
+    let descriptor;
+    try {
+      descriptor = Object.getOwnPropertyDescriptor(
+        HTMLIFrameElement.prototype,
+        "srcdoc"
+      );
+    } catch {
+      return;
+    }
+
+    if (!descriptor?.get || !descriptor?.set || !descriptor.configurable) {
+      return;
+    }
+    if (descriptor.set.__ddsV190) return;
+
+    const previousGet = descriptor.get;
+    const previousSet = descriptor.set;
+    const rawElementSetAttribute = Element.prototype.setAttribute;
+
+    function v190Set(value) {
+      const editorPreview = looksLikePreviewFrame(this);
+      const rendered = editorPreview
+        ? renderBbcode(value)
+        : value;
+
+      if (!editorPreview) {
+        previousSet.call(this, rendered);
+        return;
+      }
+
+      // Once a real preview has loaded, never navigate it again while editing.
+      if (softPatch(this, rendered)) return;
+
+      virtualSource.delete(this);
+
+      /*
+       * IMPORTANT: V185/V189 already wrapped the JS srcdoc setter. Calling the
+       * previous setter here would let those older wrappers "patch" an empty
+       * about:blank iframe on FIRST render, skipping the real srcdoc navigation
+       * (and therefore skipping stylesheet/script startup for some commissions).
+       * Set the native content attribute directly for the first render only.
+       */
+      rawElementSetAttribute.call(this, "srcdoc", String(rendered ?? ""));
+
+      this.classList.remove("dds-preview-loading");
+      this.classList.add("dds-preview-ready");
+      this.addEventListener("load", () => markLoaded(this), { once: true });
+    }
+    v190Set.__ddsV190 = true;
+
+    Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", {
+      configurable: descriptor.configurable,
+      enumerable: descriptor.enumerable,
+      get() {
+        if (virtualSource.has(this)) return virtualSource.get(this);
+        return previousGet.call(this);
+      },
+      set: v190Set
+    });
+
+    // Also catch modules that use setAttribute('srcdoc', ...).
+    const previousSetAttribute = HTMLIFrameElement.prototype.setAttribute;
+    if (!previousSetAttribute.__ddsV190) {
+      function v190SetAttribute(name, value) {
+        if (String(name).toLowerCase() === "srcdoc" && looksLikePreviewFrame(this)) {
+          this.srcdoc = value;
+          return;
+        }
+        return previousSetAttribute.call(this, name, value);
+      }
+      v190SetAttribute.__ddsV190 = true;
+      HTMLIFrameElement.prototype.setAttribute = v190SetAttribute;
+    }
+  }
+
+  function installQueueGuards() {
+    if (typeof window.updateLoadedPreviewDocument === "function") {
+      const previousUpdate = window.updateLoadedPreviewDocument;
+      if (!previousUpdate.__ddsV190) {
+        const wrappedUpdate = function(iframe, srcdoc, resizeFunction) {
+          if (looksLikePreviewFrame(iframe) && softPatch(iframe, srcdoc)) {
+            try { resizeFunction?.(iframe); } catch {}
+            return true;
+          }
+          return previousUpdate.call(this, iframe, srcdoc, resizeFunction);
+        };
+        wrappedUpdate.__ddsV190 = true;
+        window.updateLoadedPreviewDocument = wrappedUpdate;
+      }
+    }
+
+    if (typeof window.queuePreviewDocument === "function") {
+      const previousQueue = window.queuePreviewDocument;
+      if (!previousQueue.__ddsV190) {
+        const wrappedQueue = function(iframe, srcdoc, resizeFunction) {
+          if (looksLikePreviewFrame(iframe) && softPatch(iframe, srcdoc)) {
+            try { resizeFunction?.(iframe); } catch {}
+            return true;
+          }
+          return previousQueue.call(this, iframe, srcdoc, resizeFunction);
+        };
+        wrappedQueue.__ddsV190 = true;
+        window.queuePreviewDocument = wrappedQueue;
+      }
+    }
+  }
+
+  function normalizeFrames(root = document) {
+    const frames = [];
+    if (root instanceof HTMLIFrameElement) frames.push(root);
+    root.querySelectorAll?.("iframe").forEach((frame) => frames.push(frame));
+
+    frames.forEach((iframe) => {
+      if (!looksLikePreviewFrame(iframe)) return;
+      iframe.setAttribute("scrolling", "auto");
+      iframe.classList.remove("dds-preview-loading");
+      iframe.classList.add("dds-preview-ready");
+
+      if (hasMeaningfulDocument(iframe)) {
+        initializedFrames.add(iframe);
+        ensureInternalViewportStyle(iframe);
+      } else {
+        iframe.addEventListener("load", () => markLoaded(iframe), { once: true });
+      }
+    });
+  }
+
+  function boot() {
+    installSrcdocGuard();
+    installQueueGuards();
+    normalizeFrames(document);
+
+    // Editors can be created only after a commission password is accepted.
+    // Watch only inserted nodes; no class/typing observation, so V189 speed is
+    // preserved.
+    const root = document.querySelector(".dds-main") || document.body;
+    if (root && "MutationObserver" in window) {
+      const observer = new MutationObserver((records) => {
+        for (const record of records) {
+          if (record.type !== "childList" || !record.addedNodes.length) continue;
+          record.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+            normalizeFrames(node);
+          });
+        }
+      });
+      observer.observe(root, { childList: true, subtree: true });
+    }
+
+    // Existing editors are mostly toggled visible rather than recreated.
+    document.addEventListener("click", (event) => {
+      const trigger = event.target?.closest?.(
+        '[data-edit-code], [data-edit-review], [data-commission-edit], [data-protected-commission-edit], [data-edit-protected-commission], [data-edit-food-commission], [class*="commission-card"] button'
+      );
+      if (!trigger) return;
+      requestAnimationFrame(() => normalizeFrames(document));
+      window.setTimeout(() => normalizeFrames(document), 120);
+    }, true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+})();
