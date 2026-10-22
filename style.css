@@ -11585,3 +11585,38 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   visibility: visible !important;
   transition: none !important;
 }
+
+
+/* =========================================================
+   V188 — GLOBAL EDITOR PREVIEW: NEVER FLASH WHILE TYPING
+========================================================= */
+.dds-panel[data-panel*="editor"] iframe,
+.dds-panel[data-panel^="editor-"] iframe,
+.dds-protected-commission-editor iframe,
+[class*="commission-editor"] iframe {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+.dds-panel[data-panel*="editor"] iframe.dds-preview-loading,
+.dds-panel[data-panel^="editor-"] iframe.dds-preview-loading,
+.dds-protected-commission-editor iframe.dds-preview-loading,
+[class*="commission-editor"] iframe.dds-preview-loading,
+.dds-panel[data-panel*="editor"] iframe.dds-preview-ready,
+.dds-panel[data-panel^="editor-"] iframe.dds-preview-ready,
+.dds-protected-commission-editor iframe.dds-preview-ready,
+[class*="commission-editor"] iframe.dds-preview-ready {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Landon file commission: the holder represents the visible code rather than
+   the intentionally wider source canvas, so it stays centered and readable. */
+.dds-landon-file-preview-holder,
+.dds-landon-file-view-holder {
+  overflow: visible !important;
+}

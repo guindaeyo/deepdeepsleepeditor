@@ -19734,14 +19734,56 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     try {
       const doc = iframe?.contentDocument;
       const root = doc?.querySelector(".dds-landon-file-preview-root");
-      if (!doc || !root) return { width: CANVAS_WIDTH, height: 1000 };
-      const rect = root.getBoundingClientRect();
+      const visual = doc?.querySelector(".ddsh-file-roll");
+      if (!doc || !root) {
+        return {
+          width: CANVAS_WIDTH,
+          visualWidth: CANVAS_WIDTH,
+          visualLeft: 0,
+          height: 1000
+        };
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const visualRect = visual?.getBoundingClientRect?.();
+      const visualWidth = Math.max(
+        1,
+        Math.ceil(
+          visualRect?.width ||
+          visual?.offsetWidth ||
+          CANVAS_WIDTH
+        )
+      );
+      const visualLeft = Math.max(
+        0,
+        Math.round(
+          (visualRect?.left ?? rootRect.left) - rootRect.left
+        )
+      );
+
       return {
+        // Keep the real iframe canvas intact so positioned decoration is not clipped.
         width: CANVAS_WIDTH,
-        height: Math.max(1, Math.ceil(root.scrollHeight || rect.height || doc.body.scrollHeight || 1000))
+        // Fit the visible code itself, not the blank wrapper width.
+        visualWidth,
+        visualLeft,
+        height: Math.max(
+          1,
+          Math.ceil(
+            root.scrollHeight ||
+            rootRect.height ||
+            doc.body.scrollHeight ||
+            1000
+          )
+        )
       };
     } catch {
-      return { width: CANVAS_WIDTH, height: 1000 };
+      return {
+        width: CANVAS_WIDTH,
+        visualWidth: CANVAS_WIDTH,
+        visualLeft: 0,
+        height: 1000
+      };
     }
   }
 
@@ -19760,13 +19802,30 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fitHolder(stage, holder, iframe) {
     if (!stage || !holder || !iframe) return;
     const metrics = measureIframe(iframe);
-    const availableWidth = Math.max(1, (stage.clientWidth || CANVAS_WIDTH) - 48);
-    const scale = Math.max(0.05, Math.min(1, availableWidth / metrics.width));
+    const visibleWidth = Math.max(1, metrics.visualWidth || metrics.width);
+    const availableWidth = Math.max(
+      1,
+      (stage.clientWidth || visibleWidth) - 48
+    );
+    const scale = Math.max(
+      0.05,
+      Math.min(1, availableWidth / visibleWidth)
+    );
+
+    // The iframe keeps the complete 820px source canvas, while the holder
+    // is sized to the actual visible design. Shift away the wrapper's empty
+    // left gutter so the preview no longer sits as a tiny strip on the right.
     iframe.style.setProperty("width", `${metrics.width}px`, "important");
     iframe.style.setProperty("height", `${metrics.height}px`, "important");
+    iframe.style.setProperty(
+      "left",
+      `${Math.round(-(metrics.visualLeft || 0) * scale)}px`,
+      "important"
+    );
+    iframe.style.setProperty("top", "0px", "important");
     iframe.style.setProperty("transform", `scale(${scale})`, "important");
     iframe.style.setProperty("transform-origin", "top left", "important");
-    holder.style.width = `${Math.ceil(metrics.width * scale)}px`;
+    holder.style.width = `${Math.ceil(visibleWidth * scale)}px`;
     holder.style.height = `${Math.ceil(metrics.height * scale)}px`;
   }
 
@@ -27767,9 +27826,376 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 
+
+
 /* =========================================================
-   V187 — FIXED CANVAS PREVIEW WIDTH GUARD
-   Editor previews with a declared CANVAS_WIDTH must never use
-   overflowing child scrollWidth as the canvas width. This keeps
-   long text/BBCode from shrinking the whole preview into a strip.
+   V188 — GLOBAL STEADY EDITOR PREVIEW + ROLEPLAY/NOTE BBCODE
+   Final late patch. Applies to every current and dynamically
+   created editor, including protected commission editors.
 ========================================================= */
+(() => {
+  "use strict";
+
+  if (window.__DDS_V188_GLOBAL_EDITOR_FIX__) return;
+  window.__DDS_V188_GLOBAL_EDITOR_FIX__ = true;
+
+  const virtualSrcdoc = new WeakMap();
+  const toolbarScanQueued = new WeakSet();
+
+  function isEditorPanel(element) {
+    return Boolean(
+      element?.closest?.(
+        [
+          '.dds-panel[data-panel*="editor"]',
+          '.dds-panel[data-panel^="editor-"]',
+          '.dds-protected-commission-editor',
+          '[class*="commission-editor"]',
+          '[class*="editor-panel"]'
+        ].join(',')
+      )
+    );
+  }
+
+  function isEditorPreviewIframe(iframe) {
+    if (!(iframe instanceof HTMLIFrameElement)) return false;
+    if (!isEditorPanel(iframe)) return false;
+
+    // A catalogue card can occasionally be nested in a complex editor DOM;
+    // it is not a live editor preview and should keep its original behavior.
+    if (
+      iframe.classList.contains('dds-roleplay-card-preview-frame') &&
+      iframe.closest('.dds-roleplay-card')
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function importClone(ownerDocument, node) {
+    try {
+      return ownerDocument.importNode(node, true);
+    } catch {
+      return node.cloneNode(true);
+    }
+  }
+
+  function syncAttributes(currentElement, nextElement) {
+    Array.from(currentElement.attributes || []).forEach((attribute) => {
+      if (!nextElement.hasAttribute(attribute.name)) {
+        currentElement.removeAttribute(attribute.name);
+      }
+    });
+
+    Array.from(nextElement.attributes || []).forEach((attribute) => {
+      if (currentElement.getAttribute(attribute.name) !== attribute.value) {
+        currentElement.setAttribute(attribute.name, attribute.value);
+      }
+    });
+  }
+
+  function morphNode(currentNode, nextNode) {
+    if (!currentNode || !nextNode) return;
+
+    if (
+      currentNode.nodeType !== nextNode.nodeType ||
+      currentNode.nodeName !== nextNode.nodeName
+    ) {
+      currentNode.replaceWith(
+        importClone(currentNode.ownerDocument || document, nextNode)
+      );
+      return;
+    }
+
+    if (
+      currentNode.nodeType === Node.TEXT_NODE ||
+      currentNode.nodeType === Node.COMMENT_NODE
+    ) {
+      if (currentNode.nodeValue !== nextNode.nodeValue) {
+        currentNode.nodeValue = nextNode.nodeValue;
+      }
+      return;
+    }
+
+    if (currentNode.nodeType !== Node.ELEMENT_NODE) return;
+
+    syncAttributes(currentNode, nextNode);
+
+    // Existing preview scripts already own resize/observer state. Keeping the
+    // current script node avoids tearing that state down on every keystroke.
+    if (currentNode.nodeName === 'SCRIPT') return;
+
+    const currentChildren = Array.from(currentNode.childNodes);
+    const nextChildren = Array.from(nextNode.childNodes);
+    const shared = Math.min(currentChildren.length, nextChildren.length);
+
+    for (let index = 0; index < shared; index += 1) {
+      morphNode(currentChildren[index], nextChildren[index]);
+    }
+
+    for (let index = currentChildren.length - 1; index >= nextChildren.length; index -= 1) {
+      currentNode.removeChild(currentNode.childNodes[index]);
+    }
+
+    for (let index = currentChildren.length; index < nextChildren.length; index += 1) {
+      currentNode.appendChild(
+        importClone(currentNode.ownerDocument || document, nextChildren[index])
+      );
+    }
+  }
+
+  function renderBbcode(value) {
+    const renderer = window.__ddsRenderBbcodePreviewV185;
+    if (typeof renderer !== 'function') return String(value ?? '');
+    try {
+      return renderer(String(value ?? ''));
+    } catch {
+      return String(value ?? '');
+    }
+  }
+
+  function patchExistingPreview(iframe, source) {
+    if (!isEditorPreviewIframe(iframe)) return false;
+
+    let previewDocument;
+    try {
+      previewDocument = iframe.contentDocument;
+    } catch {
+      return false;
+    }
+
+    if (
+      !previewDocument?.documentElement ||
+      !previewDocument.body ||
+      previewDocument.readyState === 'loading'
+    ) {
+      return false;
+    }
+
+    const rendered = renderBbcode(source);
+    const parsed = new DOMParser().parseFromString(rendered, 'text/html');
+    if (!parsed?.body) return false;
+
+    try {
+      // Update inline preview styles when an editor generates them dynamically.
+      const currentStyles = Array.from(previewDocument.head?.querySelectorAll('style') || []);
+      const nextStyles = Array.from(parsed.head?.querySelectorAll('style') || []);
+      const styleCount = Math.min(currentStyles.length, nextStyles.length);
+      for (let index = 0; index < styleCount; index += 1) {
+        if (currentStyles[index].textContent !== nextStyles[index].textContent) {
+          currentStyles[index].textContent = nextStyles[index].textContent;
+        }
+      }
+
+      syncAttributes(previewDocument.documentElement, parsed.documentElement);
+      syncAttributes(previewDocument.body, parsed.body);
+      morphNode(previewDocument.body, parsed.body);
+
+      virtualSrcdoc.set(iframe, rendered);
+      iframe.classList.remove('dds-preview-loading');
+      iframe.classList.add('dds-preview-ready');
+
+      // Let every legacy editor keep its resize contract without navigating
+      // the iframe to a blank/loading document.
+      queueMicrotask(() => {
+        try {
+          iframe.contentWindow?.dispatchEvent(new Event('resize'));
+        } catch {}
+        try {
+          iframe.dispatchEvent(new Event('load'));
+        } catch {}
+      });
+
+      return true;
+    } catch (error) {
+      console.warn('[DDS V188] steady editor DOM patch failed', error);
+      return false;
+    }
+  }
+
+  function installGlobalSrcdocGuard() {
+    let descriptor;
+    try {
+      descriptor = Object.getOwnPropertyDescriptor(
+        HTMLIFrameElement.prototype,
+        'srcdoc'
+      );
+    } catch {
+      return;
+    }
+
+    if (
+      !descriptor?.get ||
+      !descriptor?.set ||
+      !descriptor.configurable ||
+      descriptor.set?.__ddsV188
+    ) {
+      return;
+    }
+
+    const previousGet = descriptor.get;
+    const previousSet = descriptor.set;
+
+    function steadySet(value) {
+      const rendered = isEditorPreviewIframe(this)
+        ? renderBbcode(value)
+        : value;
+
+      if (patchExistingPreview(this, rendered)) {
+        return;
+      }
+
+      virtualSrcdoc.delete(this);
+      return previousSet.call(this, rendered);
+    }
+    steadySet.__ddsV188 = true;
+
+    Object.defineProperty(HTMLIFrameElement.prototype, 'srcdoc', {
+      configurable: descriptor.configurable,
+      enumerable: descriptor.enumerable,
+      get() {
+        if (virtualSrcdoc.has(this)) {
+          return virtualSrcdoc.get(this);
+        }
+        return previousGet.call(this);
+      },
+      set: steadySet
+    });
+  }
+
+  function getSemanticText(target) {
+    const label = target.closest('label');
+    const section = target.closest('.dds-control-section');
+    const labelText = label?.querySelector(':scope > span, :scope > strong')?.textContent || label?.textContent || '';
+    const sectionText = section?.querySelector('.dds-control-title h2, .dds-control-title h3')?.textContent || '';
+    const attrs = Array.from(target.attributes || [])
+      .filter((attribute) => /^data-.*field|^name$|^id$|^placeholder$/i.test(attribute.name))
+      .map((attribute) => attribute.value)
+      .join(' ');
+
+    return `${labelText} ${sectionText} ${attrs}`
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  function isRoleplayOrNoteTarget(target) {
+    if (!target?.matches?.('textarea, input[type="text"], input:not([type]), [contenteditable="true"]')) {
+      return false;
+    }
+    if (!isEditorPanel(target)) return false;
+    if (target.matches('[data-dds-no-bbcode-hard], [data-named-save-name], [data-bbcode-color]')) return false;
+    if (target.closest('.dds-rich-toolbar, .dds-named-save-library, .dds-color-field')) return false;
+
+    const text = getSemanticText(target);
+    const noteClassifier = window.__ddsGetNoteBbcodeKind;
+    if (typeof noteClassifier === 'function') {
+      try {
+        if (noteClassifier(target)) return true;
+      } catch {}
+    }
+
+    const looksLikeNote =
+      /(?:หมายเหตุ|(?:^|[\s_-])note(?:text|content|label|prefix)?(?:$|[\s_-]))/i.test(text);
+    const looksLikeNoteDecoration =
+      /(?:สี|color|ขอบ|border|พื้น(?:หลัง)?|background|icon|symbol)/i.test(text);
+
+    if (looksLikeNote && !looksLikeNoteDecoration) {
+      return true;
+    }
+
+    return /(?:เนื้อหา\s*โรลเพลย์|ข้อความ\s*โรลเพลย์|role\s*play|roleplay|rp\s*text|rpcontent|roletext|rolecontent)/i.test(text);
+  }
+
+  function ensureRoleplayAndNoteToolbars(root = document) {
+    const installer = window.__ddsInstallBbcodeToolbarForTarget;
+    if (typeof installer !== 'function') return;
+
+    const targets = [];
+    if (root instanceof Element && isRoleplayOrNoteTarget(root)) targets.push(root);
+    root.querySelectorAll?.('textarea, input[type="text"], input:not([type]), [contenteditable="true"]').forEach((target) => {
+      if (isRoleplayOrNoteTarget(target)) targets.push(target);
+    });
+
+    targets.forEach((target) => {
+      target.removeAttribute('data-dds-no-bbcode');
+      delete target.dataset.ddsNoBbcode;
+      installer(target);
+
+      const toolbar = target.previousElementSibling?.classList?.contains('dds-rich-toolbar')
+        ? target.previousElementSibling
+        : target.closest('label')?.querySelector(`.dds-rich-toolbar[data-toolbar-for="${CSS.escape(target.id || '')}"]`);
+
+      if (toolbar) {
+        window.__ddsDecorateNoteBbcodeToolbar?.(toolbar, target);
+      }
+    });
+  }
+
+  function steadyEditorFrames(root = document) {
+    const frames = [];
+    if (root instanceof HTMLIFrameElement) frames.push(root);
+    root.querySelectorAll?.('iframe').forEach((iframe) => frames.push(iframe));
+
+    frames.forEach((iframe) => {
+      if (!isEditorPreviewIframe(iframe)) return;
+      iframe.classList.remove('dds-preview-loading');
+      iframe.classList.add('dds-preview-ready');
+      iframe.style.setProperty('opacity', '1', 'important');
+      iframe.style.setProperty('visibility', 'visible', 'important');
+      iframe.style.setProperty('transition', 'none', 'important');
+      iframe.style.setProperty('animation', 'none', 'important');
+    });
+  }
+
+  function scan(root = document) {
+    ensureRoleplayAndNoteToolbars(root);
+    steadyEditorFrames(root);
+  }
+
+  function boot() {
+    installGlobalSrcdocGuard();
+    scan(document);
+
+    [0, 80, 220, 600, 1200].forEach((delay) => {
+      window.setTimeout(() => scan(document), delay);
+    });
+
+    const observer = new MutationObserver((records) => {
+      const roots = new Set();
+      for (const record of records) {
+        if (record.type === 'childList') {
+          record.addedNodes.forEach((node) => {
+            if (node instanceof Element) roots.add(node);
+          });
+        }
+        if (record.type === 'attributes' && record.target instanceof Element) {
+          roots.add(record.target);
+        }
+      }
+      if (!roots.size) return;
+      roots.forEach((root) => scan(root));
+    });
+
+    observer.observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    document.addEventListener('input', (event) => {
+      const target = event.target;
+      if (!target || !isEditorPanel(target)) return;
+      // Dynamic commission editors can be inserted only after unlock.
+      ensureRoleplayAndNoteToolbars(target.closest('[data-panel], .dds-protected-commission-editor') || document);
+      steadyEditorFrames(target.closest('[data-panel], .dds-protected-commission-editor') || document);
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+})();

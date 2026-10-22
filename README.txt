@@ -1,17 +1,17 @@
-DEEP DEEP SLEEP CODE SHOP — V187 READY
+DEEP DEEP SLEEP EDITOR — V188 READY
 
-ใช้ไฟล์ 5 ตัวนี้เขียนทับชุด V186 เดิม:
-1. index.html
-2. style.css
-3. script.js
-4. cloud-config.js
-5. cloud-bridge.js
+ใช้ไฟล์ทั้งหมดในโฟลเดอร์นี้เขียนทับชุดเดิม:
+- index.html
+- style.css
+- script.js
+- cloud-config.js
+- cloud-bridge.js
 
-V187 แก้เพิ่มเติม:
-- พรีวิวหน้า Editor ไม่กะพริบเหมือน V186
-- แก้พรีวิวบางโคดถูกย่อเป็นแถบแคบ/ไปกองด้านขวา
-- Fixed-canvas preview จะยึดความกว้าง canvas จริง ไม่ใช้ scrollWidth จากข้อความ/องค์ประกอบที่ล้น
-- ขยาย fast DOM patch ให้รองรับ preview-root/preview-shell เพิ่มขึ้น
-- BBCode live preview และ Cloud Save จาก V185/V186 ยังคงเดิม
+V188 แก้:
+1) Live Preview ทุกหน้า Editor ไม่ fade/ไม่ดับระหว่างพิมพ์
+2) ถ้า iframe โหลดแล้ว จะ patch DOM เดิมแทนการ reload srcdoc
+3) Dynamic/Commission editor ถูกครอบด้วยระบบเดียวกัน
+4) ช่องเนื้อหาโรลเพลย์และหมายเหตุใน editor/commission ที่สร้างทีหลัง จะได้รับ BBCode toolbar อัตโนมัติ
+5) Landon A. Rutherford ใช้ความกว้างของตัวโคดจริงสำหรับ fit preview แทน blank canvas 820px
 
-หลังอัปโหลดให้กด Ctrl + F5
+หลังอัปโหลดให้ Ctrl+F5
