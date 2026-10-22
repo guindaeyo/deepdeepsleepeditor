@@ -4622,6 +4622,30 @@ ${stylesheetLinks}
         );
 
         output = output
+          .replace(
+            /\[color=([^\]]+)\]([\s\S]*?)\[\/color\]/gi,
+            '<span style="color:$1;">$2</span>'
+          )
+          .replace(
+            /\[size=(small|medium|large)\]([\s\S]*?)\[\/size\]/gi,
+            (_match, size, body) => {
+              const sizes = {
+                small: "0.82em",
+                medium: "1em",
+                large: "1.28em"
+              };
+
+              return `<span style="font-size:${sizes[size] || "1em"};">${body}</span>`;
+            }
+          )
+          .replace(
+            /\[quote\]([\s\S]*?)\[\/quote\]/gi,
+            '<blockquote style="margin:10px 0;padding:8px 12px;border-left:2px solid currentColor;">$1</blockquote>'
+          )
+          .replace(
+            /\[code\]([\s\S]*?)\[\/code\]/gi,
+            '<code style="white-space:pre-wrap;">$1</code>'
+          )
           .replace(/\[hr\]/gi, '<hr style="margin:18px 0;border:0;border-top:1px solid rgba(127,127,127,.35);">')
           .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "<strong>$1</strong>")
           .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "<em>$1</em>")
@@ -6077,7 +6101,90 @@ ${stylesheetLinks}
     return target.id;
   }
 
+  function isNoteBbcodeTarget(target) {
+    if (
+      !target?.matches?.(
+        "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      target.closest?.(
+        ".dds-rich-toolbar, .dds-named-save-library, .dds-color-field"
+      ) ||
+      target.matches?.(
+        "[data-named-save-name], [data-bbcode-color]"
+      )
+    ) {
+      return false;
+    }
+
+    const label =
+      target.closest?.("label");
+
+    const labelTitle =
+      label?.querySelector?.(":scope > span")?.textContent ||
+      label?.querySelector?.(":scope > strong")?.textContent ||
+      label?.textContent ||
+      "";
+
+    const keyText = [
+      target.id || "",
+      target.name || "",
+      target.getAttribute?.("data-dds-field-key") || "",
+      target.getAttribute?.("data-hans-field") || "",
+      target.getAttribute?.("data-jewel-field") || "",
+      target.getAttribute?.("data-landon-file-field") || "",
+      target.getAttribute?.("data-code013-field") || "",
+      target.getAttribute?.("data-code014-field") || "",
+      target.getAttribute?.("data-mhp-field") || ""
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    const visibleText =
+      String(labelTitle || "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const excludedVisible =
+      /สี|color|คำหน้า|label|สัญลักษณ์|symbol|icon|ขอบ|border|พื้น(?:หลัง)?|background|topnote/i
+        .test(visibleText);
+
+    const excludedKey =
+      /(?:notelabel|note-label|notecolor|note-color|noteborder|note-border|topnote|noteicon|note-icon)/i
+        .test(keyText);
+
+    if (
+      excludedVisible ||
+      excludedKey
+    ) {
+      return false;
+    }
+
+    const visibleIsNote =
+      /ข้อความ\s*(?:หมายเหตุ|note)|^(?:หมายเหตุ|note)$/i
+        .test(visibleText);
+
+    const keyIsNote =
+      /(?:^|[\s_-])note(?:text|content)?(?:$|[\s_-])/i
+        .test(keyText) ||
+      /(?:notetext|notecontent)$/i
+        .test(keyText);
+
+    return Boolean(
+      visibleIsNote ||
+      keyIsNote
+    );
+  }
+
   function isLongTextTarget(target) {
+    if (isNoteBbcodeTarget(target)) {
+      return true;
+    }
+
     if (target.matches?.("[data-dds-no-bbcode]") || target.closest?.(".dds-rich-toolbar, .dds-named-save-library") || target.matches?.("[data-named-save-name], [data-bbcode-color]")) {
       return false;
     }
@@ -6551,18 +6658,59 @@ ${stylesheetLinks}
     colorInput?.addEventListener("change", () => {
       applyBbcodeAction(target, "color", toolbar);
     });
+
+    if (isNoteBbcodeTarget(target)) {
+      target.dataset.ddsNoteBbcode = "true";
+      target
+        .closest("label")
+        ?.classList.add(
+          "dds-note-bbcode-field"
+        );
+    }
   }
+
+  window.__ddsIsNoteBbcodeTarget =
+    isNoteBbcodeTarget;
+
+  window.__ddsInstallBbcodeToolbarForTarget =
+    installBbcodeToolbarForTarget;
 
   function removeDisabledBbcodeToolbars(panel) {
     if (!panel) return;
-    panel.querySelectorAll("[data-dds-no-bbcode]").forEach((target) => {
-      const previous = target.previousElementSibling;
-      if (previous?.classList?.contains("dds-rich-toolbar")) previous.remove();
-      if (target.id) {
-        panel.querySelectorAll(`[data-toolbar-for="${target.id}"]`).forEach((toolbar) => toolbar.remove());
-      }
-      delete target.dataset.ddsBbcodeReady;
-    });
+
+    panel
+      .querySelectorAll("[data-dds-no-bbcode]")
+      .forEach((target) => {
+        if (isNoteBbcodeTarget(target)) {
+          target.removeAttribute(
+            "data-dds-no-bbcode"
+          );
+          return;
+        }
+
+        const previous =
+          target.previousElementSibling;
+
+        if (
+          previous?.classList?.contains(
+            "dds-rich-toolbar"
+          )
+        ) {
+          previous.remove();
+        }
+
+        if (target.id) {
+          panel
+            .querySelectorAll(
+              `[data-toolbar-for="${target.id}"]`
+            )
+            .forEach(
+              (toolbar) => toolbar.remove()
+            );
+        }
+
+        delete target.dataset.ddsBbcodeReady;
+      });
   }
 
   function installBbcodeToolbars(panel) {
@@ -26279,4 +26427,211 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
       return true;
     };
+})();
+
+
+/* =========================================================
+   ALL EDITORS — NOTE BBCode AUTO-INSTALL v182
+   Uses the existing BBCode toolbar on every real NOTE text field.
+========================================================= */
+(() => {
+  "use strict";
+
+  if (
+    window.__DDS_NOTE_BBCODE_ALL_EDITORS_V182__
+  ) {
+    return;
+  }
+
+  window.__DDS_NOTE_BBCODE_ALL_EDITORS_V182__ =
+    true;
+
+  let scanFrame = 0;
+
+  function isInsideEditor(target) {
+    return Boolean(
+      target?.closest?.(
+        [
+          '.dds-panel[data-panel^="editor-code"]',
+          '.dds-panel[data-panel^="editor-profile"]',
+          '.dds-panel[data-panel^="editor-review"]',
+          ".dds-protected-commission-editor",
+          '[data-panel*="editor"]'
+        ].join(",")
+      )
+    );
+  }
+
+  function scan(root = document) {
+    const classify =
+      window.__ddsIsNoteBbcodeTarget;
+
+    const install =
+      window.__ddsInstallBbcodeToolbarForTarget;
+
+    if (
+      typeof classify !== "function" ||
+      typeof install !== "function"
+    ) {
+      return;
+    }
+
+    const candidates = [];
+
+    if (
+      root instanceof Element &&
+      root.matches?.(
+        "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
+      )
+    ) {
+      candidates.push(root);
+    }
+
+    root
+      .querySelectorAll?.(
+        "textarea, input[type='text'], input:not([type]), [contenteditable='true']"
+      )
+      .forEach(
+        (target) => candidates.push(target)
+      );
+
+    candidates.forEach((target) => {
+      if (
+        !isInsideEditor(target) ||
+        !classify(target)
+      ) {
+        return;
+      }
+
+      target.removeAttribute(
+        "data-dds-no-bbcode"
+      );
+
+      target.dataset.ddsNoteBbcode =
+        "true";
+
+      target
+        .closest("label")
+        ?.classList.add(
+          "dds-note-bbcode-field"
+        );
+
+      install(target);
+    });
+  }
+
+  function scheduleScan(root = document) {
+    if (scanFrame) {
+      cancelAnimationFrame(scanFrame);
+    }
+
+    scanFrame =
+      requestAnimationFrame(() => {
+        scanFrame = 0;
+        scan(root);
+      });
+  }
+
+  function boot() {
+    scan(document);
+
+    const main =
+      document.querySelector(
+        ".dds-main"
+      ) ||
+      document.body;
+
+    if (
+      main &&
+      "MutationObserver" in window
+    ) {
+      const observer =
+        new MutationObserver(
+          (records) => {
+            for (const record of records) {
+              if (
+                record.type !== "childList" ||
+                !record.addedNodes.length
+              ) {
+                continue;
+              }
+
+              for (
+                const node of record.addedNodes
+              ) {
+                if (
+                  node instanceof Element
+                ) {
+                  scheduleScan(node);
+                }
+              }
+            }
+          }
+        );
+
+      observer.observe(
+        main,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+    }
+
+    document.addEventListener(
+      "click",
+      (event) => {
+        const editButton =
+          event.target?.closest?.(
+            [
+              "[data-edit-code]",
+              "[data-edit-review]",
+              "[data-code013-edit]",
+              "[data-code014-edit]",
+              "[data-commission-edit]",
+              "[data-protected-commission-edit]",
+              ".dds-commission-card button"
+            ].join(",")
+          );
+
+        if (!editButton) {
+          return;
+        }
+
+        window.setTimeout(
+          () => scan(document),
+          0
+        );
+
+        window.setTimeout(
+          () => scan(document),
+          120
+        );
+      },
+      true
+    );
+
+    window.addEventListener(
+      "hashchange",
+      () => {
+        window.setTimeout(
+          () => scan(document),
+          0
+        );
+      },
+      { passive: true }
+    );
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once: true }
+    );
+  } else {
+    boot();
+  }
 })();
