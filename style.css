@@ -14524,3 +14524,14 @@ body.dds-y2k-vampire:has(.dds-protected-commission-editor.is-active) .dds-browse
     display: none !important;
   }
 }
+
+/* ==========================================================
+   V231 PATCH — VIEW WORK: BROWSER BACK ONLY
+   COMMISSION & SHOWCASE / ACTIVITY / MY OWN CODE
+   Hide the entire internal Back toolbar, including its space.
+   Does not affect EDIT CODE pages or browser controls.
+   ========================================================== */
+.dds-commission-view-panel .dds-commission-view-toolbar,
+.dds-commission-view-panel .dds-back-button {
+  display: none !important;
+}

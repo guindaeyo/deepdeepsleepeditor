@@ -1,10 +1,12 @@
-Deep Deep Sleep Code Shop — V220 Editor Full Height
+Deep Deep Sleep Code Shop — V231 VIEW WORK BACK BUTTON PATCH
 
-Based directly on V219 Browser Vampire Compact.
-UI-only change:
-- Directory pages keep Y2K browser chrome.
-- Every Edit page hides the simulated browser chrome.
-- Edit pages use the full browser viewport height.
-- Internal editor back button is hidden; use the real browser Back button.
-- Existing 60/40 Preview/Controls layout is preserved.
-- script.js / cloud-config.js / cloud-bridge.js are unchanged from V219.
+Change only:
+- Hide the internal Back button and its entire toolbar in every
+  .dds-commission-view-panel (including dynamically generated views).
+- Applies to COMMISSION & SHOWCASE, ACTIVITY and MY OWN CODE VIEW WORK.
+- Use the native browser Back button instead.
+- EDIT CODE and all unrelated behavior remain untouched.
+
+Deploy all six runtime files together:
+index.html, style.css, script.js, cloud-config.js, cloud-bridge.js
+(README files are informational.)
