@@ -16355,7 +16355,7 @@ ${stylesheetLinks}
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์<br><span class="dds-hans-commission-card-subtype">(สำหรับโรลเพลย์ภายใน Pine Woods Rd. No.7)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", openEditor);
@@ -17255,7 +17255,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-hans-roleplay-commission-card dds-hans-solo-roleplay-commission-card";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-hans-card-preview-frame" data-hans-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Roleplay Hans X. Frost"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์ <span class="dds-hans-commission-card-subtype">(สำหรับฮันส์คนเดียว)</span></p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-hans-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-hans-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-hans-view]")?.addEventListener("click", openView);
     card.querySelector("[data-hans-edit]")?.addEventListener("click", () => openModal());
@@ -17631,7 +17631,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function createModal(){if(modal?.isConnected)return modal;modal=document.createElement("div");modal.className="dds-commission-lock-modal";modal.id="ddsRoraimaHouseLockModal";modal.hidden=true;modal.innerHTML=`<form class="dds-commission-lock-dialog" data-rora-lock-form><small>CLIENT ACCESS / HANS X. FROST</small><h2>Protected editor</h2><p>กรอกรหัสของผู้จ้างเพื่อเปิดหน้าแก้ไขโคดกระทู้บ้าน</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" data-rora-lock-input placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" data-rora-lock-error aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-rora-lock-close>CANCEL</button></div></form>`;document.body.appendChild(modal);modal.querySelector("[data-rora-lock-close]")?.addEventListener("click",closeModal);modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});modal.querySelector("[data-rora-lock-form]")?.addEventListener("submit",async(e)=>{e.preventDefault();const input=modal.querySelector("[data-rora-lock-input]"),error=modal.querySelector("[data-rora-lock-error]"),submit=modal.querySelector('button[type="submit"]');if(!input||!error||!submit)return;submit.disabled=true;error.textContent="กำลังตรวจสอบ...";try{if(await sha256(input.value||"")===ACCESS_HASH){sessionStorage.setItem(ACCESS_SESSION_KEY,"1");error.textContent="";closeModal();openEditor()}else{error.textContent="รหัสผ่านไม่ถูกต้อง";input.select()}}catch{error.textContent="ไม่สามารถตรวจสอบรหัสได้ กรุณาลองใหม่"}finally{submit.disabled=false}});return modal}
   function openModal(){const lock=createModal();lock.hidden=false;document.body.classList.add("dds-modal-open");const input=lock.querySelector("[data-rora-lock-input]"),error=lock.querySelector("[data-rora-lock-error]");if(input)input.value="";if(error)error.textContent="";requestAnimationFrame(()=>input?.focus())}
 
-  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const stage=frame?.closest(".dds-roleplay-card-preview");warmRoraPreviewAssets();if(frame){frame.style.setProperty("visibility","hidden","important");frame.style.setProperty("opacity","0","important")}const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};render();if("ResizeObserver" in window&&stage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitCardPreview()));observer.observe(stage)}[0,100,260,600,1100,1900].forEach(delay=>window.setTimeout(()=>fitCardPreview(),delay));return true}
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector(".dds-commission-grid");if(!grid)return false;if(grid.querySelector(".dds-roraima-house-commission-card"))return true;card=document.createElement("article");card.className="dds-roleplay-card dds-commission-card dds-roraima-house-commission-card";card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-rora-card-preview-frame" data-rora-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น RORAIMA House"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทกระทู้บ้าน</p><p class="dds-commission-card-client">ผู้จ้าง <strong>HANS X. FROST</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rora-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rora-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;grid.appendChild(card);card.querySelector("[data-rora-view]")?.addEventListener("click",openView);card.querySelector("[data-rora-edit]")?.addEventListener("click",()=>openModal());const frame=card.querySelector("[data-rora-card-preview]");const stage=frame?.closest(".dds-roleplay-card-preview");warmRoraPreviewAssets();if(frame){frame.style.setProperty("visibility","hidden","important");frame.style.setProperty("opacity","0","important")}const render=()=>{if(cardRendered||!frame)return;cardRendered=true;writeIframe(frame,OFFICIAL_CODE,fitCardPreview)};render();if("ResizeObserver" in window&&stage){const observer=new ResizeObserver(()=>requestAnimationFrame(()=>fitCardPreview()));observer.observe(stage)}[0,100,260,600,1100,1900].forEach(delay=>window.setTimeout(()=>fitCardPreview(),delay));return true}
   function install(){createModal();let attempts=0;const timer=setInterval(()=>{attempts+=1;if(installCard()||attempts>100)clearInterval(timer)},100);window.addEventListener("resize",()=>{fitCardPreview();fitEditorPreview();fitViewPreview()})}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
@@ -20567,7 +20567,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-roleplay-card-code013";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="eager" fetchpriority="high" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-roleplay-card-preview-code013"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame" data-code013-card-preview loading="lazy" fetchpriority="low" scrolling="no" tabindex="-1" title="ตัวอย่าง DEEP DEEP SLEEP CODE013"></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE013</span><h2 class="dds-roleplay-name">candy pink magic hole flip phone</h2><button class="dds-roleplay-edit dds-code013-edit-button" data-code013-edit type="button">EDIT CODE <span>↗</span></button></div>`;
     const code14 =
       grid.querySelector(
         ".dds-roleplay-card-code014"
@@ -21575,7 +21575,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (grid.querySelector(".dds-commission-card-alan")) return true;
     card = document.createElement("article");
     card.className = "dds-roleplay-card dds-commission-card dds-commission-card-alan";
-    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="eager" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
+    card.innerHTML = `<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-alan-card-preview"><iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-alan-card-preview loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่น Alan"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Alan R. Clinton</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-alan-view type="button">VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-alan-edit type="button">EDIT CODE <span>↗</span></button></div></div>`;
     grid.appendChild(card);
     card.querySelector("[data-alan-view]")?.addEventListener("click", openView);
     card.querySelector("[data-alan-edit]")?.addEventListener("click", requestEditorAccess);
@@ -27829,15 +27829,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   V188 — GLOBAL STEADY EDITOR PREVIEW + ROLEPLAY/NOTE BBCODE
+   V189 — FAST BOOT + STEADY EDITOR PREVIEW + ROLEPLAY/NOTE BBCODE
    Final late patch. Applies to every current and dynamically
    created editor, including protected commission editors.
 ========================================================= */
 (() => {
   "use strict";
 
-  if (window.__DDS_V188_GLOBAL_EDITOR_FIX__) return;
-  window.__DDS_V188_GLOBAL_EDITOR_FIX__ = true;
+  if (window.__DDS_V189_GLOBAL_EDITOR_FIX__) return;
+  window.__DDS_V189_GLOBAL_EDITOR_FIX__ = true;
 
   const virtualSrcdoc = new WeakMap();
   const toolbarScanQueued = new WeakSet();
@@ -28008,7 +28008,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
       return true;
     } catch (error) {
-      console.warn('[DDS V188] steady editor DOM patch failed', error);
+      console.warn('[DDS V189] steady editor DOM patch failed', error);
       return false;
     }
   }
@@ -28028,7 +28028,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       !descriptor?.get ||
       !descriptor?.set ||
       !descriptor.configurable ||
-      descriptor.set?.__ddsV188
+      descriptor.set?.__ddsV189
     ) {
       return;
     }
@@ -28048,7 +28048,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       virtualSrcdoc.delete(this);
       return previousSet.call(this, rendered);
     }
-    steadySet.__ddsV188 = true;
+    steadySet.__ddsV189 = true;
 
     Object.defineProperty(HTMLIFrameElement.prototype, 'srcdoc', {
       configurable: descriptor.configurable,
@@ -28155,41 +28155,96 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function boot() {
     installGlobalSrcdocGuard();
-    scan(document);
 
-    [0, 80, 220, 600, 1200].forEach((delay) => {
-      window.setTimeout(() => scan(document), delay);
-    });
+    /*
+     * FAST BOOT v189
+     * Do not scan the whole 6k-line page repeatedly and do not watch class
+     * mutations. Editors are processed only when they are active/inserted.
+     */
+    const activeEditorSelector = [
+      '.dds-panel.is-active[data-panel*="editor"]',
+      '.dds-protected-commission-editor:not([hidden])',
+      '[class*="commission-editor"].is-active',
+      '[class*="editor-panel"].is-active'
+    ].join(',');
 
-    const observer = new MutationObserver((records) => {
-      const roots = new Set();
-      for (const record of records) {
-        if (record.type === 'childList') {
+    const pendingRoots = new Set();
+    let scanFrame = 0;
+
+    function queueRoot(root) {
+      if (!(root instanceof Element)) return;
+      pendingRoots.add(root);
+      if (scanFrame) return;
+      scanFrame = requestAnimationFrame(() => {
+        scanFrame = 0;
+        const roots = Array.from(pendingRoots);
+        pendingRoots.clear();
+        roots.forEach((item) => scan(item));
+      });
+    }
+
+    function scanActiveEditors() {
+      document.querySelectorAll(activeEditorSelector).forEach(queueRoot);
+    }
+
+    // Deep-link directly into an editor: process only that visible editor.
+    scanActiveEditors();
+
+    const observeRoot = document.querySelector('.dds-main') || document.body;
+    if (observeRoot && 'MutationObserver' in window) {
+      const observer = new MutationObserver((records) => {
+        for (const record of records) {
+          if (record.type !== 'childList' || !record.addedNodes.length) continue;
           record.addedNodes.forEach((node) => {
-            if (node instanceof Element) roots.add(node);
+            if (!(node instanceof Element)) return;
+
+            // Only newly-created editor UI needs processing. Ordinary page
+            // mutations, class toggles and typing are intentionally ignored.
+            if (isEditorPanel(node)) {
+              queueRoot(node.closest('[data-panel], .dds-protected-commission-editor') || node);
+              return;
+            }
+
+            const nestedEditor = node.querySelector?.(
+              '.dds-panel[data-panel*="editor"], .dds-protected-commission-editor, [class*="commission-editor"], [class*="editor-panel"]'
+            );
+            if (nestedEditor) queueRoot(nestedEditor);
           });
         }
-        if (record.type === 'attributes' && record.target instanceof Element) {
-          roots.add(record.target);
-        }
-      }
-      if (!roots.size) return;
-      roots.forEach((root) => scan(root));
-    });
+      });
 
-    observer.observe(document.body || document.documentElement, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class']
-    });
+      observer.observe(observeRoot, {
+        childList: true,
+        subtree: true
+      });
+    }
 
-    document.addEventListener('input', (event) => {
+    // Existing editors are usually toggled visible rather than recreated.
+    // Scan after the user actually opens/unlocks one, not on every keystroke.
+    document.addEventListener('click', (event) => {
+      if (!event.target?.closest?.([
+        '[data-edit-code]',
+        '[data-edit-review]',
+        '[data-code013-edit]',
+        '[data-code014-edit]',
+        '[data-commission-edit]',
+        '[data-protected-commission-edit]',
+        '[data-hans-edit]',
+        '[data-rora-edit]',
+        '[data-alan-edit]',
+        '.dds-commission-card button'
+      ].join(','))) return;
+
+      requestAnimationFrame(scanActiveEditors);
+      window.setTimeout(scanActiveEditors, 120);
+    }, true);
+
+    // If a roleplay/note field is focused in a legacy editor, install only
+    // that field's toolbar. This replaces the old full-panel scan on input.
+    document.addEventListener('focusin', (event) => {
       const target = event.target;
-      if (!target || !isEditorPanel(target)) return;
-      // Dynamic commission editors can be inserted only after unlock.
-      ensureRoleplayAndNoteToolbars(target.closest('[data-panel], .dds-protected-commission-editor') || document);
-      steadyEditorFrames(target.closest('[data-panel], .dds-protected-commission-editor') || document);
+      if (!target || !isRoleplayOrNoteTarget(target)) return;
+      ensureRoleplayAndNoteToolbars(target.closest('[data-panel], .dds-protected-commission-editor') || target);
     }, true);
   }
 

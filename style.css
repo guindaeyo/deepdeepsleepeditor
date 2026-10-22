@@ -11620,3 +11620,5 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
 .dds-landon-file-view-holder {
   overflow: visible !important;
 }
+
+/* V189 FAST BOOT: no visual changes; loading work moved to lazy/on-demand JS. */
