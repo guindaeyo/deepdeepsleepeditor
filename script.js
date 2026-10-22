@@ -26842,3 +26842,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 
+
+
+/* V198 — PERMANENT 60/40 LAYOUT IS CSS-DRIVEN; preview engine remains V197 stable. */

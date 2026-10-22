@@ -1,18 +1,17 @@
-DEEP DEEP SLEEP EDITOR — V197
+DEEP DEEP SLEEP EDITOR — V198
 
-Use all five main files together:
+ใช้ไฟล์ 5 ตัวนี้เขียนทับชุดเดิม:
 - index.html
 - style.css
 - script.js
 - cloud-config.js
 - cloud-bridge.js
 
-V197 changes:
-- central 60/40 editor layout (preview / controls)
-- preview fills editor viewport height
-- preview content stays horizontally fitted and centered
-- vertical scrolling stays available but scrollbar is invisible
-- typing morphs content only; no refit/zoom on each keystroke
-- existing BBCode/cloud/draft behavior preserved
+V198:
+- หน้า Edit ทุกตัวเริ่มต้น 60% Preview / 40% Controls ทันที ไม่ต้องคลิกซ้ำ
+- ตัวโคดในพรีวิวอยู่กึ่งกลางพื้นที่ Preview
+- พรีวิวสูงเต็มพื้นที่หน้า Edit
+- เลื่อนขึ้น/ลงได้ตามปกติ แต่ซ่อน scrollbar จริงทุกชั้น
+- ไม่แก้ระบบ Cloud / Draft / BBCode / Central Preview Engine จาก V197
 
-After upload: hard refresh (Ctrl+F5).
+หลังอัปโหลดให้ Ctrl + F5 หนึ่งครั้ง
