@@ -17587,8 +17587,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   function fitEditorPreview() {
-    fitFrame(
-      panel?.querySelector("[data-rora-preview]"),
+    const iframe = panel?.querySelector("[data-rora-preview]");
+    if (window.__ddsCentralEditorPreviewOwnsV205?.(iframe)) {
+      window.__ddsCentralEditorNormalizeV205?.(iframe);
+      return true;
+    }
+    return fitFrame(
+      iframe,
       panel?.querySelector("[data-rora-preview-stage]"),
       panel?.querySelector("[data-rora-preview-holder]"),
       "width"
@@ -26602,7 +26607,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 })();
 
 /* =========================================================
-   V204 — SINGLE CENTRAL LEFT PREVIEW ENGINE
+   V205 — TARGETED VISUAL-CENTER FIX
    One owner for every Edit-page LEFT preview.
 
    Contract:
@@ -26618,8 +26623,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 (() => {
   "use strict";
 
-  if (window.__DDS_V204_CENTRAL_EDITOR__) return;
-  window.__DDS_V204_CENTRAL_EDITOR__ = true;
+  if (window.__DDS_V205_CENTRAL_EDITOR__) return;
+  window.__DDS_V205_CENTRAL_EDITOR__ = true;
 
   const states = new WeakMap();
   const activeFrames = new Set();
@@ -26710,6 +26715,187 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     const direct = meaningfulChildren(doc.body)[0] || null;
     return direct ? { target: direct, shell: null, direct: true } : null;
+  }
+
+  const V205_SPECIAL_PREVIEW_IDS = new Set([
+    "loveSongPreview",
+    "dumbDumberPreview",
+    "higherHeavenPreview",
+    "fortyOnePreview",
+    "nothinPreview",
+    "foodReviewPreview",
+    "musicReviewPreview",
+    "movieReviewPreview"
+  ]);
+
+  const V205_SPECIAL_ROOT_SELECTORS = Object.freeze({
+    foodReviewPreview: [".fdreview-wrap"],
+    musicReviewPreview: [".ddsh-revmus-wrap"],
+    movieReviewPreview: [".ddsh-moviereview"]
+  });
+
+  function isV205SpecialPreview(iframe) {
+    return Boolean(
+      iframe && (
+        V205_SPECIAL_PREVIEW_IDS.has(iframe.id) ||
+        iframe.matches?.("[data-rora-preview]")
+      )
+    );
+  }
+
+  function v205VisualRoot(iframe, parts) {
+    const doc = iframe?.contentDocument;
+    if (!doc || !parts?.target) return parts?.target || null;
+
+    if (iframe.matches?.("[data-rora-preview]")) {
+      return (
+        doc.querySelector(".dds-rora-preview-shell") ||
+        doc.querySelector(".ddsh-roraima") ||
+        parts.target
+      );
+    }
+
+    for (const selector of V205_SPECIAL_ROOT_SELECTORS[iframe.id] || []) {
+      const found = doc.querySelector(selector);
+      if (found) return found;
+    }
+
+    const children = meaningfulChildren(parts.target).filter((el) => {
+      const cls = String(el.className || "").toLowerCase();
+      return !cls.includes("credit");
+    });
+
+    // Roleplay/profile templates often use a full-width preview target with the
+    // actual code as its first meaningful child. Centre the visible code, not
+    // that full-width wrapper.
+    return children[0] || parts.target;
+  }
+
+  function v205ElementWidth(doc, el) {
+    if (!doc || !el) return 0;
+    const cs = doc.defaultView?.getComputedStyle(el);
+    const css = Number.parseFloat(cs?.width || "0") || 0;
+    const max = cs?.maxWidth && cs.maxWidth !== "none"
+      ? Number.parseFloat(cs.maxWidth) || 0
+      : 0;
+    const rect = el.getBoundingClientRect?.();
+    let width = Math.max(
+      css,
+      el.offsetWidth || 0,
+      el.scrollWidth || 0,
+      Math.ceil(rect?.width || 0)
+    );
+    if (max > 100 && max < 5000 && width > max) width = max;
+    return width > 1 && width < 5000 ? width : 0;
+  }
+
+  function v205FitSpecialPreview(iframe, parts, recalc = false) {
+    if (!isV205SpecialPreview(iframe) || !parts?.target) return false;
+    const doc = iframe.contentDocument;
+    if (!doc?.body) return false;
+
+    const state = states.get(iframe) || {};
+    const target = parts.target;
+    const root = v205VisualRoot(iframe, parts) || target;
+
+    if (recalc) {
+      state.v205VisualWidth = 0;
+      state.v205VisualLeft = 0;
+      state.scale = 0;
+    }
+
+    // Neutralise only the central positioning while measuring. This happens on
+    // first fit / real viewport resize, never on each keystroke.
+    target.style.setProperty("position", "relative", "important");
+    target.style.setProperty("left", "0", "important");
+    target.style.setProperty("right", "auto", "important");
+    target.style.setProperty("margin-left", "0", "important");
+    target.style.setProperty("margin-right", "0", "important");
+    target.style.setProperty("zoom", "1", "important");
+    target.style.setProperty("transform", "none", "important");
+    target.style.setProperty("transform-origin", "top left", "important");
+
+    let visualWidth = state.v205VisualWidth || 0;
+    let visualLeft = Number.isFinite(state.v205VisualLeft)
+      ? state.v205VisualLeft
+      : 0;
+
+    if (!(visualWidth > 1) || recalc) {
+      const targetRect = target.getBoundingClientRect?.();
+      const rootRect = root.getBoundingClientRect?.();
+      visualWidth = Math.max(
+        v205ElementWidth(doc, root),
+        Math.ceil(rootRect?.width || 0),
+        1
+      );
+      visualLeft = (rootRect?.left || 0) - (targetRect?.left || 0);
+
+      // Fixed-canvas profile templates publish their intended width as data.
+      // Use it only when the visual root itself is the canvas; never enlarge a
+      // visible inner code just because its wrapper is wider.
+      if (root === target) {
+        const declared = declaredWidth(iframe);
+        if (declared > 100) visualWidth = Math.max(visualWidth, declared);
+      }
+
+      state.v205VisualWidth = visualWidth;
+      state.v205VisualLeft = visualLeft;
+    }
+
+    const viewport = Math.max(
+      1,
+      iframe.clientWidth ||
+      stageFor(iframe)?.clientWidth ||
+      previewColumnFor(iframe)?.clientWidth ||
+      1
+    );
+
+    const scale = state.scale > 0 && !recalc
+      ? state.scale
+      : Math.max(0.05, Math.min(1, (viewport - 28) / Math.max(1, visualWidth)));
+
+    // Centre the actual visible code in the 60% viewport. This accounts for
+    // templates whose real code starts inside a wide blank wrapper/canvas.
+    const translateX =
+      (viewport - visualWidth * scale) / 2 - visualLeft * scale;
+
+    state.scale = scale;
+    state.fitted = true;
+    state.v205TranslateX = translateX;
+    states.set(iframe, state);
+
+    target.style.setProperty("left", "0", "important");
+    target.style.setProperty("right", "auto", "important");
+    target.style.setProperty("margin-left", "0", "important");
+    target.style.setProperty("margin-right", "0", "important");
+    target.style.setProperty("transform-origin", "top left", "important");
+    target.style.setProperty(
+      "transform",
+      `translateX(${translateX}px) scale(${scale})`,
+      "important"
+    );
+    target.style.setProperty("max-height", "none", "important");
+    target.style.setProperty("overflow", "visible", "important");
+    target.style.setProperty("opacity", "1", "important");
+    target.style.setProperty("visibility", "visible", "important");
+    target.style.setProperty("transition", "none", "important");
+    target.style.setProperty("animation", "none", "important");
+
+    if (parts.shell) {
+      parts.shell.style.setProperty("width", "100%", "important");
+      parts.shell.style.setProperty("min-width", "0", "important");
+      parts.shell.style.setProperty("max-width", "none", "important");
+      parts.shell.style.setProperty("height", "auto", "important");
+      parts.shell.style.setProperty("min-height", "0", "important");
+      parts.shell.style.setProperty("max-height", "none", "important");
+      parts.shell.style.setProperty("margin", "0", "important");
+      parts.shell.style.setProperty("padding", "0", "important");
+      parts.shell.style.setProperty("overflow", "visible", "important");
+      parts.shell.style.setProperty("transform", "none", "important");
+    }
+
+    updateFrameHeight(iframe);
+    return true;
   }
 
   function declaredWidth(iframe) {
@@ -27003,6 +27189,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const parts = locate(doc);
     if (!parts?.target) return false;
 
+    if (isV205SpecialPreview(iframe)) {
+      return v205FitSpecialPreview(iframe, parts, recalc);
+    }
+
     const state = states.get(iframe) || {};
     if (recalc) {
       state.naturalWidth = 0;
@@ -27061,6 +27251,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const state = states.get(iframe) || {};
     const scale = state.scale || 1;
     const target = parts.target;
+
+    if (isV205SpecialPreview(iframe)) {
+      const root = v205VisualRoot(iframe, parts) || target;
+      const rootRect = root.getBoundingClientRect?.();
+      let rootBottom = Math.max(0, rootRect?.bottom || 0);
+      const descendants = Array.from(root.querySelectorAll?.("*") || []);
+      for (const el of descendants) {
+        const rect = el.getBoundingClientRect?.();
+        if (rect && Number.isFinite(rect.bottom)) rootBottom = Math.max(rootBottom, rect.bottom);
+      }
+      const docBottom = Math.max(
+        doc.body?.scrollHeight || 0,
+        doc.documentElement?.scrollHeight || 0
+      );
+      // Bounding rectangles already include the central scale. scrollHeight is
+      // a fallback for long profile/RORAIMA canvases whose descendants are
+      // absolutely positioned outside the normal flow.
+      const declared = declaredHeight(iframe);
+      const fallback = Math.max(
+        root.scrollHeight || 0,
+        root.offsetHeight || 0,
+        declared || 0
+      ) * scale;
+      return Math.max(
+        1,
+        Math.ceil(Math.max(rootBottom, docBottom, fallback) + 28)
+      );
+    }
 
     let maxBottom = 0;
     const nodes = [target, ...Array.from(target.querySelectorAll('*'))];
@@ -27368,6 +27586,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   window.__ddsCentralEditorNormalizeV203 = (iframe) => legacyFitRequest(iframe);
   window.__ddsCentralEditorPreviewOwnsV204 = owns;
   window.__ddsCentralEditorRenderV204 = render;
+  window.__ddsCentralEditorPreviewOwnsV205 = owns;
+  window.__ddsCentralEditorRenderV205 = render;
+  window.__ddsCentralEditorNormalizeV205 = (iframe) => legacyFitRequest(iframe);
 
   function boot() {
     document.body?.classList.add('dds-v204-central-preview');
