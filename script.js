@@ -6200,7 +6200,7 @@ ${stylesheetLinks}
     const contentByKey =
       /(?:^|[\s_-])note(?:text|content)?(?:$|[\s_-])/i
         .test(keyText) ||
-      /(?:notetext|notecontent)$/i
+      /(?:note|notetext|notecontent)$/i
         .test(keyText);
 
     const contentBySection =
@@ -18118,13 +18118,14 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const id = (name) => document.getElementById(name);
 
     function removeChocolateLoveNoteToolbar() {
+      /*
+       * v184: NOTE fields must keep the shared BBCode toolbar.
+       * Keep this legacy hook harmless so the rest of CODE012 stays unchanged.
+       */
       const note = id("chocoloveNote");
       if (!note) return;
-      note.dataset.ddsNoBbcode = "";
-      const previous = note.previousElementSibling;
-      if (previous?.classList?.contains("dds-rich-toolbar")) previous.remove();
-      panel.querySelectorAll('[data-toolbar-for="chocoloveNote"]').forEach((toolbar) => toolbar.remove());
-      delete note.dataset.ddsBbcodeReady;
+      note.removeAttribute("data-dds-no-bbcode");
+      delete note.dataset.ddsNoBbcode;
     }
 
     removeChocolateLoveNoteToolbar();
@@ -26501,18 +26502,35 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
 
 /* =========================================================
-   ALL EDITORS — NOTE / NOTE PREFIX BBCode LAYOUT v183
+   ALL EDITORS — UNIFIED BBCode + COMPLETE NOTE COVERAGE v184
+
+   ONE visual system for:
+   - roleplay/content BBCode
+   - note-prefix BBCode
+   - note/content BBCode
+   - Commission editors
+
+   NOTE layout only:
+   note only:
+     [BBCode]
+     [note field]
+
+   prefix + note:
+     [BBCode]
+     [prefix field]
+     [BBCode]
+     [note field]
 ========================================================= */
 (() => {
   "use strict";
 
   if (
-    window.__DDS_NOTE_BBCODE_LAYOUT_V183__
+    window.__DDS_UNIFIED_BBCODE_NOTE_V184__
   ) {
     return;
   }
 
-  window.__DDS_NOTE_BBCODE_LAYOUT_V183__ =
+  window.__DDS_UNIFIED_BBCODE_NOTE_V184__ =
     true;
 
   let scanFrame = 0;
@@ -26520,7 +26538,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function ensureIconFont() {
     if (
       document.querySelector(
-        'link[data-dds-note-bbcode-icons="v183"]'
+        'link[data-dds-unified-bbcode-icons="v184"]'
       )
     ) {
       return;
@@ -26532,16 +26550,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     link.rel = "stylesheet";
     link.href =
       "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css";
-    link.dataset.ddsNoteBbcodeIcons =
-      "v183";
+    link.dataset.ddsUnifiedBbcodeIcons =
+      "v184";
 
     document.head?.appendChild(link);
   }
 
-  function ensureLayoutCss() {
+  function ensureUnifiedCss() {
     if (
       document.getElementById(
-        "ddsNoteBbcodeLayoutV183"
+        "ddsUnifiedBbcodeV184"
       )
     ) {
       return;
@@ -26551,9 +26569,122 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       document.createElement("style");
 
     style.id =
-      "ddsNoteBbcodeLayoutV183";
+      "ddsUnifiedBbcodeV184";
 
     style.textContent = `
+      /* =========================
+         ONE BBCode appearance
+         ========================= */
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar{
+        width:100% !important;
+        max-width:100% !important;
+        display:flex !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        gap:5px !important;
+        box-sizing:border-box !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar .dds-bbcode-group,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar .dds-bbcode-group{
+        display:flex !important;
+        align-items:center !important;
+        gap:3px !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar button,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar button{
+        width:30px !important;
+        min-width:30px !important;
+        max-width:30px !important;
+        height:30px !important;
+        min-height:30px !important;
+        padding:0 !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        box-sizing:border-box !important;
+        font-size:0 !important;
+        line-height:1 !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar button i,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar button i{
+        font-size:14px !important;
+        line-height:1 !important;
+        pointer-events:none !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar label.dds-bbcode-color,
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar label.dds-rich-color,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar label.dds-bbcode-color,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar label.dds-rich-color{
+        width:30px !important;
+        min-width:30px !important;
+        height:30px !important;
+        padding:0 !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        gap:0 !important;
+        box-sizing:border-box !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar label.dds-bbcode-color > span,
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar label.dds-rich-color > span,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar label.dds-bbcode-color > span,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar label.dds-rich-color > span{
+        font-size:0 !important;
+        display:inline-flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar label i,
+      .dds-protected-commission-editor
+      .dds-rich-toolbar label i{
+        font-size:14px !important;
+        line-height:1 !important;
+        pointer-events:none !important;
+      }
+
+      .dds-panel[data-panel*="editor"]
+      .dds-rich-toolbar input[type="color"],
+      .dds-protected-commission-editor
+      .dds-rich-toolbar input[type="color"]{
+        width:12px !important;
+        height:12px !important;
+        min-width:12px !important;
+        padding:0 !important;
+        border:0 !important;
+      }
+
+      .dds-bbcode-toolbar-target{
+        display:none !important;
+      }
+
+      /* =========================
+         NOTE / NOTE PREFIX only
+         exact vertical layering
+         ========================= */
       .dds-note-bbcode-field{
         grid-column:1 / -1 !important;
         width:100% !important;
@@ -26566,11 +26697,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         box-sizing:border-box !important;
       }
 
-      .dds-note-bbcode-field > .dds-rich-toolbar,
-      .dds-note-bbcode-field > .dds-bbcode-toolbar{
+      .dds-note-bbcode-field > .dds-rich-toolbar{
         order:2 !important;
         width:100% !important;
-        box-sizing:border-box !important;
         margin:0 !important;
       }
 
@@ -26588,77 +26717,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         order:1 !important;
       }
 
-      .dds-note-bbcode-toolbar{
-        display:flex !important;
-        flex-wrap:wrap !important;
-        align-items:center !important;
-        gap:5px !important;
-      }
-
-      .dds-note-bbcode-toolbar
-      .dds-bbcode-group{
-        display:flex !important;
-        align-items:center !important;
-        gap:3px !important;
-      }
-
-      .dds-note-bbcode-toolbar button{
-        width:30px !important;
-        min-width:30px !important;
-        height:30px !important;
-        min-height:30px !important;
-        padding:0 !important;
-        display:inline-flex !important;
-        align-items:center !important;
-        justify-content:center !important;
-      }
-
-      .dds-note-bbcode-toolbar button i{
-        font-size:14px !important;
-        line-height:1 !important;
-        pointer-events:none !important;
-      }
-
-      .dds-note-bbcode-toolbar
-      label.dds-bbcode-color,
-      .dds-note-bbcode-toolbar
-      label.dds-rich-color{
-        min-width:30px !important;
-        height:30px !important;
-        display:inline-flex !important;
-        align-items:center !important;
-        justify-content:center !important;
-        gap:0 !important;
-        padding:0 !important;
-      }
-
-      .dds-note-bbcode-toolbar
-      label.dds-bbcode-color > span,
-      .dds-note-bbcode-toolbar
-      label.dds-rich-color > span{
-        font-size:0 !important;
-        display:inline-flex !important;
-        align-items:center !important;
-        justify-content:center !important;
-      }
-
-      .dds-note-bbcode-toolbar
-      label.dds-bbcode-color > span i,
-      .dds-note-bbcode-toolbar
-      label.dds-rich-color > span i{
-        font-size:14px !important;
-      }
-
-      .dds-note-bbcode-toolbar
-      input[type="color"]{
-        width:13px !important;
-        height:13px !important;
-        padding:0 !important;
-        border:0 !important;
-      }
-
       .dds-control-section.dds-note-bbcode-section
-      > .dds-note-bbcode-toolbar{
+      > .dds-rich-toolbar{
         margin-bottom:7px !important;
       }
     `;
@@ -26669,10 +26729,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const ICONS = {
     b: "bi-type-bold",
     bold: "bi-type-bold",
+
     i: "bi-type-italic",
     italic: "bi-type-italic",
+
     u: "bi-type-underline",
     underline: "bi-type-underline",
+
     s: "bi-type-strikethrough",
     strikeThrough: "bi-type-strikethrough",
 
@@ -26688,6 +26751,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     url: "bi-link-45deg",
     img: "bi-image",
     video: "bi-play-btn",
+
     quote: "bi-quote",
     code: "bi-code-slash",
     hide: "bi-eye-slash",
@@ -26702,7 +26766,21 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     removeFormat: "bi-eraser"
   };
 
-  function iconKey(button) {
+  function isInsideEditor(target) {
+    return Boolean(
+      target?.closest?.(
+        [
+          '.dds-panel[data-panel^="editor-code"]',
+          '.dds-panel[data-panel^="editor-profile"]',
+          '.dds-panel[data-panel^="editor-review"]',
+          ".dds-protected-commission-editor",
+          '[data-panel*="editor"]'
+        ].join(",")
+      )
+    );
+  }
+
+  function toolbarIconKey(button) {
     return (
       button.dataset.bbcode ||
       button.dataset.command ||
@@ -26717,82 +26795,39 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     );
   }
 
-  function decorateToolbar(
-    toolbar,
-    target
-  ) {
-    if (
-      !toolbar ||
-      !target
-    ) {
+  function decorateToolbar(toolbar) {
+    if (!toolbar) {
       return;
     }
 
     ensureIconFont();
-    ensureLayoutCss();
-
-    const kind =
-      window.__ddsGetNoteBbcodeKind?.(
-        target
-      ) ||
-      target.dataset.ddsNoteBbcodeKind ||
-      "content";
-
-    target.dataset.ddsNoteBbcode =
-      "true";
-
-    target.dataset.ddsNoteBbcodeKind =
-      kind;
+    ensureUnifiedCss();
 
     toolbar.classList.add(
-      "dds-note-bbcode-toolbar"
+      "dds-unified-bbcode-toolbar"
     );
-
-    toolbar.dataset.noteBbcodeKind =
-      kind;
-
-    const label =
-      target.closest("label");
-
-    if (label) {
-      label.classList.add(
-        "dds-note-bbcode-field",
-        `dds-note-bbcode-${kind}`
-      );
-
-      if (
-        toolbar.parentElement !== label ||
-        toolbar.nextElementSibling !== target
-      ) {
-        label.insertBefore(
-          toolbar,
-          target
-        );
-      }
-    } else {
-      target
-        .closest(".dds-control-section")
-        ?.classList.add(
-          "dds-note-bbcode-section"
-        );
-    }
 
     toolbar
       .querySelectorAll("button")
       .forEach((button) => {
         const icon =
-          ICONS[iconKey(button)];
+          ICONS[toolbarIconKey(button)];
 
-        if (
-          !icon ||
-          button.dataset.ddsNoteIconV183 ===
-            "1"
-        ) {
+        if (!icon) {
           return;
         }
 
-        button.dataset.ddsNoteIconV183 =
-          "1";
+        const existing =
+          button.querySelector(
+            ":scope > i.bi"
+          );
+
+        if (
+          existing &&
+          existing.classList.contains(icon)
+        ) {
+          return;
+        }
 
         button.innerHTML =
           `<i class="bi ${icon}" aria-hidden="true"></i>`;
@@ -26803,36 +26838,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         "label.dds-bbcode-color > span, label.dds-rich-color > span"
       )
       .forEach((span) => {
-        if (
-          span.dataset.ddsNoteIconV183 ===
-          "1"
-        ) {
-          return;
-        }
-
-        span.dataset.ddsNoteIconV183 =
-          "1";
-
         span.innerHTML =
           '<i class="bi bi-palette" aria-hidden="true"></i>';
       });
-  }
-
-  window.__ddsDecorateNoteBbcodeToolbar =
-    decorateToolbar;
-
-  function isInsideEditor(target) {
-    return Boolean(
-      target?.closest?.(
-        [
-          '.dds-panel[data-panel^="editor-code"]',
-          '.dds-panel[data-panel^="editor-profile"]',
-          '.dds-panel[data-panel^="editor-review"]',
-          ".dds-protected-commission-editor",
-          '[data-panel*="editor"]'
-        ].join(",")
-      )
-    );
   }
 
   function findToolbar(target) {
@@ -26873,7 +26881,64 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return null;
   }
 
-  function scan(root = document) {
+  function markNoteLayout(
+    target,
+    kind,
+    toolbar
+  ) {
+    target.dataset.ddsNoteBbcode =
+      "true";
+
+    target.dataset.ddsNoteBbcodeKind =
+      kind;
+
+    const label =
+      target.closest("label");
+
+    if (label) {
+      label.classList.add(
+        "dds-note-bbcode-field",
+        `dds-note-bbcode-${kind}`
+      );
+
+      if (
+        toolbar &&
+        (
+          toolbar.parentElement !== label ||
+          toolbar.nextElementSibling !== target
+        )
+      ) {
+        label.insertBefore(
+          toolbar,
+          target
+        );
+      }
+    } else {
+      target
+        .closest(
+          ".dds-control-section"
+        )
+        ?.classList.add(
+          "dds-note-bbcode-section"
+        );
+    }
+
+    toolbar?.classList.add(
+      "dds-note-bbcode-toolbar"
+    );
+
+    if (toolbar) {
+      toolbar.dataset.noteBbcodeKind =
+        kind;
+    }
+  }
+
+  window.__ddsDecorateNoteBbcodeToolbar =
+    (toolbar) => {
+      decorateToolbar(toolbar);
+    };
+
+  function scanNoteTargets(root = document) {
     const classify =
       window.__ddsGetNoteBbcodeKind;
 
@@ -26886,8 +26951,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     ) {
       return;
     }
-
-    ensureLayoutCss();
 
     const candidates = [];
 
@@ -26921,22 +26984,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         return;
       }
 
+      /*
+       * Every real note/prefix gets BBCode,
+       * regardless of any legacy opt-out.
+       */
       target.removeAttribute(
         "data-dds-no-bbcode"
       );
 
-      target.dataset.ddsNoteBbcode =
-        "true";
-
-      target.dataset.ddsNoteBbcodeKind =
-        kind;
-
-      target
-        .closest("label")
-        ?.classList.add(
-          "dds-note-bbcode-field",
-          `dds-note-bbcode-${kind}`
-        );
+      delete target.dataset.ddsNoBbcode;
 
       install(target);
 
@@ -26944,15 +27000,60 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         findToolbar(target);
 
       if (toolbar) {
-        decorateToolbar(
-          toolbar,
-          target
+        markNoteLayout(
+          target,
+          kind,
+          toolbar
         );
+
+        decorateToolbar(toolbar);
       }
     });
   }
 
-  function scheduleScan(root = document) {
+  function decorateAllEditorToolbars(
+    root = document
+  ) {
+    const toolbars = [];
+
+    if (
+      root instanceof Element &&
+      root.matches?.(
+        ".dds-rich-toolbar"
+      ) &&
+      isInsideEditor(root)
+    ) {
+      toolbars.push(root);
+    }
+
+    root
+      .querySelectorAll?.(
+        [
+          '.dds-panel[data-panel*="editor"] .dds-rich-toolbar',
+          '.dds-protected-commission-editor .dds-rich-toolbar'
+        ].join(",")
+      )
+      .forEach(
+        (toolbar) =>
+          toolbars.push(toolbar)
+      );
+
+    toolbars.forEach(
+      decorateToolbar
+    );
+  }
+
+  function scan(root = document) {
+    ensureUnifiedCss();
+    ensureIconFont();
+
+    scanNoteTargets(root);
+    decorateAllEditorToolbars(root);
+  }
+
+  function scheduleScan(
+    root = document
+  ) {
     if (scanFrame) {
       cancelAnimationFrame(
         scanFrame
@@ -26969,6 +27070,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function boot() {
     scan(document);
 
+    /*
+     * Explicit retries cover legacy modules which mutate/remove
+     * toolbars shortly after DOMContentLoaded.
+     */
+    [
+      0,
+      120,
+      350,
+      900
+    ].forEach((delay) => {
+      window.setTimeout(
+        () => scan(document),
+        delay
+      );
+    });
+
     const main =
       document.querySelector(
         ".dds-main"
@@ -26982,28 +27099,29 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const observer =
         new MutationObserver(
           (records) => {
+            let changed = false;
+
             for (
               const record of records
             ) {
               if (
                 record.type !==
-                  "childList" ||
-                !record.addedNodes.length
+                  "childList"
               ) {
                 continue;
               }
 
-              for (
-                const node of
-                  record.addedNodes
+              if (
+                record.addedNodes.length ||
+                record.removedNodes.length
               ) {
-                if (
-                  node instanceof
-                  Element
-                ) {
-                  scheduleScan(node);
-                }
+                changed = true;
+                break;
               }
+            }
+
+            if (changed) {
+              scheduleScan(document);
             }
           }
         );
@@ -27037,15 +27155,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           return;
         }
 
-        window.setTimeout(
-          () => scan(document),
-          0
-        );
-
-        window.setTimeout(
-          () => scan(document),
-          120
-        );
+        [
+          0,
+          80,
+          220
+        ].forEach((delay) => {
+          window.setTimeout(
+            () => scan(document),
+            delay
+          );
+        });
       },
       true
     );
@@ -27074,4 +27193,5 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     boot();
   }
 })();
+
 
