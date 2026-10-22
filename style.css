@@ -11938,26 +11938,24 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
 
 
 /* =========================================================
-   V200 — PERMANENT EDITOR LAYOUT STANDARD
-   EVERY real Edit page, from the first visible frame:
-   - LEFT preview 60%
-   - RIGHT controls 40%
-   - Both columns end on the same bottom edge
-   - LEFT preview is centered, vertically scrollable, scrollbar invisible
-   - RIGHT controls remain vertically scrollable WITH its scrollbar visible
+   V202 — PERMANENT EDITOR LAYOUT STANDARD
+   LEFT preview 60% / RIGHT controls 40% on every real Edit page.
+   Only LEFT scrollbar chrome is hidden; RIGHT controls scroll normally.
 ========================================================= */
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) {
-  --dds-v200-editor-height: calc(100dvh - 155px);
+  --dds-v202-editor-height: calc(100dvh - 155px);
 }
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-layout,
@@ -11965,46 +11963,29 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   [class*="editor-layout"],
   [class*="commission-layout"]
 ) {
-  width: 100% !important;
-  max-width: none !important;
-  height: var(--dds-v200-editor-height) !important;
-  min-height: 620px !important;
-  max-height: none !important;
-  display: grid !important;
-  grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr) !important;
-  grid-template-rows: minmax(0, 1fr) !important;
-  align-items: stretch !important;
-  gap: 24px !important;
-  overflow: hidden !important;
+  width:100% !important;
+  max-width:none !important;
+  height:var(--dds-v202-editor-height) !important;
+  min-height:620px !important;
+  max-height:none !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,3fr) minmax(340px,2fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  align-items:stretch !important;
+  gap:24px !important;
+  overflow:hidden !important;
 }
 
-/* LEFT — preview 60%, same full height as controls. */
+/* LEFT PREVIEW — fixed viewport, scroll happens inside iframe document. */
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-preview-column,
   .dds-protected-commission-preview-column,
-  [class*="preview-column"]
-) {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  align-self: stretch !important;
-  position: relative !important;
-  inset: auto !important;
-  overflow: hidden !important;
-}
-
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="editor-panel"]:not(.dds-commission-view-panel)
-) :is(
+  [class*="preview-column"],
   .dds-editor-preview-stage,
   .dds-protected-commission-preview-stage,
   .dds-code013-editor-stage,
@@ -12013,94 +11994,84 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   [class*="preview-holder"],
   [class*="preview-canvas-host"]
 ) {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  position: relative !important;
-  inset: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  transform: none !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  position:relative !important;
+  inset:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  transform:none !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
 }
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
-  [class*="editor-panel"]:not(.dds-commission-view-panel)
-) :is(
-  .dds-editor-preview-frame,
-  .dds-protected-commission-preview-frame,
-  iframe[class*="preview-frame"],
-  iframe.dds-v200-editor-preview
-) {
-  width: 100% !important;
-  min-width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  position: relative !important;
-  inset: auto !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  border: 0 !important;
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-  transform-origin: top center !important;
-  transition: none !important;
-  animation: none !important;
-  will-change: auto !important;
-  background: #202020 !important;
-}
-
-/* Hide scrollbar ONLY on LEFT preview wrappers. Scrolling inside iframe still works. */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-preview-column,
   .dds-protected-commission-preview-column,
   [class*="preview-column"],
-  .dds-editor-preview-stage,
-  .dds-protected-commission-preview-stage,
-  [class*="preview-stage"],
-  [class*="preview-holder"],
-  [class*="preview-canvas-host"]
-) {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="editor-panel"]:not(.dds-commission-view-panel)
-) :is(
-  .dds-editor-preview-column,
-  .dds-protected-commission-preview-column,
-  [class*="preview-column"],
-  .dds-editor-preview-stage,
-  .dds-protected-commission-preview-stage,
   [class*="preview-stage"],
   [class*="preview-holder"],
   [class*="preview-canvas-host"]
 )::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
 }
 
-/* RIGHT — 40%, scroll normally and KEEP visible scrollbar. */
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) iframe.dds-v202-editor-preview,
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
+  [class*="editor-panel"]:not(.dds-commission-view-panel)
+) :is(.dds-editor-preview-frame,.dds-protected-commission-preview-frame,iframe[class*="preview-frame"]) {
+  width:100% !important;
+  min-width:100% !important;
+  max-width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  position:relative !important;
+  inset:auto !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  transform:none !important;
+  transform-origin:top center !important;
+  transition:none !important;
+  animation:none !important;
+  will-change:auto !important;
+  pointer-events:auto !important;
+  background:#202020 !important;
+}
+
+/* RIGHT CONTROLS — keep normal visible scrolling. */
+:is(
+  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
+  .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-controls,
@@ -12110,23 +12081,24 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   [class*="controls-column"],
   [class*="controls-scroll"]
 ) {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  align-self: stretch !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  overscroll-behavior: contain !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(193, 23, 36, 0.72) rgba(255,255,255,0.045) !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  align-self:stretch !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain !important;
+  scrollbar-width:thin !important;
+  scrollbar-color:rgba(193,23,36,.72) rgba(255,255,255,.045) !important;
 }
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-controls,
@@ -12136,14 +12108,15 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   [class*="controls-column"],
   [class*="controls-scroll"]
 )::-webkit-scrollbar {
-  width: 7px !important;
-  height: 7px !important;
-  display: block !important;
+  width:7px !important;
+  height:7px !important;
+  display:block !important;
 }
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-controls,
@@ -12152,13 +12125,12 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   .dds-protected-commission-scroll,
   [class*="controls-column"],
   [class*="controls-scroll"]
-)::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.04) !important;
-}
+)::-webkit-scrollbar-track { background:rgba(255,255,255,.04) !important; }
 
 :is(
   .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
   .dds-protected-commission-editor,
+  [class*="protected-commission-editor"],
   [class*="editor-panel"]:not(.dds-commission-view-panel)
 ) :is(
   .dds-editor-controls,
@@ -12168,308 +12140,49 @@ body.dds-v197-layout .dds-v197-editor-panel :is(
   [class*="controls-column"],
   [class*="controls-scroll"]
 )::-webkit-scrollbar-thumb {
-  background: rgba(193, 23, 36, 0.72) !important;
-  border-radius: 999px !important;
+  background:rgba(193,23,36,.72) !important;
+  border-radius:999px !important;
 }
 
-/* Keep the actual preview frame centered in the 60% column. */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="editor-panel"]:not(.dds-commission-view-panel)
-) :is(
-  .dds-editor-preview-column,
-  .dds-protected-commission-preview-column,
-  [class*="preview-column"],
-  [class*="preview-stage"],
-  [class*="preview-holder"],
-  [class*="preview-canvas-host"]
-) > iframe {
-  left: auto !important;
-  right: auto !important;
-  top: auto !important;
-  bottom: auto !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transform: none !important;
-  transform-origin: top center !important;
-}
-
-@media (max-width: 900px) {
+@media (max-width:900px) {
   :is(
     .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
     .dds-protected-commission-editor,
+    [class*="protected-commission-editor"],
     [class*="editor-panel"]:not(.dds-commission-view-panel)
-  ) {
-    --dds-v200-editor-height: auto;
-  }
+  ) { --dds-v202-editor-height:auto; }
 
   :is(
     .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
     .dds-protected-commission-editor,
+    [class*="protected-commission-editor"],
     [class*="editor-panel"]:not(.dds-commission-view-panel)
-  ) :is(
-    .dds-editor-layout,
-    .dds-protected-commission-layout,
-    [class*="editor-layout"],
-    [class*="commission-layout"]
-  ) {
-    height: auto !important;
-    min-height: 0 !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    grid-template-rows: auto auto !important;
-    overflow: visible !important;
+  ) :is(.dds-editor-layout,.dds-protected-commission-layout,[class*="editor-layout"],[class*="commission-layout"]) {
+    height:auto !important;
+    min-height:0 !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    overflow:visible !important;
   }
 
   :is(
     .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
     .dds-protected-commission-editor,
+    [class*="protected-commission-editor"],
     [class*="editor-panel"]:not(.dds-commission-view-panel)
-  ) :is(
-    .dds-editor-preview-column,
-    .dds-protected-commission-preview-column,
-    [class*="preview-column"]
-  ) {
-    height: 68vh !important;
-    min-height: 420px !important;
+  ) :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) {
+    height:68vh !important;
+    min-height:420px !important;
   }
 
   :is(
     .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
     .dds-protected-commission-editor,
+    [class*="protected-commission-editor"],
     [class*="editor-panel"]:not(.dds-commission-view-panel)
-  ) :is(
-    .dds-editor-controls,
-    .dds-editor-tools-column,
-    .dds-protected-commission-controls-column,
-    .dds-protected-commission-scroll,
-    [class*="controls-column"],
-    [class*="controls-scroll"]
-  ) {
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-}
-
-
-/* =========================================================
-   V201 — FINAL CENTRAL EDITOR CONTRACT
-   - every real Edit page = 60% preview / 40% controls
-   - columns have identical height/bottom edge
-   - ONLY left preview hides scrollbar chrome
-   - right controls keep normal visible vertical scrollbar
-========================================================= */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-){
-  --dds-v201-editor-height:calc(100dvh - 155px);
-}
-
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-layout,
-  .dds-protected-commission-layout,
-  [class*="editor-layout"],
-  [class*="commission-layout"]
-){
-  width:100%!important;
-  max-width:none!important;
-  height:var(--dds-v201-editor-height)!important;
-  min-height:620px!important;
-  display:grid!important;
-  grid-template-columns:minmax(0,3fr) minmax(340px,2fr)!important;
-  grid-template-rows:minmax(0,1fr)!important;
-  align-items:stretch!important;
-  gap:24px!important;
-  overflow:hidden!important;
-}
-
-/* LEFT preview column: same full height, no outer scrollbar chrome. */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-preview-column,
-  .dds-protected-commission-preview-column,
-  [class*="preview-column"]
-){
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  align-self:stretch!important;
-  overflow:hidden!important;
-  scrollbar-width:none!important;
-  -ms-overflow-style:none!important;
-}
-
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-preview-column,
-  .dds-protected-commission-preview-column,
-  [class*="preview-column"]
-)::-webkit-scrollbar{
-  width:0!important;
-  height:0!important;
-  display:none!important;
-}
-
-/* Preview stage/holder is NOT the scroll owner. iframe document scrolls vertically. */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-preview-stage,
-  .dds-protected-commission-preview-stage,
-  .dds-code013-editor-stage,
-  .dds-code014-editor-stage,
-  [class*="preview-stage"],
-  [class*="preview-holder"],
-  [class*="preview-canvas-host"]
-){
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  margin:0!important;
-  padding:0!important;
-  overflow:hidden!important;
-  transform:none!important;
-  scrollbar-width:none!important;
-  -ms-overflow-style:none!important;
-}
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-preview-stage,
-  .dds-protected-commission-preview-stage,
-  [class*="preview-stage"],
-  [class*="preview-holder"],
-  [class*="preview-canvas-host"]
-)::-webkit-scrollbar{
-  width:0!important;
-  height:0!important;
-  display:none!important;
-}
-
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-preview-frame,
-  .dds-protected-commission-preview-frame,
-  iframe[class*="preview-frame"],
-  iframe.dds-v201-editor-preview
-){
-  width:100%!important;
-  min-width:100%!important;
-  max-width:100%!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  position:relative!important;
-  inset:auto!important;
-  margin:0 auto!important;
-  border:0!important;
-  display:block!important;
-  opacity:1!important;
-  visibility:visible!important;
-  transform:none!important;
-  transition:none!important;
-  animation:none!important;
-  will-change:auto!important;
-}
-
-/* RIGHT controls: keep its scrollbar visible and usable. */
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-controls,
-  .dds-editor-tools-column,
-  .dds-protected-commission-controls-column,
-  .dds-protected-commission-scroll,
-  [class*="controls-column"],
-  [class*="controls-scroll"]
-){
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
-  align-self:stretch!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  scrollbar-width:thin!important;
-  scrollbar-color:rgba(193,23,36,.72) rgba(255,255,255,.045)!important;
-  -ms-overflow-style:auto!important;
-}
-:is(
-  .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-  .dds-protected-commission-editor,
-  [class*="commission-editor"].dds-panel,
-  [class*="editor-panel"].dds-panel
-) :is(
-  .dds-editor-controls,
-  .dds-editor-tools-column,
-  .dds-protected-commission-controls-column,
-  .dds-protected-commission-scroll,
-  [class*="controls-column"],
-  [class*="controls-scroll"]
-)::-webkit-scrollbar{
-  width:7px!important;
-  height:7px!important;
-  display:block!important;
-}
-
-@media (max-width:1100px){
-  :is(
-    .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-    .dds-protected-commission-editor,
-    [class*="commission-editor"].dds-panel,
-    [class*="editor-panel"].dds-panel
-  ) :is(.dds-editor-layout,.dds-protected-commission-layout,[class*="editor-layout"],[class*="commission-layout"]){
-    height:auto!important;
-    min-height:0!important;
-    grid-template-columns:minmax(0,1fr)!important;
-    grid-template-rows:minmax(440px,68vh) auto!important;
-    overflow:visible!important;
-  }
-  :is(
-    .dds-panel[data-panel^="editor-"]:not(.dds-commission-view-panel),
-    .dds-protected-commission-editor,
-    [class*="commission-editor"].dds-panel,
-    [class*="editor-panel"].dds-panel
-  ) :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-column"],[class*="controls-scroll"]){
-    height:auto!important;
-    max-height:none!important;
+  ) :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-column"],[class*="controls-scroll"]) {
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
   }
 }
