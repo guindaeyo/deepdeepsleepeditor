@@ -1,1 +1,1 @@
-v252 — PROFILE CODE002 M.Moodboard only: restore original 1100px artboard width instead of stretching the iframe to 1750px; fit once to stage, center, invisible vertical scrolling. No other editor changes.
+v253 — FOR PROFILE CODE002 only: expand iframe native viewport to 1900px before scaling to fit its complete artboard, so tiles to the right of the nominal 1100px wrapper remain visible. No changes to other editors.

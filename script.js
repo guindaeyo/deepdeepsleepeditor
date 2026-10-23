@@ -26859,10 +26859,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return 0;
   }
 
-  /* PROFILE CODE002 ONLY — single, stable artboard fitting.
-     The source layout is 1100px wide. Match that width in the iframe,
-     then apply the responsive scale exactly once. An oversized iframe
-     otherwise leaves a blank right half while clipping the actual art. */
+  /* PROFILE CODE002 — fit entire artboard, including absolutely-positioned
+     items outside its 1100px wrapper, within the iframe viewport. */
   function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
@@ -26871,7 +26869,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const host = document.getElementById("moodboardCanvasHost");
     if (!host || !host.contains(iframe)) return false;
 
-    const nativeWidth = 1100;
+    // M.Moodboard contains absolutely positioned tiles extending well past
+    // its nominal 1100px wrapper. The iframe viewport must encompass the
+    // entire artwork BEFORE scaling; otherwise the iframe clips its right.
+    const nativeWidth = 1900;
     const available = Math.max(1, stage.clientWidth - 40);
     const scale = Math.min(1, available / nativeWidth);
     const renderedWidth = nativeWidth * scale;
