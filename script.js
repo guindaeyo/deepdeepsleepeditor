@@ -26859,85 +26859,92 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return 0;
   }
 
-  /* PROFILE CODE002 — measure the actual painted artwork before fitting.
-     Do not infer its width from the wrapper or hard-code the iframe width. */
+  /* PROFILE CODE002: one stable artboard; never measure against a temporary
+     2600px viewport (that produced the flash, reflow and clipped right edge).
+     Scale the original 1100px moodboard INSIDE a viewport-sized iframe so the
+     iframe itself is never shrunk or clipped by another fit pass. */
   function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     const host = document.getElementById("moodboardCanvasHost");
     if (!doc?.body || !stage || !host?.contains(iframe) || stage.clientWidth < 40) return false;
     ensurePreviewStyle(doc);
     setupStage(stage);
-
+    const state = stateFor(iframe);
     const root = findVisualRoot(doc);
     if (root) restoreOriginalRoot(iframe, root);
+
+    // Content is authored for an 1100px artboard. All measurements are taken
+    // once at its ORIGINAL width; later keystrokes update height, not width.
+    const nativeWidth = 1100;
+    const available = Math.max(1, stage.clientWidth - 32);
+    const scale = Math.min(1, available / nativeWidth);
+    const viewportWidth = Math.max(1, stage.clientWidth);
     const html = doc.documentElement;
     const body = doc.body;
+    const fixed = (el, prop, value) => el.style.setProperty(prop, value, "important");
 
-    // Remove earlier frame transforms before measuring descendants.
-    iframe.style.setProperty("transform", "none", "important");
-    iframe.style.setProperty("left", "0px", "important");
-    iframe.style.setProperty("top", "0px", "important");
-    iframe.style.setProperty("width", "2600px", "important");
-    iframe.style.setProperty("min-width", "2600px", "important");
-    iframe.style.setProperty("max-width", "none", "important");
-    iframe.style.setProperty("height", "2200px", "important");
-    for (const el of [html, body]) {
-      el.style.setProperty("width", "2600px", "important");
-      el.style.setProperty("min-width", "2600px", "important");
-      el.style.setProperty("max-width", "none", "important");
-      el.style.setProperty("height", "auto", "important");
+    // Clear earlier v246-v254 inline sizing and transforms; the viewport is
+    // always the same size as the visible stage, NOT the native artboard.
+    for (const prop of ["min-width", "max-width", "min-height", "max-height"]) {
+      iframe.style.removeProperty(prop);
+      html.style.removeProperty(prop);
+      body.style.removeProperty(prop);
     }
-    const viewportWidth = 2600;
-    let minX = 0, maxX = 1100, maxY = 1200;
-    // getBoundingClientRect includes absolutely positioned collage items,
-    // unlike scrollWidth of the narrow main wrapper.
-    const candidates = [...body.querySelectorAll("*")];
-    for (const el of candidates) {
+    fixed(iframe, "display", "block");
+    fixed(iframe, "position", "absolute");
+    fixed(iframe, "inset", "auto");
+    fixed(iframe, "top", "0px");
+    fixed(iframe, "left", "0px");
+    fixed(iframe, "right", "auto");
+    fixed(iframe, "width", viewportWidth + "px");
+    fixed(iframe, "min-width", "0px");
+    fixed(iframe, "max-width", "100%");
+    fixed(iframe, "transform", "none");
+    fixed(iframe, "margin", "0");
+    fixed(iframe, "border", "0");
+    fixed(iframe, "zoom", "1");
+    fixed(iframe, "pointer-events", "none");
+
+    fixed(html, "width", viewportWidth + "px");
+    fixed(html, "overflow-x", "hidden");
+    fixed(html, "overflow-y", "hidden");
+    fixed(body, "box-sizing", "border-box");
+    fixed(body, "width", nativeWidth + "px");
+    fixed(body, "min-width", nativeWidth + "px");
+    fixed(body, "max-width", nativeWidth + "px");
+    fixed(body, "margin", "0");
+    fixed(body, "position", "relative");
+    fixed(body, "transform-origin", "top left");
+    fixed(body, "transform", `translateX(${Math.max(0, (viewportWidth - nativeWidth * scale) / 2)}px) scale(${scale})`);
+
+    // Bounds are measured in the fixed native-width coordinate system.
+    // The artboard may extend vertically but is never cropped horizontally.
+    const prevHeight = Number(state.moodboardNaturalHeight) || 1200;
+    let naturalHeight = Math.max(1200, body.scrollHeight, prevHeight);
+    if (root) naturalHeight = Math.max(naturalHeight, root.scrollHeight || 0);
+    for (const el of body.querySelectorAll("*")) {
       if (!(el instanceof doc.defaultView.HTMLElement)) continue;
-      const cs = doc.defaultView.getComputedStyle(el);
-      if (cs.display === "none" || cs.visibility === "hidden") continue;
-      const r = el.getBoundingClientRect();
-      if (!r.width && !r.height) continue;
-      minX = Math.min(minX, r.left);
-      maxX = Math.max(maxX, r.right);
-      maxY = Math.max(maxY, r.bottom);
+      const style = doc.defaultView.getComputedStyle(el);
+      if (style.display === "none" || style.visibility === "hidden") continue;
+      // offsetTop is independent of the body transform and stable on rerender.
+      const rect = el.getBoundingClientRect();
+      const bodyRect = body.getBoundingClientRect();
+      if (rect.height > 0) naturalHeight = Math.max(naturalHeight, (rect.bottom - bodyRect.top) / scale + 24);
     }
-    // Keep at least the standard 1100px work surface, but include all
-    // visibly protruding cards, images and positioned decorations.
-    const artworkWidth = Math.max(1100, Math.ceil(maxX - Math.min(0, minX)) + 24);
-    const nativeHeight = Math.max(1200, Math.ceil(maxY + 35), body.scrollHeight);
-    const available = Math.max(1, stage.clientWidth - 40);
-    const scale = Math.min(1, available / artworkWidth);
-    const renderedWidth = artworkWidth * scale;
-    const renderedHeight = Math.ceil(nativeHeight * scale);
-
-    // The iframe viewport has to cover the whole visual artwork; scaling
-    // a narrow iframe only makes its already-clipped contents smaller.
-    iframe.style.setProperty("width", artworkWidth + "px", "important");
-    iframe.style.setProperty("min-width", artworkWidth + "px", "important");
-    iframe.style.setProperty("max-width", artworkWidth + "px", "important");
-    iframe.style.setProperty("height", nativeHeight + "px", "important");
-    iframe.style.setProperty("min-height", nativeHeight + "px", "important");
-    iframe.style.setProperty("position", "absolute", "important");
-    iframe.style.setProperty("inset", "auto", "important");
-    iframe.style.setProperty("top", "20px", "important");
-    iframe.style.setProperty("left", `calc(50% - ${renderedWidth / 2}px)`, "important");
-    iframe.style.setProperty("right", "auto", "important");
-    iframe.style.setProperty("margin", "0", "important");
-    iframe.style.setProperty("transform-origin", "top left", "important");
-    iframe.style.setProperty("transform", `scale(${scale})`, "important");
-    iframe.style.setProperty("pointer-events", "none", "important");
-    html.style.setProperty("width", artworkWidth + "px", "important");
-    body.style.setProperty("width", artworkWidth + "px", "important");
-    host.style.setProperty("position", "relative", "important");
-    host.style.setProperty("width", "100%", "important");
-    host.style.setProperty("min-width", "0", "important");
-    host.style.setProperty("height", Math.max(stage.clientHeight, renderedHeight + 40) + "px", "important");
-    host.style.setProperty("overflow", "visible", "important");
-    const state = stateFor(iframe);
+    naturalHeight = Math.ceil(naturalHeight);
+    state.moodboardNaturalHeight = naturalHeight;
+    const renderedHeight = Math.ceil(naturalHeight * scale);
+    fixed(iframe, "height", renderedHeight + "px");
+    fixed(iframe, "min-height", renderedHeight + "px");
+    fixed(body, "height", naturalHeight + "px");
+    fixed(host, "position", "relative");
+    fixed(host, "width", "100%");
+    fixed(host, "min-width", "0");
+    fixed(host, "height", Math.max(stage.clientHeight, renderedHeight) + "px");
+    fixed(host, "overflow", "visible");
     state.ready = true;
     state.scale = scale;
-    state.bounds = {left: 0, top: 0, width: artworkWidth, height: nativeHeight};
+    state.bounds = { left: 0, top: 0, width: nativeWidth, height: naturalHeight };
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
