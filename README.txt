@@ -1,1 +1,1 @@
-v253 — FOR PROFILE CODE002 only: expand iframe native viewport to 1900px before scaling to fit its complete artboard, so tiles to the right of the nominal 1100px wrapper remain visible. No changes to other editors.
+v254: Measured-fit preview adjustment for FOR PROFILE CODE002 only. Other files unchanged from v253.

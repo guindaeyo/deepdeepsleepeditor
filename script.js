@@ -26859,62 +26859,85 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return 0;
   }
 
-  /* PROFILE CODE002 — fit entire artboard, including absolutely-positioned
-     items outside its 1100px wrapper, within the iframe viewport. */
+  /* PROFILE CODE002 — measure the actual painted artwork before fitting.
+     Do not infer its width from the wrapper or hard-code the iframe width. */
   function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
-    if (!doc?.body || !stage || stage.clientWidth < 40) return false;
+    const host = document.getElementById("moodboardCanvasHost");
+    if (!doc?.body || !stage || !host?.contains(iframe) || stage.clientWidth < 40) return false;
     ensurePreviewStyle(doc);
     setupStage(stage);
-    const host = document.getElementById("moodboardCanvasHost");
-    if (!host || !host.contains(iframe)) return false;
 
-    // M.Moodboard contains absolutely positioned tiles extending well past
-    // its nominal 1100px wrapper. The iframe viewport must encompass the
-    // entire artwork BEFORE scaling; otherwise the iframe clips its right.
-    const nativeWidth = 1900;
-    const available = Math.max(1, stage.clientWidth - 40);
-    const scale = Math.min(1, available / nativeWidth);
-    const renderedWidth = nativeWidth * scale;
-    const html = doc.documentElement;
-    const body = doc.body;
-    for (const element of [html, body]) {
-      element.style.setProperty("width", nativeWidth + "px", "important");
-      element.style.setProperty("min-width", nativeWidth + "px", "important");
-      element.style.setProperty("max-width", "none", "important");
-      element.style.setProperty("height", "auto", "important");
-      element.style.setProperty("min-height", "0", "important");
-    }
     const root = findVisualRoot(doc);
     if (root) restoreOriginalRoot(iframe, root);
-    // Keep native size stable regardless of input/focus; only the height
-    // of the scrollable canvas needs to follow longer content.
-    let nativeHeight = Math.max(1200, html.scrollHeight, body.scrollHeight);
-    if (root) nativeHeight = Math.max(nativeHeight, root.scrollHeight, root.offsetHeight);
-    nativeHeight = Math.ceil(nativeHeight + 40);
+    const html = doc.documentElement;
+    const body = doc.body;
+
+    // Remove earlier frame transforms before measuring descendants.
+    iframe.style.setProperty("transform", "none", "important");
+    iframe.style.setProperty("left", "0px", "important");
+    iframe.style.setProperty("top", "0px", "important");
+    iframe.style.setProperty("width", "2600px", "important");
+    iframe.style.setProperty("min-width", "2600px", "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("height", "2200px", "important");
+    for (const el of [html, body]) {
+      el.style.setProperty("width", "2600px", "important");
+      el.style.setProperty("min-width", "2600px", "important");
+      el.style.setProperty("max-width", "none", "important");
+      el.style.setProperty("height", "auto", "important");
+    }
+    const viewportWidth = 2600;
+    let minX = 0, maxX = 1100, maxY = 1200;
+    // getBoundingClientRect includes absolutely positioned collage items,
+    // unlike scrollWidth of the narrow main wrapper.
+    const candidates = [...body.querySelectorAll("*")];
+    for (const el of candidates) {
+      if (!(el instanceof doc.defaultView.HTMLElement)) continue;
+      const cs = doc.defaultView.getComputedStyle(el);
+      if (cs.display === "none" || cs.visibility === "hidden") continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      minX = Math.min(minX, r.left);
+      maxX = Math.max(maxX, r.right);
+      maxY = Math.max(maxY, r.bottom);
+    }
+    // Keep at least the standard 1100px work surface, but include all
+    // visibly protruding cards, images and positioned decorations.
+    const artworkWidth = Math.max(1100, Math.ceil(maxX - Math.min(0, minX)) + 24);
+    const nativeHeight = Math.max(1200, Math.ceil(maxY + 35), body.scrollHeight);
+    const available = Math.max(1, stage.clientWidth - 40);
+    const scale = Math.min(1, available / artworkWidth);
+    const renderedWidth = artworkWidth * scale;
     const renderedHeight = Math.ceil(nativeHeight * scale);
-    const pad = 20;
+
+    // The iframe viewport has to cover the whole visual artwork; scaling
+    // a narrow iframe only makes its already-clipped contents smaller.
+    iframe.style.setProperty("width", artworkWidth + "px", "important");
+    iframe.style.setProperty("min-width", artworkWidth + "px", "important");
+    iframe.style.setProperty("max-width", artworkWidth + "px", "important");
+    iframe.style.setProperty("height", nativeHeight + "px", "important");
+    iframe.style.setProperty("min-height", nativeHeight + "px", "important");
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("inset", "auto", "important");
+    iframe.style.setProperty("top", "20px", "important");
+    iframe.style.setProperty("left", `calc(50% - ${renderedWidth / 2}px)`, "important");
+    iframe.style.setProperty("right", "auto", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("pointer-events", "none", "important");
+    html.style.setProperty("width", artworkWidth + "px", "important");
+    body.style.setProperty("width", artworkWidth + "px", "important");
     host.style.setProperty("position", "relative", "important");
     host.style.setProperty("width", "100%", "important");
     host.style.setProperty("min-width", "0", "important");
-    host.style.setProperty("height", Math.max(stage.clientHeight, renderedHeight + pad * 2) + "px", "important");
-    host.style.setProperty("min-height", "0", "important");
+    host.style.setProperty("height", Math.max(stage.clientHeight, renderedHeight + 40) + "px", "important");
     host.style.setProperty("overflow", "visible", "important");
-    const positioning = {
-      display: "block", position: "absolute", top: pad + "px",
-      left: "calc(50% - " + (renderedWidth / 2) + "px)",
-      right: "auto", bottom: "auto", width: nativeWidth + "px",
-      "min-width": nativeWidth + "px", "max-width": nativeWidth + "px",
-      height: nativeHeight + "px", "min-height": nativeHeight + "px",
-      "max-height": "none", margin: "0", inset: "auto",
-      transform: "scale(" + scale + ")", "transform-origin": "top left",
-      border: "0", "pointer-events": "none", zoom: "1"
-    };
-    Object.entries(positioning).forEach(([name, value]) => iframe.style.setProperty(name, value, "important"));
     const state = stateFor(iframe);
     state.ready = true;
     state.scale = scale;
-    state.bounds = { left: 0, top: 0, width: nativeWidth, height: nativeHeight };
+    state.bounds = {left: 0, top: 0, width: artworkWidth, height: nativeHeight};
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
