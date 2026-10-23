@@ -1,1 +1,1 @@
-v254: Measured-fit preview adjustment for FOR PROFILE CODE002 only. Other files unchanged from v253.
+v256: PROFILE CODE003 FortyOneWinks only. Center fitted preview within left canvas and prevent first-render flash. Other files inherited from v255.

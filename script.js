@@ -26829,6 +26829,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.setProperty("zoom", "1", "important");
     iframe.style.setProperty("pointer-events", "none", "important");
     iframe.style.setProperty("background", "transparent", "important");
+    /* PROFILE CODE003 only: center the already-fitted iframe within its
+       full-width canvas host.  This is reapplied on every height update so
+       typing cannot push the preview back to the left. */
+    if (iframe.id === "fortyOnePreview") {
+      const host = iframe.parentElement;
+      if (host) {
+        host.style.setProperty("width", "100%", "important");
+        host.style.setProperty("min-width", "0", "important");
+        host.style.setProperty("max-width", "100%", "important");
+        host.style.setProperty("position", "relative", "important");
+      }
+      iframe.style.setProperty("left", "50%", "important");
+      iframe.style.setProperty("transform", "translateX(-50%)", "important");
+      iframe.style.setProperty("transform-origin", "top center", "important");
+      iframe.style.setProperty("margin", "0", "important");
+    }
   }
 
   function setDocumentBox(doc, width, height) {
@@ -27005,6 +27021,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const scaledHeight = Math.max(1, Math.ceil(bounds.height * scale));
     setDocumentBox(doc, scaledWidth, scaledHeight);
     applyFrameBox(iframe, scaledWidth, scaledHeight);
+    /* Reveal FortyOneWinks only once its first centering/fit is ready;
+       leave it visible through all subsequent text updates. */
+    if (iframe.id === "fortyOnePreview") {
+      iframe.style.setProperty("opacity", "1", "important");
+    }
 
     const state = stateFor(iframe);
     state.root = root;
