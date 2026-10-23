@@ -26859,9 +26859,79 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return 0;
   }
 
+  /* PROFILE CODE002 ONLY: fit the complete iframe as one canvas.
+     Do not resize html/body to the SCALED viewport: doing so makes
+     M.Moodboard's multi-column CSS overflow and crop to the right. */
+  function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body || !stage || stage.clientWidth < 40) return false;
+    ensurePreviewStyle(doc);
+    setupStage(stage);
+    const host = document.getElementById("moodboardCanvasHost");
+    if (!host || !host.contains(iframe)) return false;
+
+    // Use a stable, unscaled layout viewport for the moodboard itself.
+    const nativeWidth = 1750;
+    const available = Math.max(1, stage.clientWidth - 32);
+    const scale = Math.min(1, available / nativeWidth);
+    const renderedWidth = nativeWidth * scale;
+
+    const html = doc.documentElement;
+    const body = doc.body;
+    html.style.setProperty("width", nativeWidth + "px", "important");
+    html.style.setProperty("min-width", nativeWidth + "px", "important");
+    html.style.setProperty("height", "auto", "important");
+    html.style.setProperty("min-height", "0", "important");
+    body.style.setProperty("width", nativeWidth + "px", "important");
+    body.style.setProperty("min-width", nativeWidth + "px", "important");
+    body.style.setProperty("height", "auto", "important");
+    body.style.setProperty("min-height", "0", "important");
+
+    // Undo the central root zoom, so no second scaling is applied.
+    const root = findVisualRoot(doc);
+    if (root) restoreOriginalRoot(iframe, root);
+
+    let nativeHeight = Math.max(1200, html.scrollHeight, body.scrollHeight);
+    if (root) {
+      nativeHeight = Math.max(nativeHeight, root.scrollHeight, root.offsetHeight);
+    }
+    nativeHeight = Math.ceil(nativeHeight + 30);
+    const renderedHeight = Math.ceil(nativeHeight * scale);
+    const pad = 16;
+
+    host.style.setProperty("position", "relative", "important");
+    host.style.setProperty("width", "100%", "important");
+    host.style.setProperty("min-width", "0", "important");
+    host.style.setProperty("height", Math.max(stage.clientHeight, renderedHeight + pad * 2) + "px", "important");
+    host.style.setProperty("min-height", "0", "important");
+    host.style.setProperty("overflow", "visible", "important");
+
+    const positioning = {
+      display: "block", position: "absolute", top: pad + "px",
+      left: "calc(50% - " + (renderedWidth / 2) + "px)",
+      right: "auto", bottom: "auto", width: nativeWidth + "px",
+      "min-width": nativeWidth + "px", "max-width": nativeWidth + "px",
+      height: nativeHeight + "px", "min-height": nativeHeight + "px",
+      "max-height": "none", margin: "0", inset: "auto",
+      transform: "scale(" + scale + ")", "transform-origin": "top left",
+      border: "0", "pointer-events": "none", zoom: "1"
+    };
+    Object.entries(positioning).forEach(([name,value]) => iframe.style.setProperty(name,value,"important"));
+    const state = stateFor(iframe);
+    state.ready = true;
+    state.scale = scale;
+    state.bounds = {left:0,top:0,width:nativeWidth,height:nativeHeight};
+    if (resetScroll) stage.scrollTop = 0;
+    stage.scrollLeft = 0;
+    return true;
+  }
+
   function applyFullFit(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || !editorPanelFor(stage) || stage.clientWidth < 40) return false;
+    if (iframe.id === "moodboardPreview" && stage.id === "moodboardPreviewStage") {
+      return fitMoodboardCanvas(iframe, stage, resetScroll);
+    }
 
     ensurePreviewStyle(doc);
     setupStage(stage);
@@ -26925,6 +26995,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   /* While typing we only grow/shrink the vertical document box.  We do not
      touch transform/scale/X position, so there is nothing visible to blink. */
   function updateVerticalExtent(iframe, stage = stageFor(iframe)) {
+    if (iframe?.id === "moodboardPreview" && stage?.id === "moodboardPreviewStage") {
+      return fitMoodboardCanvas(iframe, stage, false);
+    }
     const doc = iframe?.contentDocument;
     const state = stateFor(iframe);
     if (!doc?.body || !stage) return false;

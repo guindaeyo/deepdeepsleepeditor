@@ -1,1 +1,1 @@
-v248 — CODE002 M.Moodboard only: ensure the complete wide collage is fitted within the left preview using the existing central preview renderer. Invisible vertical scrollbar remains. Other pages unchanged.
+v249: CODE002 M.Moodboard only. Fit the entire iframe width to preview canvas, center horizontally and allow invisible vertical scroll. Other editors unchanged.
