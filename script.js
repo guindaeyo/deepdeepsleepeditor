@@ -26870,8 +26870,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const host = document.getElementById("moodboardCanvasHost");
     if (!host || !host.contains(iframe)) return false;
 
-    // Use a stable, unscaled layout viewport for the moodboard itself.
-    const nativeWidth = 1750;
+    // CODE002: the actual Moodboard canvas is 1100px (see the iframe's
+    // data-moodboard-canvas-width). The former 1750px iframe made the
+    // 1100px artwork occupy only the left part of the visible canvas.
+    // Keep the document, iframe, and fitting calculation on one width.
+    const declaredWidth = Number.parseFloat(iframe.dataset.moodboardCanvasWidth);
+    const nativeWidth = Number.isFinite(declaredWidth) && declaredWidth > 0
+      ? declaredWidth : 1100;
     const available = Math.max(1, stage.clientWidth - 32);
     const scale = Math.min(1, available / nativeWidth);
     const renderedWidth = nativeWidth * scale;
