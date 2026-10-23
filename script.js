@@ -26859,9 +26859,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return 0;
   }
 
-  /* PROFILE CODE002 ONLY: fit the complete iframe as one canvas.
-     Do not resize html/body to the SCALED viewport: doing so makes
-     M.Moodboard's multi-column CSS overflow and crop to the right. */
+  /* PROFILE CODE002 ONLY — single, stable artboard fitting.
+     The collage exceeds 1100px. A 1100px iframe cuts the artwork on
+     the right; a second root-level resize makes it jump while typing.
+     Keep one generous native artboard and scale ONLY its iframe. */
   function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
@@ -26870,47 +26871,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const host = document.getElementById("moodboardCanvasHost");
     if (!host || !host.contains(iframe)) return false;
 
-    // CODE002: the actual Moodboard canvas is 1100px (see the iframe's
-    // data-moodboard-canvas-width). The former 1750px iframe made the
-    // 1100px artwork occupy only the left part of the visible canvas.
-    // Keep the document, iframe, and fitting calculation on one width.
-    const declaredWidth = Number.parseFloat(iframe.dataset.moodboardCanvasWidth);
-    const nativeWidth = Number.isFinite(declaredWidth) && declaredWidth > 0
-      ? declaredWidth : 1100;
-    const available = Math.max(1, stage.clientWidth - 32);
+    const nativeWidth = 1750;
+    const available = Math.max(1, stage.clientWidth - 40);
     const scale = Math.min(1, available / nativeWidth);
     const renderedWidth = nativeWidth * scale;
-
     const html = doc.documentElement;
     const body = doc.body;
-    html.style.setProperty("width", nativeWidth + "px", "important");
-    html.style.setProperty("min-width", nativeWidth + "px", "important");
-    html.style.setProperty("height", "auto", "important");
-    html.style.setProperty("min-height", "0", "important");
-    body.style.setProperty("width", nativeWidth + "px", "important");
-    body.style.setProperty("min-width", nativeWidth + "px", "important");
-    body.style.setProperty("height", "auto", "important");
-    body.style.setProperty("min-height", "0", "important");
-
-    // Undo the central root zoom, so no second scaling is applied.
+    for (const element of [html, body]) {
+      element.style.setProperty("width", nativeWidth + "px", "important");
+      element.style.setProperty("min-width", nativeWidth + "px", "important");
+      element.style.setProperty("max-width", "none", "important");
+      element.style.setProperty("height", "auto", "important");
+      element.style.setProperty("min-height", "0", "important");
+    }
     const root = findVisualRoot(doc);
     if (root) restoreOriginalRoot(iframe, root);
-
+    // Keep native size stable regardless of input/focus; only the height
+    // of the scrollable canvas needs to follow longer content.
     let nativeHeight = Math.max(1200, html.scrollHeight, body.scrollHeight);
-    if (root) {
-      nativeHeight = Math.max(nativeHeight, root.scrollHeight, root.offsetHeight);
-    }
-    nativeHeight = Math.ceil(nativeHeight + 30);
+    if (root) nativeHeight = Math.max(nativeHeight, root.scrollHeight, root.offsetHeight);
+    nativeHeight = Math.ceil(nativeHeight + 40);
     const renderedHeight = Math.ceil(nativeHeight * scale);
-    const pad = 16;
-
+    const pad = 20;
     host.style.setProperty("position", "relative", "important");
     host.style.setProperty("width", "100%", "important");
     host.style.setProperty("min-width", "0", "important");
     host.style.setProperty("height", Math.max(stage.clientHeight, renderedHeight + pad * 2) + "px", "important");
     host.style.setProperty("min-height", "0", "important");
     host.style.setProperty("overflow", "visible", "important");
-
     const positioning = {
       display: "block", position: "absolute", top: pad + "px",
       left: "calc(50% - " + (renderedWidth / 2) + "px)",
@@ -26921,11 +26909,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       transform: "scale(" + scale + ")", "transform-origin": "top left",
       border: "0", "pointer-events": "none", zoom: "1"
     };
-    Object.entries(positioning).forEach(([name,value]) => iframe.style.setProperty(name,value,"important"));
+    Object.entries(positioning).forEach(([name, value]) => iframe.style.setProperty(name, value, "important"));
     const state = stateFor(iframe);
     state.ready = true;
     state.scale = scale;
-    state.bounds = {left:0,top:0,width:nativeWidth,height:nativeHeight};
+    state.bounds = { left: 0, top: 0, width: nativeWidth, height: nativeHeight };
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
