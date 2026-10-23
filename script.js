@@ -26860,9 +26860,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   }
 
   /* PROFILE CODE002 ONLY — single, stable artboard fitting.
-     The collage exceeds 1100px. A 1100px iframe cuts the artwork on
-     the right; a second root-level resize makes it jump while typing.
-     Keep one generous native artboard and scale ONLY its iframe. */
+     The source layout is 1100px wide. Match that width in the iframe,
+     then apply the responsive scale exactly once. An oversized iframe
+     otherwise leaves a blank right half while clipping the actual art. */
   function fitMoodboardCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
@@ -26871,7 +26871,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const host = document.getElementById("moodboardCanvasHost");
     if (!host || !host.contains(iframe)) return false;
 
-    const nativeWidth = 1750;
+    const nativeWidth = 1100;
     const available = Math.max(1, stage.clientWidth - 40);
     const scale = Math.min(1, available / nativeWidth);
     const renderedWidth = nativeWidth * scale;

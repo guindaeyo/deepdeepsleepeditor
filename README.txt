@@ -1,1 +1,1 @@
-v251 — CODE002 M.Moodboard: use a stable 1750px artboard fitted to the left preview; preserves scroll and other editors. JS syntax check required.
+v252 — PROFILE CODE002 M.Moodboard only: restore original 1100px artboard width instead of stretching the iframe to 1750px; fit once to stage, center, invisible vertical scrolling. No other editor changes.
