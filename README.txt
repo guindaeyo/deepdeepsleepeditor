@@ -1,1 +1,1 @@
-v245 — HOME right photo only. Restores the original left shop title, description and buttons from v242; keeps the supplied image embedded on the right. Other pages and scripts unchanged.
+v247 — Fixed profile CODE002 M.Moodboard only. Removed conflicting v246 iframe sizing/transform overrides; retained invisible vertical scrollbar and native fit-to-width JS. Others unchanged.

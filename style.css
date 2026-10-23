@@ -14800,46 +14800,17 @@ body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {
   body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {height: min(70vh, 530px);min-height:360px;}
 }
 
-/* v246 — FOR PROFILE / CODE002 (M.Moodboard) ONLY.
-   Center the width-fitted preview, keep all left/right edges visible and
-   allow vertical scrolling without a visible scrollbar. */
+/* v247 — PROFILE CODE002 only: let the existing JS keep its width-fit
+   iframe transform; hide the vertical scrollbar without disabling scroll. */
 body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardPreviewStage {
-  width:100% !important;
-  min-width:0 !important;
-  overflow-x:hidden !important;
-  overflow-y:auto !important;
-  scrollbar-width:none !important;
-  -ms-overflow-style:none !important;
-  overscroll-behavior-y:contain !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overscroll-behavior-y: contain;
 }
 body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardPreviewStage::-webkit-scrollbar {
-  display:none !important;
-  width:0 !important;
-  height:0 !important;
-}
-body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardCanvasHost {
-  box-sizing:border-box !important;
-  width:100% !important;
-  min-width:0 !important;
-  max-width:100% !important;
-  height:auto !important;
-  min-height:100% !important;
-  overflow:visible !important;
-  margin:0 auto !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-}
-body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardPreview {
-  position:relative !important;
-  inset:auto !important;
-  top:auto !important;
-  left:auto !important;
-  right:auto !important;
-  bottom:auto !important;
-  margin:0 auto !important;
-  transform:none !important;
-  transform-origin:top center !important;
-  flex:0 0 auto !important;
-  max-width:100% !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
