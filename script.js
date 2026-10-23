@@ -26872,6 +26872,23 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const bounds = naturalBounds(iframe, root);
     const canvasWidth = declaredCanvasWidth(iframe);
     if (canvasWidth > 0) bounds.width = Math.max(bounds.width, canvasWidth);
+
+    // PROFILE CODE002 M.Moodboard: its floating/absolute collage extends
+    // beyond the nominal 1100px canvas and may not enter normal scrollWidth.
+    // Reserve the entire visual artboard when fitting so the right edge
+    // remains on screen instead of enlarging/cropping it on first render.
+    const isMoodboard = iframe.id === "moodboardPreview" &&
+      stage.id === "moodboardPreviewStage";
+    if (isMoodboard) {
+      const visualWidth = Math.max(
+        bounds.width,
+        doc.documentElement.scrollWidth || 0,
+        doc.body.scrollWidth || 0,
+        1750
+      );
+      bounds.width = visualWidth;
+    }
+
     const availableWidth = Math.max(1, stage.clientWidth - 24);
     const scale = Math.min(1, availableWidth / Math.max(1, bounds.width));
 

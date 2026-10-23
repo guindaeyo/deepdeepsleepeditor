@@ -1,1 +1,1 @@
-v247 — Fixed profile CODE002 M.Moodboard only. Removed conflicting v246 iframe sizing/transform overrides; retained invisible vertical scrollbar and native fit-to-width JS. Others unchanged.
+v248 — CODE002 M.Moodboard only: ensure the complete wide collage is fitted within the left preview using the existing central preview renderer. Invisible vertical scrollbar remains. Other pages unchanged.
