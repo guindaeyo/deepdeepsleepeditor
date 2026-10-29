@@ -27046,16 +27046,25 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     fixed(iframe, "margin", "0");
     fixed(iframe, "border", "0");
     fixed(iframe, "pointer-events", "none");
-    const host = iframe.parentElement;
+    // CODE009: the stage is the viewport, NOT the tall content wrapper.
+    // Prior versions accidentally set the stage height to the artwork height,
+    // eliminating overflow and preventing wheel/trackpad scrolling.
+    let host = iframe.parentElement;
+    if (host === stage) {
+      host = document.createElement("div");
+      host.className = "dds-higher-scroll-content";
+      stage.insertBefore(host, iframe);
+      host.appendChild(iframe);
+    }
     if (host) {
       fixed(host, "position", "relative");
       fixed(host, "width", "100%");
       fixed(host, "min-width", "0");
-      fixed(host, "height", Math.max(stage.clientHeight, visualHeight) + "px");
-    // The stage, not the iframe, is the vertical scrolling viewport.
-    fixed(stage, "overflow-y", "auto");
-    fixed(stage, "overflow-x", "hidden");
+      fixed(host, "height", Math.max(stage.clientHeight, visualHeight + 24) + "px");
       fixed(host, "overflow", "visible");
+      // Only the viewport stays at the available height. Its tall child scrolls.
+      fixed(stage, "overflow-y", "auto");
+      fixed(stage, "overflow-x", "hidden");
     }
     state.ready = true;
     state.scale = scale;
