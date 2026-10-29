@@ -15144,3 +15144,16 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
 [data-panel="editor-code013"] .dds-code013-editor-stage *::-webkit-scrollbar { display:none!important; width:0!important; height:0!important; }
 
 /* v279: FortyOneWinks iframe centering is calculated in applyFrameBox(). */
+/* CODE015: native editor shell, only its preview geometry */
+.dds-code015-editor .dds-code015-stage{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:thin;scrollbar-color:#a20e22 transparent}
+.dds-code015-editor .dds-code015-stage iframe{position:absolute;left:50%;top:10px;border:0;display:block;transform-origin:top center;max-width:none;pointer-events:none}
+.dds-code015-editor .dds-code015-stage:after{content:"";display:block;height:var(--cyworld-height,850px);pointer-events:none}
+.dds-code015-editor .dds-protected-commission-preview-column{min-height:0;display:flex;flex-direction:column}
+.dds-code015-editor .dds-protected-commission-controls-column{min-height:0}
+.dds-code015-editor .dds-protected-commission-draft{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dds-code015-editor .dds-protected-commission-draft input{min-width:110px;flex:1}
+.dds-code015-editor .dds-protected-commission-draft select{min-width:130px;flex:1}
+.dds-code015-editor textarea[data-015="roleplay"]{height:150px;min-height:150px;max-height:150px;overflow-y:auto;resize:none}
+
+@media(min-width:1100px){.dds-code015-editor .dds-protected-commission-layout{display:grid;grid-template-columns:minmax(0,60fr) minmax(0,40fr);gap:12px;height:calc(100dvh - 100px);min-height:530px;padding-bottom:0;align-items:stretch}.dds-code015-editor .dds-protected-commission-controls-column{display:flex;flex-direction:column;overflow:hidden}.dds-code015-editor .dds-protected-commission-scroll{flex:1;min-height:0;overflow-y:auto}.dds-code015-editor .dds-code015-stage{flex:1}}
+@media(max-width:1099px){.dds-code015-editor .dds-code015-stage{height:65vh;min-height:400px}}
