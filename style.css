@@ -14997,3 +14997,20 @@ body.dds-editor-one-screen .dds-code013-editor.is-active .dds-code013-editor-sta
   width: 0 !important;
   height: 0 !important;
 }
+
+
+/* v268 — CODE013 ONLY: hide scrollbar on FIRST PAINT, regardless of
+   editor-one-screen / is-active classes added later by JavaScript. */
+html body.dds-y2k-vampire .dds-panel.dds-code013-editor .dds-code013-editor-stage,
+html body .dds-panel.dds-code013-editor .dds-code013-editor-stage {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body.dds-y2k-vampire .dds-panel.dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar,
+html body .dds-panel.dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}

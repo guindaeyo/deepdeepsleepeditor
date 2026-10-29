@@ -1,1 +1,1 @@
-v265: Only CODE010 LONG WAY LONG RIDE editor preview centering/width-fit. All other files and behaviors stay as v264.
+v268 — Only CODE013 Candy Pink initial LIVE PREVIEW scrollbar hidden. Scroll remains functional. No JS changes.
