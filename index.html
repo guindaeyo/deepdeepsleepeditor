@@ -98,6 +98,36 @@ body.dds-code015-active .dds-main > .dds-footer{display:none!important}
 .dds-code015-preview-frame{display:block;border:0;pointer-events:none;width:750px;transform-origin:top left;position:absolute;top:0;left:0}
 .dds-code015-card-shell{position:relative;width:100%;height:100%;min-height:200px;overflow:hidden;background:#1a1b1b}
 @media(max-width:800px){.dds-code015-layout{display:flex;flex-direction:column;height:auto}.dds-code015-left{height:65vh;min-height:360px}.dds-code015-right{height:70vh;min-height:520px}.dds-code015-grid{grid-template-columns:1fr}}
+/* v292: CODE015 follows native editor control card layout. */
+.dds-code015-editor .dds-code015-right{background:transparent;border:0;gap:10px}
+.dds-code015-editor .dds-code015-saves{flex:0 0 auto;padding:12px 14px;gap:8px;background:linear-gradient(145deg,rgba(143,14,22,.07),#0d0c0c);border:1px solid rgba(255,255,255,.1);border-radius:5px}
+.dds-code015-editor .dds-code015-saves input,.dds-code015-editor .dds-code015-saves select{height:38px;padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:2px;background:#090708;font-size:11px}
+.dds-code015-editor .dds-code015-saves button{height:38px;padding:8px 12px;font:600 10px var(--dds-font-main);letter-spacing:.04em}
+.dds-code015-editor .dds-code015-fields{padding:0 5px 0 0;display:flex;flex-direction:column;gap:10px;background:transparent}
+.dds-code015-editor .dds-code015-fields section{flex:none;margin:0;padding:22px 20px;background:linear-gradient(145deg,rgba(143,14,22,.06),transparent 48%),#0d0c0c;border:1px solid rgba(255,255,255,.09);border-radius:5px}
+.dds-code015-editor .dds-code015-fields h3{display:flex;align-items:center;gap:14px;margin:0 0 20px;padding:0 0 13px;border-bottom:1px solid rgba(255,255,255,.1);color:var(--dds-white);font-size:15px;font-weight:600;letter-spacing:0}
+.dds-code015-editor .dds-code015-fields h3 em{font:500 25px var(--dds-font-serif);color:var(--dds-red-bright);margin-right:0}
+.dds-code015-editor .dds-code015-grid{gap:13px 14px}
+.dds-code015-editor .dds-code015-fields label{font-size:11px;line-height:1.5;gap:8px;color:rgba(255,255,255,.55)}
+.dds-code015-editor .dds-code015-fields input:not([type=color]):not([type=range]),.dds-code015-editor .dds-code015-fields textarea{padding:11px 12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.025);color:var(--dds-white);font-size:12px;border-radius:2px}
+.dds-code015-editor .dds-code015-fields input[type=color]{width:42px;height:42px;padding:3px;border:1px solid rgba(255,255,255,.12);background:#111}
+.dds-code015-editor .dds-code015-color{gap:7px}
+.dds-code015-editor .dds-code015-color input[type=color]{flex:0 0 42px}
+.dds-code015-editor .dds-code015-tools{gap:7px;margin:9px 0;padding:8px;border:1px solid rgba(255,255,255,.1);background:#090909}
+.dds-code015-editor .dds-code015-tools button{min-width:35px;width:35px;height:35px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--dds-white)}
+.dds-code015-editor .dds-code015-copy{flex:0 0 auto;padding:12px 14px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(145deg,rgba(143,14,22,.06),#0d0c0c);border-radius:5px}
+.dds-code015-editor .dds-code015-copy button{height:42px}
+@media(max-width:800px){.dds-code015-editor .dds-code015-fields section{padding:16px 13px}.dds-code015-editor .dds-code015-saves{flex-wrap:wrap}}
+/* CODE015-only: match native right-side editor cards without changing other editors. */
+.dds-code015-editor .dds-code015-right{min-width:0!important;overflow:hidden!important}
+.dds-code015-editor .dds-code015-fields{scrollbar-width:thin;scrollbar-color:#ae1026 #160b0d}
+.dds-code015-editor .dds-code015-fields section{box-sizing:border-box;width:100%}
+.dds-code015-editor .dds-code015-fields label > span{font-family:var(--dds-font-main);font-weight:500}
+.dds-code015-editor .dds-code015-color{display:flex;align-items:center;min-width:0;width:100%}
+.dds-code015-editor .dds-code015-color input[type="text"]{height:42px;flex:1;min-width:0}
+.dds-code015-editor .dds-code015-fields textarea[data-c15="roleplay"]{display:block;min-height:150px;max-height:150px;height:150px;resize:none;overflow-y:auto}
+.dds-code015-editor .dds-code015-counter{display:block;margin-top:7px;text-align:right;color:#d92a42;font-size:11px}
+.dds-code015-editor .dds-code015-stage{overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain}
 </style>
 </head>
 <body class="dds-y2k-vampire">
@@ -7264,8 +7294,8 @@ function resize(frame,wrap,mode){
  try{
   const d=frame.contentDocument, root=d?.querySelector('.dds-code015-root');
   if(root){
-   const bodyHeight=d.body?.scrollHeight||0;
-   height=Math.max(300,Math.ceil(root.getBoundingClientRect().height),root.scrollHeight,bodyHeight);
+   const rootBottom=Math.ceil(root.getBoundingClientRect().bottom-root.getBoundingClientRect().top);
+   height=Math.max(300,rootBottom,root.scrollHeight)+48;
   }
  }catch{}
  frame.style.width=width+'px';frame.style.height=height+'px';
