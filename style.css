@@ -10802,8 +10802,8 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow-y:auto !important;
     overflow-x:hidden !important;
     overscroll-behavior:contain !important;
-    scrollbar-width:thin !important;
-    scrollbar-color:#c11724 #090909 !important;
+    scrollbar-width:none !important;
+    -ms-overflow-style:none !important;
   }
 
   /*
@@ -11294,8 +11294,9 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
   body.dds-editor-one-screen
   .dds-code013-editor
   .dds-code013-editor-stage::-webkit-scrollbar{
-    width:7px !important;
-    height:7px !important;
+    display:none !important;
+    width:0 !important;
+    height:0 !important;
   }
 
   body.dds-editor-one-screen
@@ -14864,7 +14865,7 @@ body.dds-y2k-vampire :is(
   .dds-profile-preview-stage,.dds-moodboard-preview-stage,
   .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
   .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
-  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
   [class*="preview-stage"]
 ) {
   scrollbar-width: thin !important;
@@ -14880,7 +14881,7 @@ body.dds-y2k-vampire :is(
   .dds-profile-preview-stage,.dds-moodboard-preview-stage,
   .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
   .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
-  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
   [class*="preview-stage"]
 )::-webkit-scrollbar {
   display: block !important;
@@ -14897,7 +14898,7 @@ body.dds-y2k-vampire :is(
   .dds-profile-preview-stage,.dds-moodboard-preview-stage,
   .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
   .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
-  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
   [class*="preview-stage"]
 )::-webkit-scrollbar-track { background: #090506 !important; }
 body.dds-y2k-vampire :is(
@@ -14909,7 +14910,7 @@ body.dds-y2k-vampire :is(
   .dds-profile-preview-stage,.dds-moodboard-preview-stage,
   .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
   .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
-  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  .dds-code014-editor-stage,.dds-v210-auto-stage,
   [class*="preview-stage"]
 )::-webkit-scrollbar-thumb {
   background: #b5162e !important;
@@ -15074,4 +15075,14 @@ body.dds-y2k-vampire [data-panel="home"] .dds-home-copy h1 span {
   body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {
     height: 330px !important;
   }
+}
+
+/* v270 — CODE013 only: no visible preview scrollbar, including first render. */
+html body .dds-protected-commission-editor.dds-code013-editor .dds-code013-editor-stage {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body .dds-protected-commission-editor.dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar {
+  display: none !important; width: 0 !important; height: 0 !important;
 }
