@@ -15157,3 +15157,39 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
 
 @media(min-width:1100px){.dds-code015-editor .dds-protected-commission-layout{display:grid;grid-template-columns:minmax(0,60fr) minmax(0,40fr);gap:12px;height:calc(100dvh - 100px);min-height:530px;padding-bottom:0;align-items:stretch}.dds-code015-editor .dds-protected-commission-controls-column{display:flex;flex-direction:column;overflow:hidden}.dds-code015-editor .dds-protected-commission-scroll{flex:1;min-height:0;overflow-y:auto}.dds-code015-editor .dds-code015-stage{flex:1}}
 @media(max-width:1099px){.dds-code015-editor .dds-code015-stage{height:65vh;min-height:400px}}
+
+
+/* v298 CODE015 only: one native-sized draft bar; no global duplicate host. */
+.dds-code015-editor .dds-code015-savebar {
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.2fr) auto auto;
+  align-items:end;gap:8px;padding:12px 14px;min-width:0;
+  border:1px solid rgba(255,255,255,.12);border-radius:7px;
+  background:rgba(25,8,12,.65);
+}
+.dds-code015-editor .dds-code015-savebar > div:first-child {
+  grid-column:1/-1;display:flex;align-items:baseline;gap:5px;min-width:0;
+  font-size:11px;line-height:1.3;
+}
+.dds-code015-editor .dds-code015-savebar > div:first-child small {
+  color:#817579;font-size:10px;
+}
+.dds-code015-editor .dds-code015-savebar > input,
+.dds-code015-editor .dds-code015-savebar > select {
+  width:100%;min-width:0;height:37px;box-sizing:border-box;
+  color:#eae4e2;background:#090608;border:1px solid #35262b;
+  border-radius:3px;padding:0 9px;font:inherit;font-size:11px;
+}
+.dds-code015-editor .dds-code015-savebar > button {
+  height:37px;min-width:0;padding:0 11px;font:600 10px inherit;
+  border:1px solid #69232b;background:#12090d;color:#f4e8e8;cursor:pointer;
+}
+.dds-code015-editor .dds-code015-savebar > [data-015-save] {
+  background:#9c0b20;color:white;border-color:#aa1b30;font-weight:700;
+}
+.dds-code015-editor .dds-code015-savebar > [data-015-delete] {opacity:.55;}
+/* Color hex fields never contain roleplay text: hide any legacy counters injected there. */
+.dds-code015-editor .dds-color-grid .dds-word-counter {display:none!important;}
+@media(max-width:650px) {
+ .dds-code015-editor .dds-code015-savebar {grid-template-columns:minmax(0,1fr) auto;}
+ .dds-code015-editor .dds-code015-savebar > select {grid-column:1/-1;}
+}
