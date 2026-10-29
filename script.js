@@ -27011,8 +27011,22 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     // Keep native-width iframe and scale as one intact visual rectangle.
     // This preserves the original left/right proportions and floating notes.
-    const contentHeight = Math.max(900, body.scrollHeight,
-      html.scrollHeight, state.higherNativeHeight || 0);
+    // CODE009: include positioned/overflowing artwork when determining the
+    // scrollable height (body.scrollHeight alone can miss those elements).
+    const bodyTop = body.getBoundingClientRect().top;
+    let artworkBottom = 0;
+    const visualRoot = doc.querySelector(".ddsh-higherthanheaven") || body;
+    artworkBottom = Math.max(artworkBottom, visualRoot.scrollHeight || 0);
+    for (const element of visualRoot.querySelectorAll("*")) {
+      const cs = doc.defaultView.getComputedStyle(element);
+      if (cs.display === "none" || cs.position === "fixed") continue;
+      const rect = element.getBoundingClientRect();
+      if (rect.height > 0 && Number.isFinite(rect.bottom)) {
+        artworkBottom = Math.max(artworkBottom, rect.bottom - bodyTop);
+      }
+    }
+    const contentHeight = Math.ceil(Math.max(900, body.scrollHeight,
+      html.scrollHeight, artworkBottom + 32, state.higherNativeHeight || 0));
     state.higherNativeHeight = contentHeight;
     const visualHeight = Math.ceil(contentHeight * scale);
     const offsetX = Math.max(0, (stage.clientWidth - nativeWidth * scale) / 2);
@@ -27038,6 +27052,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       fixed(host, "width", "100%");
       fixed(host, "min-width", "0");
       fixed(host, "height", Math.max(stage.clientHeight, visualHeight) + "px");
+    // The stage, not the iframe, is the vertical scrolling viewport.
+    fixed(stage, "overflow-y", "auto");
+    fixed(stage, "overflow-x", "hidden");
       fixed(host, "overflow", "visible");
     }
     state.ready = true;
