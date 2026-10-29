@@ -15014,3 +15014,64 @@ html body .dds-panel.dds-code013-editor .dds-code013-editor-stage::-webkit-scrol
   height: 0 !important;
   background: transparent !important;
 }
+
+
+/* v269 — HOME ONLY: fit within one desktop viewport, remove SLEEP outline. */
+body.dds-y2k-vampire [data-panel="home"].is-active {
+  min-height: 0 !important;
+  height: calc(100dvh - 151px) !important;
+  padding: 12px 0 0 !important;
+  overflow: hidden !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-hero {
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 14px !important;
+  align-items: stretch !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-copy {
+  min-height: 0 !important;
+  padding: clamp(12px, 2vh, 28px) 20px !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-copy h1 {
+  font-size: clamp(43px, min(5.3vw, 9.5vh), 90px) !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-description {
+  margin-top: clamp(12px, 2vh, 24px) !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-visual {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+body.dds-y2k-vampire [data-panel="home"] .dds-home-copy h1 span {
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  color: var(--dds-white) !important;
+}
+@media (min-width: 901px) and (min-height: 550px) {
+  html:has(body.dds-y2k-vampire [data-panel="home"].is-active),
+  body.dds-y2k-vampire:has([data-panel="home"].is-active) {
+    overflow-y: hidden !important;
+  }
+}
+@media (max-width: 900px), (max-height: 549px) {
+  body.dds-y2k-vampire [data-panel="home"].is-active {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-hero {
+    height: auto !important;
+  }
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-visual {
+    height: auto !important;
+    min-height: 300px !important;
+  }
+  body.dds-y2k-vampire [data-panel="home"] .dds-home-right-photo {
+    height: 330px !important;
+  }
+}

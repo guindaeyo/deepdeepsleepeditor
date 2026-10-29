@@ -1,1 +1,1 @@
-v268 — Only CODE013 Candy Pink initial LIVE PREVIEW scrollbar hidden. Scroll remains functional. No JS changes.
+v269: HOME only — fit hero in desktop viewport and remove SLEEP text outline. Other pages and scripts unchanged.
