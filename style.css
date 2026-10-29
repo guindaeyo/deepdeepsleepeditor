@@ -14982,3 +14982,18 @@ body.dds-y2k-vampire .dds-code013-editor .dds-code013-editor-stage::-webkit-scro
   width: 0 !important;
   height: 0 !important;
 }
+
+/* v267 — CODE013 ONLY: override the v175 visible scrollbar selectors.
+   Keep vertical scrolling functional while hiding the scrollbar. */
+body.dds-y2k-vampire.dds-editor-one-screen .dds-code013-editor.is-active .dds-code013-editor-stage,
+body.dds-editor-one-screen .dds-code013-editor.is-active .dds-code013-editor-stage {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+body.dds-y2k-vampire.dds-editor-one-screen .dds-code013-editor.is-active .dds-code013-editor-stage::-webkit-scrollbar,
+body.dds-editor-one-screen .dds-code013-editor.is-active .dds-code013-editor-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
