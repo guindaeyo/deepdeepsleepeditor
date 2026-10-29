@@ -15193,3 +15193,31 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
  .dds-code015-editor .dds-code015-savebar {grid-template-columns:minmax(0,1fr) auto;}
  .dds-code015-editor .dds-code015-savebar > select {grid-column:1/-1;}
 }
+
+/* v299 — CODE015 only: invisible scrolling in editor LIVE PREVIEW. */
+.dds-code015-editor .dds-code015-stage {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.dds-code015-editor .dds-code015-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+/* CODE015 directory: keep the complete miniature centered. */
+.dds-roleplay-card:has([data-015-card]) .dds-roleplay-card-preview-live::after {
+  content: none !important;
+}
+.dds-roleplay-card [data-015-card] {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0;
+  max-width: none !important;
+  width: 800px !important;
+  border: 0;
+  transform-origin: top center !important;
+  pointer-events: none;
+  opacity: 1 !important;
+}

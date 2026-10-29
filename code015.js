@@ -41,7 +41,46 @@
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
   function sizeFrame(iframe){const doc=iframe.contentDocument;if(!doc||!iframe.isConnected)return;const stage=iframe.parentElement;const root=doc.querySelector('.ddsh-syre');if(!root)return;const width=Math.max(800,root.scrollWidth,root.getBoundingClientRect().width);const height=Math.max(root.scrollHeight,doc.body.scrollHeight)+40;const scale=Math.min(1,(stage.clientWidth-24)/width);iframe.style.width=width+'px';iframe.style.height=height+'px';iframe.style.transform=`translateX(-50%) scale(${scale})`;stage.style.setProperty('--cyworld-height',(height*scale+28)+'px');}
   function render(){if(!panel)return;const iframe=panel.querySelector('[data-015-preview]');if(!iframe)return;iframe.onload=()=>{sizeFrame(iframe);[100,350,900].forEach(t=>setTimeout(()=>sizeFrame(iframe),t));};iframe.srcdoc=docHTML(state);}
-  function card(){const grid=document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');if(!grid||grid.querySelector('[data-015-open]'))return;const article=document.createElement('article');article.className='dds-roleplay-card';article.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe class="dds-roleplay-card-preview-frame" title="ตัวอย่าง cyworld.exe" aria-hidden="true" loading="lazy" tabindex="-1" data-015-card></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE015</span><h2 class="dds-roleplay-name">cyworld.exe</h2><button type="button" class="dds-roleplay-edit" data-015-open>EDIT CODE <span>↗</span></button></div>`;grid.appendChild(article);const fr=article.querySelector('[data-015-card]');fr.srcdoc=docHTML({...BLANK(),...DEMO});fr.onload=()=>{const w=800;const container=fr.parentElement;fr.style.width=w+'px';fr.style.transformOrigin='top left';fr.style.transform=`scale(${Math.min(.7,container.clientWidth/w)})`;fr.style.height='850px';};article.querySelector('[data-015-open]').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open();});}
+  function fitCardPreview(frame){
+    if(!frame?.isConnected)return;
+    const holder=frame.parentElement;
+    const doc=frame.contentDocument;
+    if(!doc?.body || !holder)return;
+    const root=doc.querySelector('.ddsh-syre');
+    if(!root)return;
+    const actualWidth=Math.max(800,root.scrollWidth,Math.ceil(root.getBoundingClientRect().width));
+    const actualHeight=Math.max(root.scrollHeight,Math.ceil(root.getBoundingClientRect().height),doc.body.scrollHeight)+8;
+    const availableWidth=Math.max(1,holder.clientWidth-20);
+    const availableHeight=Math.max(1,holder.clientHeight-20);
+    const scale=Math.min(1,availableWidth/actualWidth,availableHeight/actualHeight);
+    frame.style.setProperty('width',actualWidth+'px','important');
+    frame.style.setProperty('height',actualHeight+'px','important');
+    frame.style.setProperty('left','50%','important');
+    frame.style.setProperty('top',Math.max(0,Math.round((holder.clientHeight-actualHeight*scale)/2))+'px','important');
+    frame.style.setProperty('transform',`translateX(-50%) scale(${scale})`,'important');
+    frame.classList.remove('dds-preview-loading');
+    frame.classList.add('dds-preview-ready');
+  }
+  function card(){
+    const grid=document.querySelector('[data-panel="roleplay"] .dds-roleplay-grid');
+    if(!grid||grid.querySelector('[data-015-open]'))return;
+    const article=document.createElement('article');article.className='dds-roleplay-card';
+    article.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><iframe class="dds-roleplay-card-preview-frame dds-preview-ready" title="ตัวอย่าง cyworld.exe" aria-hidden="true" loading="eager" tabindex="-1" data-015-card></iframe><span class="dds-roleplay-preview-badge">AVAILABLE</span></div><div class="dds-roleplay-card-body"><span class="dds-roleplay-index">CODE015</span><h2 class="dds-roleplay-name">cyworld.exe</h2><button type="button" class="dds-roleplay-edit" data-015-open>EDIT CODE <span>↗</span></button></div>`;
+    grid.appendChild(article);
+    const fr=article.querySelector('[data-015-card]');
+    const update=()=>fitCardPreview(fr);
+    fr.addEventListener('load',()=>{
+      update();
+      fr.contentDocument?.fonts?.ready?.then(update);
+      fr.contentDocument?.querySelectorAll('img').forEach(img=>{
+        if(!img.complete)img.addEventListener('load',update,{once:true});
+      });
+      [80,300,800].forEach(t=>setTimeout(update,t));
+    });
+    fr.srcdoc=docHTML({...BLANK(),...DEMO},true);
+    if(window.ResizeObserver)new ResizeObserver(update).observe(fr.parentElement);
+    article.querySelector('[data-015-open]').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open();});
+  }
   function open(){if(!panel)createPanel();document.querySelectorAll('.dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));panel.classList.add('is-active');document.body.classList.add('dds-editor-mode','dds-force-editor-mode');document.documentElement.classList.add('dds-force-editor-mode');if(location.hash!=='#editor-code015')history.pushState({ddsCode015:true},'','#editor-code015');window.scrollTo(0,0);render();}
   function route(){if(location.hash==='#editor-code015'){open();return;}if(!panel)return;panel.classList.remove('is-active');}
   function init(){card();if(!panel)createPanel();try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))sizeFrame(panel.querySelector('[data-015-preview]'));});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
