@@ -1,1 +1,1 @@
-v269: HOME only — fit hero in desktop viewport and remove SLEEP text outline. Other pages and scripts unchanged.
+v283: Added FOR ROLEPLAY CODE015 cyworld.exe. Directory card uses supplied filled example. Editor starts blank for all text/images/links; only colors and image adjustment defaults remain. Other site files unchanged.
