@@ -15086,3 +15086,20 @@ html body .dds-protected-commission-editor.dds-code013-editor .dds-code013-edito
 html body .dds-protected-commission-editor.dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar {
   display: none !important; width: 0 !important; height: 0 !important;
 }
+
+/* v271 — CODE013 ONLY: override the global V260 red preview scrollbar.
+   Match the actual runtime panel from script.js (data-panel="editor-code013").
+   Applied before any input/edit event, including the initial iframe render. */
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar-track,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
