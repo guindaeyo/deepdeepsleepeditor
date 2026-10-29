@@ -27270,7 +27270,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
 
     const availableWidth = Math.max(1, stage.clientWidth - 24);
-    const scale = Math.min(1, availableWidth / Math.max(1, bounds.width));
+    // REVIEW CODE001 only: the 1300px source canvas has generous empty margins.
+    // Enlarge the actual GGUM design by 25%, then let the existing visual-centering
+    // routine position it; preserve the original sizing for every other editor.
+    const standardScale = Math.min(1, availableWidth / Math.max(1, bounds.width));
+    const scale = iframe.id === "foodReviewPreview"
+      ? Math.min(1.25, standardScale * 1.25)
+      : standardScale;
 
     root.style.setProperty("transform-origin", "top left", "important");
     root.style.setProperty("position", "relative", "important");
