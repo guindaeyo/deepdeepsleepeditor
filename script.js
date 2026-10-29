@@ -26883,6 +26883,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         host.style.setProperty("min-width", "0", "important");
         host.style.setProperty("max-width", "100%", "important");
         host.style.setProperty("position", "relative", "important");
+        // CODE003: center the fitted preview as a flex item, not with offsets.
+        host.style.setProperty("display", "flex", "important");
+        host.style.setProperty("flex-direction", "column", "important");
+        host.style.setProperty("align-items", "center", "important");
+        host.style.setProperty("justify-content", "flex-start", "important");
       }
       // The iframe is sized to the already-scaled artwork by this engine.
       // Center that real width through normal layout, not a second translate.
