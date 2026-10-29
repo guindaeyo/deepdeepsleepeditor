@@ -7234,8 +7234,45 @@ function refresh(){if(!panel)return;panel.querySelector('[data-c15-count]').text
 function sync(){panel.querySelectorAll('[data-c15]').forEach(e=>e.value=state[e.dataset.c15]);panel.querySelectorAll('[data-c15-color]').forEach(e=>e.value=state.colors[e.dataset.c15Color]);panel.querySelectorAll('[data-c15-hex]').forEach(e=>e.value=state.colors[e.dataset.c15Hex]);panel.querySelectorAll('[data-c15-out]').forEach(e=>e.textContent=state[e.dataset.c15Out]+'%')}
 function bb(k){const t=panel.querySelector('textarea[data-c15="roleplay"]');const a=t.selectionStart,b=t.selectionEnd,selected=t.value.slice(a,b);let left='',right='';if(k==='color'){const co=prompt('สีข้อความ (HEX)','#e51b49');if(!/^#[0-9a-f]{6}$/i.test(co||''))return;left='[color='+co+']';right='[/color]'}else if(k==='link'){const url=prompt('URL','https://');if(!url)return;left='[url='+url+']';right='[/url]'}else{const tag={bold:'b',italic:'i',underline:'u',strike:'s'}[k];left='['+tag+']';right='[/'+tag+']'}t.setRangeText(left+selected+right,a,b,'select');state.roleplay=t.value;t.focus();refresh()}
 const storeKey='dds:roleplay:code015:saves:v1';function getSaves(){try{return JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{return {}}}function updateSaves(){if(!panel)return;const select=panel.querySelector('[data-c15-save-list]');const name=select.value;select.innerHTML='<option value="">เลือกไฟล์ที่บันทึก</option>'+Object.keys(getSaves()).map(k=>`<option value="${escape(k)}">${escape(k)}</option>`).join('');if(getSaves()[name])select.value=name}function save(){const name=panel.querySelector('[data-c15-save-name]').value.trim();if(!name)return;const all=getSaves();all[name]=state;localStorage.setItem(storeKey,JSON.stringify(all));updateSaves();panel.querySelector('[data-c15-save-list]').value=name}function load(){const s=getSaves()[panel.querySelector('[data-c15-save-list]').value];if(s){state={...blank(),...s,colors:{...colors,...s.colors}};sync();refresh()}}function del(){const name=panel.querySelector('[data-c15-save-list]').value;if(!name)return;const s=getSaves();delete s[name];localStorage.setItem(storeKey,JSON.stringify(s));updateSaves()}
-function show(push=false){ensurePanel();document.querySelectorAll('.dds-panel').forEach(p=>{p.classList.remove('is-active');p.style.display='none'});panel.style.display='block';panel.classList.add('is-active');document.body.classList.add('dds-code015-active');open=true;sync();refresh();if(push)history.pushState({dds:'code015'},'', '#editor-code015');window.scrollTo(0,0)}
-function close(){if(!open)return;open=false;panel?.classList.remove('is-active');if(panel)panel.style.display='none';document.body.classList.remove('dds-code015-active');const p=document.querySelector('[data-panel="roleplay"]');if(p){p.style.display='block';p.classList.add('is-active')}window.scrollTo(0,0)}
+function show(push=false){
+  ensurePanel();
+  // The rest of the shop switches panels with is-active. Never write inline
+  // display:none on those panels: it permanently overrides their CSS.
+  document.querySelectorAll('.dds-panel').forEach(p=>{
+    p.classList.toggle('is-active',p===panel);
+    if(p.style.display==='none'||p.style.display==='block')p.style.removeProperty('display');
+  });
+  document.body.classList.add('dds-code015-active');
+  open=true;sync();refresh();
+  if(push)history.pushState({dds:'code015'},'', '#editor-code015');
+  window.scrollTo(0,0);
+}
+function close(){
+  if(!open)return;
+  open=false;
+  panel?.classList.remove('is-active');
+  document.body.classList.remove('dds-code015-active');
+  document.querySelectorAll('.dds-panel').forEach(p=>{
+    if(p.style.display==='none'||p.style.display==='block')p.style.removeProperty('display');
+  });
+  const p=document.querySelector('[data-panel="roleplay"]');
+  if(p)p.classList.add('is-active');
+  window.scrollTo(0,0);
+}
+// If the visitor switches to another category or editor, CODE015 must release
+// its active state; the shop's normal navigation still handles that click.
+document.addEventListener('click',e=>{
+  if(!open)return;
+  const target=e.target.closest?.('[data-edit-code], [data-edit-profile], [data-edit-review], [data-page], [data-go], [data-browser-page], [data-code013-edit], [data-code014-edit]');
+  if(target&&!target.closest('.dds-code015-editor')){
+    open=false;
+    panel?.classList.remove('is-active');
+    document.body.classList.remove('dds-code015-active');
+    document.querySelectorAll('.dds-panel').forEach(p=>{
+      if(p.style.display==='none'||p.style.display==='block')p.style.removeProperty('display');
+    });
+  }
+},true);
 window.addEventListener('popstate',()=>{if(open&&location.hash!=='#editor-code015')close()});window.addEventListener('hashchange',()=>{if(open&&location.hash!=='#editor-code015')close()});window.addEventListener('resize',()=>{if(open){resize(iframe,panel.querySelector('[data-c15-wrap]'),'editor')}if(cardFrame){resize(cardFrame,cardFrame.closest('[data-code015-card-wrap]'),'card')}});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',card,{once:true});else card();
 })();
