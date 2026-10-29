@@ -1,1 +1,3 @@
-v283: Added FOR ROLEPLAY CODE015 cyworld.exe. Directory card uses supplied filled example. Editor starts blank for all text/images/links; only colors and image adjustment defaults remain. Other site files unchanged.
+Deep Deep Sleep Code Shop — v295
+Removed CODE015 cyworld.exe by restoring the complete pre-CODE015 v282 code baseline.
+CODE001–CODE014, other editor categories, preview, controls and cloud integration are unchanged relative to v282.
