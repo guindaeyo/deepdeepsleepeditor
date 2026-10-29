@@ -15143,40 +15143,4 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
 [data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar,
 [data-panel="editor-code013"] .dds-code013-editor-stage *::-webkit-scrollbar { display:none!important; width:0!important; height:0!important; }
 
-/* v277: center only PROFILE CODE003 FortyOneWinks live preview.
-   Do not alter iframe dimensions, zoom or any other editor. */
-[data-panel="editor-profile003"] #fortyOneCanvasHost {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  width: 100% !important;
-}
-[data-panel="editor-profile003"] #fortyOnePreview {
-  flex: 0 0 auto !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* v278: FortyOneWinks only — override the shared left:50% iframe rule.
-   Its host is already flex-centered and its frame width is post-fit. */
-body.dds-editor-one-screen [data-panel="editor-profile003"].is-active #fortyOneCanvasHost,
-body.dds-y2k-vampire [data-panel="editor-profile003"] #fortyOneCanvasHost {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-body.dds-editor-one-screen [data-panel="editor-profile003"].is-active #fortyOneCanvasHost > #fortyOnePreview,
-body.dds-y2k-vampire [data-panel="editor-profile003"] #fortyOneCanvasHost > #fortyOnePreview {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transform: none !important;
-  flex-shrink: 0 !important;
-}
+/* v279: FortyOneWinks iframe centering is calculated in applyFrameBox(). */

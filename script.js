@@ -26873,31 +26873,28 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.setProperty("zoom", "1", "important");
     iframe.style.setProperty("pointer-events", "none", "important");
     iframe.style.setProperty("background", "transparent", "important");
-    /* PROFILE CODE003 only: center the already-fitted iframe within its
-       full-width canvas host.  This is reapplied on every height update so
-       typing cannot push the preview back to the left. */
+    /* PROFILE CODE003: center at the one true sizing point. The shared
+       fit routine calculates the final iframe width before this call; CSS
+       flex centering alone was overridden by later inline geometry. */
     if (iframe.id === "fortyOnePreview") {
       const host = iframe.parentElement;
       if (host) {
+        const stage = document.getElementById("fortyOnePreviewStage");
+        const available = Math.max(1, stage?.clientWidth || host.clientWidth);
+        const fitted = Math.max(1, Math.ceil(width));
+        const offset = Math.max(0, (available - fitted) / 2);
+        host.style.setProperty("display", "block", "important");
+        host.style.setProperty("position", "relative", "important");
         host.style.setProperty("width", "100%", "important");
         host.style.setProperty("min-width", "0", "important");
         host.style.setProperty("max-width", "100%", "important");
-        host.style.setProperty("position", "relative", "important");
-        // CODE003: center the fitted preview as a flex item, not with offsets.
-        host.style.setProperty("display", "flex", "important");
-        host.style.setProperty("flex-direction", "column", "important");
-        host.style.setProperty("align-items", "center", "important");
-        host.style.setProperty("justify-content", "flex-start", "important");
+        iframe.style.setProperty("position", "relative", "important");
+        iframe.style.setProperty("left", `${offset}px`, "important");
+        iframe.style.setProperty("right", "auto", "important");
+        iframe.style.setProperty("margin", "0", "important");
+        iframe.style.setProperty("transform", "none", "important");
+        iframe.style.setProperty("transform-origin", "top left", "important");
       }
-      // The iframe is sized to the already-scaled artwork by this engine.
-      // Center that real width through normal layout, not a second translate.
-      iframe.style.setProperty("position", "relative", "important");
-      iframe.style.setProperty("left", "auto", "important");
-      iframe.style.setProperty("right", "auto", "important");
-      iframe.style.setProperty("transform", "none", "important");
-      iframe.style.setProperty("transform-origin", "top center", "important");
-      iframe.style.setProperty("margin-left", "auto", "important");
-      iframe.style.setProperty("margin-right", "auto", "important");
     }
   }
 
