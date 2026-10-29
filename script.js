@@ -26898,6 +26898,38 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }
 
+  /* REVIEW CODE001 only: center the *visible design*, not the 1300px
+     document box (which contains asymmetric blank space).  Keep the
+     original iframe scaling and all other editors untouched. */
+  function centerGgumVisibleDesign(iframe, stage) {
+    if (iframe?.id !== "foodReviewPreview" || !stage) return;
+    const doc = iframe.contentDocument;
+    if (!doc?.body || stage.clientWidth < 1) return;
+    // The card and two side panels are the composition's visual center.
+    const selectors = [".fdpopup-card", ".fdpopup-info-left", ".fdpopup-info-right"];
+    const rects = selectors.map(sel => doc.querySelector(sel))
+      .filter(Boolean).map(el => el.getBoundingClientRect())
+      .filter(r => r.width > 2 && r.height > 2);
+    const reference = rects.length ? {
+      left: Math.min(...rects.map(r => r.left)),
+      right: Math.max(...rects.map(r => r.right))
+    } : (() => {
+      const r = doc.querySelector(".fdpopup-stage")?.getBoundingClientRect();
+      return r ? {left:r.left,right:r.right} : null;
+    })();
+    if (!reference) return;
+    // offsetLeft is the untransformed iframe position inside its stage.
+    const contentCenter = iframe.offsetLeft + (reference.left + reference.right) / 2;
+    const shift = Math.round((stage.clientWidth / 2 - contentCenter) * 10) / 10;
+    const prior = Number(iframe.dataset.ggumVisualShift || "NaN");
+    if (Number.isFinite(prior) && Math.abs(prior - shift) < 0.5) {
+      iframe.style.setProperty("transform", `translateX(${prior}px)`, "important");
+      return;
+    }
+    iframe.dataset.ggumVisualShift = String(shift);
+    iframe.style.setProperty("transform", `translateX(${shift}px)`, "important");
+  }
+
   function setDocumentBox(doc, width, height) {
     const w = `${Math.max(1, Math.ceil(width))}px`;
     const h = `${Math.max(1, Math.ceil(height))}px`;
@@ -27259,6 +27291,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const scaledHeight = Math.max(1, Math.ceil(bounds.height * scale));
     setDocumentBox(doc, scaledWidth, scaledHeight);
     applyFrameBox(iframe, scaledWidth, scaledHeight);
+    centerGgumVisibleDesign(iframe, stage);
     /* Reveal FortyOneWinks only once its first centering/fit is ready;
        leave it visible through all subsequent text updates. */
     if (iframe.id === "fortyOnePreview") {
@@ -27312,6 +27345,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const width = Math.max(1, Math.ceil((state.bounds?.width || rootRect.width || 1) * (state.scale || 1)));
     setDocumentBox(doc, width, height);
     applyFrameBox(iframe, width, height);
+    centerGgumVisibleDesign(iframe, stage);
     return true;
   }
 
