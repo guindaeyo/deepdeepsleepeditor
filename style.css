@@ -14969,3 +14969,16 @@ body.dds-y2k-vampire [data-panel="editor-code009"].is-active .dds-higher-scroll-
   width: 100% !important;
   min-width: 0 !important;
 }
+
+
+/* v266 — CODE013 Candy Pink Magic Hole Flip Phone ONLY:
+   invisible LIVE PREVIEW scrollbar; scrolling remains enabled. */
+body.dds-y2k-vampire .dds-code013-editor .dds-code013-editor-stage {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+body.dds-y2k-vampire .dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
