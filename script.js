@@ -26976,11 +26976,74 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return true;
   }
 
+  /* CODE009 only: keep one full-width source canvas inside a viewport-sized
+     iframe.  The generic fitter previously measured only part of the
+     artwork and shrank the iframe itself, clipping its right-hand content. */
+  function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body || !stage || stage.clientWidth < 40) return false;
+    ensurePreviewStyle(doc);
+    setupStage(stage);
+
+    const state = stateFor(iframe);
+    const body = doc.body;
+    const html = doc.documentElement;
+    const root = findVisualRoot(doc);
+    if (root) restoreOriginalRoot(iframe, root);
+    const fixed = (el, prop, value) => el.style.setProperty(prop, value, "important");
+    const viewportWidth = Math.max(1, stage.clientWidth);
+    // The source artboard needs more horizontal room than the visible panel.
+    // Reserve this width BEFORE its CSS is laid out, never by shrinking the
+    // document after it renders.
+    const nativeWidth = 1000;
+    const scale = Math.min(1, Math.max(1, viewportWidth - 28) / nativeWidth);
+
+    fixed(iframe, "display", "block");
+    fixed(iframe, "position", "relative");
+    fixed(iframe, "inset", "auto");
+    fixed(iframe, "width", viewportWidth + "px");
+    fixed(iframe, "min-width", "0");
+    fixed(iframe, "max-width", "100%");
+    fixed(iframe, "transform", "none");
+    fixed(iframe, "zoom", "1");
+    fixed(iframe, "margin", "0 auto");
+    fixed(iframe, "border", "0");
+    fixed(iframe, "pointer-events", "none");
+
+    fixed(html, "width", viewportWidth + "px");
+    fixed(html, "overflow-x", "hidden");
+    fixed(html, "overflow-y", "hidden");
+    fixed(body, "box-sizing", "border-box");
+    fixed(body, "position", "relative");
+    fixed(body, "width", nativeWidth + "px");
+    fixed(body, "min-width", nativeWidth + "px");
+    fixed(body, "max-width", nativeWidth + "px");
+    fixed(body, "margin", "0");
+    fixed(body, "transform-origin", "top left");
+    fixed(body, "transform", `translateX(${Math.max(0, (viewportWidth - nativeWidth * scale) / 2)}px) scale(${scale})`);
+
+    const naturalHeight = Math.max(900, body.scrollHeight, root?.scrollHeight || 0);
+    const renderedHeight = Math.max(1, Math.ceil(naturalHeight * scale + 16));
+    fixed(body, "height", naturalHeight + "px");
+    fixed(iframe, "height", renderedHeight + "px");
+    fixed(iframe, "min-height", renderedHeight + "px");
+    fixed(iframe, "max-height", "none");
+    state.ready = true;
+    state.scale = scale;
+    state.bounds = { left: 0, top: 0, width: nativeWidth, height: naturalHeight };
+    if (resetScroll) stage.scrollTop = 0;
+    stage.scrollLeft = 0;
+    return true;
+  }
+
   function applyFullFit(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || !editorPanelFor(stage) || stage.clientWidth < 40) return false;
     if (iframe.id === "moodboardPreview" && stage.id === "moodboardPreviewStage") {
       return fitMoodboardCanvas(iframe, stage, resetScroll);
+    }
+    if (iframe.id === "higherHeavenPreview") {
+      return fitHigherHeavenFullCanvas(iframe, stage, resetScroll);
     }
 
     ensurePreviewStyle(doc);
@@ -27050,6 +27113,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   /* While typing we only grow/shrink the vertical document box.  We do not
      touch transform/scale/X position, so there is nothing visible to blink. */
   function updateVerticalExtent(iframe, stage = stageFor(iframe)) {
+    if (iframe?.id === "higherHeavenPreview") {
+      return fitHigherHeavenFullCanvas(iframe, stage, false);
+    }
     if (iframe?.id === "moodboardPreview" && stage?.id === "moodboardPreviewStage") {
       return fitMoodboardCanvas(iframe, stage, false);
     }
