@@ -11255,8 +11255,8 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow-y:auto !important;
     overflow-x:hidden !important;
     overscroll-behavior:contain !important;
-    scrollbar-width:thin !important;
-    scrollbar-color:#c11724 #090909 !important;
+    scrollbar-width:none !important;
+    -ms-overflow-style:none !important;
   }
 
   /*
@@ -15098,6 +15098,21 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013
 html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar,
 html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar-track,
 html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-code013-editor[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* v272: CODE013 stage only — invisible scrollbar from the FIRST render. */
+html body .dds-code013-editor .dds-code013-editor-stage {
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body .dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar,
+html body .dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar-track,
+html body .dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar-thumb {
   display: none !important;
   width: 0 !important;
   height: 0 !important;

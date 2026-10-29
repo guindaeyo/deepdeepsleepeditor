@@ -20718,7 +20718,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     panel.dataset.panel = PANEL_NAME;
     panel.innerHTML = `<div class="dds-editor-heading"><button aria-label="กลับหน้า FOR ROLEPLAY" class="dds-back-button" data-code013-back title="กลับหน้า FOR ROLEPLAY" type="button">←</button><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>CANDY PINK MAGIC HOLE FLIP PHONE</h1><p>Candy pink magic hole flip phone, 나 어떡해? 한 칸 배터리, 찾아 24시</p></div></div>
       <div class="dds-protected-commission-layout">
-        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE013</strong></div><div class="dds-code013-editor-stage"><iframe class="dds-protected-commission-preview-frame dds-code013-editor-preview" data-code013-editor-preview scrolling="no" title="ตัวอย่าง CODE013"></iframe></div></div>
+        <div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE013</strong></div><div class="dds-code013-editor-stage" style="overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important"><iframe class="dds-protected-commission-preview-frame dds-code013-editor-preview" data-code013-editor-preview scrolling="no" title="ตัวอย่าง CODE013"></iframe></div></div>
         <div class="dds-protected-commission-controls-column">
           <div class="dds-protected-commission-draft dds-code013-draft"><div><strong>บันทึกแบบร่าง</strong><small data-code013-draft-status>ยังไม่มีแบบร่าง</small></div></div>
           <div class="dds-protected-commission-scroll dds-code013-commission-scroll">
