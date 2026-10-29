@@ -13794,14 +13794,7 @@ body.dds-y2k-vampire .dds-home-hero{
     linear-gradient(135deg,#3e0a14 0%,#19090c 40%,#0b0708 100%)!important;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.55)!important;
 }
-body.dds-y2k-vampire .dds-home-hero::before{
-  content:"DDS://VAMPIRE_WEB_ARCHIVE / ONLINE";
-  position:absolute;
-  top:11px;right:15px;
-  color:#c97986;
-  font:700 9px/1 var(--dds-browser-mono);
-  letter-spacing:.08em;
-}
+
 body.dds-y2k-vampire .dds-home-copy{
   align-self:stretch;
   display:flex;
