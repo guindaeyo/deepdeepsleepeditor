@@ -15139,3 +15139,13 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
   height: 0 !important;
   background: transparent !important;
 }
+
+/* v275: CODE013 LIVE PREVIEW ONLY, scrollbar hidden without disabling scroll */
+[data-panel="editor-code013"] .dds-protected-commission-preview-column,
+[data-panel="editor-code013"] .dds-protected-commission-preview-column *,
+[data-panel="editor-code013"] .dds-code013-editor-stage,
+[data-panel="editor-code013"] .dds-code013-editor-stage * { scrollbar-width:none!important; -ms-overflow-style:none!important; }
+[data-panel="editor-code013"] .dds-protected-commission-preview-column::-webkit-scrollbar,
+[data-panel="editor-code013"] .dds-protected-commission-preview-column *::-webkit-scrollbar,
+[data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar,
+[data-panel="editor-code013"] .dds-code013-editor-stage *::-webkit-scrollbar { display:none!important; width:0!important; height:0!important; }

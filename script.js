@@ -20337,7 +20337,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const OFFICIAL_CODE = buildCode(defaults, false);
 
   function previewDocument(code) {
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important;scrollbar-width:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}.dds-code013-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code013-preview-root">${code}</div></body></html>`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important;scrollbar-width:none!important}html *,body *{scrollbar-width:none!important;-ms-overflow-style:none!important}html *::-webkit-scrollbar,body *::-webkit-scrollbar,html *::-webkit-scrollbar-track,body *::-webkit-scrollbar-thumb{display:none!important;width:0!important;height:0!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}.dds-code013-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code013-preview-root">${code}</div></body></html>`;
   }
 
   function measureIframe(iframe) {
@@ -20446,15 +20446,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     stage.style.setProperty(
       "scrollbar-width",
-      "thin",
+      "none",
       "important"
     );
 
-    stage.style.setProperty(
-      "scrollbar-color",
-      "#c11724 #090909",
-      "important"
-    );
+    stage.style.removeProperty("scrollbar-color");
 
     iframe.style.setProperty(
       "position",
@@ -20961,8 +20957,43 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function hideCode013PreviewScrollbars() {
+    // Only the CODE013 LIVE PREVIEW; controls remain untouched.
+    let rule = document.getElementById("dds-code013-scrollbar-v275");
+    if (!rule) {
+      rule = document.createElement("style");
+      rule.id = "dds-code013-scrollbar-v275";
+      rule.textContent = `
+        [data-panel="editor-code013"] .dds-protected-commission-preview-column,
+        [data-panel="editor-code013"] .dds-protected-commission-preview-column *,
+        [data-panel="editor-code013"] .dds-code013-editor-stage,
+        [data-panel="editor-code013"] .dds-code013-editor-stage * {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        [data-panel="editor-code013"] .dds-protected-commission-preview-column::-webkit-scrollbar,
+        [data-panel="editor-code013"] .dds-protected-commission-preview-column *::-webkit-scrollbar,
+        [data-panel="editor-code013"] .dds-code013-editor-stage::-webkit-scrollbar,
+        [data-panel="editor-code013"] .dds-code013-editor-stage *::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+          background: transparent !important;
+        }
+      `;
+      document.head.appendChild(rule);
+    }
+    const panel = document.querySelector('[data-panel="editor-code013"]');
+    panel?.querySelectorAll('.dds-protected-commission-preview-column, .dds-protected-commission-preview-column *, .dds-code013-editor-stage, .dds-code013-editor-stage *').forEach((el) => {
+      el.style.setProperty('scrollbar-width', 'none', 'important');
+      el.style.setProperty('-ms-overflow-style', 'none', 'important');
+    });
+    // Scroll stays active: hide the scrollbar itself, not overflow-y.
+  }
+
   function openEditor() {
     createPanel();
+    hideCode013PreviewScrollbars();
     const draft = getDraft();
     const restored = draft?.values ? { ...editorDefaults, ...draft.values } : { ...editorDefaults };
     if (draft?.values?.control && !draft?.values?.button) restored.button = draft.values.control;
