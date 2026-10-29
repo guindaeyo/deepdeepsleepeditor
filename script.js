@@ -26096,6 +26096,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
     const { cfg, stage, host, iframe } = parts;
 
+    // v257: CODE003 belongs exclusively to the stable central preview engine.
+    // The legacy profile fitter writes a second transform after iframe load,
+    // which shifts and flashes FortyOneWinks after its first correct paint.
+    if (panel.dataset.panel === "editor-profile003") return true;
+
     if (window.__ddsCentralEditorPreviewOwnsV192?.(iframe)) {
       window.__ddsCentralEditorScheduleFitV192?.(iframe);
       return true;
@@ -26840,10 +26845,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
         host.style.setProperty("max-width", "100%", "important");
         host.style.setProperty("position", "relative", "important");
       }
-      iframe.style.setProperty("left", "50%", "important");
-      iframe.style.setProperty("transform", "translateX(-50%)", "important");
+      // The iframe is sized to the already-scaled artwork by this engine.
+      // Center that real width through normal layout, not a second translate.
+      iframe.style.setProperty("position", "relative", "important");
+      iframe.style.setProperty("left", "auto", "important");
+      iframe.style.setProperty("right", "auto", "important");
+      iframe.style.setProperty("transform", "none", "important");
       iframe.style.setProperty("transform-origin", "top center", "important");
-      iframe.style.setProperty("margin", "0", "important");
+      iframe.style.setProperty("margin-left", "auto", "important");
+      iframe.style.setProperty("margin-right", "auto", "important");
     }
   }
 

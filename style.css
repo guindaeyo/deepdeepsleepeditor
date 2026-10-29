@@ -14814,3 +14814,44 @@ body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardPrevie
   width: 0 !important;
   height: 0 !important;
 }
+
+
+/* V258 — directory cards only: five per row on wide screens.
+   Does not affect editors or view-work canvases. */
+@media (min-width: 1400px) {
+  body.dds-y2k-vampire:not(.dds-editor-mode) :is(
+    [data-panel="roleplay"], [data-panel="profile"],
+    [data-panel="review"], [data-panel="commission"]
+  ) :is(.dds-roleplay-grid, .dds-profile-grid, .dds-review-grid,
+        .dds-commission-grid, .dds-activity-grid, .dds-my-own-code-grid) {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 900px) and (max-width: 1399px) {
+  body.dds-y2k-vampire:not(.dds-editor-mode) :is(
+    [data-panel="roleplay"], [data-panel="profile"],
+    [data-panel="review"], [data-panel="commission"]
+  ) :is(.dds-roleplay-grid, .dds-profile-grid, .dds-review-grid,
+        .dds-commission-grid, .dds-activity-grid, .dds-my-own-code-grid) {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  body.dds-y2k-vampire:not(.dds-editor-mode) :is(
+    [data-panel="roleplay"], [data-panel="profile"],
+    [data-panel="review"], [data-panel="commission"]
+  ) :is(.dds-roleplay-grid, .dds-profile-grid, .dds-review-grid,
+        .dds-commission-grid, .dds-activity-grid, .dds-my-own-code-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 599px) {
+  body.dds-y2k-vampire:not(.dds-editor-mode) :is(
+    [data-panel="roleplay"], [data-panel="profile"],
+    [data-panel="review"], [data-panel="commission"]
+  ) :is(.dds-roleplay-grid, .dds-profile-grid, .dds-review-grid,
+        .dds-commission-grid, .dds-activity-grid, .dds-my-own-code-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}

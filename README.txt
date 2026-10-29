@@ -1,1 +1,1 @@
-v256: PROFILE CODE003 FortyOneWinks only. Center fitted preview within left canvas and prevent first-render flash. Other files inherited from v255.
+v257 — FOR PROFILE CODE003 FortyOneWinks only: remove conflict between legacy profile fitter and central preview engine; center scaled iframe with auto margins without a second transform. All other files unchanged from v256.
