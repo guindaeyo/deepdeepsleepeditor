@@ -10327,16 +10327,11 @@ body.dds-editor-one-screen .dds-account-cloud-trigger:hover {
     overflow:hidden !important;
   }
 
-  /*
-   * HIGHER THAN HEAVEN:
-   * ก่อน unified controller จัด layout ไม่ให้โชว์ layout ที่บีบอยู่เดิม
-   */
-  #higherHeavenPreview:not([data-dds-unified-preview-ready="1"]){
-    opacity:0 !important;
-  }
-
-  #higherHeavenPreview[data-dds-unified-preview-ready="1"]{
+  /* HIGHER THAN HEAVEN: never hide preview while waiting for an
+     attribute that the current preview controller does not set. */
+  #higherHeavenPreview{
     opacity:1 !important;
+    visibility:visible !important;
   }
 }
 
