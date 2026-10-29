@@ -14850,3 +14850,68 @@ body.dds-y2k-vampire [data-panel="editor-profile002"].is-active #moodboardPrevie
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+
+/* V260 — EDITOR LIVE PREVIEW ONLY: consistent visible red scrollbar.
+   Overrides older invisible-preview rules without changing sizing/overflow. */
+body.dds-y2k-vampire :is(
+  .dds-panel[data-panel^="editor-"],
+  .dds-protected-commission-editor,
+  .dds-code014-editor,
+  [class*="protected-commission-editor"]
+) :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-profile-preview-stage,.dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+) {
+  scrollbar-width: thin !important;
+  scrollbar-color: #b5162e #090506 !important;
+  -ms-overflow-style: auto !important;
+}
+body.dds-y2k-vampire :is(
+  .dds-panel[data-panel^="editor-"],
+  .dds-protected-commission-editor,.dds-code014-editor,
+  [class*="protected-commission-editor"]
+) :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-profile-preview-stage,.dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+)::-webkit-scrollbar {
+  display: block !important;
+  width: 9px !important;
+  height: 9px !important;
+  background: #090506 !important;
+}
+body.dds-y2k-vampire :is(
+  .dds-panel[data-panel^="editor-"],
+  .dds-protected-commission-editor,.dds-code014-editor,
+  [class*="protected-commission-editor"]
+) :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-profile-preview-stage,.dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+)::-webkit-scrollbar-track { background: #090506 !important; }
+body.dds-y2k-vampire :is(
+  .dds-panel[data-panel^="editor-"],
+  .dds-protected-commission-editor,.dds-code014-editor,
+  [class*="protected-commission-editor"]
+) :is(
+  .dds-editor-preview-stage,.dds-live-preview-stage,.dds-preview-stage,
+  .dds-profile-preview-stage,.dds-moodboard-preview-stage,
+  .dds-fortyone-preview-stage,.dds-nothin-preview-stage,
+  .dds-commission-preview-stage,.dds-protected-commission-preview-stage,
+  .dds-code013-editor-stage,.dds-code014-editor-stage,.dds-v210-auto-stage,
+  [class*="preview-stage"]
+)::-webkit-scrollbar-thumb {
+  background: #b5162e !important;
+  border-radius: 5px !important;
+}
