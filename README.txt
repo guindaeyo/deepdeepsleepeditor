@@ -1,1 +1,1 @@
-v257 — FOR PROFILE CODE003 FortyOneWinks only: remove conflict between legacy profile fitter and central preview engine; center scaled iframe with auto margins without a second transform. All other files unchanged from v256.
+v265: Only CODE010 LONG WAY LONG RIDE editor preview centering/width-fit. All other files and behaviors stay as v264.

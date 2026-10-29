@@ -7194,6 +7194,14 @@ ${stylesheetLinks}
       return;
     }
 
+    // CODE010 Editor is fitted by the stable central preview engine.
+    // Do not let this older asynchronous resizer overwrite its centering.
+    if (!isCard && iframe.id === "longWayLongRidePreview" &&
+        window.__ddsCentralEditorPreviewOwnsV192?.(iframe)) {
+      window.__ddsCentralEditorScheduleFitV192?.(iframe);
+      return;
+    }
+
     target.style.transform = "none";
     shell.style.height = "auto";
 
@@ -27074,6 +27082,89 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     return true;
   }
 
+  /* CODE010 LONG WAY LONG RIDE: preserve the original CSS layout and fit
+     the entire rendered artboard in the full-width editor viewport. */
+  function fitLongWayRideCanvas(iframe, stage, resetScroll = false) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body || !stage || stage.clientWidth < 40) return false;
+    const shell = doc.querySelector(".dds-lwl-preview-shell");
+    const target = doc.querySelector(".dds-lwl-preview-shell > .dds-preview-target");
+    const artwork = target?.querySelector(".ddsh-lwlrz-wrap");
+    if (!shell || !target || !artwork) return false;
+
+    setupStage(stage);
+    ensurePreviewStyle(doc);
+    const set = (el, prop, value) => el.style.setProperty(prop, value, "important");
+    const viewportWidth = stage.clientWidth;
+    // Measure the native artboard, not the full iframe or its empty shell.
+    // Once established, keep the width stable while text is edited.
+    const state = stateFor(iframe);
+    if (!state.longWayNativeWidth) {
+      state.longWayNativeWidth = Math.ceil(Math.max(
+        650, artwork.offsetWidth || 0, artwork.scrollWidth || 0
+      ));
+    }
+    const nativeWidth = state.longWayNativeWidth;
+    const scale = Math.min(1, (viewportWidth - 36) / nativeWidth);
+
+    set(doc.documentElement, "width", viewportWidth + "px");
+    set(doc.documentElement, "overflow", "hidden");
+    set(doc.body, "width", viewportWidth + "px");
+    set(doc.body, "height", "auto");
+    set(doc.body, "margin", "0");
+    set(doc.body, "padding", "0");
+    set(doc.body, "overflow", "hidden");
+    set(shell, "width", "100%");
+    set(shell, "height", "auto");
+    set(shell, "display", "flex");
+    set(shell, "justify-content", "center");
+    set(shell, "align-items", "flex-start");
+    set(target, "width", nativeWidth + "px");
+    set(target, "min-width", nativeWidth + "px");
+    set(target, "max-width", nativeWidth + "px");
+    set(target, "flex", "0 0 " + nativeWidth + "px");
+    set(target, "transform-origin", "top center");
+    set(target, "transform", `scale(${scale})`);
+    set(target, "margin", "0");
+
+    let naturalHeight = Math.max(
+      artwork.scrollHeight || 0, artwork.offsetHeight || 0,
+      target.scrollHeight || 0, 1
+    );
+    const rootTop = artwork.getBoundingClientRect().top;
+    for (const el of artwork.querySelectorAll("*")) {
+      const computed = doc.defaultView.getComputedStyle(el);
+      if (computed.display === "none" || computed.position === "fixed") continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.height > 0) {
+        naturalHeight = Math.max(naturalHeight, (rect.bottom - rootTop) / scale + 16);
+      }
+    }
+    naturalHeight = Math.ceil(naturalHeight);
+    const scaledHeight = Math.ceil(naturalHeight * scale);
+    set(shell, "height", scaledHeight + "px");
+    set(iframe, "display", "block");
+    set(iframe, "width", "100%");
+    set(iframe, "min-width", "0");
+    set(iframe, "max-width", "100%");
+    set(iframe, "height", (scaledHeight + 8) + "px");
+    set(iframe, "min-height", "0");
+    set(iframe, "max-height", "none");
+    set(iframe, "position", "relative");
+    set(iframe, "inset", "auto");
+    set(iframe, "margin", "0 auto");
+    set(iframe, "transform", "none");
+    set(iframe, "zoom", "1");
+    set(iframe, "border", "0");
+    set(stage, "overflow-x", "hidden");
+    set(stage, "overflow-y", "auto");
+    state.ready = true;
+    state.scale = scale;
+    state.bounds = { left: 0, top: 0, width: nativeWidth, height: naturalHeight };
+    if (resetScroll) stage.scrollTop = 0;
+    return true;
+  }
+
   function applyFullFit(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || !editorPanelFor(stage) || stage.clientWidth < 40) return false;
@@ -27082,6 +27173,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     if (iframe.id === "higherHeavenPreview") {
       return fitHigherHeavenFullCanvas(iframe, stage, resetScroll);
+    }
+    if (iframe.id === "longWayLongRidePreview") {
+      return fitLongWayRideCanvas(iframe, stage, resetScroll);
     }
 
     ensurePreviewStyle(doc);
@@ -27153,6 +27247,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function updateVerticalExtent(iframe, stage = stageFor(iframe)) {
     if (iframe?.id === "higherHeavenPreview") {
       return fitHigherHeavenFullCanvas(iframe, stage, false);
+    }
+    if (iframe?.id === "longWayLongRidePreview") {
+      return fitLongWayRideCanvas(iframe, stage, false);
     }
     if (iframe?.id === "moodboardPreview" && stage?.id === "moodboardPreviewStage") {
       return fitMoodboardCanvas(iframe, stage, false);
