@@ -26979,58 +26979,70 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   /* CODE009 only: keep one full-width source canvas inside a viewport-sized
      iframe.  The generic fitter previously measured only part of the
      artwork and shrank the iframe itself, clipping its right-hand content. */
+  /* CODE009 only: scale the COMPLETE native iframe, never the body or
+     individual artwork.  Resizing body/layout was squeezing the composition
+     and clipping the NOTE positioned outside the central column. */
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
-    ensurePreviewStyle(doc);
     setupStage(stage);
-
     const state = stateFor(iframe);
-    const body = doc.body;
+    const nativeWidth = 1100;
+    const available = Math.max(1, stage.clientWidth - 24);
+    const scale = Math.min(1, available / nativeWidth);
+    const fixed = (el, property, value) =>
+      el.style.setProperty(property, value, "important");
     const html = doc.documentElement;
-    const root = findVisualRoot(doc);
-    if (root) restoreOriginalRoot(iframe, root);
-    const fixed = (el, prop, value) => el.style.setProperty(prop, value, "important");
-    const viewportWidth = Math.max(1, stage.clientWidth);
-    // The source artboard needs more horizontal room than the visible panel.
-    // Reserve this width BEFORE its CSS is laid out, never by shrinking the
-    // document after it renders.
-    const nativeWidth = 1000;
-    const scale = Math.min(1, Math.max(1, viewportWidth - 28) / nativeWidth);
+    const body = doc.body;
 
-    fixed(iframe, "display", "block");
-    fixed(iframe, "position", "relative");
-    fixed(iframe, "inset", "auto");
-    fixed(iframe, "width", viewportWidth + "px");
-    fixed(iframe, "min-width", "0");
-    fixed(iframe, "max-width", "100%");
-    fixed(iframe, "transform", "none");
-    fixed(iframe, "zoom", "1");
-    fixed(iframe, "margin", "0 auto");
-    fixed(iframe, "border", "0");
-    fixed(iframe, "pointer-events", "none");
-
-    fixed(html, "width", viewportWidth + "px");
+    // Do not transform/shrink the document's children or body. The external
+    // code stylesheet needs its original geometry for absolute elements.
+    fixed(html, "width", nativeWidth + "px");
+    fixed(html, "min-width", nativeWidth + "px");
+    fixed(html, "max-width", nativeWidth + "px");
     fixed(html, "overflow-x", "hidden");
-    fixed(html, "overflow-y", "hidden");
-    fixed(body, "box-sizing", "border-box");
-    fixed(body, "position", "relative");
     fixed(body, "width", nativeWidth + "px");
     fixed(body, "min-width", nativeWidth + "px");
     fixed(body, "max-width", nativeWidth + "px");
+    fixed(body, "transform", "none");
+    fixed(body, "transform-origin", "initial");
     fixed(body, "margin", "0");
-    fixed(body, "transform-origin", "top left");
-    fixed(body, "transform", `translateX(${Math.max(0, (viewportWidth - nativeWidth * scale) / 2)}px) scale(${scale})`);
+    fixed(body, "overflow-x", "visible");
 
-    const naturalHeight = Math.max(900, body.scrollHeight, root?.scrollHeight || 0);
-    const renderedHeight = Math.max(1, Math.ceil(naturalHeight * scale + 16));
-    fixed(body, "height", naturalHeight + "px");
-    fixed(iframe, "height", renderedHeight + "px");
-    fixed(iframe, "min-height", renderedHeight + "px");
+    // Keep native-width iframe and scale as one intact visual rectangle.
+    // This preserves the original left/right proportions and floating notes.
+    const contentHeight = Math.max(900, body.scrollHeight,
+      html.scrollHeight, state.higherNativeHeight || 0);
+    state.higherNativeHeight = contentHeight;
+    const visualHeight = Math.ceil(contentHeight * scale);
+    const offsetX = Math.max(0, (stage.clientWidth - nativeWidth * scale) / 2);
+    fixed(iframe, "display", "block");
+    fixed(iframe, "position", "absolute");
+    fixed(iframe, "inset", "auto");
+    fixed(iframe, "top", "0");
+    fixed(iframe, "left", offsetX + "px");
+    fixed(iframe, "width", nativeWidth + "px");
+    fixed(iframe, "min-width", nativeWidth + "px");
+    fixed(iframe, "max-width", "none");
+    fixed(iframe, "height", contentHeight + "px");
+    fixed(iframe, "min-height", contentHeight + "px");
     fixed(iframe, "max-height", "none");
+    fixed(iframe, "transform", `scale(${scale})`);
+    fixed(iframe, "transform-origin", "top left");
+    fixed(iframe, "margin", "0");
+    fixed(iframe, "border", "0");
+    fixed(iframe, "pointer-events", "none");
+    const host = iframe.parentElement;
+    if (host) {
+      fixed(host, "position", "relative");
+      fixed(host, "width", "100%");
+      fixed(host, "min-width", "0");
+      fixed(host, "height", Math.max(stage.clientHeight, visualHeight) + "px");
+      fixed(host, "overflow", "visible");
+    }
     state.ready = true;
     state.scale = scale;
-    state.bounds = { left: 0, top: 0, width: nativeWidth, height: naturalHeight };
+    state.bounds = {left: 0, top: 0, width: nativeWidth, height: contentHeight};
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
