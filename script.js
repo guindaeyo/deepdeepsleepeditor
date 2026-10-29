@@ -20337,7 +20337,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   const OFFICIAL_CODE = buildCode(defaults, false);
 
   function previewDocument(code) {
-    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}.dds-code013-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code013-preview-root">${code}</div></body></html>`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important;scrollbar-width:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}.dds-code013-preview-root{width:${CANVAS_WIDTH}px;min-width:${CANVAS_WIDTH}px;max-width:${CANVAS_WIDTH}px;margin:0 auto;padding:20px 0;box-sizing:border-box}</style></head><body><div class="dds-code013-preview-root">${code}</div></body></html>`;
   }
 
   function measureIframe(iframe) {

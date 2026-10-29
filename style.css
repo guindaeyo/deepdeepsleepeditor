@@ -15118,3 +15118,24 @@ html body .dds-code013-editor .dds-code013-editor-stage::-webkit-scrollbar-thumb
   height: 0 !important;
   background: transparent !important;
 }
+
+
+/* v273 — CODE013 only: hide the scrollbar on EVERY nested LIVE PREVIEW
+   scroll container, including the wrapper added by the central fitter.
+   Controls are intentionally outside this selector. */
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *::before,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *::after {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *::-webkit-scrollbar,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *::-webkit-scrollbar-track,
+html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commission-preview-column *::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
