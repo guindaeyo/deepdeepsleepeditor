@@ -8853,17 +8853,39 @@ ${stylesheetLinks}
         margin:0!important;
         flex:0 0 auto!important;
       }
+      .dds-music-preview-target{
+        margin-left:0!important;
+        margin-right:0!important;
+        transform:translateX(var(--dds-review002-center-offset, 0px))!important;
+      }
     </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
       (() => {
-        const ready = () => {
-          const frame = window.frameElement;
-          frame?.classList.add('dds-preview-ready');
-          frame?.classList.remove('dds-preview-loading');
-        };
-        window.addEventListener('load', ready, { once:true });
-        document.fonts?.ready?.then(ready);
-        window.__ddsFitMusic = ready;
-        ready();
+        const shell = document.querySelector('.dds-music-preview-shell');
+        const target = document.querySelector('.dds-music-preview-target');
+        const wrap = target?.querySelector('.ddsh-revmus-wrap');
+        let frameId = 0;
+        function centerVisibleArtwork() {
+          cancelAnimationFrame(frameId);
+          frameId = requestAnimationFrame(() => {
+            if (!shell || !target || !wrap) return;
+            target.style.setProperty('--dds-review002-center-offset', '0px');
+            const container = shell.getBoundingClientRect();
+            const art = wrap.getBoundingClientRect();
+            if (!container.width || !art.width) return;
+            const containerMiddle = container.left + container.width / 2;
+            const artworkMiddle = art.left + art.width / 2;
+            const dx = containerMiddle - artworkMiddle;
+            target.style.setProperty('--dds-review002-center-offset', dx.toFixed(2) + 'px');
+            window.frameElement?.classList.add('dds-preview-ready');
+            window.frameElement?.classList.remove('dds-preview-loading');
+          });
+        }
+        window.__ddsFitMusic = centerVisibleArtwork;
+        window.addEventListener('load', centerVisibleArtwork);
+        window.addEventListener('resize', centerVisibleArtwork);
+        document.fonts?.ready?.then(centerVisibleArtwork);
+        if (window.ResizeObserver && shell) new ResizeObserver(centerVisibleArtwork).observe(shell);
+        centerVisibleArtwork();
       })();
     <\/script></body></html>`;
   }
@@ -9215,6 +9237,7 @@ ${stylesheetLinks}
               currentShell.scrollTop =
                 previousScrollTop;
             }
+            iframe.contentWindow?.__ddsFitMusic?.();
 
             if (previewColumn) {
               previewColumn.scrollTop =
@@ -9232,6 +9255,7 @@ ${stylesheetLinks}
                 shell.scrollTop =
                   previousScrollTop;
               }
+              iframe.contentWindow?.__ddsFitMusic?.();
 
               if (previewColumn) {
                 previewColumn.scrollTop =
