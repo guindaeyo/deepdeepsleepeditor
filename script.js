@@ -8814,22 +8814,18 @@ ${stylesheetLinks}
       }
       html::-webkit-scrollbar,body::-webkit-scrollbar,.dds-music-preview-shell::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
       .dds-music-preview-shell{
-        position:relative;
-        width:100%;height:100%;min-height:100%;box-sizing:border-box;
-        padding:16px;overflow-y:auto!important;overflow-x:hidden!important;
-        display:grid!important;grid-template-columns:minmax(0,1fr)!important;
-        grid-auto-rows:max-content!important;
-        justify-items:center!important;align-content:start!important;
+        position:relative;width:100%;height:100%;min-height:100%;
+        box-sizing:border-box;padding:16px 0;
+        display:block!important;overflow-y:auto!important;overflow-x:hidden!important;
         scrollbar-width:none!important;-ms-overflow-style:none!important;
       }
       .dds-music-preview-target{
-        position:relative!important;inset:auto!important;
-        left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-        display:block!important;justify-self:center!important;align-self:start!important;
-        width:max-content!important;min-width:0!important;max-width:none!important;
-        height:max-content!important;min-height:0!important;
+        position:relative!important;left:50%!important;right:auto!important;
+        top:0!important;bottom:auto!important;
+        display:block!important;width:max-content!important;min-width:0!important;
+        max-width:none!important;height:max-content!important;min-height:0!important;
         margin:0!important;flex:none!important;
-        transform:none!important;transform-origin:top center!important;
+        transform:translateX(-50%)!important;transform-origin:top center!important;
         zoom:var(--dds-review002-fit-zoom,1)!important;
         box-sizing:border-box!important;
       }
@@ -8847,7 +8843,7 @@ ${stylesheetLinks}
           frameId = requestAnimationFrame(() => {
             if (!shell || !target || !wrap) return;
             // Fit the artwork's intrinsic width once the canvas is measurable.
-            // Horizontal flex centering is in CSS from the very first paint;
+            // Horizontal centering is anchored with left:50% and translateX(-50%);
             // no late left/translate offsets are ever applied while typing.
             const available = Math.max(1, shell.clientWidth - 32);
             const natural = Math.max(1, wrap.scrollWidth, wrap.offsetWidth);
