@@ -15246,3 +15246,25 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
   height:0 !important;
   display:none !important;
 }
+
+/* v301 REVIEW002 ONLY: fixed preview viewport, internal invisible vertical scroll */
+[data-panel="editor-review002"] .dds-editor-preview-column {
+  overflow:hidden !important;
+  min-height:0 !important;
+}
+[data-panel="editor-review002"] #musicReviewPreview {
+  display:block !important;
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  transform:none !important;
+  width:100% !important;
+  height:calc(100dvh - 160px) !important;
+  min-height:400px !important;
+  max-height:none !important;
+  flex:none !important;
+  overflow:hidden !important;
+  pointer-events:auto !important;
+  scrollbar-width:none !important;
+}
+[data-panel="editor-review002"] #musicReviewPreview::-webkit-scrollbar {display:none!important;width:0!important;height:0!important}

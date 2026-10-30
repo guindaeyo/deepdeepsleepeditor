@@ -8820,12 +8820,12 @@ ${stylesheetLinks}
         min-height:100%;
         box-sizing:border-box;
         padding:16px;
-        overflow-y:auto;
-        overflow-x:hidden;
-        display:grid;
-        grid-template-columns:minmax(0,1fr);
-        justify-items:center;
-        align-content:start;
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:flex-start!important;
         scrollbar-width:none!important;
         -ms-overflow-style:none!important;
       }
@@ -8841,11 +8841,12 @@ ${stylesheetLinks}
         max-width:none!important;
         height:auto!important;
         margin:0 auto!important;
-        flex:0 0 auto!important;
+        flex:none!important;
         display:block!important;
         justify-self:center!important;
-        transform:none;
-        transform-origin:top center;
+        transform:none!important;
+        zoom:1!important;
+        transform-origin:top center!important;
         box-sizing:border-box!important;
       }
       .dds-music-preview-target>.ddsh-revmus-wrap{
@@ -23719,7 +23720,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     "editor-code012": { id: "chocolateLovePreview" },
 
     "editor-review001": { id: "foodReviewPreview" },
-    "editor-review002": { id: "musicReviewPreview" },
+    /* review002 manages its own preview scroll and centering */
     "editor-review003": { id: "movieReviewPreview" }
   };
 
