@@ -15221,3 +15221,28 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
   pointer-events: none;
   opacity: 1 !important;
 }
+
+/* v300 — REVIEW CODE002 only: center the visible design and hide scrollbars. */
+[data-panel="editor-review002"] .dds-editor-preview-column {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  overflow:hidden !important;
+}
+[data-panel="editor-review002"] #musicReviewPreview {
+  align-self:center !important;
+  flex:1 1 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+[data-panel="editor-review002"] .dds-editor-preview-column::-webkit-scrollbar,
+[data-panel="editor-review002"] #musicReviewPreview::-webkit-scrollbar {
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
+}
