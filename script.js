@@ -8815,48 +8815,26 @@ ${stylesheetLinks}
       html::-webkit-scrollbar,body::-webkit-scrollbar,.dds-music-preview-shell::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
       .dds-music-preview-shell{
         position:relative;
-        width:100%;
-        height:100%;
-        min-height:100%;
-        box-sizing:border-box;
-        padding:16px;
-        overflow-y:auto!important;
-        overflow-x:hidden!important;
-        display:flex!important;
-        flex-direction:column!important;
-        align-items:center!important;
-        justify-content:flex-start!important;
-        scrollbar-width:none!important;
-        -ms-overflow-style:none!important;
+        width:100%;height:100%;min-height:100%;box-sizing:border-box;
+        padding:16px;overflow-y:auto!important;overflow-x:hidden!important;
+        display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+        grid-auto-rows:max-content!important;
+        justify-items:center!important;align-content:start!important;
+        scrollbar-width:none!important;-ms-overflow-style:none!important;
       }
       .dds-music-preview-target{
-        position:relative!important;
-        inset:auto!important;
-        left:auto!important;
-        right:auto!important;
-        top:auto!important;
-        bottom:auto!important;
-        width:max-content!important;
-        min-width:0!important;
-        max-width:none!important;
-        height:auto!important;
-        margin:0 auto!important;
-        flex:none!important;
-        display:block!important;
-        justify-self:center!important;
-        transform:none!important;
-        zoom:var(--dds-review002-fit-zoom, 1)!important;
-        transform-origin:top center!important;
+        position:relative!important;inset:auto!important;
+        left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        display:block!important;justify-self:center!important;align-self:start!important;
+        width:max-content!important;min-width:0!important;max-width:none!important;
+        height:max-content!important;min-height:0!important;
+        margin:0!important;flex:none!important;
+        transform:none!important;transform-origin:top center!important;
+        zoom:var(--dds-review002-fit-zoom,1)!important;
         box-sizing:border-box!important;
       }
       .dds-music-preview-target>.ddsh-revmus-wrap{
-        margin:0!important;
-        flex:0 0 auto!important;
-      }
-      .dds-music-preview-target{
-        margin-left:auto!important;
-        margin-right:auto!important;
-        transform:none!important;
+        margin:0!important;flex:none!important;
       }
     </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
       (() => {
@@ -8874,7 +8852,8 @@ ${stylesheetLinks}
             const available = Math.max(1, shell.clientWidth - 32);
             const natural = Math.max(1, wrap.scrollWidth, wrap.offsetWidth);
             const zoom = Math.min(1, available / natural);
-            target.style.setProperty('--dds-review002-fit-zoom', String(zoom));
+            const current = target.style.getPropertyValue('--dds-review002-fit-zoom');
+            if (current !== String(zoom)) target.style.setProperty('--dds-review002-fit-zoom', String(zoom));
             window.frameElement?.classList.add('dds-preview-ready');
             window.frameElement?.classList.remove('dds-preview-loading');
           });
