@@ -8814,23 +8814,25 @@ ${stylesheetLinks}
       }
       html::-webkit-scrollbar,body::-webkit-scrollbar,.dds-music-preview-shell::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
       .dds-music-preview-shell{
-        position:relative;width:100%;height:100%;min-height:100%;
-        box-sizing:border-box;padding:16px 0;
-        display:block!important;overflow-y:auto!important;overflow-x:hidden!important;
+        position:relative!important;
+        width:100%!important;height:100%!important;min-height:100%!important;
+        box-sizing:border-box!important;padding:16px 0!important;
+        display:flex!important;flex-direction:column!important;align-items:center!important;
+        overflow-y:auto!important;overflow-x:hidden!important;
         scrollbar-width:none!important;-ms-overflow-style:none!important;
       }
       .dds-music-preview-target{
-        position:relative!important;left:50%!important;right:auto!important;
-        top:0!important;bottom:auto!important;
-        display:block!important;width:max-content!important;min-width:0!important;
-        max-width:none!important;height:max-content!important;min-height:0!important;
-        margin:0!important;flex:none!important;
-        transform:translateX(-50%)!important;transform-origin:top center!important;
+        position:relative!important;left:auto!important;right:auto!important;
+        top:auto!important;bottom:auto!important;
+        display:block!important;width:800px!important;min-width:800px!important;
+        max-width:800px!important;height:auto!important;min-height:0!important;
+        margin:0 auto!important;flex:0 0 auto!important;
+        transform:none!important;transform-origin:top center!important;
         zoom:var(--dds-review002-fit-zoom,1)!important;
         box-sizing:border-box!important;
       }
       .dds-music-preview-target>.ddsh-revmus-wrap{
-        margin:0!important;flex:none!important;
+        margin:0 auto!important;max-width:100%!important;flex:none!important;
       }
     </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
       (() => {
@@ -8846,7 +8848,8 @@ ${stylesheetLinks}
             // Horizontal centering is anchored with left:50% and translateX(-50%);
             // no late left/translate offsets are ever applied while typing.
             const available = Math.max(1, shell.clientWidth - 32);
-            const natural = Math.max(1, wrap.scrollWidth, wrap.offsetWidth);
+            // Fixed layout width: no max-content measurement changes on typing.
+            const natural = 800;
             const zoom = Math.min(1, available / natural);
             const current = target.style.getPropertyValue('--dds-review002-fit-zoom');
             if (current !== String(zoom)) target.style.setProperty('--dds-review002-fit-zoom', String(zoom));
