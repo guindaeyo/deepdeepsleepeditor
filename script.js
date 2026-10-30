@@ -8845,7 +8845,7 @@ ${stylesheetLinks}
         display:block!important;
         justify-self:center!important;
         transform:none!important;
-        zoom:1!important;
+        zoom:var(--dds-review002-fit-zoom, 1)!important;
         transform-origin:top center!important;
         box-sizing:border-box!important;
       }
@@ -8854,9 +8854,9 @@ ${stylesheetLinks}
         flex:0 0 auto!important;
       }
       .dds-music-preview-target{
-        margin-left:0!important;
-        margin-right:0!important;
-        transform:translateX(var(--dds-review002-center-offset, 0px))!important;
+        margin-left:auto!important;
+        margin-right:auto!important;
+        transform:none!important;
       }
     </style></head><body data-preview-mode="editor"><div class="dds-music-preview-shell"><div class="dds-preview-target dds-music-preview-target">${markup}</div></div><script>
       (() => {
@@ -8864,28 +8864,27 @@ ${stylesheetLinks}
         const target = document.querySelector('.dds-music-preview-target');
         const wrap = target?.querySelector('.ddsh-revmus-wrap');
         let frameId = 0;
-        function centerVisibleArtwork() {
+        function fitArtwork() {
           cancelAnimationFrame(frameId);
           frameId = requestAnimationFrame(() => {
             if (!shell || !target || !wrap) return;
-            target.style.setProperty('--dds-review002-center-offset', '0px');
-            const container = shell.getBoundingClientRect();
-            const art = wrap.getBoundingClientRect();
-            if (!container.width || !art.width) return;
-            const containerMiddle = container.left + container.width / 2;
-            const artworkMiddle = art.left + art.width / 2;
-            const dx = containerMiddle - artworkMiddle;
-            target.style.setProperty('--dds-review002-center-offset', dx.toFixed(2) + 'px');
+            // Fit the artwork's intrinsic width once the canvas is measurable.
+            // Horizontal flex centering is in CSS from the very first paint;
+            // no late left/translate offsets are ever applied while typing.
+            const available = Math.max(1, shell.clientWidth - 32);
+            const natural = Math.max(1, wrap.scrollWidth, wrap.offsetWidth);
+            const zoom = Math.min(1, available / natural);
+            target.style.setProperty('--dds-review002-fit-zoom', String(zoom));
             window.frameElement?.classList.add('dds-preview-ready');
             window.frameElement?.classList.remove('dds-preview-loading');
           });
         }
-        window.__ddsFitMusic = centerVisibleArtwork;
-        window.addEventListener('load', centerVisibleArtwork);
-        window.addEventListener('resize', centerVisibleArtwork);
-        document.fonts?.ready?.then(centerVisibleArtwork);
-        if (window.ResizeObserver && shell) new ResizeObserver(centerVisibleArtwork).observe(shell);
-        centerVisibleArtwork();
+        window.__ddsFitMusic = fitArtwork;
+        window.addEventListener('load', fitArtwork, {once:true});
+        window.addEventListener('resize', fitArtwork);
+        document.fonts?.ready?.then(fitArtwork);
+        if (window.ResizeObserver && shell) new ResizeObserver(fitArtwork).observe(shell);
+        fitArtwork();
       })();
     <\/script></body></html>`;
   }
@@ -9279,10 +9278,50 @@ ${stylesheetLinks}
       iframe.srcdoc = srcdoc;
     }
 
+    // REVIEW CODE002: Text-only edits update existing nodes. Never reload the
+    // iframe or recreate the artboard when the user is typing a review.
+    const reviewTextSelectors = {
+      reviewText: ".ddsh-revmus-review-text",
+      reviewFooter: ".ddsh-revmus-review-footer",
+      reviewTitle: ".ddsh-revmus-review-title",
+      recommender: ".ddsh-revmus-recommender-name",
+      trackTitle: ".ddsh-revmus-track strong",
+      artist: ".ddsh-revmus-track span",
+      lyricOne: ".ddsh-revmus-lyric",
+      lyricTwo: ".ddsh-revmus-lyric"
+    };
+    let previousReviewValues = null;
+
     function updateMusicReview() {
       const values = readValues();
       generatedCode.value = buildCopyCode(values);
       updateReviewWordCounter();
+
+      const changed = previousReviewValues
+        ? Object.keys(values).filter(key => values[key] !== previousReviewValues[key])
+        : [];
+      const doc = editorIframe.contentDocument;
+      const root = doc?.querySelector('.ddsh-revmus-wrap');
+      if (root && changed.length && changed.every(key => Object.hasOwn(reviewTextSelectors, key))) {
+        const nextMarkup = buildMarkup(values, true);
+        const nextRoot = new DOMParser().parseFromString(nextMarkup, 'text/html')
+          .querySelector('.ddsh-revmus-wrap');
+        if (nextRoot) {
+          const selectors = [...new Set(changed.map(key => reviewTextSelectors[key]))];
+          for (const selector of selectors) {
+            const current = root.querySelector(selector);
+            const next = nextRoot.querySelector(selector);
+            if (current && next && current.innerHTML !== next.innerHTML) {
+              current.innerHTML = next.innerHTML;
+            }
+          }
+          previousReviewValues = {...values};
+          // Intentionally do not call __ddsFitMusic or assign iframe.srcdoc:
+          // both can repaint the entire preview while the user types.
+          return;
+        }
+      }
+      previousReviewValues = {...values};
       renderIframe(editorIframe, buildMarkup(values, true), "editor");
     }
 
