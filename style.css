@@ -15725,3 +15725,26 @@ html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage {
 .dds-floyd-rp-editor .dds-frp-filter-toggle {appearance:none;cursor:pointer;border:1px solid currentColor;border-radius:6px;padding:10px 14px;font:inherit;font-weight:600;background:transparent;color:inherit;transition:background-color .12s ease,color .12s ease;}
 .dds-floyd-rp-editor .dds-frp-filter-toggle[aria-pressed="true"] {background:#242424;color:#fff;border-color:#242424;}
 .dds-floyd-rp-editor .dds-frp-filter-toggle:focus-visible {outline:2px solid currentColor;outline-offset:3px;}
+
+/* v327 — Floyd ROLEPLAY editor preview only; hide scrollbar during filter clicks and live edits. */
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *,
+html body .dds-panel.dds-floyd-rp-editor .dds-floyd-rp-stage,
+html body .dds-panel.dds-floyd-rp-editor .dds-floyd-rp-flow {
+  scrollbar-width:none!important;
+  scrollbar-color:transparent transparent!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-thumb,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-track {
+  display:none!important;
+  width:0!important;height:0!important;
+  background:transparent!important;
+  border:0!important;
+}
+html body .dds-panel.dds-floyd-rp-editor .dds-floyd-rp-stage {
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
