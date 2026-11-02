@@ -15374,3 +15374,48 @@ body:has(.dds-alan-view-panel.is-active) .dds-alan-view-panel.is-active{width:10
 body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage{height:calc(100dvh - 48px)!important;min-height:360px!important;width:100%!important;max-width:none!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important;margin:0 auto!important;background:#242424!important;}
 body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
 @media(max-width:700px){body:has(.dds-alan-view-panel.is-active) .dds-main{padding:10px!important;}body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage{height:calc(100dvh - 20px)!important;}}
+
+/* v311 — Alan VIEW WORK only: lock the outer page to one viewport.
+   Scroll the artwork inside its canvas, not the document. */
+html:has(.dds-alan-view-panel.is-active),
+body:has(.dds-alan-view-panel.is-active) {
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has(.dds-alan-view-panel.is-active) .dds-app {
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+}
+body:has(.dds-alan-view-panel.is-active) .dds-main {
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  padding:24px !important;
+  overflow:hidden !important;
+}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-panel.is-active {
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage {
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+  overscroll-behavior:contain !important;
+  touch-action:pan-y !important;
+}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage::-webkit-scrollbar {display:none !important;width:0 !important;height:0 !important;}
+@media(max-width:700px) {
+  body:has(.dds-alan-view-panel.is-active) .dds-main {padding:10px !important;}
+}
