@@ -15451,3 +15451,60 @@ body.dds-floyd-full-view .dds-browser-tabs,body.dds-floyd-full-view .dds-browser
 body.dds-floyd-full-view .dds-main{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;padding:0!important}
 @media(max-width:760px){.dds-floyd-editor .dds-protected-commission-layout{height:auto;min-height:0}.dds-floyd-preview-stage{height:60dvh}.dds-floyd-editor .dds-form-grid,.dds-floyd-color-grid{grid-template-columns:1fr}.dds-floyd-word{grid-template-columns:1fr!important}}
 
+
+/* v317 — Floyd VIEW WORK only: viewport-sized canvas, internal invisible scrolling */
+html:has(.dds-floyd-view.is-active),
+body:has(.dds-floyd-view.is-active) {
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-browser-chrome,
+body:has(.dds-floyd-view.is-active) .dds-footer,
+body:has(.dds-floyd-view.is-active) .dds-site-footer,
+body:has(.dds-floyd-view.is-active) .dds-topbar,
+body:has(.dds-floyd-view.is-active) .dds-sidebar { display:none !important; }
+body:has(.dds-floyd-view.is-active) .dds-app,
+body:has(.dds-floyd-view.is-active) .dds-main {
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-main {padding:0 !important;}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view.is-active {
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100dvh !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  z-index:2000 !important;
+  display:block !important;
+  overflow:hidden !important;
+  background:#242424 !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage {
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+  overscroll-behavior:contain !important;
+  touch-action:pan-y !important;
+  background:#242424 !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage::-webkit-scrollbar {
+  display:none !important; width:0 !important; height:0 !important;
+}
