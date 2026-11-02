@@ -28144,7 +28144,7 @@ const FALLBACK_CSS=`<style>
 function renderCode(v,forPreview=false){const vid=youtubeID(v.youtube), playlist=youtubeID(v.playlist)||vid;
 return `${FALLBACK_CSS}<link href="${CSS}" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"><style>.ddshcomf-pf .ddshcomf-pf-word1,.ddshcomf-pf .ddshcomf-pf-word2,.ddshcomf-pf .ddshcomf-pf-word3,.ddshcomf-pf .ddshcomf-pf-word4{position:absolute;translate:var(--floyd-x,0px) var(--floyd-y,0px)}</style><div class="ddshcomf-pf" style="${colorsStyle(v)}"><div class="ddshcomf-pf-canvas"><div class="ddshcomf-pf-grain"></div><div class="ddshcomf-pf-film"></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-back"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word1" style="--floyd-x:${Number(v.word1x)||0}px;--floyd-y:${Number(v.word1y)||0}px">${esc(v.word1)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-one"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-two"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-left"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word3" style="--floyd-x:${Number(v.word3x)||0}px;--floyd-y:${Number(v.word3y)||0}px">${esc(v.word3)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-bottom"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word2" style="--floyd-x:${Number(v.word2x)||0}px;--floyd-y:${Number(v.word2y)||0}px">${esc(v.word2)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-main"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word4" style="--floyd-x:${Number(v.word4x)||0}px;--floyd-y:${Number(v.word4y)||0}px">${esc(v.word4)}</div><div class="ddshcomf-pf-player"><div class="ddshcomf-pf-cover"></div><div class="ddshcomf-pf-music-info"><div class="ddshcomf-pf-now"><i class="bi bi-circle-fill ddshcomf-pf-dot"></i><span>NOW PLAYING</span><i class="bi bi-spotify ddshcomf-pf-spotify"></i></div><div class="ddshcomf-pf-song-name">${esc(v.song)}</div><div class="ddshcomf-pf-artist-name">${esc(v.artist)}</div><div class="ddshcomf-pf-progress"><div class="ddshcomf-pf-progress-fill"></div></div></div><div class="ddshcomf-pf-equalizer"><i></i><i></i><i></i><i></i></div></div><div class="ddshcomf-pf-name">${esc(v.name)}</div><div class="ddshcomf-pf-youtube">${(!forPreview&&vid)?`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&amp;loop=1&amp;playlist=${playlist}&amp;playsinline=1" width="0" height="0" title="YouTube music" allow="autoplay; encrypted-media" loading="eager" tabindex="-1"></iframe>`:''}</div><div class="ddscomm-crz"><span></span></div></div></div>`;}
 const FLOYD_ARTBOARD_WIDTH=950;
-function srcDoc(v){return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:${FLOYD_ARTBOARD_WIDTH}px;min-width:${FLOYD_ARTBOARD_WIDTH}px;margin:0;padding:0;overflow:hidden;background:transparent;scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}.ddshcomf-pf{width:${FLOYD_ARTBOARD_WIDTH}px!important;max-width:none!important;margin:0!important}</style></head><body>${renderCode(v,true)}</body></html>`;}
+function srcDoc(v,mode='editor'){return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:${FLOYD_ARTBOARD_WIDTH}px;min-width:${FLOYD_ARTBOARD_WIDTH}px;margin:0;padding:0;overflow:hidden;background:transparent;scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}.ddshcomf-pf{width:${FLOYD_ARTBOARD_WIDTH}px!important;max-width:none!important;margin:0!important}</style>${mode==='editor'?'<style>*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}</style>':''}</head><body>${renderCode(v,true)}</body></html>`;}
 function write(frame,v,mode='editor'){
  if(!frame)return;
  frame.style.visibility='hidden';
@@ -28162,7 +28162,7 @@ function write(frame,v,mode='editor'){
   frame.contentDocument?.querySelectorAll('img').forEach(img=>img.addEventListener('load',fit,{once:true}));
   [150,500,1200].forEach(t=>setTimeout(fit,t));
  };
- frame.srcdoc=srcDoc(v);
+ frame.srcdoc=srcDoc(v,mode);
 }
 function fitFrame(frame,mode){
  const doc=frame.contentDocument, root=doc?.querySelector('.ddshcomf-pf'),stage=frame.parentElement;
@@ -28195,7 +28195,9 @@ function updateFloydProfilePreview(v){
  const doc=frame?.contentDocument;
  const root=doc?.querySelector('.ddshcomf-pf');
  if(!root)return; // initial iframe load will use the latest pending values below
- root.style.cssText=colorsStyle(v);
+ // Apply only changed CSS custom properties; keep the same preview DOM and layout.
+ const next=document.createElement('div');next.style.cssText=colorsStyle(v);
+ for(let i=0;i<next.style.length;i++){const key=next.style.item(i),value=next.style.getPropertyValue(key);if(root.style.getPropertyValue(key)!==value)root.style.setProperty(key,value);}
  for(let i=1;i<=4;i++){
   const word=root.querySelector('.ddshcomf-pf-word'+i);
   if(!word)continue;
@@ -28208,8 +28210,8 @@ function updateFloydProfilePreview(v){
   const el=root.querySelector(selector);
   if(el)el.textContent=String(v[key]??'');
  }
- // Song iframe intentionally stays absent from live editor preview.
- fitFrame(frame,'editor');
+ // No fitFrame on input: resizing/recentering here caused the preview to jump.
+ // Initial load and actual browser resize still fit the artwork.
 }
 const colorField=(title,key)=>`<label class="dds-field"><span>${title}</span><div class="dds-floyd-color"><input type="color" data-floyd-picker="${key}" value="${colorHex(defaults[key])}"><input data-floyd-field="${key}" type="text" value="${esc(defaults[key])}"></div></label>`;
 const input=(title,key)=>`<label class="dds-field"><span>${title}</span><input type="text" data-floyd-field="${key}" value="${esc(defaults[key])}"></label>`;
