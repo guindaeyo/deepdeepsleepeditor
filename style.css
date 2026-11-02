@@ -15297,3 +15297,63 @@ body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-canvas > iframe {
   top: 0 !important;
   transform-origin: top left !important;
 }
+
+/* v309 — Alan R. Clinton VIEW WORK: artwork-only presentation.
+   Scoped exclusively to the public Alan view panel, never Editor or other works. */
+html.dds-alan-view-mode,
+body.dds-alan-view-mode {
+  margin: 0 !important;
+  min-height: 100% !important;
+}
+body.dds-alan-view-mode .dds-browser-chrome,
+body.dds-alan-view-mode .dds-footer,
+body.dds-alan-view-mode .dds-topbar,
+body.dds-alan-view-mode .dds-sidebar {
+  display: none !important;
+}
+body.dds-alan-view-mode .dds-app {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: #0e080b !important;
+}
+body.dds-alan-view-mode .dds-main {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 30px clamp(12px, 2vw, 32px) !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
+  background: #0e080b !important;
+}
+body.dds-alan-view-mode .dds-alan-view-panel.is-active {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  min-height: 0 !important;
+  background: transparent !important;
+}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-stage {
+  width: 100% !important;
+  max-width: none !important;
+  height: calc(100dvh - 60px) !important;
+  min-height: 360px !important;
+  margin: 0 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  background: #242424 !important;
+}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-stage::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
