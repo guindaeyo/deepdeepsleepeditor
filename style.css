@@ -15827,3 +15827,25 @@ html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-pr
   display:none !important; width:0 !important; height:0 !important;
   background:transparent !important; border:0 !important;
 }
+
+
+/* v332 — ONLY Floyd Roleplay editor, LEFT live preview: scrollbar hidden from first paint and throughout editing. */
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *,
+html body .dds-panel.dds-floyd-rp-editor [data-frp-stage],
+html body .dds-panel.dds-floyd-rp-editor [data-frp-preview] {
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+  -ms-overflow-style: none !important;
+}
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-thumb,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-track,
+html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-corner {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
