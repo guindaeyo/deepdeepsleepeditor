@@ -15531,3 +15531,52 @@ html.dds-floyd-rp-full-view,body.dds-floyd-rp-full-view{height:100dvh!important;
 body.dds-floyd-rp-full-view .dds-app,body.dds-floyd-rp-full-view .dds-main{height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow:hidden!important;}
 body.dds-floyd-rp-full-view .dds-site-footer,body.dds-floyd-rp-full-view .dds-topbar,body.dds-floyd-rp-full-view .dds-sidebar{display:none!important;}
 @media(max-width:700px){.dds-frp-color-grid{grid-template-columns:1fr;}}
+
+
+/* v319: ONLY Floyd R. Frost profile + roleplay VIEW WORK, no outer scrolling */
+html:has(.dds-floyd-view.is-active),
+html:has(.dds-floyd-rp-view.is-active),
+body:has(.dds-floyd-view.is-active),
+body:has(.dds-floyd-rp-view.is-active) {
+  height:100% !important; min-height:0 !important; overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-browser-chrome,
+body:has(.dds-floyd-rp-view.is-active) .dds-browser-chrome,
+body:has(.dds-floyd-view.is-active) .dds-topbar,
+body:has(.dds-floyd-rp-view.is-active) .dds-topbar,
+body:has(.dds-floyd-view.is-active) .dds-sidebar,
+body:has(.dds-floyd-rp-view.is-active) .dds-sidebar,
+body:has(.dds-floyd-view.is-active) .dds-site-footer,
+body:has(.dds-floyd-rp-view.is-active) .dds-site-footer { display:none !important; }
+body:has(.dds-floyd-view.is-active) .dds-app,
+body:has(.dds-floyd-rp-view.is-active) .dds-app,
+body:has(.dds-floyd-view.is-active) .dds-main,
+body:has(.dds-floyd-rp-view.is-active) .dds-main {
+  height:100dvh !important; min-height:0 !important; max-height:100dvh !important;
+  overflow:hidden !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-main,
+body:has(.dds-floyd-rp-view.is-active) .dds-main {padding:0 !important; margin:0 !important;}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view.is-active,
+body:has(.dds-floyd-rp-view.is-active) .dds-floyd-rp-view.is-active {
+  position:fixed !important; inset:0 !important; z-index:2000 !important;
+  display:block !important; width:100vw !important; height:100dvh !important;
+  min-height:0 !important; max-height:100dvh !important;
+  padding:0 !important; margin:0 !important; border:0 !important;
+  overflow:hidden !important; background:#242424 !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage,
+body:has(.dds-floyd-rp-view.is-active) .dds-floyd-rp-view-stage {
+  display:block !important; position:relative !important;
+  width:100% !important; height:100% !important;
+  min-height:0 !important; max-height:100% !important;
+  padding:0 !important; margin:0 !important; box-sizing:border-box !important;
+  overflow-x:hidden !important; overflow-y:auto !important;
+  scrollbar-width:none !important; -ms-overflow-style:none !important;
+  overscroll-behavior:contain !important; touch-action:pan-y !important;
+}
+body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage::-webkit-scrollbar,
+body:has(.dds-floyd-rp-view.is-active) .dds-floyd-rp-view-stage::-webkit-scrollbar {
+  display:none !important; width:0 !important; height:0 !important;
+}
