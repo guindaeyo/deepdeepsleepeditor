@@ -15768,3 +15768,23 @@ html body .dds-panel.dds-protected-commission-editor.dds-floyd-rp-editor .dds-fl
   overflow-x:hidden !important;
   overflow-y:auto !important;
 }
+
+/* v329 — Floyd ROLEPLAY editor only: remove colored scrollbars from EVERY scroll host (preview, controls, textarea, iframe container) from first paint and after edits. Preserve scrolling. */
+html:has(.dds-floyd-rp-editor.is-active),
+html:has(.dds-floyd-rp-editor.is-active) body,
+html:has(.dds-floyd-rp-editor.is-active) body *,
+html:has(.dds-floyd-rp-editor.is-active) .dds-floyd-rp-editor,
+html:has(.dds-floyd-rp-editor.is-active) .dds-floyd-rp-editor * {
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+html:has(.dds-floyd-rp-editor.is-active)::-webkit-scrollbar,
+html:has(.dds-floyd-rp-editor.is-active) body::-webkit-scrollbar,
+html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar,
+html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-thumb,
+html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-track,
+html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-corner {
+ display:none !important; width:0 !important; height:0 !important;
+ background:transparent !important; border:0 !important;
+}
