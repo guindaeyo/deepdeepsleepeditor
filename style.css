@@ -15849,3 +15849,35 @@ html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-colum
   background: transparent !important;
   border: 0 !important;
 }
+
+/* v333 — Floyd ROLEPLAY EDITOR: conceal the LEFT preview scrollbar gutter only.
+   The right controls column and its colored scrollbar are intentionally untouched. */
+.dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column {
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate;
+}
+.dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column .dds-floyd-rp-stage {
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+.dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column .dds-floyd-rp-stage::-webkit-scrollbar {
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+}
+/* Physical cover for Chromium/OS scrollbar tracks still painted despite CSS rules. */
+.dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-column::after {
+  content:"";
+  position:absolute;
+  z-index:50;
+  top:38px;
+  right:0;
+  bottom:0;
+  width:13px;
+  background:#242424;
+  pointer-events:none;
+}
