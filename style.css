@@ -15893,3 +15893,26 @@ html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage iframe {
   transition:none !important;
   animation:none !important;
 }
+
+/* v337 — REVIEW CODE002 ONLY: extend the left LIVE PREVIEW canvas
+   to the viewport's bottom edge without changing the artwork scale. */
+@media (min-width: 1101px) {
+  [data-panel="editor-review002"].is-active .dds-editor-preview-column {
+    height: calc(100dvh - 80px) !important;
+    max-height: calc(100dvh - 80px) !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  [data-panel="editor-review002"].is-active .dds-editor-preview-top {
+    flex: 0 0 auto !important;
+  }
+  [data-panel="editor-review002"].is-active #musicReviewPreview {
+    flex: 1 1 0 !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+}
