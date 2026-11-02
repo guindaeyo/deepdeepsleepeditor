@@ -15508,3 +15508,26 @@ body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage {
 body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage::-webkit-scrollbar {
   display:none !important; width:0 !important; height:0 !important;
 }
+/* Floyd R. Frost · Commission Roleplay · central CSS */
+.dds-floyd-rp-card-stage{position:relative;overflow:hidden!important;background:#f5f4f0;}
+.dds-floyd-rp-card-stage iframe,.dds-floyd-rp-stage iframe,.dds-floyd-rp-view-stage iframe{border:0;pointer-events:none;display:block;}
+.dds-floyd-rp-stage,.dds-floyd-rp-view-stage{position:relative;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain;background:#242424;}
+.dds-floyd-rp-stage::-webkit-scrollbar,.dds-floyd-rp-view-stage::-webkit-scrollbar{display:none;width:0;height:0;}
+.dds-floyd-rp-stage{height:calc(100% - 38px);min-height:0;}
+.dds-floyd-rp-flow{width:1px;pointer-events:none;}
+.dds-floyd-rp-editor .dds-protected-commission-controls-column{min-height:0;}
+.dds-floyd-rp-editor .dds-frp-fields{min-height:0;overflow-y:auto;}
+.dds-frp-color-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;grid-column:1/-1;}
+.dds-frp-color{display:flex;gap:8px;align-items:center;min-width:0;}
+.dds-frp-color input[type=color]{width:46px;height:42px;flex:0 0 46px;padding:4px;background:#151111;border:1px solid #403236;}
+.dds-frp-color input[type=text]{min-width:0;flex:1;}
+.dds-frp-range{display:flex;gap:12px;align-items:center;}
+.dds-frp-range input{flex:1;min-width:0;accent-color:#b81330;}
+.dds-frp-range output{min-width:38px;text-align:right;color:#b6a5aa;}
+.dds-frp-fields textarea{width:100%;height:150px;resize:none;overflow-y:auto;}
+.dds-floyd-rp-view.is-active{position:fixed!important;inset:0!important;z-index:2000!important;width:100vw!important;height:100dvh!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#242424;}
+.dds-floyd-rp-view-stage{height:100%!important;width:100%!important;padding:0!important;box-sizing:border-box;}
+html.dds-floyd-rp-full-view,body.dds-floyd-rp-full-view{height:100dvh!important;overflow:hidden!important;}
+body.dds-floyd-rp-full-view .dds-app,body.dds-floyd-rp-full-view .dds-main{height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow:hidden!important;}
+body.dds-floyd-rp-full-view .dds-site-footer,body.dds-floyd-rp-full-view .dds-topbar,body.dds-floyd-rp-full-view .dds-sidebar{display:none!important;}
+@media(max-width:700px){.dds-frp-color-grid{grid-template-columns:1fr;}}
