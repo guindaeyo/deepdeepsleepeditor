@@ -15769,25 +15769,7 @@ html body .dds-panel.dds-protected-commission-editor.dds-floyd-rp-editor .dds-fl
   overflow-y:auto !important;
 }
 
-/* v329 — Floyd ROLEPLAY editor only: remove colored scrollbars from EVERY scroll host (preview, controls, textarea, iframe container) from first paint and after edits. Preserve scrolling. */
-html:has(.dds-floyd-rp-editor.is-active),
-html:has(.dds-floyd-rp-editor.is-active) body,
-html:has(.dds-floyd-rp-editor.is-active) body *,
-html:has(.dds-floyd-rp-editor.is-active) .dds-floyd-rp-editor,
-html:has(.dds-floyd-rp-editor.is-active) .dds-floyd-rp-editor * {
-  scrollbar-width:none !important;
-  scrollbar-color:transparent transparent !important;
-  -ms-overflow-style:none !important;
-}
-html:has(.dds-floyd-rp-editor.is-active)::-webkit-scrollbar,
-html:has(.dds-floyd-rp-editor.is-active) body::-webkit-scrollbar,
-html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar,
-html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-thumb,
-html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-track,
-html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-corner {
- display:none !important; width:0 !important; height:0 !important;
- background:transparent !important; border:0 !important;
-}
+/* v334: v329 global scrollbar reset removed: it incorrectly hid the RIGHT controls scrollbar. */
 
 /* v330 — GLOBAL LEFT EDITOR PREVIEW ONLY: invisible scrollbar on every scroll host, at first paint and during edits. */
 html body .dds-panel .dds-editor-preview-column,
@@ -15880,4 +15862,34 @@ html body .dds-panel.dds-floyd-rp-editor .dds-protected-commission-preview-colum
   width:13px;
   background:#242424;
   pointer-events:none;
+}
+
+/* v334 — Only Floyd roleplay editor: RIGHT controls retain their red scrollbar.
+   Left preview invisible-scroll rules from v330–v333 stay intact. */
+html body .dds-panel.dds-floyd-rp-editor.is-active .dds-protected-commission-controls-column {
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  scrollbar-width:thin !important;
+  scrollbar-color:#c11724 #130c0e !important;
+  -ms-overflow-style:auto !important;
+}
+html body .dds-panel.dds-floyd-rp-editor.is-active .dds-protected-commission-controls-column::-webkit-scrollbar {
+  display:block !important;
+  width:8px !important;
+  height:8px !important;
+  background:#130c0e !important;
+}
+html body .dds-panel.dds-floyd-rp-editor.is-active .dds-protected-commission-controls-column::-webkit-scrollbar-thumb {
+  display:block !important;
+  background:#c11724 !important;
+  border-radius:8px !important;
+}
+html body .dds-panel.dds-floyd-rp-editor.is-active .dds-protected-commission-controls-column::-webkit-scrollbar-track {
+  display:block !important;
+  background:#130c0e !important;
+}
+/* Keep edits free of transitions in the artwork; do not affect editor controls. */
+html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage iframe {
+  transition:none !important;
+  animation:none !important;
 }

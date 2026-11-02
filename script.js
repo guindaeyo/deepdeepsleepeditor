@@ -28265,16 +28265,19 @@ function updateLivePreview(v){
  const frame=editor?.querySelector('[data-frp-preview]');
  const doc=frame?.contentDocument;
  const root=doc?.querySelector('.ddshcomiflore');
- if(!root){if(frame)write(frame,v);return;}
- const oldScroll=frame.parentElement?.scrollTop||0;
- const holder=doc.querySelector('.ddshcomiflore-wrap');
- const next=doc.createElement('div');next.innerHTML=artwork(v);
- const updated=next.querySelector('.ddshcomiflore');
- if(!updated)return;
- root.setAttribute('style',updated.getAttribute('style')||'');
- const textFields=[['.ddshcomiflore-meta','meta'],['.ddshcomiflore-w1','w1'],['.ddshcomiflore-w2','w2'],['.ddshcomiflore-w3','w3'],['.ddshcomiflore-name','name'],['.ddshcomiflore-roleplay','roleplay'],['.ddshcomiflore-note span','noteTitle'],['.ddshcomiflore-note div','note']];
- for(const [selector,key] of textFields){const node=root.querySelector(selector);if(!node)continue;if(key==='roleplay'||key==='note')node.innerHTML=esc(v[key]).replace(/\n/g,'<br>');else node.textContent=v[key]??'';}
- if(frame.parentElement)frame.parentElement.scrollTop=oldScroll;
+ if(!root){if(frame && !frame.srcdoc)write(frame,v);return;}
+ // Update only changed nodes in the existing iframe. Never reset srcdoc, scroll position or iframe visibility.
+ const nextStyle=style(v);
+ if(root.getAttribute('style')!==nextStyle)root.setAttribute('style',nextStyle);
+ const fields=[['.ddshcomiflore-meta','meta'],['.ddshcomiflore-w1','w1'],['.ddshcomiflore-w2','w2'],['.ddshcomiflore-w3','w3'],['.ddshcomiflore-name','name'],['.ddshcomiflore-roleplay','roleplay'],['.ddshcomiflore-note span','noteTitle'],['.ddshcomiflore-note div','note']];
+ for(const [selector,key] of fields){
+   const node=root.querySelector(selector);if(!node)continue;
+   const value=String(v[key]??'');
+   if(key==='roleplay'||key==='note'){
+     const html=esc(value).replace(/\n/g,'<br>');
+     if(node.innerHTML!==html)node.innerHTML=html;
+   }else if(node.textContent!==value)node.textContent=value;
+ }
 }
 
 const input=(label,key,multi=false)=>`<label class="dds-field"><span>${label}</span>${multi?`<textarea rows="6" data-frp-field="${key}">${esc(defaults[key])}</textarea>`:`<input type="text" data-frp-field="${key}" value="${esc(defaults[key])}">`}</label>`;
