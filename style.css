@@ -15580,3 +15580,34 @@ body:has(.dds-floyd-view.is-active) .dds-floyd-view-stage::-webkit-scrollbar,
 body:has(.dds-floyd-rp-view.is-active) .dds-floyd-rp-view-stage::-webkit-scrollbar {
   display:none !important; width:0 !important; height:0 !important;
 }
+
+
+/* v322 — Floyd PROFILE editor preview ONLY: scrollbar invisible from first paint.
+   The stage remains wheel/touch-scrollable; outer preview shells never scroll. */
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column,
+html body .dds-panel.dds-floyd-editor .dds-editor-preview-top {
+  overflow: hidden !important;
+}
+html body .dds-panel.dds-floyd-editor .dds-floyd-preview-stage {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  scrollbar-color: transparent transparent !important;
+  overscroll-behavior: contain;
+}
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *,
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *::before,
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *::after {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *::-webkit-scrollbar,
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-track,
+html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
