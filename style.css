@@ -15611,3 +15611,63 @@ html body .dds-panel.dds-floyd-editor .dds-protected-commission-preview-column *
   height: 0 !important;
   background: transparent !important;
 }
+
+
+/* v323 — Floyd PROFILE EDITOR only: hide the colored scrollbar on the actual
+   preview scroll owner AND its outer viewport from the very first frame. */
+html:has(.dds-floyd-editor.is-active),
+body:has(.dds-floyd-editor.is-active) {
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+html:has(.dds-floyd-editor.is-active)::-webkit-scrollbar,
+body:has(.dds-floyd-editor.is-active)::-webkit-scrollbar {
+  display:none !important; width:0 !important; height:0 !important;
+}
+body:has(.dds-floyd-editor.is-active) .dds-main,
+body:has(.dds-floyd-editor.is-active) .dds-app,
+.dds-floyd-editor.is-active,
+.dds-floyd-editor .dds-protected-commission-layout,
+.dds-floyd-editor .dds-protected-commission-preview-column,
+.dds-floyd-editor .dds-editor-preview-top,
+.dds-floyd-editor .dds-floyd-preview-stage,
+.dds-floyd-editor .dds-floyd-flow {
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+  scrollbar-color:transparent transparent !important;
+}
+body:has(.dds-floyd-editor.is-active) .dds-main::-webkit-scrollbar,
+body:has(.dds-floyd-editor.is-active) .dds-app::-webkit-scrollbar,
+.dds-floyd-editor.is-active::-webkit-scrollbar,
+.dds-floyd-editor .dds-protected-commission-layout::-webkit-scrollbar,
+.dds-floyd-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+.dds-floyd-editor .dds-editor-preview-top::-webkit-scrollbar,
+.dds-floyd-editor .dds-floyd-preview-stage::-webkit-scrollbar,
+.dds-floyd-editor .dds-floyd-flow::-webkit-scrollbar,
+.dds-floyd-editor .dds-floyd-preview-stage::-webkit-scrollbar-track,
+.dds-floyd-editor .dds-floyd-preview-stage::-webkit-scrollbar-thumb {
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+  background:transparent !important;
+  border:0 !important;
+}
+.dds-floyd-editor .dds-protected-commission-preview-column {
+  overflow:hidden !important;
+}
+.dds-floyd-editor .dds-floyd-preview-stage {
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+}
+
+/* Higher specificity than site-wide v165/v200 scrollbar theme. */
+html body .dds-panel.dds-protected-commission-editor.dds-floyd-editor.is-active .dds-protected-commission-preview-column .dds-floyd-preview-stage {
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-floyd-editor.is-active .dds-protected-commission-preview-column .dds-floyd-preview-stage::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-floyd-editor.is-active .dds-protected-commission-preview-column .dds-floyd-preview-stage::-webkit-scrollbar-thumb {
+  display:none !important; width:0 !important; height:0 !important;
+  background:transparent !important;
+}
