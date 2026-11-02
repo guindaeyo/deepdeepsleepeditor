@@ -15788,3 +15788,21 @@ html:has(.dds-floyd-rp-editor.is-active) body *::-webkit-scrollbar-corner {
  display:none !important; width:0 !important; height:0 !important;
  background:transparent !important; border:0 !important;
 }
+
+/* v330 — GLOBAL LEFT EDITOR PREVIEW ONLY: invisible scrollbar on every scroll host, at first paint and during edits. */
+html body .dds-panel .dds-editor-preview-column,
+html body .dds-panel .dds-editor-preview-column *,
+html body .dds-panel .dds-protected-commission-preview-column,
+html body .dds-panel .dds-protected-commission-preview-column * {
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+html body .dds-panel .dds-editor-preview-column::-webkit-scrollbar,
+html body .dds-panel .dds-editor-preview-column *::-webkit-scrollbar,
+html body .dds-panel .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel .dds-protected-commission-preview-column *::-webkit-scrollbar {
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+  background:transparent !important;
+}

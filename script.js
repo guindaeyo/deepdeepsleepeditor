@@ -28296,3 +28296,30 @@ function route(){if(location.hash==='#commission'&&(editor?.classList.contains('
 function init(){let tries=0,id=setInterval(()=>{if(cardInstall()||++tries>100)clearInterval(id)},100);window.addEventListener('hashchange',route);window.addEventListener('popstate',route);setTimeout(route,350);window.addEventListener('resize',()=>{if(editor?.classList.contains('is-active'))fit(editor.querySelector('[data-frp-preview]'),'editor');if(view?.classList.contains('is-active'))fit(view.querySelector('[data-frp-view]'),'view');});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+/* v330 — Apply invisible scrolling inside SAME-ORIGIN preview iframes too; never touch controls or VIEW WORK. */
+(()=>{
+  const previewSelector='.dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe';
+  const css='html,body,body *{scrollbar-width:none!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,body *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}';
+  const apply=(frame)=>{
+    try{
+      const doc=frame.contentDocument;
+      if(!doc || !doc.documentElement)return;
+      let style=doc.getElementById('dds-global-preview-invisible-scroll');
+      if(!style){style=doc.createElement('style');style.id='dds-global-preview-invisible-scroll';(doc.head||doc.documentElement).appendChild(style)}
+      if(style.textContent!==css)style.textContent=css;
+    }catch(_err){}
+  };
+  const bind=(frame)=>{
+    if(frame.dataset.ddsInvisiblePreviewBound==='1')return;
+    frame.dataset.ddsInvisiblePreviewBound='1';
+    frame.addEventListener('load',()=>apply(frame));
+    apply(frame);
+  };
+  const scan=()=>document.querySelectorAll(previewSelector).forEach(bind);
+  const start=()=>{
+    scan();
+    new MutationObserver(scan).observe(document.body,{subtree:true,childList:true});
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
