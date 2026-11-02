@@ -15357,3 +15357,20 @@ body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-stage::-webkit-scrol
   width: 0 !important;
   height: 0 !important;
 }
+
+
+/* v310: Alan VIEW WORK uses active panel as source of truth, even if navigation clears mode classes. */
+html:has(.dds-alan-view-panel.is-active),
+body:has(.dds-alan-view-panel.is-active){margin:0!important;min-height:100%!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-browser-chrome,
+body:has(.dds-alan-view-panel.is-active) .dds-topbar,
+body:has(.dds-alan-view-panel.is-active) .dds-sidebar,
+body:has(.dds-alan-view-panel.is-active) .dds-footer,
+body:has(.dds-alan-view-panel.is-active) .dds-noise,
+body:has(.dds-alan-view-panel.is-active) .dds-glow {display:none!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-app{width:100%!important;max-width:none!important;min-height:100dvh!important;margin:0!important;padding:0!important;border:0!important;display:block!important;background:#0e080b!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-main{width:100%!important;max-width:none!important;min-height:100dvh!important;margin:0!important;padding:24px!important;border:0!important;display:block!important;background:#0e080b!important;box-sizing:border-box!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-panel.is-active{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;display:block!important;background:transparent!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage{height:calc(100dvh - 48px)!important;min-height:360px!important;width:100%!important;max-width:none!important;overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important;margin:0 auto!important;background:#242424!important;}
+body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}
+@media(max-width:700px){body:has(.dds-alan-view-panel.is-active) .dds-main{padding:10px!important;}body:has(.dds-alan-view-panel.is-active) .dds-alan-view-stage{height:calc(100dvh - 20px)!important;}}
