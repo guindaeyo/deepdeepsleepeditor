@@ -15720,3 +15720,8 @@ html body .dds-panel.dds-floyd-rp-editor.is-active .dds-protected-commission-pre
 html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage {
  overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;
 }
+
+/* v326 Floyd roleplay only: grayscale toggle buttons */
+.dds-floyd-rp-editor .dds-frp-filter-toggle {appearance:none;cursor:pointer;border:1px solid currentColor;border-radius:6px;padding:10px 14px;font:inherit;font-weight:600;background:transparent;color:inherit;transition:background-color .12s ease,color .12s ease;}
+.dds-floyd-rp-editor .dds-frp-filter-toggle[aria-pressed="true"] {background:#242424;color:#fff;border-color:#242424;}
+.dds-floyd-rp-editor .dds-frp-filter-toggle:focus-visible {outline:2px solid currentColor;outline-offset:3px;}
