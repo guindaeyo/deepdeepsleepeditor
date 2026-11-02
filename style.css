@@ -15268,3 +15268,32 @@ html body.dds-y2k-vampire [data-panel="editor-code013"] .dds-protected-commissio
   scrollbar-width:none !important;
 }
 [data-panel="editor-review002"] #musicReviewPreview::-webkit-scrollbar {display:none!important;width:0!important;height:0!important}
+
+/* v308: Alan R. Clinton — VIEW WORK only. The public view shows the artwork,
+   not an editor; the scaled holder determines scroll height. */
+body.dds-alan-view-mode .dds-alan-view-panel.is-active {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-stage {
+  width: 100% !important;
+  max-width: none !important;
+  height: calc(100dvh - 16px) !important;
+  min-height: 360px !important;
+  display: block !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  background: #242424;
+}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-stage::-webkit-scrollbar {display:none !important;width:0 !important;height:0 !important;}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-canvas {display:block !important;}
+body.dds-alan-view-mode .dds-alan-view-panel .dds-alan-view-canvas > iframe {
+  left: 0 !important;
+  top: 0 !important;
+  transform-origin: top left !important;
+}

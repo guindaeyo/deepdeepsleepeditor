@@ -21575,36 +21575,45 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.style.setProperty("transform-origin", "top center", "important");
   }
 
-  function fitAlanViewIframe(iframe, stage, padding = 36) {
-    if (!iframe || !stage) return;
+  function fitAlanViewIframe(iframe, stage, padding = 24) {
+    if (!iframe || !stage || stage.clientWidth < 20) return;
     const m = measureIframe(iframe);
     const canvas = stage.querySelector("[data-alan-view-canvas]");
     if (!canvas) return;
 
-    /*
-     * VIEW WORK ใช้ขนาดจริงตามตัวโคด:
-     * กว้างตามความกว้างจริง / สูงตามความยาวจริง
-     * ไม่บังคับ aspect ratio และไม่ scale โคด
-     */
-    canvas.style.position = "relative";
-    canvas.style.width = `${m.width}px`;
-    canvas.style.height = `${m.height}px`;
-    canvas.style.margin = `${padding}px auto`;
-    canvas.style.flex = "0 0 auto";
+    // VIEW WORK: fit the original artwork, not its unscaled iframe.
+    // Keep a full-height scrollable viewport; give the inner canvas the
+    // *scaled document height* so the bottom remains accessible.
+    const width = Math.max(1, m.width);
+    const height = Math.max(1, m.height);
+    const available = Math.max(1, stage.clientWidth - padding * 2);
+    const scale = Math.min(1, available / width);
+    const scaledWidth = Math.ceil(width * scale);
+    const scaledHeight = Math.ceil(height * scale);
 
-    iframe.style.position = "absolute";
-    iframe.style.left = "0";
-    iframe.style.top = "0";
-    iframe.style.width = `${m.width}px`;
-    iframe.style.height = `${m.height}px`;
-    iframe.style.maxWidth = "none";
-    iframe.style.margin = "0";
-    iframe.style.transform = "none";
-    iframe.style.transformOrigin = "top left";
+    canvas.style.setProperty("position", "relative", "important");
+    canvas.style.setProperty("width", `${scaledWidth}px`, "important");
+    canvas.style.setProperty("height", `${scaledHeight}px`, "important");
+    canvas.style.setProperty("margin", `${padding}px auto`, "important");
+    canvas.style.setProperty("flex", "0 0 auto", "important");
 
-    stage.style.width = "100%";
-    stage.style.height = `${m.height + padding * 2}px`;
-    stage.style.minHeight = `${m.height + padding * 2}px`;
+    iframe.style.setProperty("position", "absolute", "important");
+    iframe.style.setProperty("inset", "auto", "important");
+    iframe.style.setProperty("left", "0", "important");
+    iframe.style.setProperty("top", "0", "important");
+    iframe.style.setProperty("width", `${width}px`, "important");
+    iframe.style.setProperty("min-width", `${width}px`, "important");
+    iframe.style.setProperty("max-width", "none", "important");
+    iframe.style.setProperty("height", `${height}px`, "important");
+    iframe.style.setProperty("min-height", `${height}px`, "important");
+    iframe.style.setProperty("max-height", "none", "important");
+    iframe.style.setProperty("margin", "0", "important");
+    iframe.style.setProperty("transform", `scale(${scale})`, "important");
+    iframe.style.setProperty("transform-origin", "top left", "important");
+    stage.style.setProperty("height", "100%", "important");
+    stage.style.setProperty("min-height", "0", "important");
+    stage.style.setProperty("overflow-x", "hidden", "important");
+    stage.style.setProperty("overflow-y", "auto", "important");
   }
 
   function fitCardPreview() {
@@ -21767,7 +21776,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     viewPanel = document.createElement("section");
     viewPanel.className = "dds-panel dds-commission-view-panel dds-alan-view-panel";
     viewPanel.dataset.panel = VIEW_PANEL_NAME;
-    viewPanel.innerHTML = `<div class="dds-commission-view-toolbar"><button aria-label="กลับหน้า COMMISSION" class="dds-back-button" data-alan-view-back type="button">←</button></div><div class="dds-alan-view-stage"><div class="dds-alan-view-canvas" data-alan-view-canvas><iframe data-alan-view-preview scrolling="no" title="งานคอมมิชชั่น Alan R. Clinton"></iframe></div></div>`;
+    viewPanel.innerHTML = `<div class="dds-alan-view-stage"><div class="dds-alan-view-canvas" data-alan-view-canvas><iframe data-alan-view-preview scrolling="no" title="งานคอมมิชชั่น Alan R. Clinton"></iframe></div></div>`;
     document.querySelector(".dds-main")?.appendChild(viewPanel);
     viewPanel.querySelector("[data-alan-view-back]")?.addEventListener("click", goBack);
     return viewPanel;
