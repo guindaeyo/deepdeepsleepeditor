@@ -28143,9 +28143,50 @@ const FALLBACK_CSS=`<style>
 </style>`;
 function renderCode(v,forPreview=false){const vid=youtubeID(v.youtube), playlist=youtubeID(v.playlist)||vid;
 return `${FALLBACK_CSS}<link href="${CSS}" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"><style>.ddshcomf-pf .ddshcomf-pf-word1,.ddshcomf-pf .ddshcomf-pf-word2,.ddshcomf-pf .ddshcomf-pf-word3,.ddshcomf-pf .ddshcomf-pf-word4{position:absolute;translate:var(--floyd-x,0px) var(--floyd-y,0px)}</style><div class="ddshcomf-pf" style="${colorsStyle(v)}"><div class="ddshcomf-pf-canvas"><div class="ddshcomf-pf-grain"></div><div class="ddshcomf-pf-film"></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-back"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word1" style="--floyd-x:${Number(v.word1x)||0}px;--floyd-y:${Number(v.word1y)||0}px">${esc(v.word1)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-one"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-two"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-left"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word3" style="--floyd-x:${Number(v.word3x)||0}px;--floyd-y:${Number(v.word3y)||0}px">${esc(v.word3)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-bottom"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word2" style="--floyd-x:${Number(v.word2x)||0}px;--floyd-y:${Number(v.word2y)||0}px">${esc(v.word2)}</div><div class="ddshcomf-pf-photo ddshcomf-pf-photo-main"><div class="ddshcomf-pf-photo-image"></div></div><div class="ddshcomf-pf-writing ddshcomf-pf-word4" style="--floyd-x:${Number(v.word4x)||0}px;--floyd-y:${Number(v.word4y)||0}px">${esc(v.word4)}</div><div class="ddshcomf-pf-player"><div class="ddshcomf-pf-cover"></div><div class="ddshcomf-pf-music-info"><div class="ddshcomf-pf-now"><i class="bi bi-circle-fill ddshcomf-pf-dot"></i><span>NOW PLAYING</span><i class="bi bi-spotify ddshcomf-pf-spotify"></i></div><div class="ddshcomf-pf-song-name">${esc(v.song)}</div><div class="ddshcomf-pf-artist-name">${esc(v.artist)}</div><div class="ddshcomf-pf-progress"><div class="ddshcomf-pf-progress-fill"></div></div></div><div class="ddshcomf-pf-equalizer"><i></i><i></i><i></i><i></i></div></div><div class="ddshcomf-pf-name">${esc(v.name)}</div><div class="ddshcomf-pf-youtube">${(!forPreview&&vid)?`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&amp;loop=1&amp;playlist=${playlist}&amp;playsinline=1" width="0" height="0" title="YouTube music" allow="autoplay; encrypted-media" loading="eager" tabindex="-1"></iframe>`:''}</div><div class="ddscomm-crz"><span></span></div></div></div>`;}
-function srcDoc(v){return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:#242424;scrollbar-width:none}::-webkit-scrollbar{display:none}</style></head><body>${renderCode(v,true)}</body></html>`;}
-function write(frame,v,mode='editor') {if(!frame)return;frame.onload=()=>{const fit=()=>fitFrame(frame,mode);fit();[120,350,900,1700].forEach(t=>setTimeout(fit,t));frame.contentDocument?.fonts?.ready?.then(fit).catch(()=>{});frame.contentDocument?.querySelectorAll('link[rel=stylesheet]').forEach(link=>link.addEventListener('load',fit,{once:true}));};frame.srcdoc=srcDoc(v);}
-function fitFrame(frame,mode){const doc=frame.contentDocument,root=doc?.querySelector('.ddshcomf-pf'),stage=frame.parentElement;if(!doc||!root||!stage)return;const native=Math.max(650,Math.ceil(root.scrollWidth),Math.ceil(root.getBoundingClientRect().width));const h=Math.max(root.scrollHeight,root.offsetHeight,650);const margin=mode==='card'?10:24;const avail=Math.max(100,stage.clientWidth-margin*2);const scale=Math.min(1,avail/native,mode==='card'?Math.max(.1,(stage.clientHeight-16)/h):1);frame.style.position='absolute';frame.style.left='50%';frame.style.top=mode==='card'?'50%':'16px';frame.style.width=native+'px';frame.style.height=h+'px';frame.style.maxWidth='none';frame.style.transformOrigin='top left';frame.style.transform=`scale(${scale})`;frame.style.left=`calc(50% - ${native*scale/2}px)`;if(mode==='card')frame.style.top=`calc(50% - ${h*scale/2}px)`;frame.dataset.floydScale=scale;frame.style.visibility='visible';if(mode==='editor'||mode==='view'){stage.querySelector('.dds-floyd-flow')?.remove();const flow=document.createElement('div');flow.className='dds-floyd-flow';flow.style.height=Math.ceil(h*scale+36)+'px';stage.append(flow);}}
+const FLOYD_ARTBOARD_WIDTH=950;
+function srcDoc(v){return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{width:${FLOYD_ARTBOARD_WIDTH}px;min-width:${FLOYD_ARTBOARD_WIDTH}px;margin:0;padding:0;overflow:hidden;background:transparent;scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}.ddshcomf-pf{width:${FLOYD_ARTBOARD_WIDTH}px!important;max-width:none!important;margin:0!important}</style></head><body>${renderCode(v,true)}</body></html>`;}
+function write(frame,v,mode='editor'){
+ if(!frame)return;
+ frame.style.visibility='hidden';
+ frame.style.width=FLOYD_ARTBOARD_WIDTH+'px';
+ frame.style.maxWidth='none';
+ frame.style.left='0';
+ frame.style.top='0';
+ frame.style.transform='none';
+ frame.onload=()=>{
+  const fit=()=>fitFrame(frame,mode);
+  fit();
+  frame.contentDocument?.fonts?.ready?.then(fit).catch(()=>{});
+  frame.contentDocument?.querySelectorAll('link[rel="stylesheet"]').forEach(link=>link.addEventListener('load',fit,{once:true}));
+  frame.contentDocument?.querySelectorAll('img').forEach(img=>img.addEventListener('load',fit,{once:true}));
+  [150,500,1200].forEach(t=>setTimeout(fit,t));
+ };
+ frame.srcdoc=srcDoc(v);
+}
+function fitFrame(frame,mode){
+ const doc=frame.contentDocument, root=doc?.querySelector('.ddshcomf-pf'),stage=frame.parentElement;
+ if(!doc||!root||!stage)return;
+ const native=FLOYD_ARTBOARD_WIDTH;
+ const h=Math.max(900,Math.ceil(root.scrollHeight),Math.ceil(root.getBoundingClientRect().height));
+ const pad=mode==='card'?10:24;
+ const avail=Math.max(100,stage.clientWidth-pad*2);
+ const heightAvail=mode==='card'?Math.max(80,stage.clientHeight-20):Infinity;
+ const scale=Math.min(1,avail/native,heightAvail/h);
+ const shownWidth=native*scale,shownHeight=h*scale;
+ frame.style.position='absolute';
+ frame.style.width=native+'px';frame.style.minWidth=native+'px';frame.style.maxWidth='none';
+ frame.style.height=h+'px';
+ frame.style.left=Math.max(0,(stage.clientWidth-shownWidth)/2)+'px';
+ frame.style.top=mode==='card'?Math.max(0,(stage.clientHeight-shownHeight)/2)+'px':'16px';
+ frame.style.transformOrigin='0 0';frame.style.transform=`scale(${scale})`;
+ frame.style.visibility='visible';
+ frame.dataset.floydScale=String(scale);
+ if(mode!=='card'){
+  let flow=stage.querySelector('.dds-floyd-flow');
+  if(!flow){flow=document.createElement('div');flow.className='dds-floyd-flow';stage.appendChild(flow);}
+  flow.style.height=Math.ceil(shownHeight+32)+'px';flow.style.width='1px';flow.style.pointerEvents='none';
+ }
+}
 const colorField=(title,key)=>`<label class="dds-field"><span>${title}</span><div class="dds-floyd-color"><input type="color" data-floyd-picker="${key}" value="${colorHex(defaults[key])}"><input data-floyd-field="${key}" type="text" value="${esc(defaults[key])}"></div></label>`;
 const input=(title,key)=>`<label class="dds-field"><span>${title}</span><input type="text" data-floyd-field="${key}" value="${esc(defaults[key])}"></label>`;
 const slider=(title,key,min,max)=>`<label class="dds-field"><span>${title}</span><div class="dds-floyd-range"><input type="range" data-floyd-field="${key}" min="${min}" max="${max}" value="${Number(defaults[key])||0}"><output data-floyd-out="${key}">${Number(defaults[key])||0}</output></div></label>`;
