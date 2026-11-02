@@ -28297,6 +28297,45 @@ function init(){let tries=0,id=setInterval(()=>{if(cardInstall()||++tries>100)cl
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 
+/* v331 — Central left-preview iframe guard; survives iframe document rewrites and CSS reloads. */
+(()=>{
+  const columns='.dds-panel .dds-editor-preview-column, .dds-panel .dds-protected-commission-preview-column, .dds-panel [class*="preview-column"]';
+  const rule='html,body,body *{scrollbar-width:none!important;scrollbar-color:transparent transparent!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,body *::-webkit-scrollbar,html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb,body *::-webkit-scrollbar-thumb,html::-webkit-scrollbar-track,body::-webkit-scrollbar-track,body *::-webkit-scrollbar-track{display:none!important;width:0!important;height:0!important;background:transparent!important;border:0!important}';
+  const watched=new WeakSet();
+  function inject(frame){
+    try{
+      const doc=frame.contentDocument;
+      if(!doc?.documentElement)return;
+      let st=doc.getElementById('dds-v331-preview-scroll-guard');
+      if(!st){st=doc.createElement('style');st.id='dds-v331-preview-scroll-guard';(doc.head||doc.documentElement).append(st);}
+      if(st.textContent!==rule)st.textContent=rule;
+      if(!watched.has(doc)){
+        watched.add(doc);
+        const obs=new MutationObserver(()=>{
+          if(!frame.isConnected){obs.disconnect();return;}
+          if(!doc.getElementById('dds-v331-preview-scroll-guard'))inject(frame);
+        });
+        obs.observe(doc.documentElement,{childList:true,subtree:true});
+      }
+    }catch(_e){}
+  }
+  const bound=new WeakSet();
+  function scan(){
+    document.querySelectorAll(columns).forEach(col=>col.querySelectorAll('iframe').forEach(frame=>{
+      if(!bound.has(frame)){
+        bound.add(frame);
+        frame.addEventListener('load',()=>inject(frame));
+      }
+      inject(frame);
+    }));
+  }
+  function start(){scan();new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+    document.addEventListener('input',e=>{if(e.target.closest?.(columns))scan()},true);
+    document.addEventListener('click',e=>{if(e.target.closest?.('.dds-panel'))scan()},true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+
 /* v330 — Apply invisible scrolling inside SAME-ORIGIN preview iframes too; never touch controls or VIEW WORK. */
 (()=>{
   const previewSelector='.dds-editor-preview-column iframe, .dds-protected-commission-preview-column iframe';

@@ -15806,3 +15806,24 @@ html body .dds-panel .dds-protected-commission-preview-column *::-webkit-scrollb
   height:0 !important;
   background:transparent !important;
 }
+
+/* v331 — Central editor LEFT PREVIEW: force invisible scrollbars on ALL nested scroll hosts.
+   Controls and VIEW WORK intentionally excluded. */
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]),
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::before,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::after {
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"])::-webkit-scrollbar,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::-webkit-scrollbar,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"])::-webkit-scrollbar-thumb,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::-webkit-scrollbar-thumb,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"])::-webkit-scrollbar-track,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::-webkit-scrollbar-track,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,[class*="preview-column"]) *::-webkit-scrollbar-corner {
+  display:none !important; width:0 !important; height:0 !important;
+  background:transparent !important; border:0 !important;
+}
