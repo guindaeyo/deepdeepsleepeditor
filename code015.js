@@ -28,7 +28,7 @@
     const iframe=panel?.querySelector('[data-015-preview]');
     const doc=iframe?.contentDocument;
     const root=doc?.querySelector('.ddsh-syre');
-    if(!root){render();return;}
+    if(!root){pendingLiveKeys.add(key);return;}
     if(Object.prototype.hasOwnProperty.call(COLORS,key)){
       const name=({'greenTop':'green-top',rpBg:'rp-bg',pillTop:'pill-top',pillMiddle:'pill-middle',userTop:'user-top',controlBg:'control-bg'}[key]||key);
       root.style.setProperty('--syre-'+name,/^#[\da-f]{6}$/i.test(state[key])?state[key]:COLORS[key]);
@@ -55,7 +55,7 @@
     }
     const el=root.querySelector(selectors[key]||'.__no_match__');
     if(!el)return;
-    if(key==='roleplay'){el.innerHTML=plainBB(state[key]);expandIfNeeded(iframe);}
+    if(key==='roleplay'){el.innerHTML=plainBB(state[key]);requestFit(iframe,true);}
     else if(key==='account'){let span=el.querySelector('span');if(!span){span=doc.createElement('span');el.prepend(span);}span.textContent='@';el.replaceChildren(span,doc.createTextNode(state.account));}
     else if(key==='filename'){let ico=el.querySelector('i');el.replaceChildren(...(ico?[ico]:[]),doc.createTextNode(' '+state.filename));}
     else if(key==='folder1'||key==='folder2'){let ico=el.querySelector('i');el.replaceChildren(...(ico?[ico]:[]),doc.createTextNode(' '+state[key]));}
@@ -92,13 +92,14 @@
     refreshSaves();sync();return panel;
   }
   function refreshSaves(){let select=panel.querySelector('[data-015-saves]');let saves={};try{saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}')}catch{}select.innerHTML='<option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option>'+Object.keys(saves).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');}
-  function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
+  function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();if(previewReady){Object.keys(state).forEach(patchLivePreview);requestFit(panel.querySelector('[data-015-preview]'),true);}else render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
   // CODE015: give the embedded document an independent, generous layout viewport.
   // The size of the viewport MUST NEVER be used as the artwork's measured height.
   // Photo zoom/position only affects the image; never rebuild or refit the artwork.
-  let fitObserver=null,fitPending=0,previewVersion=0;
+  let fitObserver=null,fitPending=0,previewVersion=0,previewReady=false;
+  const pendingLiveKeys=new Set();
   const CODE015_WIDTH=800;
   const CODE015_SAFE_VIEWPORT=3200;
   function artworkHeight(doc){
@@ -111,6 +112,7 @@
       return rect.height?rect.bottom-top:0;
     };
     let bottom=Math.max(bottomOf(root),root.offsetTop+root.scrollHeight);
+    root.querySelectorAll('.ddsh-syre-window,.ddsh-syre-content,.ddsh-syre-rp,.ddsh-syre-rpbox,.ddsh-syre-rptext,.ddsh-syre-bottom').forEach(el=>{bottom=Math.max(bottom,bottomOf(el));});
     // The credits are a sibling of the artwork. Include them, as well as the
     // actual bottom row which was previously clipped in the live preview.
     for(const selector of ['.ddsh-syre-bottom','.ddshcr-ccyword','[data-code015-end]']){
@@ -129,7 +131,7 @@
     // The extra viewport is transparent and NOT included in the fit calculation.
     const naturalHeight=artworkHeight(doc);
     if(naturalHeight<=0)return;
-    const viewportHeight=Math.max(CODE015_SAFE_VIEWPORT,naturalHeight+120);
+    const viewportHeight=Math.ceil(naturalHeight+36);
     if(iframe.style.height!==viewportHeight+'px')iframe.style.setProperty('height',viewportHeight+'px','important');
     iframe.style.setProperty('width',CODE015_WIDTH+'px','important');
     const availableWidth=Math.max(1,stage.clientWidth-28);
@@ -137,13 +139,13 @@
     const oldScale=Number(iframe.dataset.code015Scale)||0;
     // Maintain a steady scale on edits; only change it when the stage resizes
     // or the initial CSS/fonts settle. The stage itself remains scrollable.
-    const maxScale=Math.min(1,availableWidth/CODE015_WIDTH,availableHeight/naturalHeight);
-    const scale=keepScale&&oldScale?Math.min(oldScale,availableWidth/CODE015_WIDTH):maxScale;
+    const maxScale=Math.min(1,availableWidth/CODE015_WIDTH);
+    const scale=keepScale&&oldScale?Math.min(oldScale,maxScale):maxScale;
     iframe.dataset.code015Scale=String(scale);
     iframe.style.setProperty('transform',`scale(${scale})`,'important');
     iframe.style.setProperty('top','0px','important');
     iframe.style.setProperty('left','0px','important');
-    const visualHeight=Math.ceil(naturalHeight*scale);
+    const visualHeight=Math.ceil(viewportHeight*scale);
     holder.style.setProperty('width',Math.ceil(CODE015_WIDTH*scale)+'px','important');
     holder.style.setProperty('height',visualHeight+'px','important');
     holder.style.flex='0 0 auto';
@@ -172,7 +174,8 @@
   function render(){
     if(!panel)return;
     const iframe=panel.querySelector('[data-015-preview]');
-    if(!iframe)return;
+    if(!iframe||previewReady||iframe.dataset.code015Loading==='1')return;
+    iframe.dataset.code015Loading='1';
     const version=++previewVersion;
     // Set a safe iframe height BEFORE setting srcdoc, so even the first paint
     // never clips content at the default 150px frame height.
@@ -180,7 +183,12 @@
     iframe.style.setProperty('height',CODE015_SAFE_VIEWPORT+'px','important');
     iframe.onload=()=>{
       if(!iframe.isConnected||version!==previewVersion)return;
+      previewReady=true;
+      iframe.dataset.code015Loading='0';
       iframe.dataset.code015Scale='';
+      // Updates typed while the initial iframe was still loading are applied in place.
+      for(const key of pendingLiveKeys)patchLivePreview(key);
+      pendingLiveKeys.clear();
       watchPreview(iframe);
       requestFit(iframe);
     };
@@ -227,7 +235,7 @@
     if(window.ResizeObserver)new ResizeObserver(update).observe(fr.parentElement);
     article.querySelector('[data-015-open]').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open();});
   }
-  function open(){if(!panel)createPanel();document.querySelectorAll('.dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));panel.classList.add('is-active');document.body.classList.add('dds-editor-mode','dds-force-editor-mode');document.documentElement.classList.add('dds-force-editor-mode');if(location.hash!=='#editor-code015')history.pushState({ddsCode015:true},'','#editor-code015');window.scrollTo(0,0);render();}
+  function open(){if(!panel)createPanel();document.querySelectorAll('.dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));panel.classList.add('is-active');document.body.classList.add('dds-editor-mode','dds-force-editor-mode');document.documentElement.classList.add('dds-force-editor-mode');if(location.hash!=='#editor-code015')history.pushState({ddsCode015:true},'','#editor-code015');window.scrollTo(0,0);if(!previewReady)render();else requestFit(panel.querySelector('[data-015-preview]'),true);}
   function route(){if(location.hash==='#editor-code015'){open();return;}if(!panel)return;panel.classList.remove('is-active');}
   function init(){card();if(!panel)createPanel();try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))requestFit(panel.querySelector('[data-015-preview]'));});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

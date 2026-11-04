@@ -16024,3 +16024,19 @@ html body .dds-panel.dds-code015-editor .dds-code015-fit > iframe[data-015-previ
   border:0 !important;transform-origin:top left !important;pointer-events:none !important;
 }
 html body .dds-panel.dds-code015-editor .dds-code015-stage::-webkit-scrollbar {display:none !important;width:0 !important;height:0 !important;}
+
+/* v354 — CODE015 only: stable, content-height preview; no scroll-position jump. */
+html body .dds-panel.dds-code015-editor .dds-code015-stage {
+  display:flex!important; flex-direction:column!important; align-items:center!important;
+  justify-content:flex-start!important; overflow-y:auto!important; overflow-x:hidden!important;
+  overscroll-behavior:contain!important; padding:12px 12px 28px!important;
+  scrollbar-width:none!important; scroll-behavior:auto!important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-fit {
+  flex:0 0 auto!important; margin:0 auto!important; position:relative!important;
+  overflow:visible!important; max-width:none!important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-fit > iframe[data-015-preview] {
+  transform-origin:top left!important; top:0!important; left:0!important;
+  display:block!important; visibility:visible!important;
+}
