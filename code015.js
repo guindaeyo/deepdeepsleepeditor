@@ -55,31 +55,38 @@
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
   let code015HeightObserver=null;
+  // Measure the real last visible element, not just the frame's initial scrollHeight.
+  // The photo is deliberately excluded: its transforms are clipped inside its own box.
+  function artworkSize(root){
+    const rect=root.getBoundingClientRect();
+    let bottom=Math.max(root.scrollHeight, root.offsetHeight, Math.ceil(rect.height));
+    let right=Math.max(800,root.scrollWidth,root.offsetWidth,Math.ceil(rect.width));
+    root.querySelectorAll('*').forEach(el=>{
+      if(el.closest('.ddsh-syre-photo'))return;
+      const cs=root.ownerDocument.defaultView.getComputedStyle(el);
+      if(cs.display==='none'||cs.visibility==='hidden'||cs.position==='fixed')return;
+      const r=el.getBoundingClientRect();
+      if(r.width===0&&r.height===0)return;
+      bottom=Math.max(bottom,Math.ceil(r.bottom-rect.top));
+      right=Math.max(right,Math.ceil(r.right-rect.left));
+    });
+    return {width:Math.ceil(right),height:Math.ceil(bottom+36)};
+  }
   function sizeFrame(iframe){
     const doc=iframe?.contentDocument;
     if(!doc||!iframe.isConnected)return;
     const stage=iframe.parentElement;
     const root=doc.querySelector('.ddsh-syre');
     if(!root||!stage)return;
-    const width=Math.max(800,Math.ceil(root.scrollWidth),Math.ceil(root.getBoundingClientRect().width));
-    // The document can grow after external CSS, fonts or image assets finish loading.
-    // Measure actual content, not the previous iframe viewport (which caused clipping).
-    // Measure the artwork only. The iframe document's scrollHeight includes its
-    // *previous* viewport height, producing runaway growth after photo transforms.
-    // Measure the artwork itself, never the previous iframe viewport height.
-    // Image zoom is clipped inside .ddsh-syre-photo and must not resize the card.
-    const height=Math.max(50,
-      Math.ceil(root.scrollHeight),Math.ceil(root.getBoundingClientRect().height))+24;
-    // Fit the complete CODE015 artwork in the available preview area.
-    // This is intentionally independent of the PHOTO zoom slider: moving the
-    // image must never change the overall preview scale or reset its scroll.
-    const widthScale=(stage.clientWidth-44)/width;
-    const heightScale=stage.clientHeight>80?(stage.clientHeight-28)/height:1;
-    const scale=Math.min(1,Math.max(0.1,Math.min(widthScale,heightScale)));
+    const {width,height}=artworkSize(root);
+    // Scale only to available WIDTH. The artwork's complete height stays scrollable.
+    // Photo slider events never call this function or change the artwork scale.
+    const scale=Math.min(1,Math.max(0.1,(stage.clientWidth-44)/width));
     iframe.style.width=width+'px';
     iframe.style.height=height+'px';
     iframe.style.transform=`translateX(-50%) scale(${scale})`;
-    stage.style.setProperty('--cyworld-height',Math.ceil(height*scale+30)+'px');
+    const fullHeight=Math.ceil(height*scale+24);
+    stage.style.setProperty('--cyworld-height',fullHeight+'px');
   }
   function watchFrameSize(iframe){
     if(code015HeightObserver){code015HeightObserver.disconnect();code015HeightObserver=null;}
