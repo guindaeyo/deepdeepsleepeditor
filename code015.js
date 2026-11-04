@@ -54,62 +54,62 @@
   function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
+  // CODE015 editor: measure ARTWORK bounds, never the iframe/body scrollHeight.
+  // The iframe has its own height; feeding that back into measurement creates
+  // a loop and leaves the bottom of cyworld.exe outside the visible preview.
   let code015HeightObserver=null;
-  // CODE015: measure the entire artwork document, including elements OUTSIDE
-  // .ddsh-syre (e.g. the credit). Image transforms stay clipped in photo box.
-  // The iframe itself needs breathing room: a transformed img must never
-  // change the page scale or make the last buttons disappear at its edge.
   function artworkSize(doc){
     const root=doc.querySelector('.ddsh-syre');
     if(!root)return {width:800,height:1000};
-    const body=doc.body;
-    const origin=body.getBoundingClientRect();
-    let bottom=Math.max(body.scrollHeight,root.scrollHeight,root.offsetHeight);
-    let right=Math.max(800,body.scrollWidth,root.scrollWidth);
-    for(const el of body.querySelectorAll('*')){
-      if(el.closest('.ddsh-syre-photo'))continue;
-      const style=doc.defaultView.getComputedStyle(el);
-      if(style.display==='none'||style.visibility==='hidden'||style.position==='fixed')continue;
-      const r=el.getBoundingClientRect();
-      if(!r.width&&!r.height)continue;
-      bottom=Math.max(bottom,Math.ceil(r.bottom-origin.top));
-      right=Math.max(right,Math.ceil(r.right-origin.left));
+    const origin=doc.body.getBoundingClientRect();
+    const rootBox=root.getBoundingClientRect();
+    let bottom=Math.max(rootBox.bottom-origin.top,root.offsetTop+root.offsetHeight);
+    let right=Math.max(800,rootBox.right-origin.left);
+    const credits=doc.querySelector('.ddshcr-ccyword');
+    if(credits){
+      const cr=credits.getBoundingClientRect();
+      if(cr.height)bottom=Math.max(bottom,cr.bottom-origin.top);
     }
-    // Include the final credit and a bottom safety margin, even when the
-    // external stylesheet positions content outside the main card's height.
-    return {width:Math.ceil(right),height:Math.ceil(bottom+96)};
+    // Include out-of-flow artwork elements without depending on the viewport's
+    // own scrollHeight, which is affected by the previously assigned height.
+    for(const el of doc.body.querySelectorAll('.ddsh-syre *, .ddshcr-ccyword *')){
+      if(el.closest('.ddsh-syre-photo'))continue;
+      const box=el.getBoundingClientRect();
+      if(!box.height || !box.width)continue;
+      bottom=Math.max(bottom,box.bottom-origin.top);
+      right=Math.max(right,box.right-origin.left);
+    }
+    return {width:Math.max(800,Math.ceil(right)),height:Math.max(1,Math.ceil(bottom+32))};
   }
   function sizeFrame(iframe){
     const doc=iframe?.contentDocument;
-    if(!doc||!iframe.isConnected)return;
+    if(!doc || !iframe.isConnected)return;
     const stage=iframe.parentElement;
-    if(!stage||!doc.querySelector('.ddsh-syre'))return;
+    if(!stage || !doc.querySelector('.ddsh-syre'))return;
     const {width,height}=artworkSize(doc);
-    // Fit to WIDTH only. If the artwork exceeds the available height,
-    // the stage scrolls invisibly instead of clipping off the bottom.
-    // Slider changes call only applyPhotoTransform(), never sizeFrame().
-    const availableWidth=Math.max(1,stage.clientWidth-44);
-    const scale=Math.min(1,availableWidth/width);
-    const frameHeight=Math.max(height+120,doc.body.scrollHeight+120);
-    const heightPx=frameHeight+'px';
+    // Zoom in/out affects only the PHOTO. Fit the complete CYWORLD ARTWORK
+    // into the available LIVE PREVIEW without cutting off its bottom buttons.
+    const availableWidth=Math.max(1,stage.clientWidth-40);
+    const availableHeight=Math.max(1,stage.clientHeight-34);
+    const scale=Math.min(1,availableWidth/width,availableHeight/height);
     const widthPx=width+'px';
+    const heightPx=height+'px';
     const transform=`translateX(-50%) scale(${scale})`;
-    if(iframe.style.height!==heightPx)iframe.style.setProperty('height',heightPx,'important');
     if(iframe.style.width!==widthPx)iframe.style.setProperty('width',widthPx,'important');
+    if(iframe.style.height!==heightPx)iframe.style.setProperty('height',heightPx,'important');
     if(iframe.style.transform!==transform)iframe.style.setProperty('transform',transform,'important');
-    const fullHeight=Math.ceil(frameHeight*scale+24);
-    stage.style.setProperty('--cyworld-height',fullHeight+'px');
+    stage.style.setProperty('--cyworld-height',Math.ceil(height*scale+22)+'px');
   }
   function watchFrameSize(iframe){
     if(code015HeightObserver){code015HeightObserver.disconnect();code015HeightObserver=null;}
     const doc=iframe.contentDocument;
     if(!doc)return;
     const root=doc.querySelector('.ddsh-syre');
-    if(root&&window.ResizeObserver){
+    if(root && window.ResizeObserver){
       code015HeightObserver=new ResizeObserver(()=>sizeFrame(iframe));
       code015HeightObserver.observe(root);
     }
-    doc.fonts?.ready?.then(()=>sizeFrame(iframe));
+    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)sizeFrame(iframe);});
     doc.querySelectorAll('img').forEach(img=>{
       if(!img.complete)img.addEventListener('load',()=>sizeFrame(iframe),{once:true});
     });
@@ -118,14 +118,21 @@
     if(!panel)return;
     const iframe=panel.querySelector('[data-015-preview]');
     if(!iframe)return;
-    iframe.onload=()=>{
+    // srcdoc may contain slow external fonts/images/stylesheets. Waiting only for
+    // iframe.onload leaves the default 150px iframe visible and CUTS the art.
+    // Begin sizing as soon as the new document has its artwork, not on "load".
+    const html=docHTML(state);
+    iframe.srcdoc=html;
+    let seenDoc=null;
+    const refresh=()=>{
+      if(!iframe.isConnected)return;
+      const doc=iframe.contentDocument;
+      if(!doc?.querySelector('.ddsh-syre'))return;
+      if(seenDoc!==doc){seenDoc=doc;watchFrameSize(iframe);}
       sizeFrame(iframe);
-      watchFrameSize(iframe);
-      [100,350,900,1800].forEach(t=>setTimeout(()=>{
-        if(iframe.isConnected)sizeFrame(iframe);
-      },t));
     };
-    iframe.srcdoc=docHTML(state);
+    iframe.onload=refresh;
+    [0,40,120,250,500,1000,2000,4000,7500].forEach(t=>setTimeout(refresh,t));
   }
   function fitCardPreview(frame){
     if(!frame?.isConnected)return;
