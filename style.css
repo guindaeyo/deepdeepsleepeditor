@@ -15916,3 +15916,36 @@ html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage iframe {
     overflow: hidden !important;
   }
 }
+
+/* v338 — COMMISSION & SHOWCASE directory search only */
+[data-work-panel="commission"] > .dds-commission-grid > .dds-commission-search,
+[data-panel="commission"] .dds-commission-grid:not(.dds-activity-grid):not(.dds-my-own-code-grid) > .dds-commission-search {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 12px;
+  padding: 18px 20px 12px;
+  background: rgba(14, 7, 9, .88);
+  border: 1px solid rgba(170, 54, 65, .43);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.dds-commission-search-label {
+  display:block;
+  margin-bottom: 9px;
+  color: #c5a2a6;
+  font: 600 10px/1.4 'Roboto Mono',monospace;
+  letter-spacing: .15em;
+}
+.dds-commission-search-field { position: relative; display:flex; align-items:center; gap:10px; min-height:44px; padding:0 12px; background:#110b0d; border:1px solid #654049; border-radius:4px; }
+.dds-commission-search-field:focus-within { border-color:#c11724; }
+.dds-commission-search-field svg { width:17px; height:17px; flex:0 0 17px; stroke:#ad6670; stroke-width:1.7; fill:none; }
+.dds-commission-search-field input[type="search"] { appearance:none; -webkit-appearance:none; outline:none; box-shadow:none; border:0; background:transparent; color:#fff; font: 400 14px/1.4 'Bai Jamjuree',sans-serif; width:100%; min-width:0; height:42px; padding:0; }
+.dds-commission-search-field input[type="search"]::placeholder {color:#8d777b;opacity:1;}
+.dds-commission-search-field input::-webkit-search-cancel-button { display:none; }
+.dds-commission-search-field button { border:0; background:transparent; color:#e5b8be; font-size:23px; cursor:pointer; padding:3px 7px; }
+.dds-commission-search-field button[hidden] {display:none!important;}
+.dds-commission-search-status {margin:8px 0 0; color:#aa898f; font: 400 11px/1.4 'Bai Jamjuree',sans-serif;}
+.dds-commission-grid > .dds-commission-card.dds-commission-search-hidden { display:none!important; }
+.dds-commission-grid > .dds-commission-search-empty {grid-column:1/-1; padding:38px 14px; margin:0; text-align:center; color:#d4a8ae; border:1px dashed #6d4148;}
+@media(max-width:600px){.dds-commission-grid > .dds-commission-search {padding:14px 12px 10px;}.dds-commission-search-field input[type="search"] {font-size:13px;}}

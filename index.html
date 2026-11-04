@@ -24,7 +24,7 @@
 <link href="//s13.gifyu.com" rel="dns-prefetch"/>
 <link href="//dl.dropboxusercontent.com" rel="dns-prefetch"/>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-<link href="./style.css?v=337-review002-canvas-bottom" rel="stylesheet"/>
+<link href="./style.css?v=338-commission-search" rel="stylesheet"/>
 </head>
 <body class="dds-y2k-vampire">
 <div aria-hidden="true" class="dds-noise"></div>
@@ -5464,6 +5464,15 @@ Comedy" rows="5"></textarea></label>
           </a>
 </div>
 <div class="dds-roleplay-grid dds-commission-grid">
+<div class="dds-commission-search" role="search" aria-label="ค้นหาผลงาน COMMISSION & SHOWCASE">
+  <label class="dds-commission-search-label" for="ddsCommissionSearch">SEARCH COMMISSION</label>
+  <div class="dds-commission-search-field">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></svg>
+    <input id="ddsCommissionSearch" type="search" placeholder="ค้นหาชื่อผู้จ้าง / ประเภทโค้ด / ชื่อผลงาน..." autocomplete="off" spellcheck="false" aria-controls="ddsCommissionSearchResults"/>
+    <button id="ddsCommissionSearchClear" type="button" aria-label="ล้างคำค้นหา" hidden>×</button>
+  </div>
+  <p class="dds-commission-search-status" id="ddsCommissionSearchResults" role="status" aria-live="polite"></p>
+</div>
 <article class="dds-roleplay-card dds-commission-card">
 <div class="dds-roleplay-card-preview dds-roleplay-card-preview-live">
 <iframe aria-hidden="true" class="dds-roleplay-card-preview-frame dds-commission-card-preview-frame" data-commission-canvas-height="auto" data-commission-canvas-width="1040" id="commissionCardPreview001" loading="lazy" scrolling="no" tabindex="-1" title="ตัวอย่างงานคอมมิชชั่นรีวิวอาหาร"></iframe>
@@ -7159,5 +7168,49 @@ Comedy" rows="5"></textarea></label>
 })();
 </script>
 <script src="./code015.js?v299-code015-preview-fixes"></script>
+
+<!-- v338: searchable COMMISSION & SHOWCASE directory only -->
+<script>
+(function(){
+  'use strict';
+  function initCommissionSearch(){
+    const grid=document.querySelector('[data-panel="commission"] .dds-commission-grid:not(.dds-activity-grid):not(.dds-my-own-code-grid)');
+    const field=document.getElementById('ddsCommissionSearch');
+    const clear=document.getElementById('ddsCommissionSearchClear');
+    const status=document.getElementById('ddsCommissionSearchResults');
+    if(!grid||!field||!clear||!status||grid.dataset.commissionSearchReady)return;
+    grid.dataset.commissionSearchReady='1';
+    const norm=(value)=>String(value||'').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g,' ').trim();
+    const filter=()=>{
+      const term=norm(field.value);
+      const terms=term.split(' ').filter(Boolean);
+      const cards=Array.from(grid.children).filter(el=>el.matches('.dds-commission-card'));
+      let shown=0;
+      cards.forEach(card=>{
+        const searchable=norm(card.querySelector('.dds-commission-card-body')?.textContent||card.textContent);
+        const matches=terms.every(t=>searchable.includes(t));
+        card.classList.toggle('dds-commission-search-hidden',!matches);
+        if(matches)shown++;
+      });
+      clear.hidden=!field.value;
+      status.textContent=term ? (shown ? 'พบ '+shown+' ผลงาน จากทั้งหมด '+cards.length+' รายการ' : 'ไม่พบผลงานที่ตรงกับคำค้นหา') : 'ทั้งหมด '+cards.length+' ผลงาน';
+      let empty=grid.querySelector(':scope > .dds-commission-search-empty');
+      if(!shown&&term){
+        if(!empty){empty=document.createElement('p');empty.className='dds-commission-search-empty';empty.textContent='ไม่พบโค้ดที่ค้นหา ลองใช้ชื่อผู้จ้างหรือประเภทงานอื่น';grid.appendChild(empty);}
+      }else if(empty){empty.remove();}
+    };
+    field.addEventListener('input',filter);
+    field.addEventListener('search',filter);
+    clear.addEventListener('click',()=>{field.value='';filter();field.focus();});
+    const observer=new MutationObserver(records=>{
+      if(records.some(record=>Array.from(record.addedNodes).some(n=>n.nodeType===1&&n.matches?.('.dds-commission-card')) || Array.from(record.removedNodes).some(n=>n.nodeType===1&&n.matches?.('.dds-commission-card'))))filter();
+    });
+    observer.observe(grid,{childList:true});
+    filter();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initCommissionSearch,{once:true});
+  else initCommissionSearch();
+})();
+</script>
 </body>
 </html>
