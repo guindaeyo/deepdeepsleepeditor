@@ -79,12 +79,17 @@
     const root=doc.querySelector('.ddsh-syre');
     if(!root||!stage)return;
     const {width,height}=artworkSize(root);
-    // Scale only to available WIDTH. The artwork's complete height stays scrollable.
-    // Photo slider events never call this function or change the artwork scale.
-    const scale=Math.min(1,Math.max(0.1,(stage.clientWidth-44)/width));
+    // Fit the WHOLE artwork into the visible LIVE PREVIEW, not just its width.
+    // IMPORTANT: photoX/photoY/photoZoom never call sizeFrame: sliders only
+    // transform the photo inside its clipped box, not the artwork or iframe.
+    const availableWidth=Math.max(1,stage.clientWidth-44);
+    const availableHeight=Math.max(1,stage.clientHeight-28);
+    const scale=Math.min(1,availableWidth/width,availableHeight/height);
     iframe.style.width=width+'px';
     iframe.style.height=height+'px';
     iframe.style.transform=`translateX(-50%) scale(${scale})`;
+    // Keep stage scrollable if content subsequently grows; the initial view
+    // must show all of the artwork without cropping its final buttons.
     const fullHeight=Math.ceil(height*scale+24);
     stage.style.setProperty('--cyworld-height',fullHeight+'px');
   }
