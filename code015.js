@@ -95,46 +95,60 @@
   function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
-  // CODE015 only: no iframe reload on input, no scale changes on photo controls.
-  // Two different dimensions: intrinsic artwork used for fitting, and safe iframe
-  // viewport (slightly taller) used for preventing clipping of the bottom buttons.
+  // CODE015: give the embedded document an independent, generous layout viewport.
+  // The size of the viewport MUST NEVER be used as the artwork's measured height.
+  // Photo zoom/position only affects the image; never rebuild or refit the artwork.
   let fitObserver=null,fitPending=0,previewVersion=0;
+  const CODE015_WIDTH=800;
+  const CODE015_SAFE_VIEWPORT=3200;
   function artworkHeight(doc){
     const root=doc.querySelector('.ddsh-syre');
-    if(!root)return 800;
-    const body=doc.body, origin=body.getBoundingClientRect().top;
-    const bounds=el=>{const b=el.getBoundingClientRect();return b.height?b.bottom-origin:0;};
-    let bottom=Math.max(bounds(root), root.offsetTop+root.scrollHeight);
-    const footer=doc.querySelector('.ddshcr-ccyword');
-    if(footer)bottom=Math.max(bottom,bounds(footer));
-    const end=doc.querySelector('[data-code015-end]');
-    if(end)bottom=Math.max(bottom,bounds(end));
-    root.querySelectorAll('.ddsh-syre-top,.ddsh-syre-window,.ddsh-syre-bottom,.ddsh-syre-bottom > *').forEach(el=>{
-      bottom=Math.max(bottom,bounds(el));
-    });
-    return Math.max(100,Math.ceil(bottom+32));
+    if(!root)return 0;
+    const top=doc.body.getBoundingClientRect().top;
+    const bottomOf=(el)=>{
+      if(!el)return 0;
+      const rect=el.getBoundingClientRect();
+      return rect.height?rect.bottom-top:0;
+    };
+    let bottom=Math.max(bottomOf(root),root.offsetTop+root.scrollHeight);
+    // The credits are a sibling of the artwork. Include them, as well as the
+    // actual bottom row which was previously clipped in the live preview.
+    for(const selector of ['.ddsh-syre-bottom','.ddshcr-ccyword','[data-code015-end]']){
+      bottom=Math.max(bottom,bottomOf(doc.querySelector(selector)));
+    }
+    return Math.max(100,Math.ceil(bottom+18));
   }
   function fitPreview(iframe,keepScale=false){
     if(!iframe?.isConnected||!panel?.classList.contains('is-active'))return;
     const doc=iframe.contentDocument;
-    const stage=iframe.closest('.dds-code015-stage'),holder=iframe.parentElement;
+    const stage=iframe.closest('.dds-code015-stage');
+    const holder=iframe.parentElement;
     if(!doc?.querySelector('.ddsh-syre')||!stage||!holder)return;
-    const artwork=artworkHeight(doc);
-    const nativeHeight=Math.max(artwork+180,iframe.dataset.code015NativeHeight?Number(iframe.dataset.code015NativeHeight):0);
+    // The iframe is intentionally taller than its contents. In particular,
+    // image onload / CSS reflow can never clip the bottom before it is measured.
+    // The extra viewport is transparent and NOT included in the fit calculation.
+    const naturalHeight=artworkHeight(doc);
+    if(naturalHeight<=0)return;
+    const viewportHeight=Math.max(CODE015_SAFE_VIEWPORT,naturalHeight+120);
+    if(iframe.style.height!==viewportHeight+'px')iframe.style.setProperty('height',viewportHeight+'px','important');
+    iframe.style.setProperty('width',CODE015_WIDTH+'px','important');
     const availableWidth=Math.max(1,stage.clientWidth-28);
     const availableHeight=Math.max(1,stage.clientHeight-28);
-    const originalScale=Number(iframe.dataset.code015Scale);
-    const scale=(keepScale && originalScale>0)?originalScale:Math.min(1,availableWidth/800,availableHeight/artwork);
-    iframe.style.setProperty('width','800px','important');
-    iframe.style.setProperty('height',nativeHeight+'px','important');
-    iframe.dataset.code015NativeHeight=String(nativeHeight);
+    const oldScale=Number(iframe.dataset.code015Scale)||0;
+    // Maintain a steady scale on edits; only change it when the stage resizes
+    // or the initial CSS/fonts settle. The stage itself remains scrollable.
+    const maxScale=Math.min(1,availableWidth/CODE015_WIDTH,availableHeight/naturalHeight);
+    const scale=keepScale&&oldScale?Math.min(oldScale,availableWidth/CODE015_WIDTH):maxScale;
     iframe.dataset.code015Scale=String(scale);
     iframe.style.setProperty('transform',`scale(${scale})`,'important');
-    iframe.style.setProperty('top','0','important');
-    iframe.style.setProperty('left','0','important');
-    holder.style.setProperty('width',Math.ceil(800*scale)+'px','important');
-    holder.style.setProperty('height',Math.ceil(nativeHeight*scale)+'px','important');
+    iframe.style.setProperty('top','0px','important');
+    iframe.style.setProperty('left','0px','important');
+    const visualHeight=Math.ceil(naturalHeight*scale);
+    holder.style.setProperty('width',Math.ceil(CODE015_WIDTH*scale)+'px','important');
+    holder.style.setProperty('height',visualHeight+'px','important');
     holder.style.flex='0 0 auto';
+    // Only the outer stage scrolls. Its viewport is NOT the iframe height.
+    stage.style.setProperty('overflow-y','auto','important');
   }
   function requestFit(iframe,keepScale=false){
     cancelAnimationFrame(fitPending);
@@ -150,23 +164,27 @@
       fitObserver.observe(root);
     }
     doc.querySelectorAll('link[rel="stylesheet"]').forEach(link=>link.addEventListener('load',()=>requestFit(iframe),{once:true}));
-    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)requestFit(iframe)});
-    doc.querySelectorAll('img').forEach(img=>{if(!img.complete)img.addEventListener('load',()=>requestFit(iframe,true),{once:true});});
+    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)requestFit(iframe);});
+    doc.querySelectorAll('img').forEach(img=>{
+      if(!img.complete)img.addEventListener('load',()=>requestFit(iframe,true),{once:true});
+    });
   }
   function render(){
     if(!panel)return;
     const iframe=panel.querySelector('[data-015-preview]');
     if(!iframe)return;
     const version=++previewVersion;
+    // Set a safe iframe height BEFORE setting srcdoc, so even the first paint
+    // never clips content at the default 150px frame height.
+    iframe.style.setProperty('width',CODE015_WIDTH+'px','important');
+    iframe.style.setProperty('height',CODE015_SAFE_VIEWPORT+'px','important');
     iframe.onload=()=>{
       if(!iframe.isConnected||version!==previewVersion)return;
       iframe.dataset.code015Scale='';
-      iframe.dataset.code015NativeHeight='';
       watchPreview(iframe);
       requestFit(iframe);
     };
     iframe.srcdoc=docHTML(state);
-    // External fonts/styles can delay the load event; size the local markup now.
     requestAnimationFrame(()=>{if(version===previewVersion)requestFit(iframe);});
   }
   function fitCardPreview(frame){
