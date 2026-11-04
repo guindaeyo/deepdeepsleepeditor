@@ -23,6 +23,47 @@
     const ty=(50-y)*Math.max(0,zoom-1);
     return `position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:${x}% ${y}%!important;transform-origin:50% 50%!important;transform:translate(${tx}%,${ty}%) scale(${zoom})!important;transition:none!important`;
   }
+  // Change only the edited node. Replacing srcdoc on each keystroke causes a visible flash.
+  function patchLivePreview(key){
+    const iframe=panel?.querySelector('[data-015-preview]');
+    const doc=iframe?.contentDocument;
+    const root=doc?.querySelector('.ddsh-syre');
+    if(!root){render();return;}
+    if(Object.prototype.hasOwnProperty.call(COLORS,key)){
+      const name=({'greenTop':'green-top',rpBg:'rp-bg',pillTop:'pill-top',pillMiddle:'pill-middle',userTop:'user-top',controlBg:'control-bg'}[key]||key);
+      root.style.setProperty('--syre-'+name,/^#[\da-f]{6}$/i.test(state[key])?state[key]:COLORS[key]);
+      return;
+    }
+    const selectors={world:'.ddsh-syre-brand',folder1:'.ddsh-syre-top .ddsh-syre-folder:nth-child(2)',folder2:'.ddsh-syre-top .ddsh-syre-folder:nth-child(3)',account:'.ddsh-syre-user',filename:'.ddsh-syre-rplabel',roleplay:'.ddsh-syre-rptext',music:'.ddsh-syre-music span',linkLabel:'.ddsh-syre-link span'};
+    if(key==='photo'){
+      const holder=root.querySelector('.ddsh-syre-photo');
+      if(!holder)return;
+      let img=holder.querySelector('img');
+      if(!safeUrl(state.photo)){img?.remove();return;}
+      if(!img){img=doc.createElement('img');holder.append(img);}
+      if(img.getAttribute('src')!==safeUrl(state.photo))img.setAttribute('src',safeUrl(state.photo));
+      img.setAttribute('style',photoStyles(state));
+      return;
+    }
+    if(key==='photoX'||key==='photoY'||key==='photoZoom'){
+      applyPhotoTransform(iframe);return;
+    }
+    if(key==='musicUrl'||key==='linkUrl'){
+      const a=root.querySelector(key==='musicUrl'?'.ddsh-syre-music':'.ddsh-syre-link');
+      if(a){a.setAttribute('href',safeUrl(state[key])||'#');}
+      return;
+    }
+    const el=root.querySelector(selectors[key]||'.__no_match__');
+    if(!el)return;
+    if(key==='roleplay'){el.innerHTML=plainBB(state[key]);expandIfNeeded(iframe);}
+    else if(key==='account'){let span=el.querySelector('span');if(!span){span=doc.createElement('span');el.prepend(span);}span.textContent='@';el.replaceChildren(span,doc.createTextNode(state.account));}
+    else if(key==='filename'){let ico=el.querySelector('i');el.replaceChildren(...(ico?[ico]:[]),doc.createTextNode(' '+state.filename));}
+    else if(key==='folder1'||key==='folder2'){let ico=el.querySelector('i');el.replaceChildren(...(ico?[ico]:[]),doc.createTextNode(' '+state[key]));}
+    else el.textContent=state[key];
+  }
+  function expandIfNeeded(iframe){
+    requestFit(iframe,true);
+  }
   function applyPhotoTransform(iframe){
     const img=iframe?.contentDocument?.querySelector('.ddsh-syre-photo img');
     if(img){img.setAttribute('style',photoStyles(state));}
@@ -31,7 +72,7 @@
     const a=(txt,klass,url,icon)=>`<a class="ddsh-syre-pill ${klass}" href="${esc(safeUrl(url)||'#')}"${safeUrl(url)?' target="_blank" rel="noopener noreferrer"':''}><i class="bi ${icon}"></i> <span>${esc(txt)}</span></a>`;
     return `<div class="ddsh-syre" style="${cssVars(s)}"><div class="ddsh-syre-top"><a class="ddsh-syre-pill ddsh-syre-brand" href="#">${esc(s.world)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder1)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder2)}</a></div><div class="ddsh-syre-window"><div class="ddsh-syre-toolbar"><div class="ddsh-syre-user"><span>@</span>${esc(s.account)}</div><div class="ddsh-syre-controls"><span><i class="bi bi-x-lg"></i></span><span><i class="bi bi-dash-lg"></i></span><span><i class="bi bi-copy"></i></span></div></div><div class="ddsh-syre-content"><div class="ddsh-syre-photo" style="position:relative!important;overflow:hidden!important">${safeUrl(s.photo)?`<img src="${esc(safeUrl(s.photo))}" style="${photoStyles(s)}">`:''}</div><div class="ddsh-syre-rp"><div class="ddsh-syre-rpbox"><div class="ddsh-syre-rplabel"><i class="bi bi-chevron-right"></i> ${esc(s.filename)}</div><div class="ddsh-syre-rptext">${plainBB(s.roleplay)}</div></div></div></div></div><div class="ddsh-syre-bottom">${a(s.music,'ddsh-syre-music',s.musicUrl,'bi-music-note-beamed')}${a(s.linkLabel,'ddsh-syre-link',s.linkUrl,'bi-suit-heart-fill')}</div></div><div class="ddshcr-ccyword"><span></span></div>`;
   }
-  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:hidden!important;background:transparent;scrollbar-width:none!important;scrollbar-color:transparent transparent!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}body{width:800px;min-height:50px;height:auto!important;max-height:none!important} .ddsh-syre{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}</body></html>`;}
+  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:hidden!important;background:transparent;scrollbar-width:none!important;scrollbar-color:transparent transparent!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}body{width:800px;min-height:50px;height:auto!important;max-height:none!important} .ddsh-syre{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}<div data-code015-end style="height:1px!important;clear:both!important;display:block!important"></div></body></html>`;}
   const colorField=(k)=>`<label class="dds-color-field"><span>${labels[k]}</span><div><input type="color" data-015-picker="${k}" value="${COLORS[k]}"><input type="text" data-015="${k}" data-dds-v236-counter="true" value="${COLORS[k]}"></div></label>`;
   const field=(label,key,kind='text')=>`<label class="dds-field"><span>${label}</span><input type="${kind}" data-015="${key}" data-dds-field-key="code015-${key}" value=""></label>`;
   const row=(label,key,min,max,value)=>`<label class="dds-position-row"><span>${label}</span><small>${key==='photoZoom'?'ออก':'ต้น'}</small><input data-015="${key}" type="range" min="${min}" max="${max}" value="${value}"><small>${key==='photoZoom'?'เข้า':'ปลาย'}</small><output data-015-output="${key}">${value}%</output></label>`;
@@ -39,71 +80,65 @@
     panel=document.createElement('section');panel.className='dds-panel dds-protected-commission-editor dds-code015-editor';panel.dataset.panel='editor-code015';
     panel.innerHTML=`<div class="dds-editor-heading"><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>cyworld.exe</h1><p>click click post!</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE015</strong></div><div class="dds-code015-stage"><div class="dds-code015-fit"><iframe title="CODE015 live preview" data-015-preview></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-code015-savebar"><div><strong>บันทึกแบบร่าง</strong><small data-015-status>ยังไม่มีแบบร่าง</small></div><input data-015-save-name placeholder="กรอกชื่อการบันทึก"><button type="button" data-015-save>SAVE AS</button><select data-015-saves><option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option></select><button type="button" data-015-load>LOAD</button><button type="button" data-015-delete>DELETE</button></div><div class="dds-protected-commission-scroll"><section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${Object.keys(COLORS).map(colorField).join('')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ World / โฟลเดอร์</h2></div><div class="dds-form-grid">${field('ชื่อ World','world')}${field('ชื่อไฟล์ 001','folder1')}${field('ชื่อไฟล์ 002','folder2')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อบัญชีและชื่อไฟล์</h2></div><div class="dds-form-grid">${field('ชื่อแอคเค้า','account')}${field('ชื่อไฟล์ .exe','filename')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field('URL รูปภาพ','photo','url')}</div><div class="dds-image-position">${row('ตำแหน่งรูป แนวนอน','photoX',0,100,50)}${row('ตำแหน่งรูป แนวตั้ง','photoY',0,100,50)}${row('ซูมรูป','photoZoom',50,250,100)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea id="dds-code015-roleplay" data-015="roleplay" data-dds-field-key="code015-roleplay" rows="8" placeholder="เพิ่มเนื้อหาโรลเพลย์..."></textarea><div class="dds-word-counter" data-015-counter><span class="dds-word-counter-label">จำนวนคำ</span> <strong><span data-015-count>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section><section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>เพลงและลิงก์</h2></div><div class="dds-form-grid">${field('ชื่อเพลง','music')}${field('ข้อความ Click me','linkLabel')}${field('URL เพลง (จะใส่ก็ได้ ไม่ใส่ก็ได้)','musicUrl','url')}${field('URL ลิงก์ (จะใส่ก็ได้ ไม่ใส่ก็ได้)','linkUrl','url')}</div></section></div><section class="dds-protected-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-015-copy>COPY CODE <span>↗</span></button><button type="button" data-015-reset>RESET</button></div></section></div></div>`;
     document.querySelector('.dds-main')?.append(panel);
-    panel.querySelectorAll('[data-015]').forEach(el=>el.addEventListener('input',()=>{state[el.dataset['015']]=el.value;const k=el.dataset['015'];panel.querySelector(`[data-015-output="${k}"]`)?.replaceChildren(document.createTextNode(el.value+'%'));const picker=panel.querySelector(`[data-015-picker="${k}"]`);if(picker&&/^#[\da-f]{6}$/i.test(el.value))picker.value=el.value;updateCounter();if(k==='photoX'||k==='photoY'||k==='photoZoom'){const iframe=panel.querySelector('[data-015-preview]');if(iframe?.contentDocument?.querySelector('.ddsh-syre-photo img'))applyPhotoTransform(iframe);}else render();scheduleSave();}));
-    panel.querySelectorAll('[data-015-picker]').forEach(el=>el.addEventListener('input',()=>{let k=el.dataset['015Picker'];state[k]=el.value;panel.querySelector(`[data-015="${k}"]`).value=el.value;render();scheduleSave();}));
+    panel.querySelectorAll('[data-015]').forEach(el=>el.addEventListener('input',()=>{state[el.dataset['015']]=el.value;const k=el.dataset['015'];panel.querySelector(`[data-015-output="${k}"]`)?.replaceChildren(document.createTextNode(el.value+'%'));const picker=panel.querySelector(`[data-015-picker="${k}"]`);if(picker&&/^#[\da-f]{6}$/i.test(el.value))picker.value=el.value;updateCounter();patchLivePreview(k);scheduleSave();}));
+    panel.querySelectorAll('[data-015-picker]').forEach(el=>el.addEventListener('input',()=>{let k=el.dataset['015Picker'];state[k]=el.value;panel.querySelector(`[data-015="${k}"]`).value=el.value;patchLivePreview(k);scheduleSave();}));
     panel.querySelector('[data-015-copy]').onclick=()=>{const code=`<link href="${STYLE}" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">`+codeMarkup(state);navigator.clipboard.writeText(code).then(()=>{panel.querySelector('[data-015-copy]').textContent='COPIED ✓';setTimeout(()=>panel.querySelector('[data-015-copy]').textContent='COPY CODE ↗',1200)}).catch(()=>{});};
     panel.querySelector('[data-015-reset]').onclick=()=>{state=BLANK();sync();scheduleSave();};
     panel.querySelector('[data-015-save]').onclick=()=>{const name=panel.querySelector('[data-015-save-name]').value.trim();if(!name)return;let saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}');saves[name]={...state};localStorage.setItem(KEY+':named',JSON.stringify(saves));refreshSaves();panel.querySelector('[data-015-saves]').value=name;};
     panel.querySelector('[data-015-load]').onclick=()=>{let name=panel.querySelector('[data-015-saves]').value;let saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}');if(saves[name]){state={...BLANK(),...saves[name]};sync();}};
     panel.querySelector('[data-015-delete]').onclick=()=>{let name=panel.querySelector('[data-015-saves]').value;let saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}');delete saves[name];localStorage.setItem(KEY+':named',JSON.stringify(saves));refreshSaves();};
     if(typeof window.__ddsInstallBbcodeToolbarForTarget==='function')window.__ddsInstallBbcodeToolbarForTarget(panel.querySelector('[data-015="roleplay"]'));
-    new MutationObserver(()=>{const el=panel.querySelector('[data-015="roleplay"]');if(el&&state.roleplay!==el.value){state.roleplay=el.value;updateCounter();render();scheduleSave();}}).observe(panel.querySelector('.dds-protected-commission-scroll'),{childList:true,subtree:true});
+    new MutationObserver(()=>{const el=panel.querySelector('[data-015="roleplay"]');if(el&&state.roleplay!==el.value){state.roleplay=el.value;updateCounter();patchLivePreview('roleplay');scheduleSave();}}).observe(panel.querySelector('.dds-protected-commission-scroll'),{childList:true,subtree:true});
     refreshSaves();sync();return panel;
   }
   function refreshSaves(){let select=panel.querySelector('[data-015-saves]');let saves={};try{saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}')}catch{}select.innerHTML='<option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option>'+Object.keys(saves).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');}
   function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
-  // CODE015 preview renderer (rebuilt): the artwork always has a fixed
-  // 800px layout viewport. Only the outer wrapper is fitted to the stage.
-  // Zooming a photo never changes the iframe or the whole artwork scale.
-  let fitObserver=null;
-  let fitPending=0;
-  let measuredPage=null;
+  // CODE015 only: no iframe reload on input, no scale changes on photo controls.
+  // Two different dimensions: intrinsic artwork used for fitting, and safe iframe
+  // viewport (slightly taller) used for preventing clipping of the bottom buttons.
+  let fitObserver=null,fitPending=0,previewVersion=0;
   function artworkHeight(doc){
     const root=doc.querySelector('.ddsh-syre');
-    if(!root)return 0;
-    const body=doc.body;
-    const origin=body.getBoundingClientRect().top;
-    // Measure the REAL CODE015 content, not an iframe viewport previously
-    // forced to 2200px. The footer sits outside .ddsh-syre.
-    let bottom=Math.max(root.offsetTop+root.scrollHeight,root.getBoundingClientRect().bottom-origin);
-    const credit=doc.querySelector('.ddshcr-ccyword');
-    if(credit)bottom=Math.max(bottom,credit.offsetTop+credit.scrollHeight,credit.getBoundingClientRect().bottom-origin);
-    root.querySelectorAll('*').forEach(el=>{
-      if(el.closest('.ddsh-syre-photo'))return; // zoomed image is intentionally clipped
-      const r=el.getBoundingClientRect();
-      if(r.width&&r.height)bottom=Math.max(bottom,r.bottom-origin);
+    if(!root)return 800;
+    const body=doc.body, origin=body.getBoundingClientRect().top;
+    const bounds=el=>{const b=el.getBoundingClientRect();return b.height?b.bottom-origin:0;};
+    let bottom=Math.max(bounds(root), root.offsetTop+root.scrollHeight);
+    const footer=doc.querySelector('.ddshcr-ccyword');
+    if(footer)bottom=Math.max(bottom,bounds(footer));
+    const end=doc.querySelector('[data-code015-end]');
+    if(end)bottom=Math.max(bottom,bounds(end));
+    root.querySelectorAll('.ddsh-syre-top,.ddsh-syre-window,.ddsh-syre-bottom,.ddsh-syre-bottom > *').forEach(el=>{
+      bottom=Math.max(bottom,bounds(el));
     });
-    return Math.max(80,Math.ceil(bottom+28));
+    return Math.max(100,Math.ceil(bottom+32));
   }
-  function fitPreview(iframe){
+  function fitPreview(iframe,keepScale=false){
     if(!iframe?.isConnected||!panel?.classList.contains('is-active'))return;
     const doc=iframe.contentDocument;
-    const stage=iframe.closest('.dds-code015-stage');
-    const holder=iframe.parentElement;
+    const stage=iframe.closest('.dds-code015-stage'),holder=iframe.parentElement;
     if(!doc?.querySelector('.ddsh-syre')||!stage||!holder)return;
-    const naturalHeight=artworkHeight(doc);
-    const width=800;
-    const availW=Math.max(1,stage.clientWidth-28);
-    const availH=Math.max(1,stage.clientHeight-28);
-    const scale=Math.min(1,availW/width,availH/naturalHeight);
-    // CRITICAL: the iframe's actual unscaled height MUST match the content.
-    // A 2200px iframe inside a shorter wrapper lets visible content spill
-    // outside the scrolling box and look clipped after photo adjustments.
-    iframe.style.setProperty('width',width+'px','important');
-    iframe.style.setProperty('height',naturalHeight+'px','important');
+    const artwork=artworkHeight(doc);
+    const nativeHeight=Math.max(artwork+180,iframe.dataset.code015NativeHeight?Number(iframe.dataset.code015NativeHeight):0);
+    const availableWidth=Math.max(1,stage.clientWidth-28);
+    const availableHeight=Math.max(1,stage.clientHeight-28);
+    const originalScale=Number(iframe.dataset.code015Scale);
+    const scale=(keepScale && originalScale>0)?originalScale:Math.min(1,availableWidth/800,availableHeight/artwork);
+    iframe.style.setProperty('width','800px','important');
+    iframe.style.setProperty('height',nativeHeight+'px','important');
+    iframe.dataset.code015NativeHeight=String(nativeHeight);
+    iframe.dataset.code015Scale=String(scale);
     iframe.style.setProperty('transform',`scale(${scale})`,'important');
-    iframe.style.setProperty('top','0px','important');
-    iframe.style.setProperty('left','0px','important');
-    holder.style.setProperty('width',Math.ceil(width*scale)+'px','important');
-    holder.style.setProperty('height',Math.ceil(naturalHeight*scale)+'px','important');
+    iframe.style.setProperty('top','0','important');
+    iframe.style.setProperty('left','0','important');
+    holder.style.setProperty('width',Math.ceil(800*scale)+'px','important');
+    holder.style.setProperty('height',Math.ceil(nativeHeight*scale)+'px','important');
     holder.style.flex='0 0 auto';
-    measuredPage=doc;
   }
-  function requestFit(iframe){
+  function requestFit(iframe,keepScale=false){
     cancelAnimationFrame(fitPending);
-    fitPending=requestAnimationFrame(()=>fitPreview(iframe));
+    fitPending=requestAnimationFrame(()=>fitPreview(iframe,keepScale));
   }
   function watchPreview(iframe){
     if(fitObserver){fitObserver.disconnect();fitObserver=null;}
@@ -111,29 +146,28 @@
     if(!doc)return;
     const root=doc.querySelector('.ddsh-syre');
     if(root&&typeof ResizeObserver!=='undefined'){
-      fitObserver=new ResizeObserver(()=>requestFit(iframe));
+      fitObserver=new ResizeObserver(()=>requestFit(iframe,true));
       fitObserver.observe(root);
     }
-    doc.querySelectorAll('link[rel="stylesheet"]').forEach(link=>{
-      link.addEventListener('load',()=>requestFit(iframe),{once:true});
-    });
-    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)requestFit(iframe);});
-    doc.querySelectorAll('img').forEach(img=>{
-      if(!img.complete)img.addEventListener('load',()=>requestFit(iframe),{once:true});
-    });
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach(link=>link.addEventListener('load',()=>requestFit(iframe),{once:true}));
+    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)requestFit(iframe)});
+    doc.querySelectorAll('img').forEach(img=>{if(!img.complete)img.addEventListener('load',()=>requestFit(iframe,true),{once:true});});
   }
   function render(){
     if(!panel)return;
     const iframe=panel.querySelector('[data-015-preview]');
     if(!iframe)return;
-    measuredPage=null;
+    const version=++previewVersion;
     iframe.onload=()=>{
-      if(!iframe.isConnected)return;
+      if(!iframe.isConnected||version!==previewVersion)return;
+      iframe.dataset.code015Scale='';
+      iframe.dataset.code015NativeHeight='';
       watchPreview(iframe);
       requestFit(iframe);
     };
-    // Refresh only when contents/colors change, NEVER on the photo sliders.
     iframe.srcdoc=docHTML(state);
+    // External fonts/styles can delay the load event; size the local markup now.
+    requestAnimationFrame(()=>{if(version===previewVersion)requestFit(iframe);});
   }
   function fitCardPreview(frame){
     if(!frame?.isConnected)return;
