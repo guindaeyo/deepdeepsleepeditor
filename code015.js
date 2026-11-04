@@ -37,7 +37,7 @@
   const row=(label,key,min,max,value)=>`<label class="dds-position-row"><span>${label}</span><small>${key==='photoZoom'?'ออก':'ต้น'}</small><input data-015="${key}" type="range" min="${min}" max="${max}" value="${value}"><small>${key==='photoZoom'?'เข้า':'ปลาย'}</small><output data-015-output="${key}">${value}%</output></label>`;
   function createPanel(){
     panel=document.createElement('section');panel.className='dds-panel dds-protected-commission-editor dds-code015-editor';panel.dataset.panel='editor-code015';
-    panel.innerHTML=`<div class="dds-editor-heading"><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>cyworld.exe</h1><p>click click post!</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE015</strong></div><div class="dds-code015-stage"><iframe title="CODE015 live preview" data-015-preview></iframe></div></div><div class="dds-protected-commission-controls-column"><div class="dds-code015-savebar"><div><strong>บันทึกแบบร่าง</strong><small data-015-status>ยังไม่มีแบบร่าง</small></div><input data-015-save-name placeholder="กรอกชื่อการบันทึก"><button type="button" data-015-save>SAVE AS</button><select data-015-saves><option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option></select><button type="button" data-015-load>LOAD</button><button type="button" data-015-delete>DELETE</button></div><div class="dds-protected-commission-scroll"><section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${Object.keys(COLORS).map(colorField).join('')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ World / โฟลเดอร์</h2></div><div class="dds-form-grid">${field('ชื่อ World','world')}${field('ชื่อไฟล์ 001','folder1')}${field('ชื่อไฟล์ 002','folder2')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อบัญชีและชื่อไฟล์</h2></div><div class="dds-form-grid">${field('ชื่อแอคเค้า','account')}${field('ชื่อไฟล์ .exe','filename')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field('URL รูปภาพ','photo','url')}</div><div class="dds-image-position">${row('ตำแหน่งรูป แนวนอน','photoX',0,100,50)}${row('ตำแหน่งรูป แนวตั้ง','photoY',0,100,50)}${row('ซูมรูป','photoZoom',50,250,100)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea id="dds-code015-roleplay" data-015="roleplay" data-dds-field-key="code015-roleplay" rows="8" placeholder="เพิ่มเนื้อหาโรลเพลย์..."></textarea><div class="dds-word-counter" data-015-counter><span class="dds-word-counter-label">จำนวนคำ</span> <strong><span data-015-count>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section><section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>เพลงและลิงก์</h2></div><div class="dds-form-grid">${field('ชื่อเพลง','music')}${field('ข้อความ Click me','linkLabel')}${field('URL เพลง (จะใส่ก็ได้ ไม่ใส่ก็ได้)','musicUrl','url')}${field('URL ลิงก์ (จะใส่ก็ได้ ไม่ใส่ก็ได้)','linkUrl','url')}</div></section></div><section class="dds-protected-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-015-copy>COPY CODE <span>↗</span></button><button type="button" data-015-reset>RESET</button></div></section></div></div>`;
+    panel.innerHTML=`<div class="dds-editor-heading"><div><p class="dds-eyebrow">ROLEPLAY CODE EDITOR</p><h1>cyworld.exe</h1><p>click click post!</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>CODE015</strong></div><div class="dds-code015-stage"><div class="dds-code015-fit"><iframe title="CODE015 live preview" data-015-preview></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-code015-savebar"><div><strong>บันทึกแบบร่าง</strong><small data-015-status>ยังไม่มีแบบร่าง</small></div><input data-015-save-name placeholder="กรอกชื่อการบันทึก"><button type="button" data-015-save>SAVE AS</button><select data-015-saves><option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option></select><button type="button" data-015-load>LOAD</button><button type="button" data-015-delete>DELETE</button></div><div class="dds-protected-commission-scroll"><section class="dds-control-section"><div class="dds-control-title"><span>01</span><h2>สีของโคด</h2></div><div class="dds-color-grid">${Object.keys(COLORS).map(colorField).join('')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>02</span><h2>ชื่อ World / โฟลเดอร์</h2></div><div class="dds-form-grid">${field('ชื่อ World','world')}${field('ชื่อไฟล์ 001','folder1')}${field('ชื่อไฟล์ 002','folder2')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>03</span><h2>ชื่อบัญชีและชื่อไฟล์</h2></div><div class="dds-form-grid">${field('ชื่อแอคเค้า','account')}${field('ชื่อไฟล์ .exe','filename')}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>04</span><h2>รูปภาพ</h2></div><div class="dds-form-grid">${field('URL รูปภาพ','photo','url')}</div><div class="dds-image-position">${row('ตำแหน่งรูป แนวนอน','photoX',0,100,50)}${row('ตำแหน่งรูป แนวตั้ง','photoY',0,100,50)}${row('ซูมรูป','photoZoom',50,250,100)}</div></section><section class="dds-control-section"><div class="dds-control-title"><span>05</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความโรลเพลย์</span><textarea id="dds-code015-roleplay" data-015="roleplay" data-dds-field-key="code015-roleplay" rows="8" placeholder="เพิ่มเนื้อหาโรลเพลย์..."></textarea><div class="dds-word-counter" data-015-counter><span class="dds-word-counter-label">จำนวนคำ</span> <strong><span data-015-count>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section><section class="dds-control-section"><div class="dds-control-title"><span>06</span><h2>เพลงและลิงก์</h2></div><div class="dds-form-grid">${field('ชื่อเพลง','music')}${field('ข้อความ Click me','linkLabel')}${field('URL เพลง (จะใส่ก็ได้ ไม่ใส่ก็ได้)','musicUrl','url')}${field('URL ลิงก์ (จะใส่ก็ได้ ไม่ใส่ก็ได้)','linkUrl','url')}</div></section></div><section class="dds-protected-commission-copy"><div class="dds-control-title"><span>07</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-015-copy>COPY CODE <span>↗</span></button><button type="button" data-015-reset>RESET</button></div></section></div></div>`;
     document.querySelector('.dds-main')?.append(panel);
     panel.querySelectorAll('[data-015]').forEach(el=>el.addEventListener('input',()=>{state[el.dataset['015']]=el.value;const k=el.dataset['015'];panel.querySelector(`[data-015-output="${k}"]`)?.replaceChildren(document.createTextNode(el.value+'%'));const picker=panel.querySelector(`[data-015-picker="${k}"]`);if(picker&&/^#[\da-f]{6}$/i.test(el.value))picker.value=el.value;updateCounter();if(k==='photoX'||k==='photoY'||k==='photoZoom'){const iframe=panel.querySelector('[data-015-preview]');if(iframe?.contentDocument?.querySelector('.ddsh-syre-photo img'))applyPhotoTransform(iframe);}else render();scheduleSave();}));
     panel.querySelectorAll('[data-015-picker]').forEach(el=>el.addEventListener('input',()=>{let k=el.dataset['015Picker'];state[k]=el.value;panel.querySelector(`[data-015="${k}"]`).value=el.value;render();scheduleSave();}));
@@ -54,92 +54,85 @@
   function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
-  // CODE015 ONLY: the iframe is a viewport for the actual artwork, not a
-  // second 1800px-tall canvas. Measure the visible artwork and its credit.
-  // Photo cropping is confined to .ddsh-syre-photo and never changes this fit.
-  let code015HeightObserver=null;
-  let code015FitTimer=0;
-  function artworkSize(doc){
+  // CODE015 preview renderer (rebuilt): the artwork always has a fixed
+  // 800px layout viewport. Only the outer wrapper is fitted to the stage.
+  // Zooming a photo never changes the iframe or the whole artwork scale.
+  let fitObserver=null;
+  let fitPending=0;
+  let measuredPage=null;
+  function artworkHeight(doc){
     const root=doc.querySelector('.ddsh-syre');
-    if(!root)return null;
+    if(!root)return 0;
     const body=doc.body;
-    const origin=body.getBoundingClientRect();
-    const rootBox=root.getBoundingClientRect();
-    let bottom=Math.max(rootBox.bottom-origin.top,root.offsetTop+root.offsetHeight);
-    let right=Math.max(800,rootBox.right-origin.left);
+    const origin=body.getBoundingClientRect().top;
+    // Actual layout bounds, never body.scrollHeight (which depends on iframe height).
+    let last=root.getBoundingClientRect().bottom-origin;
     const credit=doc.querySelector('.ddshcr-ccyword');
-    if(credit){
-      const box=credit.getBoundingClientRect();
-      if(box.height)bottom=Math.max(bottom,box.bottom-origin.top);
-    }
-    for(const el of body.querySelectorAll('.ddsh-syre *, .ddshcr-ccyword *')){
-      if(el.closest('.ddsh-syre-photo'))continue;
-      const box=el.getBoundingClientRect();
-      if(!box.width||!box.height)continue;
-      bottom=Math.max(bottom,box.bottom-origin.top);
-      right=Math.max(right,box.right-origin.left);
-    }
-    return {width:Math.max(800,Math.ceil(right)),height:Math.max(1,Math.ceil(bottom+12))};
+    if(credit)last=Math.max(last,credit.getBoundingClientRect().bottom-origin);
+    // Include out-of-flow items except the transformed, clipped photo.
+    root.querySelectorAll('*').forEach(el=>{
+      if(el.closest('.ddsh-syre-photo'))return;
+      const rect=el.getBoundingClientRect();
+      if(rect.width&&rect.height)last=Math.max(last,rect.bottom-origin);
+    });
+    return Math.max(1,Math.ceil(last+22));
   }
-  function sizeFrame(iframe){
-    const doc=iframe?.contentDocument;
-    if(!doc || !iframe.isConnected)return;
-    const stage=iframe.parentElement;
-    if(!stage)return;
-    const art=artworkSize(doc);
-    if(!art)return;
-    const padding=24;
-    const stageW=Math.max(1,stage.clientWidth);
-    const stageH=Math.max(1,stage.clientHeight);
-    // Fit the WHOLE artwork, including its bottom row, to the available space.
-    // Crucially: no made-up minimum 1100px artwork / 1800px iframe height.
-    const scale=Math.min(1,(stageW-padding)/art.width,(stageH-padding)/art.height);
-    const shownH=art.height*scale;
-    const top=Math.max(8,Math.floor((stageH-shownH)/2));
-    iframe.style.setProperty('width',art.width+'px','important');
-    iframe.style.setProperty('height',art.height+'px','important');
-    iframe.style.setProperty('top',top+'px','important');
-    iframe.style.setProperty('transform',`translateX(-50%) scale(${scale})`,'important');
-    stage.style.setProperty('--cyworld-height',Math.ceil(top+shownH+12)+'px');
+  function fitPreview(iframe){
+    if(!iframe?.isConnected||!panel?.classList.contains('is-active'))return;
+    const doc=iframe.contentDocument;
+    const stage=iframe.closest('.dds-code015-stage');
+    const holder=iframe.parentElement;
+    if(!doc?.querySelector('.ddsh-syre')||!stage||!holder)return;
+    const naturalHeight=artworkHeight(doc);
+    const width=800;
+    const availW=Math.max(1,stage.clientWidth-28);
+    const availH=Math.max(1,stage.clientHeight-28);
+    const scale=Math.min(1,availW/width,availH/naturalHeight);
+    holder.style.width=Math.ceil(width*scale)+'px';
+    holder.style.height=Math.ceil(naturalHeight*scale)+'px';
+    holder.style.flex='0 0 auto';
+    iframe.style.setProperty('width',width+'px','important');
+    // Keep enough space below the artwork inside the iframe; its extra
+    // transparent area is not part of the holder and cannot crop the artwork.
+    iframe.style.setProperty('height',Math.max(2200,naturalHeight+80)+'px','important');
+    iframe.style.setProperty('transform',`scale(${scale})`,'important');
+    iframe.style.setProperty('top','0px','important');
+    iframe.style.setProperty('left','0px','important');
+    measuredPage=doc;
   }
-  function scheduleFrameFit(iframe){
-    clearTimeout(code015FitTimer);
-    code015FitTimer=setTimeout(()=>sizeFrame(iframe),0);
+  function requestFit(iframe){
+    cancelAnimationFrame(fitPending);
+    fitPending=requestAnimationFrame(()=>fitPreview(iframe));
   }
-  function watchFrameSize(iframe){
-    if(code015HeightObserver){code015HeightObserver.disconnect();code015HeightObserver=null;}
+  function watchPreview(iframe){
+    if(fitObserver){fitObserver.disconnect();fitObserver=null;}
     const doc=iframe.contentDocument;
     if(!doc)return;
     const root=doc.querySelector('.ddsh-syre');
-    if(root && window.ResizeObserver){
-      code015HeightObserver=new ResizeObserver(()=>scheduleFrameFit(iframe));
-      code015HeightObserver.observe(root);
+    if(root&&typeof ResizeObserver!=='undefined'){
+      fitObserver=new ResizeObserver(()=>requestFit(iframe));
+      fitObserver.observe(root);
     }
-    // Refit when external CSS or fonts finish loading, not on the photo slider.
     doc.querySelectorAll('link[rel="stylesheet"]').forEach(link=>{
-      link.addEventListener('load',()=>scheduleFrameFit(iframe),{once:true});
+      link.addEventListener('load',()=>requestFit(iframe),{once:true});
     });
-    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)sizeFrame(iframe);});
+    doc.fonts?.ready?.then(()=>{if(iframe.isConnected)requestFit(iframe);});
     doc.querySelectorAll('img').forEach(img=>{
-      if(!img.complete)img.addEventListener('load',()=>scheduleFrameFit(iframe),{once:true});
+      if(!img.complete)img.addEventListener('load',()=>requestFit(iframe),{once:true});
     });
   }
   function render(){
     if(!panel)return;
     const iframe=panel.querySelector('[data-015-preview]');
     if(!iframe)return;
-    const html=docHTML(state);
-    iframe.srcdoc=html;
-    let seenDoc=null;
-    const refresh=()=>{
+    measuredPage=null;
+    iframe.onload=()=>{
       if(!iframe.isConnected)return;
-      const doc=iframe.contentDocument;
-      if(!doc?.querySelector('.ddsh-syre'))return;
-      if(seenDoc!==doc){seenDoc=doc;watchFrameSize(iframe);}
-      sizeFrame(iframe);
+      watchPreview(iframe);
+      requestFit(iframe);
     };
-    iframe.onload=refresh;
-    [0,50,200,600,1500].forEach(t=>setTimeout(refresh,t));
+    // Refresh only when contents/colors change, NEVER on the photo sliders.
+    iframe.srcdoc=docHTML(state);
   }
   function fitCardPreview(frame){
     if(!frame?.isConnected)return;
@@ -183,6 +176,6 @@
   }
   function open(){if(!panel)createPanel();document.querySelectorAll('.dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));panel.classList.add('is-active');document.body.classList.add('dds-editor-mode','dds-force-editor-mode');document.documentElement.classList.add('dds-force-editor-mode');if(location.hash!=='#editor-code015')history.pushState({ddsCode015:true},'','#editor-code015');window.scrollTo(0,0);render();}
   function route(){if(location.hash==='#editor-code015'){open();return;}if(!panel)return;panel.classList.remove('is-active');}
-  function init(){card();if(!panel)createPanel();try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))sizeFrame(panel.querySelector('[data-015-preview]'));});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
+  function init(){card();if(!panel)createPanel();try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))requestFit(panel.querySelector('[data-015-preview]'));});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
