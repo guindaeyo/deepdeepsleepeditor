@@ -15973,3 +15973,33 @@ html body .dds-panel.dds-code015-editor .dds-code015-stage {
   overscroll-behavior:contain;
   min-height:0;
 }
+
+/* v341 — CODE015 only: slider movements cannot expose the red native scroll track.
+   The stage remains the scrolling surface. Its extra 18px are cropped by the
+   left preview column; controls on the right are entirely untouched. */
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column {
+  overflow:hidden !important;
+  min-width:0 !important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-stage {
+  box-sizing:border-box !important;
+  width:calc(100% + 18px) !important;
+  max-width:none !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-stage::-webkit-scrollbar,
+html body .dds-panel.dds-code015-editor .dds-code015-stage::-webkit-scrollbar-thumb,
+html body .dds-panel.dds-code015-editor .dds-code015-stage::-webkit-scrollbar-track {
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+  background:transparent !important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-stage iframe {
+  left:calc(50% - 9px) !important;
+  overflow:hidden !important;
+}

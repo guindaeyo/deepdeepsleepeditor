@@ -25,13 +25,13 @@
   }
   function applyPhotoTransform(iframe){
     const img=iframe?.contentDocument?.querySelector('.ddsh-syre-photo img');
-    if(img)img.setAttribute('style',photoStyles(state));
+    if(img){img.setAttribute('style',photoStyles(state));}
   }
   function codeMarkup(s){
     const a=(txt,klass,url,icon)=>`<a class="ddsh-syre-pill ${klass}" href="${esc(safeUrl(url)||'#')}"${safeUrl(url)?' target="_blank" rel="noopener noreferrer"':''}><i class="bi ${icon}"></i> <span>${esc(txt)}</span></a>`;
     return `<div class="ddsh-syre" style="${cssVars(s)}"><div class="ddsh-syre-top"><a class="ddsh-syre-pill ddsh-syre-brand" href="#">${esc(s.world)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder1)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder2)}</a></div><div class="ddsh-syre-window"><div class="ddsh-syre-toolbar"><div class="ddsh-syre-user"><span>@</span>${esc(s.account)}</div><div class="ddsh-syre-controls"><span><i class="bi bi-x-lg"></i></span><span><i class="bi bi-dash-lg"></i></span><span><i class="bi bi-copy"></i></span></div></div><div class="ddsh-syre-content"><div class="ddsh-syre-photo" style="position:relative!important;overflow:hidden!important">${safeUrl(s.photo)?`<img src="${esc(safeUrl(s.photo))}" style="${photoStyles(s)}">`:''}</div><div class="ddsh-syre-rp"><div class="ddsh-syre-rpbox"><div class="ddsh-syre-rplabel"><i class="bi bi-chevron-right"></i> ${esc(s.filename)}</div><div class="ddsh-syre-rptext">${plainBB(s.roleplay)}</div></div></div></div></div><div class="ddsh-syre-bottom">${a(s.music,'ddsh-syre-music',s.musicUrl,'bi-music-note-beamed')}${a(s.linkLabel,'ddsh-syre-link',s.linkUrl,'bi-suit-heart-fill')}</div></div><div class="ddshcr-ccyword"><span></span></div>`;
   }
-  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:visible!important;background:transparent;scrollbar-width:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}body{width:800px;min-height:50px} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}</body></html>`;}
+  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:hidden!important;background:transparent;scrollbar-width:none!important;scrollbar-color:transparent transparent!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}body{width:800px;min-height:50px} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}</body></html>`;}
   const colorField=(k)=>`<label class="dds-color-field"><span>${labels[k]}</span><div><input type="color" data-015-picker="${k}" value="${COLORS[k]}"><input type="text" data-015="${k}" data-dds-v236-counter="true" value="${COLORS[k]}"></div></label>`;
   const field=(label,key,kind='text')=>`<label class="dds-field"><span>${label}</span><input type="${kind}" data-015="${key}" data-dds-field-key="code015-${key}" value=""></label>`;
   const row=(label,key,min,max,value)=>`<label class="dds-position-row"><span>${label}</span><small>${key==='photoZoom'?'ออก':'ต้น'}</small><input data-015="${key}" type="range" min="${min}" max="${max}" value="${value}"><small>${key==='photoZoom'?'เข้า':'ปลาย'}</small><output data-015-output="${key}">${value}%</output></label>`;
@@ -64,10 +64,11 @@
     const width=Math.max(800,Math.ceil(root.scrollWidth),Math.ceil(root.getBoundingClientRect().width));
     // The document can grow after external CSS, fonts or image assets finish loading.
     // Measure actual content, not the previous iframe viewport (which caused clipping).
+    // Measure the artwork only. The iframe document's scrollHeight includes its
+    // *previous* viewport height, producing runaway growth after photo transforms.
     const height=Math.max(800,
-      Math.ceil(root.scrollHeight),Math.ceil(root.getBoundingClientRect().height),
-      Math.ceil(doc.body.scrollHeight),Math.ceil(doc.documentElement.scrollHeight))+24;
-    const scale=Math.min(1,Math.max(0.1,(stage.clientWidth-24)/width));
+      Math.ceil(root.scrollHeight),Math.ceil(root.getBoundingClientRect().height))+36;
+    const scale=Math.min(1,Math.max(0.1,(stage.clientWidth-44)/width));
     iframe.style.width=width+'px';
     iframe.style.height=height+'px';
     iframe.style.transform=`translateX(-50%) scale(${scale})`;
