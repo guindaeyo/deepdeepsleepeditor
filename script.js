@@ -28498,7 +28498,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     refreshSaves();sync();return panel;
   }
   function refreshSaves(){let select=panel.querySelector('[data-015-saves]');let saves={};try{saves=JSON.parse(localStorage.getItem(KEY+':named')||'{}')}catch{}select.innerHTML='<option value="">กดเพื่อเลือกไฟล์ที่บันทึก</option>'+Object.keys(saves).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');}
-  function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();if(previewReady){Object.keys(state).forEach(patchLivePreview);centralFit();}else render();}
+  function sync(){panel.querySelectorAll('[data-015]').forEach(el=>{const k=el.dataset['015'];el.value=state[k]??'';panel.querySelector(`[data-015-output="${k}"]`)?.replaceChildren(document.createTextNode(el.value+'%'));});panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();if(previewReady){Object.keys(state).forEach(patchLivePreview);centralFit();}else render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
   // V355: Editor geometry is owned exclusively by the shared V210 central preview.
@@ -28519,7 +28519,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     iframe.addEventListener('load',()=>{
       previewReady=true;
       iframe.dataset.code015Loading='0';
-      for(const key of pendingLiveKeys)patchLivePreview(key);
+      // The iframe may have begun loading before a saved draft was restored.
+      // Always reconcile every property with the latest state after its first load.
+      for(const key of Object.keys(state))patchLivePreview(key);
       pendingLiveKeys.clear();
       centralFit();
     },{once:true});
@@ -28567,7 +28569,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   function open(){if(!panel)createPanel();document.querySelectorAll('.dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));panel.classList.add('is-active');document.body.classList.add('dds-editor-mode','dds-force-editor-mode');document.documentElement.classList.add('dds-force-editor-mode');if(location.hash!=='#editor-code015')history.pushState({ddsCode015:true},'','#editor-code015');window.scrollTo(0,0);if(!previewReady)render();else centralFit();}
   function route(){if(location.hash==='#editor-code015'){open();return;}if(!panel)return;panel.classList.remove('is-active');}
-  function init(){card();if(!panel)createPanel();try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))centralFit();});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
+  function init(){
+    // Restore the saved state BEFORE createPanel() starts the first iframe render.
+    // Otherwise input values restore correctly while the preview stays blank.
+    try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')state={...BLANK(),...v};}catch{}
+    card();if(!panel)createPanel();else sync();route();window.addEventListener('hashchange',route);window.addEventListener('popstate',()=>setTimeout(route,0));window.addEventListener('resize',()=>{if(panel.classList.contains('is-active'))centralFit();});document.addEventListener('click',e=>{if(e.target.closest('[data-015-open]'))return;if(panel?.classList.contains('is-active')&&e.target.closest('[data-page],[data-go],[data-browser-page]'))panel.classList.remove('is-active');},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
