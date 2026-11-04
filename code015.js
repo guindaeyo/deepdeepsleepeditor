@@ -55,42 +55,49 @@
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
   let code015HeightObserver=null;
-  // Measure the real last visible element, not just the frame's initial scrollHeight.
-  // The photo is deliberately excluded: its transforms are clipped inside its own box.
-  function artworkSize(root){
-    const rect=root.getBoundingClientRect();
-    let bottom=Math.max(root.scrollHeight, root.offsetHeight, Math.ceil(rect.height));
-    let right=Math.max(800,root.scrollWidth,root.offsetWidth,Math.ceil(rect.width));
-    root.querySelectorAll('*').forEach(el=>{
-      if(el.closest('.ddsh-syre-photo'))return;
-      const cs=root.ownerDocument.defaultView.getComputedStyle(el);
-      if(cs.display==='none'||cs.visibility==='hidden'||cs.position==='fixed')return;
+  // CODE015: measure the entire artwork document, including elements OUTSIDE
+  // .ddsh-syre (e.g. the credit). Image transforms stay clipped in photo box.
+  // The iframe itself needs breathing room: a transformed img must never
+  // change the page scale or make the last buttons disappear at its edge.
+  function artworkSize(doc){
+    const root=doc.querySelector('.ddsh-syre');
+    if(!root)return {width:800,height:1000};
+    const body=doc.body;
+    const origin=body.getBoundingClientRect();
+    let bottom=Math.max(body.scrollHeight,root.scrollHeight,root.offsetHeight);
+    let right=Math.max(800,body.scrollWidth,root.scrollWidth);
+    for(const el of body.querySelectorAll('*')){
+      if(el.closest('.ddsh-syre-photo'))continue;
+      const style=doc.defaultView.getComputedStyle(el);
+      if(style.display==='none'||style.visibility==='hidden'||style.position==='fixed')continue;
       const r=el.getBoundingClientRect();
-      if(r.width===0&&r.height===0)return;
-      bottom=Math.max(bottom,Math.ceil(r.bottom-rect.top));
-      right=Math.max(right,Math.ceil(r.right-rect.left));
-    });
-    return {width:Math.ceil(right),height:Math.ceil(bottom+36)};
+      if(!r.width&&!r.height)continue;
+      bottom=Math.max(bottom,Math.ceil(r.bottom-origin.top));
+      right=Math.max(right,Math.ceil(r.right-origin.left));
+    }
+    // Include the final credit and a bottom safety margin, even when the
+    // external stylesheet positions content outside the main card's height.
+    return {width:Math.ceil(right),height:Math.ceil(bottom+96)};
   }
   function sizeFrame(iframe){
     const doc=iframe?.contentDocument;
     if(!doc||!iframe.isConnected)return;
     const stage=iframe.parentElement;
-    const root=doc.querySelector('.ddsh-syre');
-    if(!root||!stage)return;
-    const {width,height}=artworkSize(root);
-    // Fit the WHOLE artwork into the visible LIVE PREVIEW, not just its width.
-    // IMPORTANT: photoX/photoY/photoZoom never call sizeFrame: sliders only
-    // transform the photo inside its clipped box, not the artwork or iframe.
+    if(!stage||!doc.querySelector('.ddsh-syre'))return;
+    const {width,height}=artworkSize(doc);
+    // Fit to WIDTH only. If the artwork exceeds the available height,
+    // the stage scrolls invisibly instead of clipping off the bottom.
+    // Slider changes call only applyPhotoTransform(), never sizeFrame().
     const availableWidth=Math.max(1,stage.clientWidth-44);
-    const availableHeight=Math.max(1,stage.clientHeight-28);
-    const scale=Math.min(1,availableWidth/width,availableHeight/height);
-    iframe.style.width=width+'px';
-    iframe.style.height=height+'px';
-    iframe.style.transform=`translateX(-50%) scale(${scale})`;
-    // Keep stage scrollable if content subsequently grows; the initial view
-    // must show all of the artwork without cropping its final buttons.
-    const fullHeight=Math.ceil(height*scale+24);
+    const scale=Math.min(1,availableWidth/width);
+    const frameHeight=Math.max(height+120,doc.body.scrollHeight+120);
+    const heightPx=frameHeight+'px';
+    const widthPx=width+'px';
+    const transform=`translateX(-50%) scale(${scale})`;
+    if(iframe.style.height!==heightPx)iframe.style.setProperty('height',heightPx,'important');
+    if(iframe.style.width!==widthPx)iframe.style.setProperty('width',widthPx,'important');
+    if(iframe.style.transform!==transform)iframe.style.setProperty('transform',transform,'important');
+    const fullHeight=Math.ceil(frameHeight*scale+24);
     stage.style.setProperty('--cyworld-height',fullHeight+'px');
   }
   function watchFrameSize(iframe){
