@@ -65,17 +65,17 @@
     if(!root)return 0;
     const body=doc.body;
     const origin=body.getBoundingClientRect().top;
-    // Actual layout bounds, never body.scrollHeight (which depends on iframe height).
-    let last=root.getBoundingClientRect().bottom-origin;
+    // Measure the REAL CODE015 content, not an iframe viewport previously
+    // forced to 2200px. The footer sits outside .ddsh-syre.
+    let bottom=Math.max(root.offsetTop+root.scrollHeight,root.getBoundingClientRect().bottom-origin);
     const credit=doc.querySelector('.ddshcr-ccyword');
-    if(credit)last=Math.max(last,credit.getBoundingClientRect().bottom-origin);
-    // Include out-of-flow items except the transformed, clipped photo.
+    if(credit)bottom=Math.max(bottom,credit.offsetTop+credit.scrollHeight,credit.getBoundingClientRect().bottom-origin);
     root.querySelectorAll('*').forEach(el=>{
-      if(el.closest('.ddsh-syre-photo'))return;
-      const rect=el.getBoundingClientRect();
-      if(rect.width&&rect.height)last=Math.max(last,rect.bottom-origin);
+      if(el.closest('.ddsh-syre-photo'))return; // zoomed image is intentionally clipped
+      const r=el.getBoundingClientRect();
+      if(r.width&&r.height)bottom=Math.max(bottom,r.bottom-origin);
     });
-    return Math.max(1,Math.ceil(last+22));
+    return Math.max(80,Math.ceil(bottom+28));
   }
   function fitPreview(iframe){
     if(!iframe?.isConnected||!panel?.classList.contains('is-active'))return;
@@ -88,16 +88,17 @@
     const availW=Math.max(1,stage.clientWidth-28);
     const availH=Math.max(1,stage.clientHeight-28);
     const scale=Math.min(1,availW/width,availH/naturalHeight);
-    holder.style.width=Math.ceil(width*scale)+'px';
-    holder.style.height=Math.ceil(naturalHeight*scale)+'px';
-    holder.style.flex='0 0 auto';
+    // CRITICAL: the iframe's actual unscaled height MUST match the content.
+    // A 2200px iframe inside a shorter wrapper lets visible content spill
+    // outside the scrolling box and look clipped after photo adjustments.
     iframe.style.setProperty('width',width+'px','important');
-    // Keep enough space below the artwork inside the iframe; its extra
-    // transparent area is not part of the holder and cannot crop the artwork.
-    iframe.style.setProperty('height',Math.max(2200,naturalHeight+80)+'px','important');
+    iframe.style.setProperty('height',naturalHeight+'px','important');
     iframe.style.setProperty('transform',`scale(${scale})`,'important');
     iframe.style.setProperty('top','0px','important');
     iframe.style.setProperty('left','0px','important');
+    holder.style.setProperty('width',Math.ceil(width*scale)+'px','important');
+    holder.style.setProperty('height',Math.ceil(naturalHeight*scale)+'px','important');
+    holder.style.flex='0 0 auto';
     measuredPage=doc;
   }
   function requestFit(iframe){
