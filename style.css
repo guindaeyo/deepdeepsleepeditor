@@ -15949,3 +15949,27 @@ html body .dds-panel.dds-floyd-rp-editor.is-active .dds-floyd-rp-stage iframe {
 .dds-commission-grid > .dds-commission-card.dds-commission-search-hidden { display:none!important; }
 .dds-commission-grid > .dds-commission-search-empty {grid-column:1/-1; padding:38px 14px; margin:0; text-align:center; color:#d4a8ae; border:1px dashed #6d4148;}
 @media(max-width:600px){.dds-commission-grid > .dds-commission-search {padding:14px 12px 10px;}.dds-commission-search-field input[type="search"] {font-size:13px;}}
+
+/* v340 — CODE015 LIVE PREVIEW ONLY: keep the stage scrollable, but never draw its colored scrollbar.
+   Does not affect the Controls column or another editor. */
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *::before,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *::after {
+  scrollbar-width:none !important;
+  scrollbar-color:transparent transparent !important;
+  -ms-overflow-style:none !important;
+}
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *::-webkit-scrollbar,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-thumb,
+html body .dds-panel.dds-code015-editor .dds-protected-commission-preview-column *::-webkit-scrollbar-track {
+  display:none !important; width:0 !important; height:0 !important;
+  background:transparent !important;
+}
+html body .dds-panel.dds-code015-editor .dds-code015-stage {
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain;
+  min-height:0;
+}

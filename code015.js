@@ -31,7 +31,7 @@
     const a=(txt,klass,url,icon)=>`<a class="ddsh-syre-pill ${klass}" href="${esc(safeUrl(url)||'#')}"${safeUrl(url)?' target="_blank" rel="noopener noreferrer"':''}><i class="bi ${icon}"></i> <span>${esc(txt)}</span></a>`;
     return `<div class="ddsh-syre" style="${cssVars(s)}"><div class="ddsh-syre-top"><a class="ddsh-syre-pill ddsh-syre-brand" href="#">${esc(s.world)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder1)}</a><a class="ddsh-syre-pill ddsh-syre-folder" href="#"><i class="bi bi-folder-fill"></i> ${esc(s.folder2)}</a></div><div class="ddsh-syre-window"><div class="ddsh-syre-toolbar"><div class="ddsh-syre-user"><span>@</span>${esc(s.account)}</div><div class="ddsh-syre-controls"><span><i class="bi bi-x-lg"></i></span><span><i class="bi bi-dash-lg"></i></span><span><i class="bi bi-copy"></i></span></div></div><div class="ddsh-syre-content"><div class="ddsh-syre-photo" style="position:relative!important;overflow:hidden!important">${safeUrl(s.photo)?`<img src="${esc(safeUrl(s.photo))}" style="${photoStyles(s)}">`:''}</div><div class="ddsh-syre-rp"><div class="ddsh-syre-rpbox"><div class="ddsh-syre-rplabel"><i class="bi bi-chevron-right"></i> ${esc(s.filename)}</div><div class="ddsh-syre-rptext">${plainBB(s.roleplay)}</div></div></div></div></div><div class="ddsh-syre-bottom">${a(s.music,'ddsh-syre-music',s.musicUrl,'bi-music-note-beamed')}${a(s.linkLabel,'ddsh-syre-link',s.linkUrl,'bi-suit-heart-fill')}</div></div><div class="ddshcr-ccyword"><span></span></div>`;
   }
-  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:hidden!important;background:transparent}body{width:800px;min-height:50px} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}</body></html>`;}
+  function docHTML(s,card=false){return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${STYLE}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=DotGothic16&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><style>html,body{margin:0;overflow:visible!important;background:transparent;scrollbar-width:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}body{width:800px;min-height:50px} .ddsh-syre-photo{overflow:hidden}.ddsh-syre-photo img{width:100%;height:100%;object-fit:cover}</style></head><body>${codeMarkup(s)}</body></html>`;}
   const colorField=(k)=>`<label class="dds-color-field"><span>${labels[k]}</span><div><input type="color" data-015-picker="${k}" value="${COLORS[k]}"><input type="text" data-015="${k}" data-dds-v236-counter="true" value="${COLORS[k]}"></div></label>`;
   const field=(label,key,kind='text')=>`<label class="dds-field"><span>${label}</span><input type="${kind}" data-015="${key}" data-dds-field-key="code015-${key}" value=""></label>`;
   const row=(label,key,min,max,value)=>`<label class="dds-position-row"><span>${label}</span><small>${key==='photoZoom'?'ออก':'ต้น'}</small><input data-015="${key}" type="range" min="${min}" max="${max}" value="${value}"><small>${key==='photoZoom'?'เข้า':'ปลาย'}</small><output data-015-output="${key}">${value}%</output></label>`;
@@ -54,8 +54,52 @@
   function sync(){panel.querySelectorAll('[data-015]').forEach(el=>el.value=state[el.dataset['015']]??'');panel.querySelectorAll('[data-015-picker]').forEach(el=>el.value=state[el.dataset['015Picker']]);updateCounter();render();}
   function updateCounter(){let text=state.roleplay.replace(/\[[^\]]+\]/g,'').trim();let words=(text.match(/[\p{Script=Thai}]+|[\p{L}\p{N}]+/gu)||[]).length;panel.querySelector('[data-015-count]').textContent=words;}
   function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));panel.querySelector('[data-015-status]').textContent='บันทึกแล้ว';}catch{}},180);}
-  function sizeFrame(iframe){const doc=iframe.contentDocument;if(!doc||!iframe.isConnected)return;const stage=iframe.parentElement;const root=doc.querySelector('.ddsh-syre');if(!root)return;const width=Math.max(800,root.scrollWidth,root.getBoundingClientRect().width);const height=Math.max(root.scrollHeight,doc.body.scrollHeight)+40;const scale=Math.min(1,(stage.clientWidth-24)/width);iframe.style.width=width+'px';iframe.style.height=height+'px';iframe.style.transform=`translateX(-50%) scale(${scale})`;stage.style.setProperty('--cyworld-height',(height*scale+28)+'px');}
-  function render(){if(!panel)return;const iframe=panel.querySelector('[data-015-preview]');if(!iframe)return;iframe.onload=()=>{sizeFrame(iframe);[100,350,900].forEach(t=>setTimeout(()=>sizeFrame(iframe),t));};iframe.srcdoc=docHTML(state);}
+  let code015HeightObserver=null;
+  function sizeFrame(iframe){
+    const doc=iframe?.contentDocument;
+    if(!doc||!iframe.isConnected)return;
+    const stage=iframe.parentElement;
+    const root=doc.querySelector('.ddsh-syre');
+    if(!root||!stage)return;
+    const width=Math.max(800,Math.ceil(root.scrollWidth),Math.ceil(root.getBoundingClientRect().width));
+    // The document can grow after external CSS, fonts or image assets finish loading.
+    // Measure actual content, not the previous iframe viewport (which caused clipping).
+    const height=Math.max(800,
+      Math.ceil(root.scrollHeight),Math.ceil(root.getBoundingClientRect().height),
+      Math.ceil(doc.body.scrollHeight),Math.ceil(doc.documentElement.scrollHeight))+24;
+    const scale=Math.min(1,Math.max(0.1,(stage.clientWidth-24)/width));
+    iframe.style.width=width+'px';
+    iframe.style.height=height+'px';
+    iframe.style.transform=`translateX(-50%) scale(${scale})`;
+    stage.style.setProperty('--cyworld-height',Math.ceil(height*scale+30)+'px');
+  }
+  function watchFrameSize(iframe){
+    if(code015HeightObserver){code015HeightObserver.disconnect();code015HeightObserver=null;}
+    const doc=iframe.contentDocument;
+    if(!doc)return;
+    const root=doc.querySelector('.ddsh-syre');
+    if(root&&window.ResizeObserver){
+      code015HeightObserver=new ResizeObserver(()=>sizeFrame(iframe));
+      code015HeightObserver.observe(root);
+    }
+    doc.fonts?.ready?.then(()=>sizeFrame(iframe));
+    doc.querySelectorAll('img').forEach(img=>{
+      if(!img.complete)img.addEventListener('load',()=>sizeFrame(iframe),{once:true});
+    });
+  }
+  function render(){
+    if(!panel)return;
+    const iframe=panel.querySelector('[data-015-preview]');
+    if(!iframe)return;
+    iframe.onload=()=>{
+      sizeFrame(iframe);
+      watchFrameSize(iframe);
+      [100,350,900,1800].forEach(t=>setTimeout(()=>{
+        if(iframe.isConnected)sizeFrame(iframe);
+      },t));
+    };
+    iframe.srcdoc=docHTML(state);
+  }
   function fitCardPreview(frame){
     if(!frame?.isConnected)return;
     const holder=frame.parentElement;
