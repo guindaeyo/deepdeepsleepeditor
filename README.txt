@@ -1,1 +1,1 @@
-v359 — Fix overlapping Aphrodi controls. Right editor now uses central draft/scroll/copy three-row grid. Sections 01–06 are inside a single scrollable container. Other works unchanged. Replace index.html, script.js, style.css with these files.
+v360 — Aphrodi Franders: move all color editing controls to section 01, followed by text, images, image transforms and dimensions. No preview changes.
