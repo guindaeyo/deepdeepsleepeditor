@@ -15956,3 +15956,33 @@ html body .dds-panel.dds-code015-editor .dds-code015-stage > iframe[data-015-pre
   display:block!important; margin-left:auto!important; margin-right:auto!important;
   border:0!important; pointer-events:none!important;
 }
+
+
+/* Commission Aphrodi — unified central editor, 60/40 columns */
+html body .dds-aph-editor .dds-aph-layout{display:grid!important;grid-template-columns:minmax(0,3fr) minmax(0,2fr)!important;gap:12px!important;align-items:stretch;height:calc(100vh - 135px);min-height:540px;overflow:hidden}
+html body .dds-aph-editor .dds-aph-preview-column,html body .dds-aph-editor .dds-aph-controls{min-width:0;min-height:0;max-height:100%;overflow-y:auto;overflow-x:hidden}
+html body .dds-aph-editor .dds-aph-preview-column{display:flex;flex-direction:column;scrollbar-width:none!important}
+html body .dds-aph-editor .dds-aph-preview-column::-webkit-scrollbar,html body .dds-aph-editor .dds-aph-editor-stage::-webkit-scrollbar{display:none!important}
+html body .dds-aph-editor .dds-aph-controls{scrollbar-width:thin}
+.dds-aph-editor-stage{position:relative;flex:1;min-height:0;overflow:auto;scrollbar-width:none;scroll-behavior:auto}
+.dds-aph-editor-stage::-webkit-scrollbar{display:none}
+.dds-aph-editor-stage iframe,.dds-aph-card-stage iframe,.dds-aph-view-stage iframe{display:block;border:0;background:transparent;transform-origin:top left;position:absolute;top:0;left:0;max-width:none!important;min-width:0!important;pointer-events:none}
+.dds-aph-editor-stage .dds-aph-editor-spacer{width:1px;pointer-events:none}
+.dds-aph-card-stage{position:relative!important;display:block!important;overflow:hidden!important;width:100%!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;padding:0!important;transition:none!important}
+.dds-aph-card-stage .dds-roleplay-preview-badge{position:absolute;right:10px;top:10px;z-index:3}
+.dds-aph-card-stage iframe{pointer-events:none}
+.dds-aph-view-stage{position:relative;width:min(100%,1000px);margin:0 auto;min-height:300px;overflow:hidden}
+.dds-aph-view{min-height:100vh;padding:16px 16px 40px!important;overflow:auto}
+html.dds-aph-full-view,body.dds-aph-full-view{overflow:auto!important}
+.dds-aph-fields{padding:14px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dds-aph-field{display:flex;flex-direction:column;gap:7px;min-width:0;font-family:'Bai Jamjuree',sans-serif;font-size:12px;color:#bbb}
+.dds-aph-field span{font-weight:500}
+.dds-aph-field input[type=text],.dds-aph-field textarea{width:100%;min-width:0;box-sizing:border-box;background:#0c070a;border:1px solid #39222c;color:#eee;border-radius:3px;min-height:37px;padding:8px 9px;font-family:inherit;font-size:12px}
+.dds-aph-field textarea{resize:vertical}
+.dds-aph-slider input[type=range]{accent-color:#ce1e3e;width:100%}
+.dds-aph-slider output{color:#fff;font-variant-numeric:tabular-nums;margin-left:6px}
+.dds-aph-slider small{font-size:10px;color:#888}
+.dds-aph-color>div{display:flex;align-items:center;gap:7px}
+.dds-aph-color input[type=color]{flex:none;width:38px;height:37px;border:0;background:transparent;padding:0;cursor:pointer}
+.dds-aph-editor .dds-control-section{min-width:0}
+@media(max-width:850px){html body .dds-aph-editor .dds-aph-layout{grid-template-columns:minmax(0,1fr)!important;height:auto;min-height:0;overflow:visible}html body .dds-aph-editor .dds-aph-preview-column{height:min(65vh,680px);max-height:none}html body .dds-aph-editor .dds-aph-controls{max-height:none;overflow:visible}.dds-aph-fields{grid-template-columns:minmax(0,1fr)}}
