@@ -16015,3 +16015,65 @@ html body .dds-commission-grid .dds-aph-commission-card .dds-aph-card-stage > if
   transform-origin:top left!important;
   pointer-events:none!important;
 }
+
+
+/* v359 — Aphrodi editor: obey central 3-row dock layout, avoid overlapping form sections. */
+html body .dds-panel.dds-aph-editor .dds-aph-controls {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto minmax(0,1fr) auto!important;
+  gap:8px!important;
+  align-content:stretch!important;
+  overflow:hidden!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+}
+html body .dds-panel.dds-aph-editor .dds-aph-controls > .dds-protected-commission-draft {
+  grid-column:1!important;
+  grid-row:1!important;
+  position:relative!important;
+  margin:0!important;
+  min-height:0!important;
+  z-index:1!important;
+}
+html body .dds-panel.dds-aph-editor .dds-aph-controls > .dds-aph-controls-scroll {
+  grid-column:1!important;
+  grid-row:2!important;
+  display:block!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin;
+  overscroll-behavior:contain;
+}
+html body .dds-panel.dds-aph-editor .dds-aph-controls-scroll > .dds-control-section {
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0 0 10px!important;
+  transform:none!important;
+}
+html body .dds-panel.dds-aph-editor .dds-aph-controls > .dds-aph-copy-dock {
+  grid-column:1!important;
+  grid-row:3!important;
+  display:block!important;
+  position:relative!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:10px 15px!important;
+  z-index:2!important;
+}
+html body .dds-panel.dds-aph-editor .dds-aph-copy-dock .dds-control-title {margin-bottom:8px!important;}
+html body .dds-panel.dds-aph-editor .dds-aph-copy-dock .dds-editor-actions{display:flex;flex-wrap:wrap;gap:10px;}
+@media(max-width:850px){
+  html body .dds-panel.dds-aph-editor .dds-aph-controls{height:auto!important;max-height:none!important;overflow:visible!important;grid-template-rows:auto auto auto!important;}
+  html body .dds-panel.dds-aph-editor .dds-aph-controls > .dds-aph-controls-scroll{height:auto!important;max-height:none!important;overflow:visible!important;}
+}
