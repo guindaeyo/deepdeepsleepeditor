@@ -28618,9 +28618,17 @@ function docStart(frame,v){if(!frame)return;if(frame.dataset.aphLoaded==='true')
 function fit(frame){if(!frame?.isConnected)return;const d=frame.contentDocument;if(!d)return;const art=d.querySelector('[data-aph-root]');if(!art)return;const mode=frame.dataset.aphMode;const artRect=art.getBoundingClientRect();const artHeight=Math.ceil(Math.max(art.scrollHeight,artRect.height)+16);const docHeight=Math.ceil(Math.max(d.body.scrollHeight,art.getBoundingClientRect().bottom+20));const height=Math.max(artHeight,docHeight,400);const width=850;
 if(mode==='card'){
  const stage=frame.closest('.dds-aph-card-stage');if(!stage)return;
- const sw=Math.max(stage.clientWidth,1);const scale=Math.min(1,sw/width);
- frame.style.width=width+'px';frame.style.height=height+'px';frame.style.transform=`scale(${scale})`;
- stage.style.height=Math.ceil(height*scale)+'px';
+ // Showcase thumbnails share the same 16:10 frame as every other commission card.
+ // Fit the entire sketchbook INSIDE that fixed frame; never resize the card to the artwork.
+ stage.style.removeProperty('height');
+ const sw=Math.max(stage.clientWidth,1);
+ const sh=Math.max(stage.clientHeight,sw*10/16);
+ const inset=12;
+ const scale=Math.min(1,(sw-inset*2)/width,(sh-inset*2)/height);
+ const left=Math.round((sw-width*scale)/2);
+ const top=Math.round((sh-height*scale)/2);
+ frame.style.width=width+'px';frame.style.height=height+'px';
+ frame.style.transform=`translate(${left}px,${top}px) scale(${scale})`;
 }else if(mode==='view'){
  const stage=frame.closest('.dds-aph-view-stage');if(!stage)return;
  const sw=Math.max(stage.clientWidth-16,1);const scale=Math.min(1,sw/width);
