@@ -16086,3 +16086,7 @@ html body .dds-commission-grid .dds-afrole-card .dds-aph-card-stage{position:rel
 html body .dds-commission-grid .dds-afrole-card iframe[data-afrole-mode="card"]{position:absolute!important;left:0!important;top:0!important;transform-origin:top left!important;border:0!important;pointer-events:none!important;display:block!important;max-width:none!important;max-height:none!important}
 html body .dds-afrole-editor .dds-aph-fields .dds-aph-field textarea{min-height:90px;white-space:pre-wrap;resize:vertical}
 html body .dds-afrole-editor .dds-aph-fields .dds-aph-field textarea[data-afrole-field="role"]{min-height:180px}
+
+/* Center Aphrodi roleplay in the central editor preview without changing other commissions. */
+html body .dds-afrole-editor .dds-aph-editor-stage{overflow-x:hidden!important;overflow-y:auto!important;}
+html body .dds-afrole-editor .dds-aph-editor-stage iframe[data-afrole-mode="editor"]{margin:0!important;max-width:none!important;max-height:none!important;}

@@ -5468,7 +5468,7 @@ Comedy" rows="5"></textarea></label>
   <label class="dds-commission-search-label" for="ddsCommissionSearch">SEARCH COMMISSION</label>
   <div class="dds-commission-search-field">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></svg>
-    <input id="ddsCommissionSearch" type="search" placeholder="ค้นหาชื่อผู้จ้าง / ประเภทโค้ด / ชื่อผลงาน..." autocomplete="off" spellcheck="false" aria-controls="ddsCommissionSearchResults"/>
+    <input id="ddsCommissionSearch" type="search" placeholder="ค้นหาชื่อผู้จ้าง / ประเภทโคด / ชื่อผลงาน..." autocomplete="off" spellcheck="false" aria-controls="ddsCommissionSearchResults"/>
     <button id="ddsCommissionSearchClear" type="button" aria-label="ล้างคำค้นหา" hidden>×</button>
   </div>
   <p class="dds-commission-search-status" id="ddsCommissionSearchResults" role="status" aria-live="polite"></p>
@@ -6326,7 +6326,7 @@ Comedy" rows="5"></textarea></label>
             <section class="dds-control-section"><div class="dds-control-title"><span>07</span><h2>เนื้อหาโรลเพลย์</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full dds-code014-roleplay-field"><span>ข้อความโรลเพลย์</span>${toolbarMarkup()}<textarea data-code014-field="roleplay" data-dds-field-key="code014-roleplay" rows="8">${h(editorDefaults.roleplay)}</textarea><div class="dds-word-counter" data-code014-word-counter data-empty="false"><span class="dds-word-counter-label">จำนวนคำ</span><strong><span data-code014-word-count-number>0</span> คำ</strong><small>ไม่นับคำสั่ง BBCode</small></div></label></div></section>
             <section class="dds-control-section"><div class="dds-control-title"><span>08</span><h2>หมายเหตุ</h2></div><div class="dds-form-grid"><label class="dds-field dds-field-full"><span>ข้อความ NOTE</span><textarea data-code014-field="noteText" data-dds-field-key="code014-noteText" rows="4">${h(editorDefaults.noteText)}</textarea></label></div></section>
           </div>
-          <section class="dds-protected-commission-copy"><div class="dds-control-title"><span>09</span><h2>คัดลอกโคด</h2></div><p>คัดลอก CODE014 พร้อมสี รูป ตำแหน่ง และซูม โดยตำแหน่งชื่อจะติดไปกับโค้ดจริง</p><div class="dds-protected-commission-copy-actions"><button type="button" data-code014-copy>COPY CODE <span>↗</span></button><button type="button" data-code014-reset>RESET</button></div></section>
+          <section class="dds-protected-commission-copy"><div class="dds-control-title"><span>09</span><h2>คัดลอกโคด</h2></div><p>คัดลอก CODE014 พร้อมสี รูป ตำแหน่ง และซูม โดยตำแหน่งชื่อจะติดไปกับโคดจริง</p><div class="dds-protected-commission-copy-actions"><button type="button" data-code014-copy>COPY CODE <span>↗</span></button><button type="button" data-code014-reset>RESET</button></div></section>
         </div>
       </div>`;
     const main = document.querySelector(".dds-main");
@@ -7196,7 +7196,7 @@ Comedy" rows="5"></textarea></label>
       status.textContent=term ? (shown ? 'พบ '+shown+' ผลงาน จากทั้งหมด '+cards.length+' รายการ' : 'ไม่พบผลงานที่ตรงกับคำค้นหา') : 'ทั้งหมด '+cards.length+' ผลงาน';
       let empty=grid.querySelector(':scope > .dds-commission-search-empty');
       if(!shown&&term){
-        if(!empty){empty=document.createElement('p');empty.className='dds-commission-search-empty';empty.textContent='ไม่พบโค้ดที่ค้นหา ลองใช้ชื่อผู้จ้างหรือประเภทงานอื่น';grid.appendChild(empty);}
+        if(!empty){empty=document.createElement('p');empty.className='dds-commission-search-empty';empty.textContent='ไม่พบโคดที่ค้นหา ลองใช้ชื่อผู้จ้างหรือประเภทงานอื่น';grid.appendChild(empty);}
       }else if(empty){empty.remove();}
     };
     field.addEventListener('input',filter);
