@@ -16173,3 +16173,19 @@ html body .dds-panel.dds-crtz-view .dds-aph-view-stage *::-webkit-scrollbar{
 html body .dds-panel.dds-crtz-editor [data-crtz-spacer]{
   display:block!important;max-width:1px!important;min-width:1px!important;
 }
+
+
+/* V374 — Uniform readable typography in EDITOR CONTROLS ONLY.
+   Do not change preview frame, artwork, or the visual style of the code. */
+[data-panel^="editor-"] :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-scroll"],.dds-aph-controls,.dds-draft-manager,.dds-named-save-library) :is(label,.dds-field-label,.dds-range-label,.dds-editor-label,.dds-aph-field > span,.dds-control-title h2,.dds-control-title h3,.dds-color-field > span,.dds-field > span,.dds-position-row > span,.dds-position-row output),
+.dds-protected-commission-editor .dds-protected-commission-controls-column :is(label,.dds-field-label,.dds-aph-field > span,.dds-control-title h2,.dds-control-title h3,.dds-color-field > span,.dds-field > span){font-size:14px!important;line-height:1.5!important;}
+[data-panel^="editor-"] :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-scroll"],.dds-aph-controls,.dds-named-save-library) :is(input:not([type="range"]):not([type="color"]),select,textarea,[contenteditable="true"]),
+.dds-protected-commission-editor .dds-protected-commission-controls-column :is(input:not([type="range"]):not([type="color"]),select,textarea){font-size:14px!important;line-height:1.6!important;}
+[data-panel^="editor-"] :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-scroll"],.dds-aph-controls,.dds-named-save-library) :is(input,textarea)::placeholder{font-size:13px!important;}
+[data-panel^="editor-"] :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-scroll"],.dds-aph-controls,.dds-named-save-library) :is(button,.dds-rich-toolbar button,.dds-bbcode-toolbar button),
+.dds-protected-commission-editor .dds-protected-commission-controls-column button{font-size:12px!important;line-height:1.4!important;}
+[data-panel^="editor-"] :is(.dds-editor-controls,.dds-editor-tools-column,.dds-protected-commission-controls-column,.dds-protected-commission-scroll,[class*="controls-scroll"],.dds-aph-controls,.dds-draft-manager,.dds-named-save-library) :is(small,.dds-help,.dds-hint,.dds-word-counter,.dds-draft-status,.dds-copy-description),
+.dds-protected-commission-editor .dds-protected-commission-controls-column :is(small,.dds-help,.dds-hint,.dds-word-counter){font-size:12px!important;line-height:1.5!important;}
+/* Color settings must never reserve space for generated BBCode/counters. */
+[data-panel^="editor-"] :is(.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field) :is(.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-word-counter),
+.dds-protected-commission-editor :is(.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field) :is(.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-word-counter){display:none!important;}

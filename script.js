@@ -5828,11 +5828,16 @@ ${stylesheetLinks}
   }
 
   function isColorValueField(field) {
-    return Boolean(
-      field.closest(".dds-color-field") ||
-        field.type === "color" ||
-        /color/i.test(field.id || "")
-    );
+    if (!field || !field.matches) return false;
+    if (field.matches('input[type="color"], input[type="range"], input[type="url"], [data-bbcode-color], [data-dds-no-bbcode]')) return true;
+    if (field.closest('.dds-rich-toolbar, .dds-bbcode-toolbar, .dds-named-save-library, .dds-color-field, .dds-color-grid, .dds-aph-color, .dds-crtz-color-field')) return true;
+    const label = field.closest('label');
+    const title = (label?.querySelector(':scope > span,:scope > strong')?.textContent || '').trim();
+    const heading = field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent || '';
+    const keys = [field.id,field.name, ...Object.entries(field.dataset).filter(([key])=>/field|picker|key|color/i.test(key)).map(([,value])=>value)].join(' ');
+    if (/สี|color|colour|พื้นหลัง|background|border|ขอบ|opacity|rgba|hex|gradient/i.test(title+' '+keys)) return true;
+    if (/^(?:สีของโคด|สีทั้งหมด|เปลี่ยนสีทุกส่วน|สีของโค้ด|สีของโค้ดทั้งหมด|ปรับสี|สี)/i.test(heading.trim())) return true;
+    return false;
   }
 
   function shouldKeepBaselineValue(field) {
@@ -6144,6 +6149,8 @@ ${stylesheetLinks}
     ) {
       return "";
     }
+
+    if (isColorValueField(target)) return "";
 
     const label =
       target.closest?.("label");
@@ -27899,8 +27906,16 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     'hide':'ซ่อนข้อความ','spoiler':'สปอยล์','list':'รายการจุด','list-1':'รายการตัวเลข',
     'list-item':'รายการย่อย','hr':'เส้นคั่น','clear':'ล้างรูปแบบ'};
   let timer;
+  function isControlColor(field) {
+    if (field.matches('input[type="color"], input[type="range"], input[type="url"], [data-dds-no-bbcode]') || field.closest('.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field,.dds-rich-toolbar,.dds-bbcode-toolbar')) return true;
+    const label=field.closest('label');
+    const title=label?.querySelector(':scope > span,:scope > strong')?.textContent||'';
+    const heading=field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent||'';
+    const key=[field.id,field.name,...Object.values(field.dataset)].join(' ');
+    return /สี|color|colour|พื้นหลัง|background|ขอบ|border|rgba|opacity|hex/i.test(title+' '+key) || /^สี|เปลี่ยนสีทุกส่วน|ปรับสี/i.test(heading.trim());
+  }
   function isTarget(field) {
-    if (!field.matches(TEXTS) || field.closest('.dds-rich-toolbar, .dds-bbcode-toolbar, .dds-named-save-library')) return false;
+    if (!field.matches(TEXTS) || isControlColor(field) || field.closest('.dds-rich-toolbar, .dds-bbcode-toolbar, .dds-named-save-library')) return false;
     if (field.type === 'color' || field.matches('[data-bbcode-color],[data-dds-no-save]')) return false;
     const label = field.closest('label');
     const name = (label?.querySelector(':scope > span,:scope > strong')?.textContent || '').trim();
@@ -27998,7 +28013,10 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     });
   }
   function isRp(field) {
-    if (!field.matches(editorFields) || field.closest('.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-named-save-library')) return false;
+    if (!field.matches(editorFields) || field.matches('input[type="color"],input[type="range"],[data-dds-no-bbcode]') || field.closest('.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field,.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-named-save-library')) return false;
+    const sectionTitle=field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent||'';
+    const colorTitle=field.closest('label')?.querySelector(':scope > span,:scope > strong')?.textContent||'';
+    if (/สี|color|colour|พื้นหลัง|background|ขอบ|border|rgba|opacity|hex/i.test(colorTitle+' '+field.id+' '+field.name+' '+Object.values(field.dataset).join(' ')) || /^สี|เปลี่ยนสีทุกส่วน|ปรับสี/i.test(sectionTitle.trim())) return false;
     const label=field.closest('label');
     const name=(label?.querySelector(':scope > span,:scope > strong')?.textContent||'');
     const heading=field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent||'';
@@ -28857,5 +28875,48 @@ function requestEditor(fromRoute=false){if(sessionStorage.getItem('dds:cartier-r
 function install(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid');if(!grid)return false;card=document.createElement('article');card.className='dds-roleplay-card dds-commission-card dds-aph-commission-card dds-crtz-card';card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-aph-card-stage"><iframe class="dds-roleplay-card-preview-frame" data-crtz-mode="card" title="Cartier De Pelissier roleplay preview" scrolling="no" tabindex="-1"></iframe><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโรลเพลย์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Cartier De Pelissier</strong></p><div class="dds-commission-card-actions"><button type="button" class="dds-roleplay-edit" data-crtz-view>VIEW WORK <span>↗</span></button><button type="button" class="dds-roleplay-edit dds-commission-protected-edit" data-crtz-edit>EDIT CODE <span>↗</span></button></div></div>`;grid.append(card);card.querySelector('[data-crtz-view]').onclick=()=>openView();card.querySelector('[data-crtz-edit]').onclick=()=>requestEditor();start(card.querySelector('[data-crtz-mode="card"]'),defaults);if(window.ResizeObserver)new ResizeObserver(()=>scheduleFit(card.querySelector('[data-crtz-mode="card"]'))).observe(card.querySelector('.dds-aph-card-stage'));return true;}
 function route(){if(location.hash==='#commission'&&(editor?.classList.contains('is-active')||view?.classList.contains('is-active'))){showCommission();return}if(location.hash==='#'+EDIT&&!editor?.classList.contains('is-active'))requestEditor(true);if(location.hash==='#'+VIEW&&!view?.classList.contains('is-active'))openView(true);}
 function init(){let n=0;const t=setInterval(()=>{if(install()||++n>160)clearInterval(t)},90);window.addEventListener('hashchange',route);window.addEventListener('popstate',route);window.addEventListener('resize',()=>document.querySelectorAll('[data-crtz-mode]').forEach(scheduleFit));setTimeout(route,450);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+
+/* V374 — Central editor safety: exclude color configuration from rich text tooling. */
+(()=>{
+'use strict';
+if(window.__DDS_EDITOR_COLORS_V374__)return;window.__DDS_EDITOR_COLORS_V374__=true;
+const panels='[data-panel^="editor-"],.dds-protected-commission-editor,[class*="commission-editor"],[class*="-editor-panel"]';
+const fields='input[type="text"],input:not([type]),textarea';
+function isColor(field){
+ if(field.closest('.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field'))return true;
+ const l=field.closest('label');const t=l?.querySelector(':scope > span,:scope > strong')?.textContent||'';
+ const h=field.closest('.dds-control-section')?.querySelector('.dds-control-title h2,.dds-control-title h3')?.textContent||'';
+ return /สี|color|colour|ขอบ|border|พื้นหลัง|background|opacity|hex|rgba/i.test(t+' '+field.id+' '+field.name+' '+Object.values(field.dataset).join(' '))|| /^สี|เปลี่ยนสีทุกส่วน|ปรับสี/i.test(h.trim());
+}
+let scheduled=false;
+function cleanup(){scheduled=false;document.querySelectorAll(panels).forEach(panel=>{
+ panel.querySelectorAll(fields).forEach(field=>{
+  if(!isColor(field)||field.closest('.dds-rich-toolbar,.dds-bbcode-toolbar'))return;
+  const previous=field.previousElementSibling;
+  if(previous?.matches('.dds-rich-toolbar,.dds-bbcode-toolbar'))previous.remove();
+  if(field.id)panel.querySelectorAll('[data-toolbar-for]').forEach(bar=>{if(bar.dataset.toolbarFor===field.id)bar.remove()});
+  let next=field.nextElementSibling;
+  if(next?.classList.contains('dds-word-counter'))next.remove();
+  const label=field.closest('label');
+  if(label){label.classList.remove('dds-note-bbcode-field');label.querySelectorAll(':scope > .dds-word-counter,:scope > .dds-rich-toolbar,:scope > .dds-bbcode-toolbar').forEach(el=>el.remove())}
+  delete field.dataset.ddsBbcodeReady;
+  field.dataset.ddsV236Counter='true';
+  field.classList.remove('dds-v237-roleplay-text');
+  field.setAttribute('data-dds-no-bbcode','');
+ });
+ });}
+const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(cleanup)};
+// The navigation-dependent CDN bundle can register its own BBCode scanner.
+// Guard its public installer too, without preventing normal content fields from working.
+const originalInstaller=window.__ddsInstallBbcodeToolbarForTarget;
+if(typeof originalInstaller==='function' && !originalInstaller.__ddsV374Guarded){
+ const guarded=function(field){if(field && isColor(field))return;return originalInstaller.call(this,field)};
+ guarded.__ddsV374Guarded=true;
+ window.__ddsInstallBbcodeToolbarForTarget=guarded;
+}
+function init(){cleanup();document.addEventListener('click',schedule,true);window.addEventListener('hashchange',schedule);const root=document.querySelector('.dds-main')||document.body;new MutationObserver(records=>{if(records.some(r=>r.addedNodes.length))schedule()}).observe(root,{subtree:true,childList:true});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
