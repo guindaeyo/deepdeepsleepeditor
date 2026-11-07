@@ -28651,10 +28651,18 @@ if(mode==='card'){
  frame.style.width=width+'px';frame.style.height=height+'px';
  frame.style.transform=`translate(${left}px,${top}px) scale(${scale})`;
 }else if(mode==='view'){
+ // v382 Aphrodi PROFILE view only: fit and center on the full-browser canvas.
  const stage=frame.closest('.dds-aph-view-stage');if(!stage)return;
- const sw=Math.max(stage.clientWidth-16,1);const scale=Math.min(1,sw/width);
- frame.style.width=width+'px';frame.style.height=height+'px';frame.style.transform=`scale(${scale})`;
- stage.style.height=Math.ceil(height*scale+30)+'px';
+ const sw=Math.max(stage.clientWidth,1);
+ const vh=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0,400);
+ const scale=Math.min(1,Math.max(.05,(sw-64)/width),Math.max(.05,(vh-64)/height));
+ const artW=width*scale,artH=height*scale;
+ const canvasH=Math.max(vh,Math.ceil(artH+64));
+ const x=Math.max(0,Math.round((sw-artW)/2));
+ const y=Math.max(0,Math.round((canvasH-artH)/2));
+ frame.style.width=width+'px';frame.style.height=height+'px';
+ frame.style.transform=`translate(${x}px,${y}px) scale(${scale})`;
+ stage.style.height=canvasH+'px';
 }else{
  const stage=frame.closest('.dds-aph-editor-stage');if(!stage)return;
  const sw=Math.max(stage.clientWidth-24,1);const scale=Math.min(1,sw/width);
@@ -28821,6 +28829,34 @@ function fit(frame){
   const sw=Math.max(stage.clientWidth,1),sh=Math.max(stage.clientHeight,sw*10/16);
   const sc=Math.min(1,(sw-20)/width,(sh-20)/height);
   Object.assign(frame.style,{width:width+'px',height:height+'px',transform:`translate(${Math.round((sw-width*sc)/2)}px,${Math.round((sh-height*sc)/2)}px) scale(${sc})`});
+ }else if(mode==='view'){
+  // v382 Cartier VIEW WORK only. Do not use the iframe viewport's
+  // scrollHeight: a tall initialization iframe can make the content appear taller
+  // than the art, which shrinks/cuts the preview unpredictably.
+  const elements=['[data-crtz-root]','.ddjp-layout','.ddjp-right','.ddjp-roleplay','.ddjp-bottom','.ddjp-note','.ddshcr-commrolcrt'];
+  let actualHeight=600;
+  for(const selector of elements){
+   const node=d.querySelector(selector);if(!node)continue;
+   const box=node.getBoundingClientRect();
+   actualHeight=Math.max(actualHeight,Math.ceil(box.bottom+36),Math.ceil(box.top+node.scrollHeight+36));
+  }
+  const sw=Math.max(stage.clientWidth,1);
+  const vh=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0,400);
+  // Make the complete design visible at once, with space around the edges.
+  const sc=Math.max(.05,Math.min(.85,(sw-80)/width,(vh-80)/actualHeight));
+  const visualW=width*sc,visualH=actualHeight*sc;
+  const canvasH=Math.max(vh,Math.ceil(visualH+80));
+  const ox=Math.max(0,Math.round((sw-visualW)/2));
+  const oy=Math.max(0,Math.round((canvasH-visualH)/2));
+  frame.style.width=width+'px';
+  frame.style.height=Math.max(1800,actualHeight)+'px';
+  frame.style.transform=`translate(${ox}px,${oy}px) scale(${sc})`;
+  frame.dataset.crtzScale=String(sc);
+  frame.dataset.crtzOffsetY=String(oy);
+  frame.dataset.crtzMeasured='1';
+  const spacer=stage.querySelector('[data-crtz-spacer]');
+  if(spacer){spacer.style.height=canvasH+'px';spacer.style.width='1px';}
+  stage.style.height=canvasH+'px';
  }else{
   const sw=Math.max(stage.clientWidth,1),sc=Math.max(0.1,(sw-32)/width);
   const ox=Math.max(0,Math.round((sw-width*sc)/2)),oy=24;
