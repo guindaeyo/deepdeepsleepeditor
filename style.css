@@ -16114,3 +16114,9 @@ html body .dds-commission-grid .dds-crtz-card iframe[data-crtz-mode="card"]{posi
 @media(max-width:650px){html body .dds-crtz-editor .dds-aph-fields{grid-template-columns:minmax(0,1fr)!important}}
 
 html body .dds-crtz-editor .dds-crtz-color-field .dds-rich-toolbar,html body .dds-crtz-editor .dds-crtz-color-field .dds-bbcode-toolbar{display:none!important}
+
+/* v369: Cartier roleplay controls — keep prose fields in separate full-width rows. */
+html body .dds-crtz-editor .dds-aph-fields > .dds-crtz-full-row{grid-column:1/-1!important;display:flex!important;width:100%!important;min-width:0!important;max-width:none!important;}
+html body .dds-crtz-editor .dds-crtz-full-row textarea{display:block!important;width:100%!important;min-height:150px!important;box-sizing:border-box!important;resize:vertical!important;white-space:pre-wrap!important;}
+html body .dds-crtz-editor .dds-crtz-full-row textarea[data-crtz-field="roleplay"]{min-height:180px!important;}
+html body .dds-crtz-editor .dds-crtz-full-row textarea[data-crtz-field="noteText"]{min-height:95px!important;}
