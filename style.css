@@ -16144,3 +16144,32 @@ html body .dds-panel.dds-crtz-view iframe[data-crtz-mode="view"]{
 }
 html body .dds-panel.dds-crtz-editor [data-crtz-spacer],
 html body .dds-panel.dds-crtz-view [data-crtz-spacer]{display:block!important;width:1px!important;pointer-events:none!important;}
+
+/* v371 Cartier only: the preview has exactly one scroll container, visually hidden.
+   No red scrollbars in the preview and no movement of the art on edit. */
+html body .dds-panel.dds-crtz-editor .dds-aph-preview-column{
+  overflow:hidden!important;
+  min-height:0!important;
+}
+html body .dds-panel.dds-crtz-editor .dds-aph-editor-stage{
+  position:relative!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  overflow-anchor:none!important;
+}
+html body .dds-panel.dds-crtz-editor .dds-aph-preview-column *,
+html body .dds-panel.dds-crtz-view .dds-aph-view-stage *{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel.dds-crtz-editor .dds-aph-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-crtz-editor .dds-aph-preview-column *::-webkit-scrollbar,
+html body .dds-panel.dds-crtz-view .dds-aph-view-stage *::-webkit-scrollbar{
+  width:0!important;height:0!important;display:none!important;
+}
+html body .dds-panel.dds-crtz-editor [data-crtz-spacer]{
+  display:block!important;max-width:1px!important;min-width:1px!important;
+}

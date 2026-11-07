@@ -28744,7 +28744,7 @@ if(window.__DDS_CARTIER_ROLE__)return;window.__DDS_CARTIER_ROLE__=true;
 const EDIT='editor-commission-cartier-roleplay',VIEW='view-commission-cartier-roleplay';
 const CSS='https://guindaeyo.github.io/commisdeepdcsh/comm-crtzrole.css';
 const FONT='https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Jost:wght@400;500;600&display=swap';
-const EXTRA_CSS='\n.ddjp-rp{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important}\n.ddjp-rp .ddjp-layout{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;align-items:stretch!important}\n.ddjp-rp .ddjp-right{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;display:flex!important;flex-direction:column!important}\n.ddjp-rp .ddjp-roleplay{height:auto!important;max-height:none!important;overflow:visible!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-bottom{position:relative!important;inset:auto!important;bottom:auto!important;margin-top:auto!important;padding-top:18px!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-left{min-height:420px!important;overflow:hidden!important}\n.ddjp-rp .ddjp-photo-top,.ddjp-rp .ddjp-photo-bottom{overflow:hidden!important}\n.ddjp-rp .ddjp-image{transform-origin:center center!important;will-change:auto!important}\n';
+const EXTRA_CSS='\n.ddjp-rp{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important}\n.ddjp-rp .ddjp-layout{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;align-items:stretch!important}\n.ddjp-rp .ddjp-right{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;display:flex!important;flex-direction:column!important}\n.ddjp-rp .ddjp-roleplay{height:auto!important;max-height:none!important;overflow:visible!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-bottom{position:relative!important;inset:auto!important;bottom:auto!important;margin-top:auto!important;padding-top:18px!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-right{padding-bottom:40px!important}\n.ddjp-rp .ddjp-note{position:relative!important;overflow:visible!important}\n.ddjp-rp .ddjp-left{min-height:420px!important;overflow:hidden!important}\n.ddjp-rp .ddjp-photo-top,.ddjp-rp .ddjp-photo-bottom{overflow:hidden!important}\n.ddjp-rp .ddjp-image{transform-origin:center center!important;will-change:auto!important}\n';
 const STORE='dds:commission:cartier-roleplay:draft:v1';
 const HASH='5504b94bbc0ead4407d70ad3c6bb0f5b224c6a182f20ec44f54d947c60120d79';
 const defaults={"bg":"#f7f6f3","text":"#252525","subtext":"#777777","note":"#777777","photoBg":"#e6e3de","paperEdge":"#b6a99c","topImage":"https://iili.io/ntZVKej.jpg","bottomImage":"https://iili.io/ntZVBzQ.jpg","topX":50,"topY":50,"topZoom":1,"bottomX":50,"bottomY":50,"bottomZoom":1,"topHeight":45,"ringSize":1,"jpname":"色っぽい / エロい","english":"CARTIER","roleplay":"คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊","noteText":"เจ้าที่แรง - สโมสรชิมิ"};
@@ -28764,38 +28764,44 @@ function allVars(v){const parts=[];for(const k of [...Object.keys(colors),...Obj
 function imageStyle(v,which){const zoom=num(v[which+'Zoom'],0.2,3,1);const x=num(v[which+'X'],0,100,50),y=num(v[which+'Y'],0,100,50);const moveX=(x-50)*Math.max(0,zoom-1)/zoom,moveY=(y-50)*Math.max(0,zoom-1)/zoom;return `background-position:${x}% ${y}%!important;transform:translate(${moveX}%,${moveY}%) scale(${zoom})!important;transform-origin:center center!important;`;}
 function artwork(v){return `<div class="ddjp-rp" data-crtz-root style="${esc(allVars(v))}"><div class="ddjp-layout"><div class="ddjp-left"><div class="ddjp-photo-top"><div class="ddjp-image ddjp-image-top" style="${imageStyle(v,'top')}"></div></div><div class="ddjp-photo-bottom"><div class="ddjp-image ddjp-image-bottom" style="${imageStyle(v,'bottom')}"></div></div><div class="ddjp-paper-seam"></div><div class="ddjp-binding"><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span></div></div><div class="ddjp-right"><div class="ddjp-jpname" data-crtz-text="jpname">${esc(v.jpname)}</div><div class="ddjp-english" data-crtz-text="english">${esc(v.english)}</div><div class="ddjp-roleplay" data-crtz-text="roleplay">${esc(v.roleplay)}</div><div class="ddjp-bottom"><div class="ddjp-note" data-crtz-text="noteText">${esc(v.noteText)}</div></div></div></div></div><div class="ddshcr-commrolcrt"><span></span></div>`;}
 function output(v){return `<link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style>${artwork(v)}`;}
-function doc(v){return `<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;overflow:hidden!important}body{width:950px;min-width:950px}.ddjp-rp{margin-left:auto!important;margin-right:auto!important}</style><link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style></head><body>${artwork(v)}</body></html>`;}
+function doc(v){return `<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;overflow:visible!important;scrollbar-width:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important}body{width:950px;min-width:950px}.ddjp-rp{margin-left:auto!important;margin-right:auto!important}</style><link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style></head><body>${artwork(v)}</body></html>`;}
 function patch(frame,v){let d;try{d=frame?.contentDocument}catch{return}const root=d?.querySelector('[data-crtz-root]');if(!root)return;for(const k of [...Object.keys(colors),...Object.keys(imgKeys),...Object.keys(measures)]){const p=variable(k,v[k]);if(p)root.style.setProperty(p[0],p[1])}for(const k of txtKeys){const node=root.querySelector(`[data-crtz-text="${k}"]`);if(node&&node.textContent!==String(v[k]??''))node.textContent=String(v[k]??'')};for(const which of ['top','bottom']){const image=root.querySelector('.ddjp-image-'+which);if(image){image.style.cssText=imageStyle(v,which);}}if(frame.dataset.crtzMode==='editor' || frame.dataset.crtzMode==='view')scheduleHeight(frame);}
 function start(frame,v){if(!frame)return;if(frame.dataset.crtzReady){patch(frame,v);return}frame.dataset.crtzReady='1';frame.style.visibility='hidden';frame.addEventListener('load',()=>{patch(frame,frame.dataset.crtzMode==='editor'?values:defaults);const d=frame.contentDocument;const finalize=()=>{scheduleFit(frame);};if(d?.fonts?.ready)d.fonts.ready.then(finalize,finalize);else finalize();setTimeout(finalize,300);const css=d?.querySelector('link[href*="comm-crtzrole.css"]');if(css&&!css.sheet){css.addEventListener('load',finalize,{once:true});css.addEventListener('error',finalize,{once:true});}},{passive:true});frame.srcdoc=doc(v);}
 function contentHeight(frame){
- const d=frame?.contentDocument,root=d?.querySelector('[data-crtz-root]');if(!root)return 520;
- const base=root.getBoundingClientRect().top;
- let bottom=base+520;
- const list=[root,root.querySelector('.ddjp-layout'),root.querySelector('.ddjp-right'),root.querySelector('.ddjp-roleplay'),root.querySelector('.ddjp-bottom'),root.querySelector('.ddjp-note'),root.nextElementSibling];
- for(const el of list){if(!el)continue;const r=el.getBoundingClientRect();bottom=Math.max(bottom,r.bottom, r.top+el.scrollHeight);}
- return Math.max(520,Math.ceil(bottom-base+35));
+ const d=frame?.contentDocument,root=d?.querySelector('[data-crtz-root]');if(!root)return 680;
+ // Measure every visible art element against the iframe viewport, not the book alone.
+ // Bottom notes and decorative credits can extend beyond the book's scrollHeight.
+ let bottom=0;
+ for(const selector of ['[data-crtz-root]','.ddjp-layout','.ddjp-left','.ddjp-right','.ddjp-roleplay','.ddjp-bottom','.ddjp-note','.ddshcr-commrolcrt']){
+  const el=d.querySelector(selector);if(!el)continue;
+  const r=el.getBoundingClientRect();
+  bottom=Math.max(bottom,r.bottom,r.top+el.scrollHeight);
+ }
+ return Math.max(600,Math.ceil(bottom+50));
 }
 function fit(frame){
  if(!frame?.isConnected)return;let d;try{d=frame.contentDocument}catch{return}
  const root=d?.querySelector('[data-crtz-root]'),stage=frame.parentElement;if(!root||!stage)return;
- const bounds=root.getBoundingClientRect();const width=Math.max(Math.ceil(root.scrollWidth),Math.ceil(bounds.width),950);
- const height=contentHeight(frame),mode=frame.dataset.crtzMode;
+ const mode=frame.dataset.crtzMode;
+ const bounds=root.getBoundingClientRect();
+ const width=Math.max(Math.ceil(root.scrollWidth),Math.ceil(bounds.width),950);
+ // The initial iframe must be tall enough for the bottom note to participate in layout.
+ // This happens only on first open / window resize; input never reinitializes the iframe.
+ if(mode!=='card'&&!frame.dataset.crtzMeasured)frame.style.height='1800px';
+ const height=contentHeight(frame);
  if(mode==='card'){
   const sw=Math.max(stage.clientWidth,1),sh=Math.max(stage.clientHeight,sw*10/16);
   const sc=Math.min(1,(sw-20)/width,(sh-20)/height);
-  frame.style.width=width+'px';frame.style.height=height+'px';
-  frame.style.transform=`translate(${Math.round((sw-width*sc)/2)}px,${Math.round((sh-height*sc)/2)}px) scale(${sc})`;
+  Object.assign(frame.style,{width:width+'px',height:height+'px',transform:`translate(${Math.round((sw-width*sc)/2)}px,${Math.round((sh-height*sc)/2)}px) scale(${sc})`});
  }else{
   const sw=Math.max(stage.clientWidth,1),sc=Math.max(0.1,(sw-32)/width);
-  const ox=Math.max(0,Math.round((sw-width*sc)/2));
-  // Fixed origin: height changes must never recenter or rescale the artwork.
-  const oy=Math.max(20,Math.round((Math.max(stage.clientHeight,1)-height*sc)/2));
+  const ox=Math.max(0,Math.round((sw-width*sc)/2)),oy=24;
   frame.style.width=width+'px';frame.style.height=height+'px';
   frame.style.transform=`translate(${ox}px,${oy}px) scale(${sc})`;
-  frame.dataset.crtzScale=String(sc);frame.dataset.crtzOffsetY=String(oy);
+  frame.dataset.crtzScale=String(sc);frame.dataset.crtzOffsetY=String(oy);frame.dataset.crtzMeasured='1';
   const spacer=stage.querySelector('[data-crtz-spacer]');
-  if(spacer){spacer.style.height=Math.ceil(oy+height*sc+24)+'px';spacer.style.width='100%';}
-  else stage.style.height=Math.ceil(oy+height*sc+24)+'px';
+  if(spacer){spacer.style.height=Math.ceil(oy+height*sc+24)+'px';spacer.style.width='1px';}
+  stage.scrollTop=0;
  }
  frame.style.visibility='visible';
 }
