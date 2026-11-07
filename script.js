@@ -25300,6 +25300,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function isCommissionEditor(panel) {
     return Boolean(
       panel?.classList?.contains("dds-protected-commission-editor") &&
+      !panel.classList.contains("dds-crtz-editor") &&
       !panel.classList.contains("dds-code013-editor") &&
       !panel.classList.contains("dds-code014-editor")
     );
@@ -26708,6 +26709,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function isEditorPanel(panel) {
     if (!panel) return false;
+    // Cartier has one persistent custom preview; do not let V210 rewrite its geometry.
+    if (panel.classList.contains('dds-crtz-editor')) return false;
     const panelName = String(panel.dataset?.panel || "");
     if (/^view-/i.test(panelName) || panel.classList.contains("dds-commission-view-panel")) return false;
     return Boolean(
@@ -28744,7 +28747,7 @@ if(window.__DDS_CARTIER_ROLE__)return;window.__DDS_CARTIER_ROLE__=true;
 const EDIT='editor-commission-cartier-roleplay',VIEW='view-commission-cartier-roleplay';
 const CSS='https://guindaeyo.github.io/commisdeepdcsh/comm-crtzrole.css';
 const FONT='https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Jost:wght@400;500;600&display=swap';
-const EXTRA_CSS='\n.ddjp-rp{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important}\n.ddjp-rp .ddjp-layout{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;align-items:stretch!important}\n.ddjp-rp .ddjp-right{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;display:flex!important;flex-direction:column!important}\n.ddjp-rp .ddjp-roleplay{height:auto!important;max-height:none!important;overflow:visible!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-bottom{position:relative!important;inset:auto!important;bottom:auto!important;margin-top:auto!important;padding-top:18px!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-right{padding-bottom:40px!important}\n.ddjp-rp .ddjp-note{position:relative!important;overflow:visible!important}\n.ddjp-rp .ddjp-left{min-height:420px!important;overflow:hidden!important}\n.ddjp-rp .ddjp-photo-top,.ddjp-rp .ddjp-photo-bottom{overflow:hidden!important}\n.ddjp-rp .ddjp-image{transform-origin:center center!important;will-change:auto!important}\n';
+const EXTRA_CSS='\n.ddjp-rp{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important}\n.ddjp-rp .ddjp-layout{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;align-items:stretch!important}\n.ddjp-rp .ddjp-right{height:auto!important;min-height:420px!important;max-height:none!important;overflow:visible!important;display:flex!important;flex-direction:column!important}\n.ddjp-rp .ddjp-roleplay{height:auto!important;max-height:none!important;overflow:visible!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-bottom{position:relative!important;inset:auto!important;bottom:auto!important;margin-top:auto!important;padding-top:18px!important;flex:0 0 auto!important}\n.ddjp-rp .ddjp-right{padding-bottom:40px!important;min-width:0!important}\n.ddjp-rp .ddjp-page,.ddjp-rp .ddjp-roleplay,.ddjp-rp .ddjp-bottom{position:relative!important;max-height:none!important}\n.ddjp-rp .ddjp-roleplay{min-height:0!important}\n.ddjp-rp .ddjp-bottom{order:20!important;align-self:stretch!important}\n.ddjp-rp .ddjp-note{position:relative!important;overflow:visible!important}\n.ddjp-rp .ddjp-left{min-height:420px!important;overflow:hidden!important}\n.ddjp-rp .ddjp-photo-top,.ddjp-rp .ddjp-photo-bottom{overflow:hidden!important}\n.ddjp-rp .ddjp-image{transform-origin:center center!important;will-change:auto!important}\n';
 const STORE='dds:commission:cartier-roleplay:draft:v1';
 const HASH='5504b94bbc0ead4407d70ad3c6bb0f5b224c6a182f20ec44f54d947c60120d79';
 const defaults={"bg":"#f7f6f3","text":"#252525","subtext":"#777777","note":"#777777","photoBg":"#e6e3de","paperEdge":"#b6a99c","topImage":"https://iili.io/ntZVKej.jpg","bottomImage":"https://iili.io/ntZVBzQ.jpg","topX":50,"topY":50,"topZoom":1,"bottomX":50,"bottomY":50,"bottomZoom":1,"topHeight":45,"ringSize":1,"jpname":"色っぽい / エロい","english":"CARTIER","roleplay":"คนนั้นเป็นใครกันนะ ใส ๆ อ๊ะ ๆ น่ากิ๊นน่ากิน เหมือนเนื้อโกเบไหมหนอ ที่มันนุ่มคอ ที่มันนุ่มลิ้น อย่างนี้สิเทรนด์เกาหลี มองดูดี ๆ นึกว่าวอนบิน โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน ชักช้าลีลามากนัก ยึกยัก ยึกยัก จะไม่ทันกิน เหมือน ๆ นั่งกินก๋วยเตี๋ยว หันหลังแว้บเดียวถูกฉกลูกชิ้น ต้องสู้ ต้องสู้ ต้องซ่า ต้องกล้า ต้องกล้า ต้องกินบ้าบิ่น โอ๊ย ยังไง ๆ จะต้องเอามาเป็นทรัพย์สิน แต่แบบอุ๊ยดันมีจงอาง ยืนข้าง ๆ เป็นงูหวงไข่ ประมาณว่าใครแย่งแฟน ใครแย่งไปเอาตาย หวงสุดฤทธิ์ ไม่ให้ใกล้ ไม่ให้ชิดเข้าวงใน ก็แล้วใคร ใครล่ะใครจะกล้ากับเขา เจ้าที่แรง อ๊า จ้องแย่งซีน อ๊า เท้าเอววีน อ๊า ตาเขียวปั้ด อ๊า ดุคะดุ แถมหึงสู้ฟัด ก็เลยเลิกแลกหมัดกับเจ๊","noteText":"เจ้าที่แรง - สโมสรชิมิ"};
@@ -28777,6 +28780,13 @@ function contentHeight(frame){
   const r=el.getBoundingClientRect();
   bottom=Math.max(bottom,r.bottom,r.top+el.scrollHeight);
  }
+ const flow=d.querySelector('.ddjp-right');
+ const rootBox=root.getBoundingClientRect();
+ if(flow){
+  const f=flow.getBoundingClientRect();
+  bottom=Math.max(bottom,f.top+flow.scrollHeight,f.bottom);
+ }
+ bottom=Math.max(bottom,rootBox.top+root.scrollHeight,d.body.scrollHeight);
  return Math.max(600,Math.ceil(bottom+50));
 }
 function fit(frame){
@@ -28796,7 +28806,7 @@ function fit(frame){
  }else{
   const sw=Math.max(stage.clientWidth,1),sc=Math.max(0.1,(sw-32)/width);
   const ox=Math.max(0,Math.round((sw-width*sc)/2)),oy=24;
-  frame.style.width=width+'px';frame.style.height=height+'px';
+  frame.style.width=width+'px';frame.style.height=Math.max(1800,height)+'px';
   frame.style.transform=`translate(${ox}px,${oy}px) scale(${sc})`;
   frame.dataset.crtzScale=String(sc);frame.dataset.crtzOffsetY=String(oy);frame.dataset.crtzMeasured='1';
   const spacer=stage.querySelector('[data-crtz-spacer]');
@@ -28814,7 +28824,7 @@ function scheduleHeight(frame){
   const stage=frame.parentElement,oldTop=stage?.scrollTop||0;
   const height=contentHeight(frame);
   // Only grow/shrink the iframe height. The CSS transform, scale and X/Y never change.
-  if(Math.abs(parseFloat(frame.style.height||'0')-height)>1)frame.style.height=height+'px';
+  if(Math.abs(parseFloat(frame.style.height||'0')-Math.max(1800,height))>1)frame.style.height=Math.max(1800,height)+'px';
   const spacer=stage?.querySelector('[data-crtz-spacer]');
   if(spacer){const scale=Number(frame.dataset.crtzScale)||1,oy=Number(frame.dataset.crtzOffsetY)||20;
    spacer.style.height=Math.ceil(oy+height*scale+24)+'px';}
