@@ -28920,3 +28920,130 @@ if(typeof originalInstaller==='function' && !originalInstaller.__ddsV374Guarded)
 function init(){cleanup();document.addEventListener('click',schedule,true);window.addEventListener('hashchange',schedule);const root=document.querySelector('.dds-main')||document.body;new MutationObserver(records=>{if(records.some(r=>r.addedNodes.length))schedule()}).observe(root,{subtree:true,childList:true});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+
+/* v380: common full-viewport VIEW WORK shell. All rendering remains owned by each work. */
+(() => {
+  'use strict';
+  if (window.__DDS_VIEW_WORK_UNIFIED__) return;
+  window.__DDS_VIEW_WORK_UNIFIED__ = true;
+  const root = document.documentElement;
+  const main = () => document.querySelector('.dds-main');
+  const isViewer = (panel) => panel && panel.classList.contains('is-active') && (
+    panel.classList.contains('dds-commission-view-panel') ||
+    panel.classList.contains('dds-floyd-view') ||
+    panel.classList.contains('dds-floyd-rp-view') ||
+    panel.classList.contains('dds-aph-view') ||
+    /^view-(?:commission|activity|my-own-code)/.test(panel.dataset.panel || '')
+  );
+  let current = null;
+  let scheduled = false;
+  function scan() {
+    scheduled = false;
+    const panel = [...document.querySelectorAll('.dds-main > .dds-panel.is-active')].find(isViewer) || null;
+    if (current === panel) return;
+    if (current) current.classList.remove('dds-unified-view-panel');
+    current = panel;
+    const on = !!panel;
+    document.body.classList.toggle('dds-unified-view-open', on);
+    root.classList.toggle('dds-unified-view-open', on);
+    if (!on) return;
+    panel.classList.add('dds-unified-view-panel');
+    panel.querySelectorAll('iframe').forEach(f => f.setAttribute('scrolling', 'no'));
+    // Allow existing individual canvas-fit routines to see the full-sized viewport.
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+  }
+  function queue() { if (!scheduled) {scheduled = true;requestAnimationFrame(scan);} }
+  function init() {
+    const target = main();
+    if (!target) return;
+    new MutationObserver(queue).observe(target, {subtree:true, childList:true, attributes:true, attributeFilter:['class']});
+    window.addEventListener('popstate', queue);
+    window.addEventListener('hashchange', queue);
+    queue();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
+  else init();
+})();
+
+/* v381 — VIEW WORK returns to its originating work tab (Activity / My Own Code).
+   Keeps the unified full-canvas preview and all individual renderers unchanged. */
+(() => {
+  'use strict';
+  if (window.__DDS_VIEW_RETURN_TAB_V381__) return;
+  window.__DDS_VIEW_RETURN_TAB_V381__ = true;
+  const supported = new Set(['activity','my-own-code']);
+  let origin = null;
+  let viewing = false;
+
+  const commission = () => document.querySelector('.dds-panel[data-panel="commission"]');
+  const activeView = () => [...document.querySelectorAll('.dds-main > .dds-panel.is-active')]
+    .find(p => p.classList.contains('dds-unified-view-panel') ||
+      /^view-(?:activity|my-own-code)/.test(p.dataset.panel || '') ||
+      (p.classList.contains('dds-commission-view-panel') && p !== commission()));
+
+  function selectOrigin() {
+    if (!supported.has(origin)) return;
+    const tab = commission()?.querySelector(`[data-work-tab="${origin}"]`);
+    if (!tab) return;
+    // Use the existing tab handler, rather than imposing another layout or router.
+    tab.click();
+  }
+
+  function restoreWhenBack() {
+    if (!viewing || !supported.has(origin)) return;
+    if (activeView()) return;
+    if (commission()?.classList.contains('is-active')) {
+      selectOrigin();
+      viewing = false;
+    }
+  }
+
+  function returnFromViewer() {
+    if (!supported.has(origin) || !viewing) return;
+    const panel = commission();
+    if (!panel) return;
+    if (!panel.classList.contains('is-active')) {
+      if (typeof window.openPage === 'function') window.openPage('commission');
+      else {
+        document.querySelectorAll('.dds-main > .dds-panel.is-active').forEach(p=>p.classList.remove('is-active'));
+        panel.classList.add('is-active');
+        document.body.classList.remove('dds-editor-mode');
+      }
+    }
+    requestAnimationFrame(() => { selectOrigin(); viewing = false; });
+  }
+
+  document.addEventListener('click', event => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const open = target.closest('[data-work-panel] [data-view-my-own-code-history], [data-work-panel] button');
+    if (open) {
+      const workPanel = open.closest('[data-work-panel]');
+      const workType = workPanel?.dataset.workPanel;
+      if (supported.has(workType) && /VIEW WORK/i.test(open.textContent || '')) {
+        origin = workType;
+        viewing = true;
+        // Old activity viewers use replaceState('#commission'), which leaves no
+        // back-stack entry. Create one after the viewer has opened.
+        queueMicrotask(() => {
+          if (!activeView() || !viewing || origin !== workType) return;
+          const key = activeView()?.dataset.panel || 'view-work';
+          history.pushState({ddsWorkViewOrigin:workType}, '', `#${key}`);
+        });
+      }
+    }
+    if (viewing && target.closest('.dds-unified-view-panel .dds-back-button, .dds-unified-view-panel [data-my-own-code-history-back]')) {
+      // Existing per-work back handler goes first.
+      requestAnimationFrame(restoreWhenBack);
+    }
+  }, true);
+
+  window.addEventListener('popstate', () => {
+    if (!viewing) return;
+    // Browser Back from the dedicated viewer history entry.
+    if (location.hash === '#commission') returnFromViewer();
+    else requestAnimationFrame(restoreWhenBack);
+  });
+  window.addEventListener('hashchange', () => requestAnimationFrame(restoreWhenBack));
+})();

@@ -16227,3 +16227,84 @@ html body .dds-panel.dds-crtz-editor [data-crtz-spacer]{
     height:14px;
   }
 }
+
+/* v380 — A single full-browser VIEW WORK canvas for COMMISSION, ACTIVITY and MY OWN CODE.
+   No editor or card selectors; each work keeps its own iframe sizing/fit logic. */
+html.dds-unified-view-open,
+body.dds-unified-view-open{
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+body.dds-unified-view-open .dds-browser-chrome,
+body.dds-unified-view-open .dds-sidebar,
+body.dds-unified-view-open .dds-footer,
+body.dds-unified-view-open .dds-site-footer,
+body.dds-unified-view-open .dds-topbar{
+  display:none!important;
+}
+body.dds-unified-view-open .dds-app,
+body.dds-unified-view-open .dds-main{
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:100dvh!important;
+  width:100%!important;
+  max-width:none!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body .dds-main > .dds-panel.dds-unified-view-panel.is-active{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2000!important;
+  display:block!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:100dvh!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:#242424!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-main > .dds-panel.dds-unified-view-panel.is-active::-webkit-scrollbar,
+html body .dds-main > .dds-panel.dds-unified-view-panel.is-active *::-webkit-scrollbar{
+  display:none!important;width:0!important;height:0!important;
+}
+html body .dds-unified-view-panel .dds-commission-view-toolbar,
+html body .dds-unified-view-panel > .dds-back-button{
+  display:none!important;
+}
+html body .dds-unified-view-panel .dds-view-scroll-viewport{
+  width:100%!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+}
+html body .dds-unified-view-panel :is(.dds-commission-preview-stage,[class*="-view-stage"]){
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:100dvh!important;
+  max-height:none!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  overflow:visible!important;
+  background:#242424!important;
+}
+html body .dds-unified-view-panel iframe{
+  border:0!important;
+  background:transparent!important;
+  max-height:none!important;
+  scrollbar-width:none!important;
+}
