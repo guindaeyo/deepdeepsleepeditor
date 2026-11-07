@@ -16189,3 +16189,27 @@ html body .dds-panel.dds-crtz-editor [data-crtz-spacer]{
 /* Color settings must never reserve space for generated BBCode/counters. */
 [data-panel^="editor-"] :is(.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field) :is(.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-word-counter),
 .dds-protected-commission-editor :is(.dds-color-grid,.dds-color-field,.dds-aph-color,.dds-crtz-color-field) :is(.dds-rich-toolbar,.dds-bbcode-toolbar,.dds-word-counter){display:none!important;}
+
+/* v375 — COMMISSION & SHOWCASE: show a lock only for password-gated edit cards.
+   The EDIT CODE button is the existing source of truth; free-to-edit cards remain unmarked.
+   This is presentation-only and does not affect previews, navigation, or editing. */
+[data-panel="commission"] .dds-commission-card:has(.dds-commission-protected-edit) > .dds-roleplay-card-preview::before{
+  content:"🔒";
+  position:absolute;
+  top:12px;
+  left:12px;
+  z-index:12;
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:8px;
+  background:rgba(8,8,10,.75);
+  color:#fff;
+  font-family:system-ui,sans-serif;
+  font-size:17px;
+  line-height:1;
+  box-shadow:0 2px 12px rgba(0,0,0,.2);
+  pointer-events:none;
+}
