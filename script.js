@@ -28764,14 +28764,57 @@ function allVars(v){const parts=[];for(const k of [...Object.keys(colors),...Obj
 function imageStyle(v,which){const zoom=num(v[which+'Zoom'],0.2,3,1);const x=num(v[which+'X'],0,100,50),y=num(v[which+'Y'],0,100,50);const moveX=(x-50)*Math.max(0,zoom-1)/zoom,moveY=(y-50)*Math.max(0,zoom-1)/zoom;return `background-position:${x}% ${y}%!important;transform:translate(${moveX}%,${moveY}%) scale(${zoom})!important;transform-origin:center center!important;`;}
 function artwork(v){return `<div class="ddjp-rp" data-crtz-root style="${esc(allVars(v))}"><div class="ddjp-layout"><div class="ddjp-left"><div class="ddjp-photo-top"><div class="ddjp-image ddjp-image-top" style="${imageStyle(v,'top')}"></div></div><div class="ddjp-photo-bottom"><div class="ddjp-image ddjp-image-bottom" style="${imageStyle(v,'bottom')}"></div></div><div class="ddjp-paper-seam"></div><div class="ddjp-binding"><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span><span class="ddjp-ring"></span></div></div><div class="ddjp-right"><div class="ddjp-jpname" data-crtz-text="jpname">${esc(v.jpname)}</div><div class="ddjp-english" data-crtz-text="english">${esc(v.english)}</div><div class="ddjp-roleplay" data-crtz-text="roleplay">${esc(v.roleplay)}</div><div class="ddjp-bottom"><div class="ddjp-note" data-crtz-text="noteText">${esc(v.noteText)}</div></div></div></div></div><div class="ddshcr-commrolcrt"><span></span></div>`;}
 function output(v){return `<link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style>${artwork(v)}`;}
-function doc(v){return `<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;overflow:visible}body{width:950px;min-width:950px}.ddjp-rp{margin-left:auto!important;margin-right:auto!important}</style><link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style></head><body>${artwork(v)}</body></html>`;}
-function patch(frame,v){let d;try{d=frame?.contentDocument}catch{return}const root=d?.querySelector('[data-crtz-root]');if(!root)return;for(const k of [...Object.keys(colors),...Object.keys(imgKeys),...Object.keys(measures)]){const p=variable(k,v[k]);if(p)root.style.setProperty(p[0],p[1])}for(const k of txtKeys){const node=root.querySelector(`[data-crtz-text="${k}"]`);if(node&&node.textContent!==String(v[k]??''))node.textContent=String(v[k]??'')};for(const which of ['top','bottom']){const image=root.querySelector('.ddjp-image-'+which);if(image){image.style.cssText=imageStyle(v,which);}}if(frame.dataset.crtzMode!=='card')scheduleHeight(frame);}
-function start(frame,v){if(!frame)return;if(frame.dataset.crtzReady){patch(frame,v);return}frame.dataset.crtzReady='1';frame.addEventListener('load',()=>{patch(frame,frame.dataset.crtzMode==='editor'?values:defaults);frame.contentDocument?.fonts?.ready?.then(()=>scheduleFit(frame)).catch(()=>{});setTimeout(()=>scheduleFit(frame),400);setTimeout(()=>scheduleFit(frame),1200);},{passive:true});frame.srcdoc=doc(v);}
-function fit(frame){if(!frame?.isConnected)return;let d;try{d=frame.contentDocument}catch{return}const root=d?.querySelector('[data-crtz-root]');if(!root)return;const stage=frame.parentElement;if(!stage)return;const body=d.body;const bounds=root.getBoundingClientRect();const width=Math.max(Math.ceil(root.scrollWidth),Math.ceil(bounds.width),950);const height=actualContentHeight(frame);const mode=frame.dataset.crtzMode;
- if(mode==='card'){const sw=Math.max(stage.clientWidth,1),sh=Math.max(stage.clientHeight,sw*10/16);const sc=Math.min(1,(sw-20)/width,(sh-20)/height);frame.style.width=width+'px';frame.style.height=height+'px';frame.style.transform=`translate(${Math.round((sw-width*sc)/2)}px,${Math.round((sh-height*sc)/2)}px) scale(${sc})`;}
- else {const stageWidth=Math.max(stage.clientWidth,1),stageHeight=Math.max(stage.clientHeight,1);const sc=Math.max(0.1,(stageWidth-24)/width);const visualWidth=width*sc,visualHeight=height*sc;const offsetX=Math.max(0,Math.round((stageWidth-visualWidth)/2));const offsetY=Math.max(16,Math.round((stageHeight-visualHeight)/2));frame.style.width=width+'px';frame.style.height=height+'px';frame.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${sc})`;const spacer=stage.querySelector('[data-crtz-spacer]');if(spacer){spacer.style.height=Math.ceil(offsetY+visualHeight+16)+'px';spacer.style.width='100%';}else stage.style.height=Math.ceil(offsetY+visualHeight+16)+'px';}}
-function actualContentHeight(frame){const d=frame.contentDocument,root=d?.querySelector('[data-crtz-root]');if(!root)return 420;const lower=root.nextElementSibling;const rb=root.getBoundingClientRect(),lb=lower?.getBoundingClientRect();return Math.max(420,Math.ceil(root.scrollHeight),Math.ceil(rb.bottom-root.getBoundingClientRect().top),Math.ceil(lb?.bottom-rb.top||0))+24;}
-function scheduleHeight(frame){if(!frame||frame.dataset.crtzHeightQueued==='1')return;frame.dataset.crtzHeightQueued='1';requestAnimationFrame(()=>{frame.dataset.crtzHeightQueued='0';if(!frame.isConnected)return;let d;try{d=frame.contentDocument}catch{return}if(!d?.querySelector('[data-crtz-root]'))return;const height=actualContentHeight(frame);if(Math.abs(frame.offsetHeight-height)>1)frame.style.height=height+'px';const stage=frame.parentElement;const spacer=stage?.querySelector('[data-crtz-spacer]');if(spacer){const transform=frame.style.transform;const match=transform.match(/translate\([^,]+,\s*([\d.-]+)px\) scale\(([\d.]+)\)/);const y=match?Number(match[1]):16,sc=match?Number(match[2]):1;spacer.style.height=Math.ceil(y+height*sc+16)+'px';}})}
+function doc(v){return `<!doctype html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;overflow:hidden!important}body{width:950px;min-width:950px}.ddjp-rp{margin-left:auto!important;margin-right:auto!important}</style><link href="${CSS}" rel="stylesheet"><link href="${FONT}" rel="stylesheet"><style>${EXTRA_CSS}</style></head><body>${artwork(v)}</body></html>`;}
+function patch(frame,v){let d;try{d=frame?.contentDocument}catch{return}const root=d?.querySelector('[data-crtz-root]');if(!root)return;for(const k of [...Object.keys(colors),...Object.keys(imgKeys),...Object.keys(measures)]){const p=variable(k,v[k]);if(p)root.style.setProperty(p[0],p[1])}for(const k of txtKeys){const node=root.querySelector(`[data-crtz-text="${k}"]`);if(node&&node.textContent!==String(v[k]??''))node.textContent=String(v[k]??'')};for(const which of ['top','bottom']){const image=root.querySelector('.ddjp-image-'+which);if(image){image.style.cssText=imageStyle(v,which);}}if(frame.dataset.crtzMode==='editor' || frame.dataset.crtzMode==='view')scheduleHeight(frame);}
+function start(frame,v){if(!frame)return;if(frame.dataset.crtzReady){patch(frame,v);return}frame.dataset.crtzReady='1';frame.style.visibility='hidden';frame.addEventListener('load',()=>{patch(frame,frame.dataset.crtzMode==='editor'?values:defaults);const d=frame.contentDocument;const finalize=()=>{scheduleFit(frame);};if(d?.fonts?.ready)d.fonts.ready.then(finalize,finalize);else finalize();setTimeout(finalize,300);const css=d?.querySelector('link[href*="comm-crtzrole.css"]');if(css&&!css.sheet){css.addEventListener('load',finalize,{once:true});css.addEventListener('error',finalize,{once:true});}},{passive:true});frame.srcdoc=doc(v);}
+function contentHeight(frame){
+ const d=frame?.contentDocument,root=d?.querySelector('[data-crtz-root]');if(!root)return 520;
+ const base=root.getBoundingClientRect().top;
+ let bottom=base+520;
+ const list=[root,root.querySelector('.ddjp-layout'),root.querySelector('.ddjp-right'),root.querySelector('.ddjp-roleplay'),root.querySelector('.ddjp-bottom'),root.querySelector('.ddjp-note'),root.nextElementSibling];
+ for(const el of list){if(!el)continue;const r=el.getBoundingClientRect();bottom=Math.max(bottom,r.bottom, r.top+el.scrollHeight);}
+ return Math.max(520,Math.ceil(bottom-base+35));
+}
+function fit(frame){
+ if(!frame?.isConnected)return;let d;try{d=frame.contentDocument}catch{return}
+ const root=d?.querySelector('[data-crtz-root]'),stage=frame.parentElement;if(!root||!stage)return;
+ const bounds=root.getBoundingClientRect();const width=Math.max(Math.ceil(root.scrollWidth),Math.ceil(bounds.width),950);
+ const height=contentHeight(frame),mode=frame.dataset.crtzMode;
+ if(mode==='card'){
+  const sw=Math.max(stage.clientWidth,1),sh=Math.max(stage.clientHeight,sw*10/16);
+  const sc=Math.min(1,(sw-20)/width,(sh-20)/height);
+  frame.style.width=width+'px';frame.style.height=height+'px';
+  frame.style.transform=`translate(${Math.round((sw-width*sc)/2)}px,${Math.round((sh-height*sc)/2)}px) scale(${sc})`;
+ }else{
+  const sw=Math.max(stage.clientWidth,1),sc=Math.max(0.1,(sw-32)/width);
+  const ox=Math.max(0,Math.round((sw-width*sc)/2));
+  // Fixed origin: height changes must never recenter or rescale the artwork.
+  const oy=Math.max(20,Math.round((Math.max(stage.clientHeight,1)-height*sc)/2));
+  frame.style.width=width+'px';frame.style.height=height+'px';
+  frame.style.transform=`translate(${ox}px,${oy}px) scale(${sc})`;
+  frame.dataset.crtzScale=String(sc);frame.dataset.crtzOffsetY=String(oy);
+  const spacer=stage.querySelector('[data-crtz-spacer]');
+  if(spacer){spacer.style.height=Math.ceil(oy+height*sc+24)+'px';spacer.style.width='100%';}
+  else stage.style.height=Math.ceil(oy+height*sc+24)+'px';
+ }
+ frame.style.visibility='visible';
+}
+function scheduleHeight(frame){
+ if(!frame||frame.dataset.crtzHeightQueued==='1')return;
+ frame.dataset.crtzHeightQueued='1';requestAnimationFrame(()=>{
+  frame.dataset.crtzHeightQueued='0';if(!frame.isConnected)return;
+  let d;try{d=frame.contentDocument}catch{return}
+  if(!d?.querySelector('[data-crtz-root]'))return;
+  const stage=frame.parentElement,oldTop=stage?.scrollTop||0;
+  const height=contentHeight(frame);
+  // Only grow/shrink the iframe height. The CSS transform, scale and X/Y never change.
+  if(Math.abs(parseFloat(frame.style.height||'0')-height)>1)frame.style.height=height+'px';
+  const spacer=stage?.querySelector('[data-crtz-spacer]');
+  if(spacer){const scale=Number(frame.dataset.crtzScale)||1,oy=Number(frame.dataset.crtzOffsetY)||20;
+   spacer.style.height=Math.ceil(oy+height*scale+24)+'px';}
+  if(stage && stage.scrollTop!==oldTop)stage.scrollTop=oldTop;
+ });
+}
 function scheduleFit(f){if(!f||f.dataset.crtzQueued==='1')return;f.dataset.crtzQueued='1';requestAnimationFrame(()=>{f.dataset.crtzQueued='0';fit(f)})}
 function section(i,t,c){return `<section class="dds-control-section"><div class="dds-control-title"><span>${i}</span><h2>${t}</h2></div><div class="dds-aph-fields">${c}</div></section>`;}
 function field(k,l,multi=false){return `<label class="dds-aph-field${multi?' dds-crtz-full-row':''}"><span>${esc(l)}</span>${multi?`<textarea rows="${k==='roleplay'?9:3}" data-dds-no-save data-dds-no-bbcode data-crtz-field="${k}"></textarea>`:`<input type="text" data-dds-no-save data-dds-no-bbcode data-crtz-field="${k}">`}</label>`;}
