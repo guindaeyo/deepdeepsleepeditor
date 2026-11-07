@@ -16090,3 +16090,26 @@ html body .dds-afrole-editor .dds-aph-fields .dds-aph-field textarea[data-afrole
 /* Center Aphrodi roleplay in the central editor preview without changing other commissions. */
 html body .dds-afrole-editor .dds-aph-editor-stage{overflow-x:hidden!important;overflow-y:auto!important;}
 html body .dds-afrole-editor .dds-aph-editor-stage iframe[data-afrole-mode="editor"]{margin:0!important;max-width:none!important;max-height:none!important;}
+
+
+/* v365 — Cartier only: stable form layout, color controls and full-width preview */
+html body .dds-crtz-editor .dds-rich-toolbar,
+html body .dds-crtz-editor .dds-bbcode-toolbar,
+html body .dds-crtz-editor .dds-rich-editor-shell,
+html body .dds-crtz-editor .dds-rich-counter,
+html body .dds-crtz-editor .dds-word-counter{display:none!important}
+html body .dds-crtz-editor .dds-aph-controls-scroll > .dds-control-section{position:relative!important;display:block!important;height:auto!important;min-height:0!important;max-height:none!important;margin-bottom:10px!important;overflow:visible!important}
+html body .dds-crtz-editor .dds-aph-fields{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px 16px!important;align-items:start!important;padding:16px!important}
+html body .dds-crtz-editor .dds-aph-field{display:flex!important;flex-direction:column!important;min-width:0!important;max-width:100%!important;position:relative!important;grid-column:auto!important;overflow:visible!important}
+html body .dds-crtz-editor .dds-crtz-color-field > div{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important}
+html body .dds-crtz-editor .dds-crtz-color-field input[type=color]{flex:0 0 38px!important;width:38px!important;height:38px!important;min-width:38px!important;padding:0!important}
+html body .dds-crtz-editor .dds-crtz-color-field input[type=text]{flex:1 1 0!important;width:1px!important;min-width:0!important}
+html body .dds-crtz-editor .dds-aph-field textarea{width:100%!important;max-width:100%!important;box-sizing:border-box!important;resize:vertical!important}
+html body .dds-crtz-editor textarea[data-crtz-field="roleplay"]{min-height:150px!important}
+html body .dds-crtz-editor .dds-aph-editor-stage{overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;position:relative!important}
+html body .dds-crtz-editor .dds-aph-editor-stage::-webkit-scrollbar{display:none!important}
+html body .dds-crtz-editor .dds-aph-editor-stage iframe[data-crtz-mode="editor"]{position:absolute!important;top:0!important;left:0!important;max-width:none!important;max-height:none!important;margin:0!important;transform-origin:top left!important;pointer-events:none!important}
+html body .dds-crtz-view .dds-aph-view-stage iframe[data-crtz-mode="view"]{position:absolute!important;top:0!important;left:0!important;max-width:none!important;transform-origin:top left!important}
+html body .dds-commission-grid .dds-crtz-card .dds-aph-card-stage{width:100%!important;aspect-ratio:16/10!important;overflow:hidden!important}
+html body .dds-commission-grid .dds-crtz-card iframe[data-crtz-mode="card"]{position:absolute!important;top:0!important;left:0!important;max-width:none!important;transform-origin:top left!important}
+@media(max-width:650px){html body .dds-crtz-editor .dds-aph-fields{grid-template-columns:minmax(0,1fr)!important}}
