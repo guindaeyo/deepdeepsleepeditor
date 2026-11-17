@@ -16364,18 +16364,23 @@ html body .dds-basil-editor .dds-aph-color > div{
 html body .dds-basil-editor .dds-aph-color input[type=color]{width:42px;height:38px;flex:0 0 42px}
 html body .dds-basil-editor .dds-aph-color input[type=text]{flex:1}
 
-/* v385: Basil MY OWN CODE — full-width actions matching the neighboring archive cards. */
+/* v386: Basil MY OWN CODE — two equal-sized buttons, aligned to the bottom like other archive cards. */
+html body .dds-my-own-code-grid .dds-basil-card .dds-commission-card-body{
+  display:flex!important;
+  flex-direction:column!important;
+}
 html body .dds-my-own-code-grid .dds-basil-card .dds-commission-card-actions{
   display:grid!important;
-  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:8px!important;
   width:100%!important;
-  margin-top:auto;
+  margin-top:auto!important;
 }
 html body .dds-my-own-code-grid .dds-basil-card .dds-commission-card-actions > .dds-roleplay-edit{
   display:flex!important;
   width:100%!important;
   min-width:0!important;
   box-sizing:border-box!important;
+  align-items:center!important;
   justify-content:space-between!important;
 }
