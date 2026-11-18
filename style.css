@@ -16384,3 +16384,29 @@ html body .dds-my-own-code-grid .dds-basil-card .dds-commission-card-actions > .
   align-items:center!important;
   justify-content:space-between!important;
 }
+
+/* v387 — Basil profile controls, image groups only. */
+html body .dds-basil-editor .dds-basil-image-group{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px 14px;
+  padding:14px;
+  border:1px solid rgba(193,23,36,.22);
+  border-radius:8px;
+  background:rgba(255,255,255,.015);
+}
+html body .dds-basil-editor .dds-basil-image-group > .dds-aph-field:first-child{
+  grid-column:1/-1;
+}
+html body .dds-basil-editor .dds-basil-image-group input[type="range"]{
+  width:100%;
+  min-width:0;
+}
+@media(max-width:640px){
+  html body .dds-basil-editor .dds-basil-image-group{
+    grid-template-columns:minmax(0,1fr);
+  }
+  html body .dds-basil-editor .dds-basil-image-group > .dds-aph-field:first-child{
+    grid-column:auto;
+  }
+}
