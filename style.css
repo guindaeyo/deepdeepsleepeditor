@@ -16410,3 +16410,31 @@ html body .dds-basil-editor .dds-basil-image-group input[type="range"]{
     grid-column:auto;
   }
 }
+
+/* v388 — Basil relationship rows, scoped to its editor */
+.dds-basil-editor .dds-basil-relations-editor{display:grid;gap:14px;width:100%;min-width:0}
+.dds-basil-editor .dds-basil-relation-editor-card{display:grid;gap:12px;padding:16px;border:1px solid rgba(193,23,36,.28);border-radius:7px;background:rgba(255,255,255,.02);min-width:0}
+.dds-basil-editor .dds-basil-relation-editor-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dds-basil-editor .dds-basil-relation-editor-head strong{font-size:13px;letter-spacing:.07em}
+.dds-basil-editor .dds-basil-relation-editor-head button{border:1px solid rgba(193,23,36,.55);background:transparent;color:var(--dds-red-bright,#c11724);padding:6px 12px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px}
+.dds-basil-editor .dds-basil-relation-editor-card .dds-aph-field{min-width:0;width:100%}
+.dds-basil-editor .dds-basil-relation-editor-card input{width:100%;min-width:0;font-size:14px}
+.dds-basil-editor .dds-basil-add-relation{width:100%;min-height:42px;padding:10px 15px;margin-top:12px;background:rgba(193,23,36,.07);color:var(--dds-red-bright,#c11724);border:1px dashed var(--dds-red-bright,#c11724);border-radius:5px;font-size:14px;font-family:inherit;cursor:pointer}
+.dds-basil-editor .dds-basil-add-relation:hover{background:rgba(193,23,36,.15)}
+
+/* v389 — Basil archive editor: clear categories, flexible traits and relationships */
+html body .dds-basil-editor .dds-basil-fields{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;align-items:start}
+html body .dds-basil-editor .dds-basil-fields > .dds-basil-full{grid-column:1/-1!important}
+html body .dds-basil-editor .dds-basil-fields .dds-basil-image-group{grid-column:1/-1}
+html body .dds-basil-editor .dds-basil-fields > .dds-basil-relations-editor,
+html body .dds-basil-editor .dds-basil-fields > .dds-basil-tags-editor,
+html body .dds-basil-editor .dds-basil-fields > .dds-basil-add-relation,
+html body .dds-basil-editor .dds-basil-fields > .dds-basil-editor-subhead{grid-column:1/-1}
+.dds-basil-editor .dds-basil-editor-subhead{font-size:14px;font-weight:700;color:#e6dce0;border-bottom:1px solid rgba(193,23,36,.25);padding:12px 0 8px}
+.dds-basil-editor .dds-basil-tags-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dds-basil-editor .dds-basil-tag-editor-card{display:flex;align-items:end;min-width:0;gap:8px;padding:12px;border:1px solid rgba(193,23,36,.28);border-radius:6px;background:rgba(255,255,255,.02)}
+.dds-basil-editor .dds-basil-tag-editor-card .dds-aph-field{min-width:0;flex:1}
+.dds-basil-editor .dds-basil-tag-editor-card button{border:1px solid #8d2534;border-radius:4px;background:transparent;color:#d74350;padding:9px;font-size:12px;cursor:pointer}
+.dds-basil-editor .dds-basil-relation-editor-card{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dds-basil-editor .dds-basil-relation-editor-head{grid-column:1/-1}
+@media(max-width:700px){html body .dds-basil-editor .dds-basil-fields,.dds-basil-editor .dds-basil-tags-editor,.dds-basil-editor .dds-basil-relation-editor-card{grid-template-columns:minmax(0,1fr)!important}}
