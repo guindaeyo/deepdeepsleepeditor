@@ -27119,10 +27119,59 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   /* CODE009 only: scale the COMPLETE native iframe, never the body or
      individual artwork.  Resizing body/layout was squeezing the composition
      and clipping the NOTE positioned outside the central column. */
+  // CODE009: after the first fit, leave the iframe width, zoom, X position,
+  // transform and document tree untouched. Only extend the scrollable height
+  // when newly pasted prose genuinely passes the current bottom edge.
+  function extendHigherHeavenScrollOnly(iframe, stage, state) {
+    const doc = iframe?.contentDocument;
+    if (!doc?.body || !state.higherFixedScale) return false;
+    const bodyTop = doc.body.getBoundingClientRect().top;
+    let bottom = 0;
+    for (const node of doc.querySelectorAll('.dds-preview-target, .ddshigherth-frame, .ddshigherth-scale, .ddshigherth-pearl')) {
+      const rect = node.getBoundingClientRect();
+      bottom = Math.max(bottom, rect.bottom - bodyTop, node.offsetTop + node.scrollHeight);
+      for (const child of node.querySelectorAll('*')) {
+        if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') continue;
+        const childRect = child.getBoundingClientRect();
+        if (childRect.height > 0) bottom = Math.max(bottom, childRect.bottom - bodyTop);
+      }
+    }
+    const needed = Math.ceil(Math.max(750, bottom + 96));
+    // Reserve room in 400px blocks: pasting normal text won't constantly resize
+    // the iframe, and its fixed source-width layout cannot reflow on input.
+    if (needed + 120 > (state.higherFrameHeight || 0)) {
+      const grown = Math.ceil((needed + 300) / 400) * 400;
+      if (grown > (state.higherFrameHeight || 0)) {
+        state.higherFrameHeight = grown;
+        iframe.style.setProperty('height', grown + 'px', 'important');
+        iframe.style.setProperty('min-height', grown + 'px', 'important');
+      }
+    }
+    const host = iframe.parentElement;
+    if (host) {
+      const visualHeight = Math.ceil(needed * state.higherFixedScale);
+      // Never shorten the canvas during a typing session: that used to move
+      // the scrollbar and make the entire preview appear to jump or flash.
+      state.higherHostHeight = Math.max(state.higherHostHeight || 0,
+        stage.clientHeight, visualHeight + 24);
+      host.style.setProperty('height', state.higherHostHeight + 'px', 'important');
+    }
+    state.bounds = {left:0,top:0,width:736,height:needed};
+    return true;
+  }
+
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
     const state = stateFor(iframe);
+    // No refit while typing/pasting. Refit only when the preview column width
+    // actually changes (responsive layout / real browser resize).
+    if (state.ready && state.higherFixedScale &&
+        state.higherStageWidth === stage.clientWidth) {
+      const extended = extendHigherHeavenScrollOnly(iframe, stage, state);
+      if (resetScroll) stage.scrollTop = 0;
+      return extended;
+    }
     const pendingCss = Array.from(doc.querySelectorAll('link[rel~="stylesheet"]'))
       .filter(link => !link.sheet && !link.dataset.ddsHigherCssError);
     if (pendingCss.length && !state.higherCssWaitExpired) {
@@ -27197,8 +27246,9 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     // Extra breathing room after the bottommost positioned label or note.
     // Do not derive this from body.scrollHeight (which includes iframe viewport).
-    const contentHeight = Math.ceil(Math.max(750, artworkBottom + 96));
-    const visualHeight = Math.ceil(contentHeight * scale);
+    const neededHeight = Math.ceil(Math.max(750, artworkBottom + 96));
+    const contentHeight = Math.ceil((neededHeight + 300) / 400) * 400;
+    const visualHeight = Math.ceil(neededHeight * scale);
     const offsetX = Math.max(0, (stage.clientWidth - nativeWidth * scale) / 2);
     fixed(iframe, 'display', 'block');
     fixed(iframe, 'position', 'absolute');
@@ -27234,7 +27284,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     fixed(stage, 'overflow-x', 'hidden');
     state.ready = true;
     state.scale = scale;
-    state.bounds = {left:0, top:0, width:nativeWidth, height:contentHeight};
+    state.higherFixedScale = scale;
+    state.higherStageWidth = stage.clientWidth;
+    state.higherFrameHeight = contentHeight;
+    state.higherHostHeight = Math.max(stage.clientHeight, visualHeight + 24);
+    state.bounds = {left:0, top:0, width:nativeWidth, height:neededHeight};
     iframe.dataset.ddsHigherFitReady = '1';
     fixed(iframe, 'opacity', '1');
     if (resetScroll) stage.scrollTop = 0;
@@ -27548,6 +27602,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
           currentRoot.innerHTML = nextRoot.innerHTML;
         }
       } else if (parsed.body) {
+        // CODE009 may not destroy and recreate its whole artboard on edits.
+        if (iframe.id === 'higherHeavenPreview') return false;
         doc.body.innerHTML = parsed.body.innerHTML;
         const state = stateFor(iframe);
         state.ready = false;
@@ -27596,6 +27652,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
 
     if (patchSource(iframe, srcdoc)) return true;
+    if (iframe.id === 'higherHeavenPreview') {
+      // A transient malformed update must never navigate/reload a live iframe.
+      state.pendingSource = String(srcdoc || '');
+      return true;
+    }
     nativeWriteSrcdoc(iframe, srcdoc);
     return true;
   }
@@ -27607,6 +27668,18 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     iframe.dataset.ddsStableSrcdocGuard = "1";
 
     const state = stateFor(iframe);
+    if (iframe.id === 'higherHeavenPreview' && !iframe.dataset.ddsHigherAttributeGuard) {
+      iframe.dataset.ddsHigherAttributeGuard = '1';
+      const originalSetAttribute = iframe.setAttribute;
+      iframe.setAttribute = function(name, value) {
+        if (String(name).toLowerCase() === 'srcdoc' &&
+            !stateFor(this).nativeWrite && stateFor(this).documentLoaded) {
+          render(this, value);
+          return;
+        }
+        return originalSetAttribute.call(this, name, value);
+      };
+    }
     try {
       const existing = nativeSrcdoc?.get ? String(nativeSrcdoc.get.call(iframe) || "") : String(iframe.getAttribute("srcdoc") || "");
       if (existing.trim()) state.documentLoaded = true;
