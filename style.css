@@ -16472,3 +16472,33 @@ body.dds-y2k-vampire .dds-rich-editor.dds-rich-editor-tall[contenteditable="true
   overflow-y: auto !important;
   overflow-x: hidden !important;
 }
+
+/* v408 — one consistent 225px height for roleplay CONTENT fields in all central editors.
+   Existing word-count scan adds .dds-v237-roleplay-text dynamically.
+   Keep notes, BIO, and other input fields at their existing sizes. */
+html body.dds-y2k-vampire.dds-y2k-vampire.dds-y2k-vampire :is(
+  .dds-rich-editor[contenteditable="true"].dds-v237-roleplay-text,
+  textarea.dds-v237-roleplay-text,
+  .dds-rich-editor[contenteditable="true"][id$="RoleplayEditor"],
+  textarea[id$="RoleplayEditor"],
+  textarea[data-015="roleplay"],
+  textarea[data-crtz-field="roleplay"],
+  textarea[data-code014-field="roleplay"],
+  textarea[data-landon-file-field="roleplay"],
+  textarea[data-hans-field="roleplay"],
+  textarea[data-jewel-field="roleplay"],
+  textarea[data-code013-field="roleplay"],
+  .dds-code014-roleplay-field textarea,
+  .dds-code013-roleplay-field textarea,
+  .dds-hans-roleplay-field textarea,
+  .dds-jewel-roleplay-field textarea
+) {
+  box-sizing: border-box !important;
+  height: 225px !important;
+  min-height: 225px !important;
+  max-height: 225px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  resize: none !important;
+  overscroll-behavior: contain;
+}
