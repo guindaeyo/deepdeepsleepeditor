@@ -27161,6 +27161,11 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     set(html,'margin','0');
     set(body,'margin','0');
     set(body,'padding','0');
+    // CODE009 only: remove the grey preview-document backdrop beneath
+    // the artwork. Keep the artwork's own backgrounds and scroll geometry.
+    for (const node of [html, body, shell]) {
+      set(node, 'background-color', '#080808');
+    }
     for (const node of [body,shell,target]) {
       set(node,'height','auto');
       set(node,'max-height','none');
