@@ -27191,6 +27191,34 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       fixed(visualRoot, "min-width", nativeWidth + "px");
       fixed(visualRoot, "max-width", nativeWidth + "px");
     }
+    // CODE009: the editable source intentionally starts with no photos or text.
+    // Its inner white layout (not the 1100px iframe) can then collapse into a
+    // thin strip. Preserve the artboard's design width without adding sample
+    // text/images to the blank editor or changing the code exported by COPY.
+    // Find the OUTERMOST large white artboard; don't expand smaller white
+    // polaroids, note boxes or any other artwork panels.
+    const nearWhite = (color) => {
+      const match = String(color || "").match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/i);
+      return !!match && Number(match[1]) >= 245 && Number(match[2]) >= 245 &&
+        Number(match[3]) >= 245 && (match[4] === undefined || Number(match[4]) >= .95);
+    };
+    const elements = [visualRoot, ...visualRoot.querySelectorAll('*')];
+    const narrowArtboards = elements.filter(el => {
+      const rect = el.getBoundingClientRect();
+      if (!(rect.width >= 200 && rect.width < 730 && rect.height >= 620)) return false;
+      const css = doc.defaultView.getComputedStyle(el);
+      return css.display !== 'none' && nearWhite(css.backgroundColor);
+    });
+    // Run once per new iframe document; re-apply safely after stylesheet loads.
+    if (narrowArtboards.length) {
+      const artboard = narrowArtboards[0];
+      fixed(artboard, 'box-sizing', 'border-box');
+      fixed(artboard, 'width', '850px');
+      fixed(artboard, 'min-width', '850px');
+      fixed(artboard, 'max-width', '850px');
+      fixed(artboard, 'margin-left', 'auto');
+      fixed(artboard, 'margin-right', 'auto');
+    }
     artworkBottom = Math.max(artworkBottom, visualRoot.scrollHeight || 0);
     for (const element of visualRoot.querySelectorAll("*")) {
       const cs = doc.defaultView.getComputedStyle(element);
