@@ -27222,8 +27222,30 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
     set(stage,'overflow-y','auto');
     set(stage,'overflow-x','hidden');
-    set(iframe,'visibility','visible');
-    set(iframe,'opacity','1');
+    // CODE009 first paint: keep the frame invisible until its native-size
+    // geometry and its stylesheet/fonts are ready.  Do this ONLY once.
+    // Subsequent edits keep the same visible frame and never flash it.
+    if (!state.higherRevealScheduled && iframe.dataset.ddsHigherReady !== '1') {
+      state.higherRevealScheduled = true;
+      let revealed = false;
+      const reveal = () => {
+        if (revealed || !iframe.isConnected || !iframe.contentDocument?.body) return;
+        revealed = true;
+        // One final native-width fit before the first visible frame.
+        // Prevent rescheduling the initial reveal on that fit.
+        fitHigherHeavenFullCanvas(iframe, stage, false);
+        requestAnimationFrame(() => {
+          iframe.dataset.ddsHigherReady = '1';
+        });
+      };
+      // The iframe load event means its CSS is loaded. Font readiness avoids
+      // a second layout shift once the actual typefaces finish resolving.
+      const fonts = doc.fonts?.ready;
+      if (fonts?.then) fonts.then(() => requestAnimationFrame(reveal), reveal);
+      else requestAnimationFrame(reveal);
+      // Never leave the editor blank if an external font request stalls.
+      setTimeout(reveal, 1800);
+    }
     state.ready=true;
     state.scale=state.higherLockedScale;
     state.bounds={left:0,top:0,width:nativeWidth,height:state.higherReservedHeight};
