@@ -27237,6 +27237,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     state.bounds = {left: 0, top: 0, width: nativeWidth, height: contentHeight};
     // Show only once the full native canvas has received its final first fit.
     iframe.dataset.ddsHigherFitReady = '1';
+    fixed(iframe, "opacity", "1");
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;

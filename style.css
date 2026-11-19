@@ -16443,3 +16443,6 @@ html body .dds-basil-editor .dds-basil-fields > .dds-basil-editor-subhead{grid-c
 #higherHeavenPreview:not([data-dds-higher-fit-ready="1"]){
   visibility:hidden !important;
 }
+
+/* CODE009 only: reveal the full-size source after its first native-width fit. */
+#higherHeavenPreview:not([data-dds-higher-fit-ready="1"]) { opacity: 0 !important; }
