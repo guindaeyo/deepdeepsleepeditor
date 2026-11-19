@@ -16463,3 +16463,12 @@ body.dds-y2k-vampire [data-panel="editor-code009"] #higherHeavenPreview:not([dat
 body.dds-y2k-vampire [data-panel="editor-code009"] #higherHeavenPreview[data-dds-higher-ready="1"]{
   opacity:1!important;visibility:visible!important;
 }
+
+/* v407 — central roleplay text editor: 150px → 225px (+50%); keep internal scrolling. */
+body.dds-y2k-vampire .dds-rich-editor.dds-rich-editor-tall[contenteditable="true"] {
+  height: 225px !important;
+  min-height: 225px !important;
+  max-height: 225px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
