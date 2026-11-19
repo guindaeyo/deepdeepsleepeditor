@@ -27122,8 +27122,37 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
-    setupStage(stage);
+    // CODE009 only: the third-party artwork stylesheet may still be loading
+    // at the first iframe paint. Never reveal its temporary, squeezed layout.
+    // Retry the fit after the source CSS is available instead of fitting the
+    // unstyled composition and then visibly resizing it.
     const state = stateFor(iframe);
+    const pendingCss = Array.from(doc.querySelectorAll('link[rel~="stylesheet"]'))
+      .filter(link => !link.sheet && !link.dataset.ddsHigherCssError);
+    if (pendingCss.length && !state.higherCssWaitExpired) {
+      if (!state.higherCssWaitStarted) {
+        state.higherCssWaitStarted = Date.now();
+        state.higherCssTimeout = window.setTimeout(() => {
+          state.higherCssWaitExpired = true;
+          scheduleNormalize(iframe, true, false);
+        }, 4000);
+      }
+      pendingCss.forEach(link => {
+        if (link.dataset.ddsHigherCssWatch === '1') return;
+        link.dataset.ddsHigherCssWatch = '1';
+        link.addEventListener('load', () => scheduleNormalize(iframe, true, false), {once:true});
+        link.addEventListener('error', () => {
+          link.dataset.ddsHigherCssError = '1';
+          scheduleNormalize(iframe, true, false);
+        }, {once:true});
+      });
+      return false;
+    }
+    if (state.higherCssTimeout) {
+      window.clearTimeout(state.higherCssTimeout);
+      state.higherCssTimeout = 0;
+    }
+    setupStage(stage);
     const nativeWidth = 1100;
     const available = Math.max(1, stage.clientWidth - 24);
     const scale = Math.min(1, available / nativeWidth);
@@ -27206,6 +27235,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     state.ready = true;
     state.scale = scale;
     state.bounds = {left: 0, top: 0, width: nativeWidth, height: contentHeight};
+    // Show only once the full native canvas has received its final first fit.
+    iframe.dataset.ddsHigherFitReady = '1';
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
