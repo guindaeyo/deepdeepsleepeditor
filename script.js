@@ -27122,10 +27122,6 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
-    // CODE009 only: the third-party artwork stylesheet may still be loading
-    // at the first iframe paint. Never reveal its temporary, squeezed layout.
-    // Retry the fit after the source CSS is available instead of fitting the
-    // unstyled composition and then visibly resizing it.
     const state = stateFor(iframe);
     const pendingCss = Array.from(doc.querySelectorAll('link[rel~="stylesheet"]'))
       .filter(link => !link.sheet && !link.dataset.ddsHigherCssError);
@@ -27153,128 +27149,79 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       state.higherCssTimeout = 0;
     }
     setupStage(stage);
-    const nativeWidth = 1100;
-    const available = Math.max(1, stage.clientWidth - 24);
-    const scale = Math.min(1, available / nativeWidth);
-    const fixed = (el, property, value) =>
-      el.style.setProperty(property, value, "important");
-    const html = doc.documentElement;
-    const body = doc.body;
-
-    // Do not transform/shrink the document's children or body. The external
-    // code stylesheet needs its original geometry for absolute elements.
-    fixed(html, "width", nativeWidth + "px");
-    fixed(html, "min-width", nativeWidth + "px");
-    fixed(html, "max-width", nativeWidth + "px");
-    fixed(html, "overflow-x", "hidden");
-    fixed(body, "width", nativeWidth + "px");
-    fixed(body, "min-width", nativeWidth + "px");
-    fixed(body, "max-width", nativeWidth + "px");
-    fixed(body, "transform", "none");
-    fixed(body, "transform-origin", "initial");
-    fixed(body, "margin", "0");
-    fixed(body, "overflow-x", "visible");
-
-    // Keep native-width iframe and scale as one intact visual rectangle.
-    // This preserves the original left/right proportions and floating notes.
-    // CODE009: include positioned/overflowing artwork when determining the
-    // scrollable height (body.scrollHeight alone can miss those elements).
-    const bodyTop = body.getBoundingClientRect().top;
-    let artworkBottom = 0;
-    const visualRoot = doc.querySelector(".ddsh-higherthanheaven") || body;
-    // CODE009: When the template is empty, the artwork's content-sized
-    // wrapper collapses to a narrow strip. Preserve the 1100px design canvas
-    // from the first paint, regardless of whether images/text are filled in.
-    // Do not alter its children or the user's editable source content.
-    if (visualRoot !== body) {
-      fixed(visualRoot, "width", nativeWidth + "px");
-      fixed(visualRoot, "min-width", nativeWidth + "px");
-      fixed(visualRoot, "max-width", nativeWidth + "px");
+    // The real CODE009 stylesheet specifies a 736px artwork, not 1100px.
+    // The original script uses a flex .dds-preview-target: when empty it is
+    // min-content sized, collapsing the entire white artwork into a strip.
+    // Fix that exact flex item, then let the source's own 736px CSS work.
+    const nativeWidth = 736;
+    const fixed = (el, property, value) => el?.style.setProperty(property, value, 'important');
+    const target = doc.querySelector('.dds-preview-target');
+    const frame = doc.querySelector('.ddshigherth-frame');
+    const inner = doc.querySelector('.ddshigherth-scale');
+    const pearl = doc.querySelector('.ddshigherth-pearl');
+    fixed(doc.documentElement, 'width', nativeWidth + 'px');
+    fixed(doc.documentElement, 'min-width', nativeWidth + 'px');
+    fixed(doc.body, 'width', nativeWidth + 'px');
+    fixed(doc.body, 'min-width', nativeWidth + 'px');
+    fixed(doc.body, 'padding', '0');
+    fixed(doc.body, 'margin', '0');
+    fixed(doc.body, 'overflow-x', 'hidden');
+    fixed(doc.querySelector('.dds-preview-shell'), 'width', nativeWidth + 'px');
+    for (const el of [target, frame, inner, pearl]) {
+      fixed(el, 'width', nativeWidth + 'px');
+      fixed(el, 'min-width', nativeWidth + 'px');
+      fixed(el, 'max-width', nativeWidth + 'px');
+      fixed(el, 'box-sizing', 'border-box');
     }
-    // CODE009: the editable source intentionally starts with no photos or text.
-    // Its inner white layout (not the 1100px iframe) can then collapse into a
-    // thin strip. Preserve the artboard's design width without adding sample
-    // text/images to the blank editor or changing the code exported by COPY.
-    // Find the OUTERMOST large white artboard; don't expand smaller white
-    // polaroids, note boxes or any other artwork panels.
-    const nearWhite = (color) => {
-      const match = String(color || "").match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/i);
-      return !!match && Number(match[1]) >= 245 && Number(match[2]) >= 245 &&
-        Number(match[3]) >= 245 && (match[4] === undefined || Number(match[4]) >= .95);
-    };
-    const elements = [visualRoot, ...visualRoot.querySelectorAll('*')];
-    const narrowArtboards = elements.filter(el => {
-      const rect = el.getBoundingClientRect();
-      if (!(rect.width >= 200 && rect.width < 730 && rect.height >= 620)) return false;
-      const css = doc.defaultView.getComputedStyle(el);
-      return css.display !== 'none' && nearWhite(css.backgroundColor);
-    });
-    // Run once per new iframe document; re-apply safely after stylesheet loads.
-    if (narrowArtboards.length) {
-      const artboard = narrowArtboards[0];
-      fixed(artboard, 'box-sizing', 'border-box');
-      fixed(artboard, 'width', '850px');
-      fixed(artboard, 'min-width', '850px');
-      fixed(artboard, 'max-width', '850px');
-      fixed(artboard, 'margin-left', 'auto');
-      fixed(artboard, 'margin-right', 'auto');
-    }
-    artworkBottom = Math.max(artworkBottom, visualRoot.scrollHeight || 0);
-    for (const element of visualRoot.querySelectorAll("*")) {
-      const cs = doc.defaultView.getComputedStyle(element);
-      if (cs.display === "none" || cs.position === "fixed") continue;
-      const rect = element.getBoundingClientRect();
-      if (rect.height > 0 && Number.isFinite(rect.bottom)) {
-        artworkBottom = Math.max(artworkBottom, rect.bottom - bodyTop);
-      }
-    }
-    const contentHeight = Math.ceil(Math.max(900, body.scrollHeight,
-      html.scrollHeight, artworkBottom + 32, state.higherNativeHeight || 0));
-    state.higherNativeHeight = contentHeight;
+    fixed(target, 'flex', '0 0 736px');
+    fixed(target, 'transform', 'none');
+    fixed(target, 'position', 'relative');
+    const scale = Math.min(1, Math.max(1,stage.clientWidth - 24) / nativeWidth);
+    // Measure the actual artwork after its natural width is restored.
+    let contentHeight = Math.max(1,
+      Math.ceil(frame?.scrollHeight || 0),
+      Math.ceil(inner?.scrollHeight || 0),
+      Math.ceil(doc.body.scrollHeight || 0));
+    contentHeight = Math.max(650, contentHeight + 24);
     const visualHeight = Math.ceil(contentHeight * scale);
     const offsetX = Math.max(0, (stage.clientWidth - nativeWidth * scale) / 2);
-    fixed(iframe, "display", "block");
-    fixed(iframe, "position", "absolute");
-    fixed(iframe, "inset", "auto");
-    fixed(iframe, "top", "0");
-    fixed(iframe, "left", offsetX + "px");
-    fixed(iframe, "width", nativeWidth + "px");
-    fixed(iframe, "min-width", nativeWidth + "px");
-    fixed(iframe, "max-width", "none");
-    fixed(iframe, "height", contentHeight + "px");
-    fixed(iframe, "min-height", contentHeight + "px");
-    fixed(iframe, "max-height", "none");
-    fixed(iframe, "transform", `scale(${scale})`);
-    fixed(iframe, "transform-origin", "top left");
-    fixed(iframe, "margin", "0");
-    fixed(iframe, "border", "0");
-    fixed(iframe, "pointer-events", "none");
-    // CODE009: the stage is the viewport, NOT the tall content wrapper.
-    // Prior versions accidentally set the stage height to the artwork height,
-    // eliminating overflow and preventing wheel/trackpad scrolling.
+    fixed(iframe, 'display', 'block');
+    fixed(iframe, 'position', 'absolute');
+    fixed(iframe, 'inset', 'auto');
+    fixed(iframe, 'top', '0');
+    fixed(iframe, 'left', offsetX + 'px');
+    fixed(iframe, 'width', nativeWidth + 'px');
+    fixed(iframe, 'min-width', nativeWidth + 'px');
+    fixed(iframe, 'max-width', 'none');
+    fixed(iframe, 'height', contentHeight + 'px');
+    fixed(iframe, 'min-height', contentHeight + 'px');
+    fixed(iframe, 'max-height', 'none');
+    fixed(iframe, 'transform', `scale(${scale})`);
+    fixed(iframe, 'transform-origin', 'top left');
+    fixed(iframe, 'margin', '0');
+    fixed(iframe, 'border', '0');
+    fixed(iframe, 'pointer-events', 'none');
     let host = iframe.parentElement;
     if (host === stage) {
-      host = document.createElement("div");
-      host.className = "dds-higher-scroll-content";
+      host = document.createElement('div');
+      host.className = 'dds-higher-scroll-content';
       stage.insertBefore(host, iframe);
       host.appendChild(iframe);
     }
     if (host) {
-      fixed(host, "position", "relative");
-      fixed(host, "width", "100%");
-      fixed(host, "min-width", "0");
-      fixed(host, "height", Math.max(stage.clientHeight, visualHeight + 24) + "px");
-      fixed(host, "overflow", "visible");
-      // Only the viewport stays at the available height. Its tall child scrolls.
-      fixed(stage, "overflow-y", "auto");
-      fixed(stage, "overflow-x", "hidden");
+      fixed(host, 'position', 'relative');
+      fixed(host, 'width', '100%');
+      fixed(host, 'min-width', '0');
+      fixed(host, 'height', Math.max(stage.clientHeight, visualHeight + 24) + 'px');
+      fixed(host, 'overflow', 'visible');
     }
+    fixed(stage, 'overflow-y', 'auto');
+    fixed(stage, 'overflow-x', 'hidden');
     state.ready = true;
     state.scale = scale;
-    state.bounds = {left: 0, top: 0, width: nativeWidth, height: contentHeight};
-    // Show only once the full native canvas has received its final first fit.
+    state.bounds = {left:0, top:0, width:nativeWidth, height:contentHeight};
     iframe.dataset.ddsHigherFitReady = '1';
-    fixed(iframe, "opacity", "1");
+    fixed(iframe, 'opacity', '1');
     if (resetScroll) stage.scrollTop = 0;
     stage.scrollLeft = 0;
     return true;
