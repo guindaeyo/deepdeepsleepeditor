@@ -29309,3 +29309,34 @@ function route(){if(location.hash==='#commission'&&(editor?.classList.contains('
 function init(){let attempt=0;const id=setInterval(()=>{if(install()||++attempt>140)clearInterval(id)},100);window.addEventListener('hashchange',route);window.addEventListener('popstate',route);window.addEventListener('resize',()=>document.querySelectorAll('[data-basil-mode]').forEach(requestFit));setTimeout(route,450)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+
+/* CODE009 v409 — editor-only: bypass the legacy re-render/resize queue.
+   The catalogue preview (roleplayCardPreview009) continues through the
+   original queue and keeps its example artwork.  The editor iframe is
+   written only for its first document; subsequent input changes patch
+   the existing DOM without dispatching old iframe resize/reveal callbacks. */
+(() => {
+  "use strict";
+  if (window.__ddsHigher009NoReloadQueueV409) return;
+  window.__ddsHigher009NoReloadQueueV409 = true;
+  const previousQueue = window.queuePreviewDocument;
+  if (typeof previousQueue !== 'function') return;
+  window.queuePreviewDocument = function ddsHigher009InPlaceQueue(frame, source, resize) {
+    if (frame?.id !== 'higherHeavenPreview') {
+      return previousQueue.call(this, frame, source, resize);
+    }
+    // Initialize the existing preview column; never create a second stage.
+    const column = frame.closest('.dds-editor-preview-column');
+    if (column && typeof window.__ddsCentralEditorAttachV210 === 'function') {
+      window.__ddsCentralEditorAttachV210(column);
+    }
+    const updater = window.__ddsCentralEditorRenderV210;
+    if (typeof updater === 'function') {
+      updater(frame, source);
+      return true;
+    }
+    // Only an unavailable central renderer may fall back to the old queue.
+    return previousQueue.call(this, frame, source, resize);
+  };
+})();
