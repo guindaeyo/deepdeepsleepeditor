@@ -27182,6 +27182,15 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     const bodyTop = body.getBoundingClientRect().top;
     let artworkBottom = 0;
     const visualRoot = doc.querySelector(".ddsh-higherthanheaven") || body;
+    // CODE009: When the template is empty, the artwork's content-sized
+    // wrapper collapses to a narrow strip. Preserve the 1100px design canvas
+    // from the first paint, regardless of whether images/text are filled in.
+    // Do not alter its children or the user's editable source content.
+    if (visualRoot !== body) {
+      fixed(visualRoot, "width", nativeWidth + "px");
+      fixed(visualRoot, "min-width", nativeWidth + "px");
+      fixed(visualRoot, "max-width", nativeWidth + "px");
+    }
     artworkBottom = Math.max(artworkBottom, visualRoot.scrollHeight || 0);
     for (const element of visualRoot.querySelectorAll("*")) {
       const cs = doc.defaultView.getComputedStyle(element);
