@@ -27123,125 +27123,86 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   // The actual artwork is .ddsh-higherthanheaven (not .ddshigherth-*).
   // Keep the iframe and source artwork at native width. Scale the iframe
   // exactly once when it is first displayed, then change only its height.
+  // CODE009 ONLY: the editor iframe is the sole artboard; no added scroll wrapper.
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
     const state = stateFor(iframe);
-    const artwork = doc.querySelector('.ddsh-higherthanheaven');
-    const target = doc.querySelector('.dds-preview-target');
-    const shell = doc.querySelector('.dds-preview-shell');
-    if (!artwork || !target) return false;
-
-    const cssLinks = Array.from(doc.querySelectorAll('link[rel~="stylesheet"]'));
-    const pending = cssLinks.filter(l => !l.sheet && !l.dataset.ddsHigherCssError);
-    if (pending.length && !state.higherCssWaitExpired) {
-      if (!state.higherCssWaitStarted) {
-        state.higherCssWaitStarted = Date.now();
-        state.higherCssTimeout = setTimeout(() => {
-          state.higherCssWaitExpired = true;
-          scheduleNormalize(iframe,true,false);
-        }, 4000);
-      }
-      for (const link of pending) {
-        if (link.dataset.ddsHigherCssWatch === '1') continue;
-        link.dataset.ddsHigherCssWatch = '1';
-        link.addEventListener('load', () => scheduleNormalize(iframe,true,false), {once:true});
-        link.addEventListener('error', () => {
-          link.dataset.ddsHigherCssError='1';
-          scheduleNormalize(iframe,true,false);
-        }, {once:true});
-      }
-      return false;
-    }
-    if (state.higherCssTimeout) { clearTimeout(state.higherCssTimeout);state.higherCssTimeout=0; }
     setupStage(stage);
-    const set = (element, property, value) => element?.style.setProperty(property,value,'important');
-    const nativeWidth=736;
-    // Delete the extra wrapper introduced by earlier revisions, if present.
-    const wrapper=iframe.parentElement;
-    if(wrapper?.classList.contains('dds-higher-scroll-content')) {
-      stage.insertBefore(iframe,wrapper);
-      wrapper.remove();
-    }
-    if (!state.higherNativeSized) {
-      set(doc.documentElement,'width',nativeWidth+'px');
-      set(doc.documentElement,'min-width',nativeWidth+'px');
-      set(doc.documentElement,'overflow-x','hidden');
-      set(doc.body,'width',nativeWidth+'px');
-      set(doc.body,'min-width',nativeWidth+'px');
-      set(doc.body,'max-width',nativeWidth+'px');
-      set(doc.body,'margin','0');
-      set(doc.body,'padding','0');
-      set(doc.body,'overflow-x','hidden');
-      if(shell) {
-        set(shell,'display','block');
-        set(shell,'width',nativeWidth+'px');
-        set(shell,'min-width',nativeWidth+'px');
-        set(shell,'max-width',nativeWidth+'px');
+    const fixed = (el, property, value) => el?.style.setProperty(property, value, 'important');
+    const nativeWidth = 736;
+    const body = doc.body;
+    const html = doc.documentElement;
+    const target = doc.querySelector('.dds-preview-target');
+    // CODE009's source markup starts with ddshigherth-*; the old selector
+    // .ddsh-higherthanheaven does not occur in its generated HTML.
+    const artwork = doc.querySelector('.ddshigherth') ||
+      doc.querySelector('[class*="ddshigherth-"]') ||
+      target?.firstElementChild ||
+      Array.from(body.children).find(el => !/^(STYLE|SCRIPT|LINK|META)$/.test(el.tagName));
+    if (!artwork) return false;
+    if (!state.higherFixedArtboard) {
+      for (const el of [html,body,target,artwork]) {
+        fixed(el,'width',nativeWidth+'px');
+        fixed(el,'min-width',nativeWidth+'px');
+        fixed(el,'max-width',nativeWidth+'px');
+        fixed(el,'box-sizing','border-box');
       }
-      for(const element of [target, artwork]) {
-        set(element,'width',nativeWidth+'px');
-        set(element,'min-width',nativeWidth+'px');
-        set(element,'max-width',nativeWidth+'px');
-        set(element,'flex','0 0 '+nativeWidth+'px');
-        set(element,'box-sizing','border-box');
-      }
-      set(target,'transform','none');
-      state.higherNativeSized=true;
+      fixed(html,'margin','0');
+      fixed(body,'margin','0');
+      fixed(body,'padding','0');
+      fixed(target,'flex','0 0 '+nativeWidth+'px');
+      fixed(target,'transform','none');
+      fixed(doc.querySelector('.dds-preview-shell'),'width',nativeWidth+'px');
+      fixed(doc.querySelector('.dds-preview-shell'),'min-width',nativeWidth+'px');
+      state.higherFixedArtboard=true;
     }
-    if (!state.higherInitialFitComplete || state.higherLockedStageWidth!==stage.clientWidth) {
-      const scale=Math.min(1,Math.max(1,stage.clientWidth-24)/nativeWidth);
-      const offsetX=Math.max(0,(stage.clientWidth-nativeWidth*scale)/2);
-      set(iframe,'position','relative');
-      set(iframe,'display','block');
-      set(iframe,'inset','auto');
-      set(iframe,'left','0');
-      set(iframe,'top','0');
-      set(iframe,'width',nativeWidth+'px');
-      set(iframe,'min-width',nativeWidth+'px');
-      set(iframe,'max-width','none');
-      set(iframe,'transform',`translateX(${offsetX}px) scale(${scale})`);
-      set(iframe,'transform-origin','top left');
-      set(iframe,'border','0');
-      set(iframe,'margin','0');
-      set(iframe,'zoom','1');
+    // No CSS hiding, no replacement of nodes and no new element in parent.
+    // First fit fixes scale once; later edits ONLY grow the iframe's height.
+    const stageWidth = stage.clientWidth;
+    if (!state.higherFirstFit || stageWidth !== state.higherStageWidth) {
+      const scale = Math.min(1,(stageWidth-24)/nativeWidth);
+      const x = Math.max(0,(stageWidth-nativeWidth*scale)/2);
+      fixed(iframe,'width',nativeWidth+'px');
+      fixed(iframe,'min-width',nativeWidth+'px');
+      fixed(iframe,'max-width','none');
+      fixed(iframe,'position','relative');
+      fixed(iframe,'inset','auto');
+      fixed(iframe,'left','0');
+      fixed(iframe,'top','0');
+      fixed(iframe,'margin','0');
+      fixed(iframe,'display','block');
+      fixed(iframe,'border','0');
+      fixed(iframe,'transform-origin','top left');
+      fixed(iframe,'transform',`translateX(${x}px) scale(${scale})`);
       state.higherLockedScale=scale;
-      state.higherLockedStageWidth=stage.clientWidth;
-      state.higherInitialFitComplete=true;
+      state.higherStageWidth=stageWidth;
+      state.higherFirstFit=true;
     }
-    // Heights are measured in the native 736px DOM, never from iframe
-    // viewport height (which otherwise causes repeated growing).
-    const base=artwork.getBoundingClientRect().top;
-    let bottom=Math.max(artwork.scrollHeight,artwork.offsetHeight,target.scrollHeight,750);
-    for (const child of artwork.querySelectorAll('*')) {
-      if(child.tagName==='SCRIPT'||child.tagName==='STYLE') continue;
-      const css=doc.defaultView.getComputedStyle(child);
-      if(css.display==='none'||css.position==='fixed') continue;
-      const r=child.getBoundingClientRect();
-      if(r.height>0) bottom=Math.max(bottom, r.bottom-base+20);
+    let height=Math.max(750,artwork.scrollHeight||0,target?.scrollHeight||0);
+    const top=artwork.getBoundingClientRect().top;
+    for (const el of artwork.querySelectorAll('*')) {
+      if (el.tagName==='STYLE'||el.tagName==='SCRIPT') continue;
+      const cs=doc.defaultView.getComputedStyle(el);
+      if(cs.display==='none'||cs.position==='fixed') continue;
+      const rect=el.getBoundingClientRect();
+      if(rect.height>0) height=Math.max(height,rect.bottom-top+24);
     }
-    const nativeHeight=Math.ceil(bottom+48);
-    if (!state.higherReservedHeight || nativeHeight>state.higherReservedHeight-64) {
-      state.higherReservedHeight=Math.ceil((nativeHeight+128)/200)*200;
-      set(iframe,'height',state.higherReservedHeight+'px');
-      set(iframe,'min-height',state.higherReservedHeight+'px');
-      set(iframe,'max-height','none');
+    const required=Math.ceil(height+80);
+    if (!state.higherReservedHeight || required>state.higherReservedHeight-100) {
+      state.higherReservedHeight=Math.ceil((required+120)/100)*100;
+      fixed(iframe,'height',state.higherReservedHeight+'px');
+      fixed(iframe,'min-height',state.higherReservedHeight+'px');
+      fixed(iframe,'max-height','none');
     }
-    // The single existing stage owns scrolling; no additional DOM wrapper.
-    set(stage,'overflow-x','hidden');
-    set(stage,'overflow-y','auto');
-    set(stage,'align-items','flex-start');
-    // Transforms do not consume flow height. A stage min-height is not needed;
-    // use the iframe scaled bottom bound as the stage's scrollable content.
-    const visualBottom=Math.ceil(state.higherReservedHeight*state.higherLockedScale);
-    const spacer=stage.querySelector(':scope > .dds-higher-height-spacer');
-    if(spacer) spacer.remove();
-    set(iframe,'margin-bottom',Math.max(0,visualBottom-state.higherReservedHeight)+'px');
-    state.scale=state.higherLockedScale;
+    fixed(stage,'overflow-y','auto');
+    fixed(stage,'overflow-x','hidden');
+    fixed(iframe,'visibility','visible');
+    fixed(iframe,'opacity','1');
     state.ready=true;
+    state.scale=state.higherLockedScale;
     state.bounds={left:0,top:0,width:nativeWidth,height:state.higherReservedHeight};
     iframe.dataset.ddsHigherFitReady='1';
-    set(iframe,'opacity','1');
     if(resetScroll)stage.scrollTop=0;
     return true;
   }
@@ -27492,7 +27453,7 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     if (current.nodeType !== 1) return true;
     const protect = new Set(['width','min-width','max-width','flex','transform','transform-origin',
       'position','top','left','right','bottom','margin','box-sizing']);
-    const isFitted = current.matches('.dds-preview-shell,.dds-preview-target,.ddsh-higherthanheaven');
+    const isFitted = current.matches('.dds-preview-shell,.dds-preview-target,.ddshigherth,[class*="ddshigherth-"]');
     for (const attr of Array.from(current.attributes)) {
       if (attr.name !== 'style' && !next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
     }

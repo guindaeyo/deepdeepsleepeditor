@@ -5947,26 +5947,6 @@ Comedy" rows="5"></textarea></label>
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/gh/guindaeyo/deepdeepsleepeditor@9550fb74db2ae4898bb9b76fcdefab8af64134b3/script.js"></script>
-<script id="dds-code009-sample-card-v398">
-// CODE009 ONLY: the shop's demonstration card is independent of the blank editor.
-// The original controller ships the sample as defaults009; leave that artwork intact.
-(() => {
-  if (typeof updateHigherHeaven !== 'function' || typeof defaults009 === 'undefined') return;
-  const updateOriginal = updateHigherHeaven;
-  updateHigherHeaven = function () {
-    updateOriginal();
-    // Last queued card document wins; the editable iframe and copied source stay blank.
-    if (roleplayCardPreview009) {
-      queuePreviewDocument(
-        roleplayCardPreview009,
-        buildCardPreviewDocument(higherHeavenStylesheets, buildHigherHeavenMarkup(defaults009)),
-        resizeCardPreview
-      );
-    }
-  };
-})();
-</script>
-
 <script id="dds-code009-empty-template-v395">
 (() => {
   const ids = [
@@ -6021,6 +6001,37 @@ Comedy" rows="5"></textarea></label>
 <script src="./cloud-config.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./cloud-bridge.js?v=20260922-code014-sssluv-v132"></script>
 <script src="./script.js?v373-nav-restored"></script>
+<script id="dds-code009-sample-card-v398">
+// CODE009 ONLY: the shop's demonstration card is independent of the blank editor.
+// The original controller ships the sample as defaults009; leave that artwork intact.
+(() => {
+  if (typeof updateHigherHeaven !== 'function' || typeof defaults009 === 'undefined' || typeof buildHigherHeavenMarkup !== 'function') return;
+  const updateOriginal = updateHigherHeaven;
+  updateHigherHeaven = function () {
+    updateOriginal();
+    // Last queued card document wins; the editable iframe and copied source stay blank.
+    if (roleplayCardPreview009) {
+      queuePreviewDocument(
+        roleplayCardPreview009,
+        buildCardPreviewDocument(higherHeavenStylesheets, buildHigherHeavenMarkup(defaults009)),
+        resizeCardPreview
+      );
+    }
+  };
+  // One guaranteed sample paint after the initial controller setup.
+  const restore = () => {
+    const frame = document.getElementById('roleplayCardPreview009');
+    if (!frame || typeof queuePreviewDocument !== 'function') return;
+    queuePreviewDocument(frame,
+      buildCardPreviewDocument(higherHeavenStylesheets, buildHigherHeavenMarkup(defaults009)),
+      resizeCardPreview);
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(restore), {once:true});
+  else requestAnimationFrame(restore);
+})();
+</script>
+
+
 <script id="dds-code014-fixed-v172">
 /* CODE014 FIXED MODULE v172 — self-contained helpers + tested editor route */
 

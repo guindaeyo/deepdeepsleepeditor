@@ -16439,10 +16439,3 @@ html body .dds-basil-editor .dds-basil-fields > .dds-basil-editor-subhead{grid-c
 .dds-basil-editor .dds-basil-relation-editor-head{grid-column:1/-1}
 @media(max-width:700px){html body .dds-basil-editor .dds-basil-fields,.dds-basil-editor .dds-basil-tags-editor,.dds-basil-editor .dds-basil-relation-editor-card{grid-template-columns:minmax(0,1fr)!important}}
 
-/* v394 — CODE009 only: do not show the transient pre-fit squeezed iframe. */
-#higherHeavenPreview:not([data-dds-higher-fit-ready="1"]){
-  visibility:hidden !important;
-}
-
-/* CODE009 only: reveal the full-size source after its first native-width fit. */
-#higherHeavenPreview:not([data-dds-higher-fit-ready="1"]) { opacity: 0 !important; }
