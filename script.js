@@ -27177,12 +27177,27 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     fixed(target, 'transform', 'none');
     fixed(target, 'position', 'relative');
     const scale = Math.min(1, Math.max(1,stage.clientWidth - 24) / nativeWidth);
-    // Measure the actual artwork after its natural width is restored.
-    let contentHeight = Math.max(1,
-      Math.ceil(frame?.scrollHeight || 0),
-      Math.ceil(inner?.scrollHeight || 0),
-      Math.ceil(doc.body.scrollHeight || 0));
-    contentHeight = Math.max(650, contentHeight + 24);
+    // CODE009: measure artwork rather than the previous iframe viewport.
+    // The old body.scrollHeight + 24 grew by 24px after each edit and could
+    // alternately clip lower absolute elements when the frame was rerendered.
+    const artwork = [target, frame, inner, pearl].filter(Boolean);
+    let artworkBottom = 0;
+    for (const element of artwork) {
+      const rect = element.getBoundingClientRect();
+      const bodyTop = doc.body.getBoundingClientRect().top;
+      artworkBottom = Math.max(artworkBottom,
+        rect.bottom - bodyTop,
+        element.offsetTop + element.scrollHeight,
+        element.offsetTop + element.offsetHeight);
+      for (const child of element.querySelectorAll('*')) {
+        if (child.tagName === 'SCRIPT' || child.tagName === 'STYLE') continue;
+        const childRect = child.getBoundingClientRect();
+        if (childRect.height > 0) artworkBottom = Math.max(artworkBottom, childRect.bottom - bodyTop);
+      }
+    }
+    // Extra breathing room after the bottommost positioned label or note.
+    // Do not derive this from body.scrollHeight (which includes iframe viewport).
+    const contentHeight = Math.ceil(Math.max(750, artworkBottom + 96));
     const visualHeight = Math.ceil(contentHeight * scale);
     const offsetX = Math.max(0, (stage.clientWidth - nativeWidth * scale) / 2);
     fixed(iframe, 'display', 'block');
@@ -27461,6 +27476,59 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
     }
   }
 
+  // CODE009 only: reconcile nodes in place. Replacing root.innerHTML on
+  // every keystroke caused white flashes, reset images and scroll positions.
+  function patchHigherHeavenNodes(current, next) {
+    if (!current || !next || current.nodeType !== next.nodeType ||
+        (current.nodeType === 1 && current.tagName !== next.tagName)) return false;
+    if (current.nodeType === 3 || current.nodeType === 8) {
+      if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
+      return true;
+    }
+    if (current.nodeType !== 1) return true;
+    const protect = new Set(['width','min-width','max-width','flex','transform','transform-origin',
+      'position','top','left','right','bottom','margin','box-sizing']);
+    const isFitted = current.matches('.dds-preview-target,.ddshigherth-frame,.ddshigherth-scale,.ddshigherth-pearl');
+    for (const attr of Array.from(current.attributes)) {
+      if (attr.name !== 'style' && !next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
+    }
+    for (const attr of Array.from(next.attributes)) {
+      if (attr.name === 'style') {
+        // Keep central fitter's inline geometry without losing editable
+        // CSS custom properties or source-defined styles.
+        const nextStyle = next.style;
+        for (const prop of Array.from(current.style)) {
+          if (isFitted && protect.has(prop)) continue;
+          if (!nextStyle.getPropertyValue(prop)) current.style.removeProperty(prop);
+        }
+        for (const prop of Array.from(nextStyle)) {
+          if (isFitted && protect.has(prop)) continue;
+          const value = nextStyle.getPropertyValue(prop);
+          const priority = nextStyle.getPropertyPriority(prop);
+          if (current.style.getPropertyValue(prop) !== value ||
+              current.style.getPropertyPriority(prop) !== priority) current.style.setProperty(prop,value,priority);
+        }
+      } else if (current.getAttribute(attr.name) !== attr.value) {
+        current.setAttribute(attr.name, attr.value);
+      }
+    }
+    // Reconcile in place; only insert/remove nodes when conditional markup
+    // actually changes, rather than destroying all images on every input.
+    let index = 0;
+    while (index < next.childNodes.length) {
+      const expected = next.childNodes[index];
+      let existing = current.childNodes[index];
+      if (!existing) {
+        current.appendChild(expected.cloneNode(true));
+      } else if (!patchHigherHeavenNodes(existing, expected)) {
+        current.replaceChild(expected.cloneNode(true), existing);
+      }
+      index++;
+    }
+    while (current.childNodes.length > next.childNodes.length) current.lastChild.remove();
+    return true;
+  }
+
   function patchSource(iframe, srcdoc) {
     const stage = stageFor(iframe);
     const doc = iframe?.contentDocument;
@@ -27472,8 +27540,13 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
       const currentRoot = findVisualRoot(doc);
 
       if (nextRoot && currentRoot && currentRoot.tagName === nextRoot.tagName) {
-        syncRootAttributes(currentRoot, nextRoot);
-        currentRoot.innerHTML = nextRoot.innerHTML;
+        if (iframe.id === 'higherHeavenPreview') {
+          // Keep the existing artboard DOM alive on every text/image/color edit.
+          patchHigherHeavenNodes(currentRoot, nextRoot);
+        } else {
+          syncRootAttributes(currentRoot, nextRoot);
+          currentRoot.innerHTML = nextRoot.innerHTML;
+        }
       } else if (parsed.body) {
         doc.body.innerHTML = parsed.body.innerHTML;
         const state = stateFor(iframe);
