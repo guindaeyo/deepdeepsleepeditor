@@ -26733,6 +26733,17 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function stageFor(iframe) {
     if (!iframe) return null;
+    // CODE009: the preview COLUMN is the scroll container. Never create an
+    // extra .dds-v210-auto-stage wrapper around this iframe.
+    if (iframe.id === "higherHeavenPreview") {
+      const column = iframe.closest('.dds-editor-preview-column');
+      if (!column || !editorPanelFor(column)) return null;
+      const extra = iframe.parentElement;
+      if (extra?.classList.contains('dds-v210-auto-stage')) {
+        extra.replaceWith(iframe);
+      }
+      return column;
+    }
     let stage = iframe.closest?.(STAGE_SELECTOR) || null;
     if (stage && editorPanelFor(stage)) return stage;
 
@@ -27123,87 +27134,95 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
   // The actual artwork is .ddsh-higherthanheaven (not .ddshigherth-*).
   // Keep the iframe and source artwork at native width. Scale the iframe
   // exactly once when it is first displayed, then change only its height.
-  // CODE009 ONLY: the editor iframe is the sole artboard; no added scroll wrapper.
+  // CODE009: preserve the correctly-sized 736px artboard. The existing
+  // preview column is the ONLY scrolling surface; no generated wrapper.
+  // Changes to the content only update the iframe height, never its scale.
   function fitHigherHeavenFullCanvas(iframe, stage, resetScroll = false) {
     const doc = iframe?.contentDocument;
     if (!doc?.body || !stage || stage.clientWidth < 40) return false;
     const state = stateFor(iframe);
-    setupStage(stage);
-    const fixed = (el, property, value) => el?.style.setProperty(property, value, 'important');
+    const set = (node, prop, value) => node?.style.setProperty(prop, value, 'important');
     const nativeWidth = 736;
-    const body = doc.body;
     const html = doc.documentElement;
+    const body = doc.body;
+    const shell = doc.querySelector('.dds-preview-shell');
     const target = doc.querySelector('.dds-preview-target');
-    // CODE009's source markup starts with ddshigherth-*; the old selector
-    // .ddsh-higherthanheaven does not occur in its generated HTML.
-    const artwork = doc.querySelector('.ddshigherth') ||
-      doc.querySelector('[class*="ddshigherth-"]') ||
-      target?.firstElementChild ||
-      Array.from(body.children).find(el => !/^(STYLE|SCRIPT|LINK|META)$/.test(el.tagName));
+    const artwork = target?.firstElementChild || doc.querySelector('.ddshigherth') || body.firstElementChild;
     if (!artwork) return false;
-    if (!state.higherFixedArtboard) {
-      for (const el of [html,body,target,artwork]) {
-        fixed(el,'width',nativeWidth+'px');
-        fixed(el,'min-width',nativeWidth+'px');
-        fixed(el,'max-width',nativeWidth+'px');
-        fixed(el,'box-sizing','border-box');
-      }
-      fixed(html,'margin','0');
-      fixed(body,'margin','0');
-      fixed(body,'padding','0');
-      fixed(target,'flex','0 0 '+nativeWidth+'px');
-      fixed(target,'transform','none');
-      fixed(doc.querySelector('.dds-preview-shell'),'width',nativeWidth+'px');
-      fixed(doc.querySelector('.dds-preview-shell'),'min-width',nativeWidth+'px');
-      state.higherFixedArtboard=true;
+
+    // Source width must be independent of empty text and images.
+    // Do not force the original artwork's own children or height.
+    for (const node of [html, body, shell, target]) {
+      set(node, 'width', nativeWidth + 'px');
+      set(node, 'min-width', nativeWidth + 'px');
+      set(node, 'max-width', nativeWidth + 'px');
+      set(node, 'box-sizing', 'border-box');
     }
-    // No CSS hiding, no replacement of nodes and no new element in parent.
-    // First fit fixes scale once; later edits ONLY grow the iframe's height.
-    const stageWidth = stage.clientWidth;
+    set(html,'margin','0');
+    set(body,'margin','0');
+    set(body,'padding','0');
+    for (const node of [body,shell,target]) {
+      set(node,'height','auto');
+      set(node,'max-height','none');
+      set(node,'overflow','visible');
+    }
+    set(target,'transform','none');
+
+    const stageWidth=stage.clientWidth;
     if (!state.higherFirstFit || stageWidth !== state.higherStageWidth) {
-      const scale = Math.min(1,(stageWidth-24)/nativeWidth);
-      const x = Math.max(0,(stageWidth-nativeWidth*scale)/2);
-      fixed(iframe,'width',nativeWidth+'px');
-      fixed(iframe,'min-width',nativeWidth+'px');
-      fixed(iframe,'max-width','none');
-      fixed(iframe,'position','relative');
-      fixed(iframe,'inset','auto');
-      fixed(iframe,'left','0');
-      fixed(iframe,'top','0');
-      fixed(iframe,'margin','0');
-      fixed(iframe,'display','block');
-      fixed(iframe,'border','0');
-      fixed(iframe,'transform-origin','top left');
-      fixed(iframe,'transform',`translateX(${x}px) scale(${scale})`);
+      const scale=Math.min(1, Math.max(0.1,(stageWidth-24)/nativeWidth));
+      const x=Math.max(0,(stageWidth-nativeWidth*scale)/2);
+      set(iframe,'display','block');
+      set(iframe,'position','relative');
+      set(iframe,'width',nativeWidth+'px');
+      set(iframe,'min-width',nativeWidth+'px');
+      set(iframe,'max-width','none');
+      set(iframe,'flex','0 0 auto');
+      set(iframe,'left','0');
+      set(iframe,'top','0');
+      set(iframe,'right','auto');
+      set(iframe,'margin','0');
+      set(iframe,'border','0');
+      set(iframe,'transform-origin','top left');
+      set(iframe,'transform',`translateX(${x}px) scale(${scale})`);
       state.higherLockedScale=scale;
       state.higherStageWidth=stageWidth;
       state.higherFirstFit=true;
     }
-    let height=Math.max(750,artwork.scrollHeight||0,target?.scrollHeight||0);
-    const top=artwork.getBoundingClientRect().top;
-    for (const el of artwork.querySelectorAll('*')) {
-      if (el.tagName==='STYLE'||el.tagName==='SCRIPT') continue;
+
+    // Crucial: read *all* document descendants (including normal-flow rich
+    // text), not only the first matching ddshigherth-* decoration. Use the
+    // content's untransformed coordinates; the iframe itself is scaled OUTSIDE.
+    let bottom=Math.max(750,body.scrollHeight||0,html.scrollHeight||0,
+      target?.scrollHeight||0,shell?.scrollHeight||0,artwork.scrollHeight||0);
+    const origin=body.getBoundingClientRect().top;
+    for (const el of body.querySelectorAll('*')) {
+      if (/^(SCRIPT|STYLE|LINK|META|NOSCRIPT)$/.test(el.tagName)) continue;
       const cs=doc.defaultView.getComputedStyle(el);
-      if(cs.display==='none'||cs.position==='fixed') continue;
-      const rect=el.getBoundingClientRect();
-      if(rect.height>0) height=Math.max(height,rect.bottom-top+24);
+      if (cs.display==='none'||cs.visibility==='hidden'||cs.position==='fixed') continue;
+      const r=el.getBoundingClientRect();
+      if (r.height>0 && Number.isFinite(r.bottom)) bottom=Math.max(bottom,r.bottom-origin+48);
+      if (el.scrollHeight>el.clientHeight+1) {
+        bottom=Math.max(bottom,r.top-origin+el.scrollHeight+48);
+      }
     }
-    const required=Math.ceil(height+80);
-    if (!state.higherReservedHeight || required>state.higherReservedHeight-100) {
+    // Allow an extra trailing margin for font loading and wrapped rich text.
+    // The viewport scrolls; height changes do not change scale or X position.
+    const required=Math.ceil(bottom+160);
+    if (!state.higherReservedHeight || required>state.higherReservedHeight-80) {
       state.higherReservedHeight=Math.ceil((required+120)/100)*100;
-      fixed(iframe,'height',state.higherReservedHeight+'px');
-      fixed(iframe,'min-height',state.higherReservedHeight+'px');
-      fixed(iframe,'max-height','none');
+      set(iframe,'height',state.higherReservedHeight+'px');
+      set(iframe,'min-height',state.higherReservedHeight+'px');
+      set(iframe,'max-height','none');
     }
-    fixed(stage,'overflow-y','auto');
-    fixed(stage,'overflow-x','hidden');
-    fixed(iframe,'visibility','visible');
-    fixed(iframe,'opacity','1');
+    set(stage,'overflow-y','auto');
+    set(stage,'overflow-x','hidden');
+    set(iframe,'visibility','visible');
+    set(iframe,'opacity','1');
     state.ready=true;
     state.scale=state.higherLockedScale;
     state.bounds={left:0,top:0,width:nativeWidth,height:state.higherReservedHeight};
-    iframe.dataset.ddsHigherFitReady='1';
-    if(resetScroll)stage.scrollTop=0;
+    if (resetScroll) stage.scrollTop=0;
     return true;
   }
 
@@ -27646,6 +27665,8 @@ Fairy</textarea></label><label class="dds-field dds-field-full"><span>หัว�
 
   function initCentralPreview(root = document) {
     root.querySelectorAll?.(STAGE_SELECTOR).forEach(attachPreview);
+    const higher=root.getElementById?.('higherHeavenPreview') || root.querySelector?.('#higherHeavenPreview');
+    if (higher) attachPreview(stageFor(higher));
   }
 
   function activateSoon() {

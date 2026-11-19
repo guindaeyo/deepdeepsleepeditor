@@ -16439,3 +16439,15 @@ html body .dds-basil-editor .dds-basil-fields > .dds-basil-editor-subhead{grid-c
 .dds-basil-editor .dds-basil-relation-editor-head{grid-column:1/-1}
 @media(max-width:700px){html body .dds-basil-editor .dds-basil-fields,.dds-basil-editor .dds-basil-tags-editor,.dds-basil-editor .dds-basil-relation-editor-card{grid-template-columns:minmax(0,1fr)!important}}
 
+
+/* v404 — CODE009 only: scroll the original preview column, no extra wrapper. */
+body.dds-y2k-vampire [data-panel="editor-code009"].is-active .dds-editor-preview-column{
+  display:flex!important;flex-direction:column!important;overflow-y:auto!important;
+  overflow-x:hidden!important;overscroll-behavior:contain;min-height:0!important;
+  scrollbar-width:none!important;
+}
+body.dds-y2k-vampire [data-panel="editor-code009"].is-active .dds-editor-preview-column::-webkit-scrollbar{display:none!important;}
+body.dds-y2k-vampire [data-panel="editor-code009"].is-active .dds-editor-preview-top{
+  position:sticky!important;top:0!important;z-index:4!important;flex:0 0 auto!important;
+}
+body.dds-y2k-vampire [data-panel="editor-code009"].is-active #higherHeavenPreview{flex:0 0 auto!important;}
