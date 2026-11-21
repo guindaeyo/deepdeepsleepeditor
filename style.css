@@ -16809,3 +16809,8 @@ body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikae
 body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikael-signature-preview-stage::after {
   display:none!important;
 }
+
+/* v425 — center MIKAEL sample vertically within its commission card only */
+.dds-rr-signature-card .dds-rr-card-host iframe[data-rr-card-frame]{
+  top:70%!important;
+}
