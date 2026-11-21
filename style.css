@@ -16555,3 +16555,40 @@ html body.dds-y2k-vampire.dds-y2k-vampire.dds-y2k-vampire :is(
 .dds-rr-commission-editor [data-rr-copy]{flex:1;min-width:0}
 .dds-rr-commission-editor [data-rr-reset]{flex:0 0 auto}
 @media(max-width:900px){.dds-rr-commission-editor .dds-rr-layout{height:auto;overflow:visible}.dds-rr-commission-editor .dds-rr-controls{max-height:75dvh!important;min-height:450px!important}}
+
+/* v412 — requested UI cleanup / MIKAEL signature only */
+body.dds-y2k-vampire .dds-browser-chrome{display:none!important}
+.dds-rr-signature-card .dds-rr-card-host iframe[data-rr-card-frame]{
+  position:absolute!important;inset:auto!important;
+  left:50%!important;top:50%!important;
+  opacity:0!important;visibility:hidden!important;
+  transform-origin:center center!important;
+}
+.dds-rr-signature-card .dds-rr-card-host iframe[data-rr-card-frame][data-rr-fitted="yes"]{
+  opacity:1!important;visibility:visible!important;
+}
+.dds-rr-commission-editor .dds-rr-layout{
+  grid-template-columns:minmax(0,3fr) minmax(0,2fr)!important;
+  height:calc(100dvh - 125px)!important;
+  min-height:0!important;
+}
+.dds-rr-commission-editor .dds-rr-controls{min-height:0!important;overflow:hidden!important}
+.dds-rr-commission-editor .dds-rr-control-scroll{
+  flex:1 1 0!important;min-height:0!important;overflow-y:auto!important;
+  overflow-x:hidden!important;overscroll-behavior:contain;
+}
+.dds-rr-commission-editor [data-rr-copy]{
+  color:#fff!important;text-align:left!important;
+  border:1px solid rgba(193,23,36,.72)!important;
+  background:linear-gradient(135deg,#b0121d,#720810)!important;
+  padding:12px 16px!important;
+  font-family:'Courier Prime',monospace!important;
+}
+.dds-rr-commission-editor [data-rr-reset]{
+  color:#dfc6cb!important;border:1px solid #493035!important;
+  background:#100b0e!important;padding:12px 14px!important;
+}
+@media(max-width:900px){
+ .dds-rr-commission-editor .dds-rr-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}
+ .dds-rr-commission-editor .dds-rr-controls{height:70dvh!important;max-height:none!important;min-height:390px!important}
+}

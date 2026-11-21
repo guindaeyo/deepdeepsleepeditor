@@ -58745,10 +58745,33 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     for(const key of Object.keys(s.text)){const node=root.querySelector(`[data-rr-text="${key}"]`);if(node)node.textContent=s.text[key];}
     return true;
   }catch{return false;}}
-  function initFrame(frame,s){if(!frame)return;frame.dataset.rrReady='no';frame.addEventListener('load',()=>{frame.dataset.rrReady='yes';fit(frame);const d=frame.contentDocument;d?.fonts?.ready?.then(()=>fit(frame));setTimeout(()=>fit(frame),180);setTimeout(()=>fit(frame),650);},{once:true});frame.style.width='800px';frame.style.height='360px';frame.srcdoc=sourceDoc(s);}
+  function initFrame(frame,s){
+    if(!frame)return;
+    frame.dataset.rrReady='no';
+    frame.addEventListener('load',()=>{
+      frame.dataset.rrReady='yes';
+      fit(frame);
+      const d=frame.contentDocument;
+      d?.fonts?.ready?.then(()=>fit(frame));
+      setTimeout(()=>fit(frame),180);
+      setTimeout(()=>fit(frame),650);
+    },{once:true});
+    frame.style.width='800px';
+    frame.style.height='360px';
+    if(frame.hasAttribute('data-rr-card-frame')){
+      const host=frame.closest('[data-rr-host]');
+      if(host&&typeof ResizeObserver!=='undefined'){
+        const observer=new ResizeObserver(()=>fit(frame));
+        observer.observe(host);
+      }
+    }
+    frame.srcdoc=sourceDoc(s);
+  }
   function fit(frame){if(!frame?.isConnected||frame.dataset.rrReady!=='yes')return;
     const host=frame.closest('[data-rr-host]');if(!host)return;
-    const available=Math.max(1,host.clientWidth-20);
+    const visibleWidth=host.getBoundingClientRect().width;
+    if(visibleWidth<80)return;
+    const available=Math.max(1,visibleWidth-20);
     const root=frame.contentDocument?.querySelector('.rr-sign');
     const dimensions=root?.getBoundingClientRect();
     const naturalWidth=Math.max(1,Math.ceil(root?.offsetWidth||dimensions?.width||800));
@@ -58757,13 +58780,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     frame.style.width=naturalWidth+'px';frame.style.height=naturalHeight+'px';
     frame.style.transform=`scale(${scale})`;
     frame.style.marginLeft=-(naturalWidth/2)+'px';
-    if(frame.hasAttribute('data-rr-card-frame')){frame.style.marginLeft='0px';frame.style.left='50%';frame.style.top='50%';frame.style.transform=`translate(-50%,-50%) scale(${scale})`;}
+    if(frame.hasAttribute('data-rr-card-frame')){frame.style.marginLeft='0px';frame.style.left='50%';frame.style.top='50%';frame.style.transform=`translate(-50%,-50%) scale(${scale})`;frame.dataset.rrFitted='yes';}
     if(!frame.hasAttribute('data-rr-card-frame'))host.style.height=Math.max(30,Math.ceil(naturalHeight*scale)+8)+'px';
     host.style.setProperty('--rr-fit-width',Math.ceil(naturalWidth*scale)+'px');
   }
   function load(){try{const data=JSON.parse(localStorage.getItem(ST));if(data&&typeof data==='object')return {colors:{...initialColors,...data.colors},opacity:data.opacity??.25,image:data.image||'',motion:{...initialMotion,...data.motion},text:{...blank.text,...data.text}};}catch{}return clone(blank);}
   function persist(){try{localStorage.setItem(ST,JSON.stringify(state));}catch{}}
-  function show(name){document.querySelectorAll('.dds-panel').forEach(p=>p.classList.toggle('is-active',p.dataset.panel===name));document.querySelectorAll('.dds-nav-button').forEach(b=>b.classList.toggle('is-active',b.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',name===VIEW);document.documentElement.classList.toggle('dds-editor-mode',name===VIEW);window.scrollTo({top:0,behavior:'instant'});}
+  function show(name){document.querySelectorAll('.dds-panel').forEach(p=>p.classList.toggle('is-active',p.dataset.panel===name));document.querySelectorAll('.dds-nav-button').forEach(b=>b.classList.toggle('is-active',b.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',name===VIEW||name===EDIT);document.documentElement.classList.toggle('dds-editor-mode',name===VIEW||name===EDIT);window.scrollTo({top:0,behavior:'instant'});}
   function back(event){event?.preventDefault();document.body.classList.remove('dds-editor-mode','dds-modal-open');document.documentElement.classList.remove('dds-editor-mode');history.replaceState({},'','#commission');show('commission');document.querySelector('[data-work-tab="commission"]')?.click();}
   function makeSection(n,title,inner){return `<section class="dds-control-section"><div class="dds-control-title"><span>${n}</span><h2>${title}</h2></div>${inner}</section>`;}
   function makeTextField(label,key){return `<label class="dds-rr-field"><span>${esc(label)}</span><input type="text" data-rr-textfield="${key}" value="" autocomplete="off"></label>`;}
@@ -58799,6 +58822,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     card=document.createElement('article');card.className='dds-roleplay-card dds-commission-card dds-rr-signature-card';card.innerHTML=`<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><div class="dds-rr-card-host" data-rr-host><iframe data-rr-card-frame class="dds-roleplay-card-preview-frame" loading="eager" scrolling="no" tabindex="-1" title="MIKAEL Signature sample"></iframe></div><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทลายเซ็น</p><p class="dds-commission-card-client">ผู้จ้าง <strong>MIKAEL F. KAISER</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-rr-view>VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-rr-edit>EDIT CODE <span>↗</span></button></div></div>`;grid.append(card);card.querySelector('[data-rr-view]').onclick=()=>openView();card.querySelector('[data-rr-edit]').onclick=()=>requestEdit();initFrame(card.querySelector('[data-rr-card-frame]'),sample);return true;
   }
   function route(){if(location.hash==='#'+EDIT&&!editor?.classList.contains('is-active'))requestEdit(true);else if(location.hash==='#'+VIEW&&!view?.classList.contains('is-active'))openView(true);}
-  function start(){let count=0;const timer=setInterval(()=>{if(install()||++count>100)clearInterval(timer);},120);window.addEventListener('resize',()=>document.querySelectorAll('[data-rr-card-frame],[data-rr-editor-frame],[data-rr-view-frame]').forEach(fit));window.addEventListener('hashchange',route);window.addEventListener('popstate',route);setTimeout(route,500);}
+  function start(){let count=0;const timer=setInterval(()=>{if(install()||++count>100)clearInterval(timer);},120);window.addEventListener('resize',()=>document.querySelectorAll('[data-rr-card-frame],[data-rr-editor-frame],[data-rr-view-frame]').forEach(fit));window.addEventListener('hashchange',route);window.addEventListener('popstate',route);document.querySelector('[data-work-tab="commission"]')?.addEventListener('click',()=>requestAnimationFrame(()=>document.querySelectorAll('[data-rr-card-frame]').forEach(fit)));setTimeout(route,500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
