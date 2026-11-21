@@ -16797,3 +16797,15 @@ body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-pro
     padding-top:8px!important;
   }
 }
+
+/* v423 — MIKAEL signature editor only: seamless preview canvas */
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-protected-commission-preview-column,
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikael-signature-preview-stage,
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-rr-preview-host {
+  background:#202020!important;
+  background-image:none!important;
+}
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikael-signature-preview-stage::before,
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikael-signature-preview-stage::after {
+  display:none!important;
+}
