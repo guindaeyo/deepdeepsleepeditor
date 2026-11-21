@@ -16787,3 +16787,13 @@ body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-edito
 body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-protected-commission-layout{
   margin-top:0!important;
 }
+
+/* v422 — MIKAEL only: 8px ABOVE editor heading; columns stop 4px above viewport bottom */
+@media (min-width:901px){
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active{
+    padding-top:0!important;
+  }
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-editor-heading{
+    padding-top:8px!important;
+  }
+}

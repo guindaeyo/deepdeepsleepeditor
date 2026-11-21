@@ -58828,7 +58828,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(!layout)return;
     if(window.matchMedia('(max-width:900px)').matches){layout.style.removeProperty('height');return;}
     const top=layout.getBoundingClientRect().top;
-    layout.style.setProperty('height',Math.max(360,Math.floor(window.innerHeight-top-8))+'px','important');
+    layout.style.setProperty('height',Math.max(0,Math.floor(window.innerHeight-top-4))+'px','important');
   }
   function openEditor(route=false){createEditor();state=load();fillInputs();show(EDIT);sizeEditorToViewport();if(!route)history.pushState({},'','#'+EDIT);currentPreview=editor.querySelector('[data-rr-editor-frame]');if(currentPreview.dataset.rrReady==='yes'){patch(currentPreview,state);fit(currentPreview);}else initFrame(currentPreview,state);requestAnimationFrame(sizeEditorToViewport);}
   function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-rr-view';view.dataset.panel=VIEW;view.innerHTML=`<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-rr-back>←</button></div><div class="dds-rr-view-surface"><div class="dds-rr-view-host" data-rr-host><iframe data-rr-view-frame title="Signature preview" scrolling="no"></iframe></div></div>`;(document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-rr-back]').addEventListener('click',back);}
