@@ -16592,3 +16592,43 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
  .dds-rr-commission-editor .dds-rr-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}
  .dds-rr-commission-editor .dds-rr-controls{height:70dvh!important;max-height:none!important;min-height:390px!important}
 }
+
+
+/* v414 — MIKAEL signature: shared commission copy footer, outside scroll */
+.dds-rr-commission-editor .dds-editor-heading h1{
+  font-size:clamp(25px,3.4vw,48px)!important;
+  line-height:1.12!important;
+}
+.dds-rr-commission-editor .dds-rr-layout{
+  margin-top:15px;
+  height:calc(100dvh - 140px)!important;
+}
+.dds-rr-commission-editor .dds-rr-controls > .dds-rr-central-copy{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:100%;
+  box-sizing:border-box;
+  margin:0!important;
+  padding:12px 14px!important;
+  border-width:1px 0 0!important;
+  border-color:#362025!important;
+  background:#10090c!important;
+}
+.dds-rr-commission-editor .dds-rr-central-copy .dds-control-title{
+  margin-bottom:10px!important;
+}
+.dds-rr-commission-editor .dds-rr-central-copy .dds-protected-commission-copy-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:8px!important;
+}
+.dds-rr-commission-editor .dds-rr-central-copy [data-rr-copy]{
+  width:100%!important;
+  min-height:42px!important;
+}
+.dds-rr-commission-editor .dds-rr-central-copy [data-rr-reset]{
+  min-height:42px!important;
+}
+@media(max-width:900px){
+  .dds-rr-commission-editor .dds-rr-layout{height:auto!important;}
+}
