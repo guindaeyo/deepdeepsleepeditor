@@ -16738,3 +16738,23 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
     box-sizing: border-box !important;
   }
 }
+
+/* v419 — only MIKAEL signature: heading text and bottom-aligned editor columns */
+@media (min-width:901px){
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-editor-heading h1{
+    font-size:20px!important;
+    line-height:1.2!important;
+  }
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-protected-commission-layout{
+    height:calc(100dvh - 52px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-items:stretch!important;
+  }
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-protected-commission-preview-column,
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-protected-commission-controls-column{
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+}
