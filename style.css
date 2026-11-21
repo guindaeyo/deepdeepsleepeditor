@@ -16717,3 +16717,24 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
  .dds-mikael-signature-editor .dds-protected-commission-controls-column{height:75dvh!important;min-height:450px!important;max-height:none!important}
  .dds-mikael-signature-editor .dds-rr-control-grid{grid-template-columns:1fr}
 }
+
+/* v418 — MIKAEL editor: compact title and viewport-height columns only */
+@media (min-width: 901px) {
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-editor-heading h1 {
+    font-size: clamp(23px, 2vw, 32px) !important;
+    line-height: 1.12 !important;
+  }
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-protected-commission-layout {
+    height: calc(100dvh - 116px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    align-items: stretch !important;
+  }
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-protected-commission-preview-column,
+  body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-protected-commission-controls-column {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+  }
+}
