@@ -16557,7 +16557,7 @@ html body.dds-y2k-vampire.dds-y2k-vampire.dds-y2k-vampire :is(
 @media(max-width:900px){.dds-rr-commission-editor .dds-rr-layout{height:auto;overflow:visible}.dds-rr-commission-editor .dds-rr-controls{max-height:75dvh!important;min-height:450px!important}}
 
 /* v412 — requested UI cleanup / MIKAEL signature only */
-body.dds-y2k-vampire .dds-browser-chrome{display:none!important}
+body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrome{display:none!important}
 .dds-rr-signature-card .dds-rr-card-host iframe[data-rr-card-frame]{
   position:absolute!important;inset:auto!important;
   left:50%!important;top:50%!important;
