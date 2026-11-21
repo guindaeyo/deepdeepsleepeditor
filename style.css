@@ -16632,3 +16632,72 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
 @media(max-width:900px){
   .dds-rr-commission-editor .dds-rr-layout{height:auto!important;}
 }
+
+
+/* v415 — MIKAEL commission uses established protected editor structure */
+.dds-mikael-signature-editor .dds-protected-commission-layout{
+ display:grid!important;grid-template-columns:minmax(0,3fr) minmax(340px,2fr)!important;
+ align-items:stretch!important;gap:12px!important;height:calc(100dvh - 150px)!important;min-height:540px!important;
+ padding-bottom:0!important;margin-top:15px!important;
+}
+.dds-mikael-signature-editor .dds-editor-heading h1{font-size:clamp(25px,3.4vw,48px)!important;line-height:1.12!important}
+.dds-mikael-signature-editor .dds-protected-commission-preview-column{
+ min-height:0!important;display:flex!important;flex-direction:column!important;
+ overflow:hidden!important;border:1px solid var(--dds-red,#8f0e16);border-radius:6px;background:#0c090b;
+}
+.dds-mikael-signature-editor .dds-mikael-signature-preview-stage{
+ position:relative!important;flex:1!important;min-height:0!important;
+ overflow:auto!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;
+ padding:36px 20px!important;background:#0a090a!important;scrollbar-width:none!important;
+}
+.dds-mikael-signature-editor .dds-mikael-signature-preview-stage::-webkit-scrollbar{display:none}
+.dds-mikael-signature-editor .dds-rr-preview-host{
+ position:relative;flex:none;width:100%;min-height:100px;
+ display:flex;justify-content:center;align-items:flex-start;
+}
+.dds-mikael-signature-editor .dds-protected-commission-preview-frame{
+ position:absolute!important;top:0!important;left:50%!important;
+ display:block!important;border:0!important;max-width:none!important;
+ margin:0 0 0 -400px;transform-origin:top center!important;
+ background:transparent!important;transition:none!important;
+}
+.dds-mikael-signature-editor .dds-protected-commission-controls-column{
+ height:auto!important;min-height:0!important;max-height:100%!important;
+ display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;
+ gap:0!important;overflow:hidden!important;background:#10090c;
+ border:1px solid #362025;border-radius:6px;
+}
+.dds-mikael-signature-editor .dds-protected-commission-draft{display:flex!important;align-items:center!important;padding:14px!important;min-height:0!important}
+.dds-mikael-signature-editor .dds-mikael-signature-scroll{
+ min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+ padding:10px!important;scrollbar-width:none!important;
+}
+.dds-mikael-signature-editor .dds-mikael-signature-scroll::-webkit-scrollbar{display:none}
+.dds-mikael-signature-editor .dds-rr-control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:12px 4px 4px}
+.dds-mikael-signature-editor .dds-rr-wide{grid-column:1/-1}
+.dds-mikael-signature-editor .dds-rr-field{display:flex;flex-direction:column;gap:7px;color:#c9b7ba;font:400 13px 'Bai Jamjuree',sans-serif;min-width:0}
+.dds-mikael-signature-editor .dds-rr-field>span{line-height:1.45}
+.dds-mikael-signature-editor .dds-rr-field input[type=text],
+.dds-mikael-signature-editor .dds-rr-field input[type=url]{width:100%;min-width:0;box-sizing:border-box;background:#0a0709;border:1px solid #4a2b33;color:#fff;padding:12px;font:400 14px 'Bai Jamjuree',sans-serif}
+.dds-mikael-signature-editor .dds-rr-color{display:flex;gap:6px;min-width:0}
+.dds-mikael-signature-editor .dds-rr-color input[type=color]{width:42px;height:40px;flex:none;padding:3px;border:1px solid #4a2b33;background:#0a0709}
+.dds-mikael-signature-editor .dds-rr-color input[type=text]{flex:1;width:20px}
+.dds-mikael-signature-editor .dds-rr-range{display:flex;align-items:center;gap:10px}
+.dds-mikael-signature-editor .dds-rr-range input[type=range]{flex:1;min-width:0;accent-color:var(--dds-red-bright,#c11724)}
+.dds-mikael-signature-editor .dds-rr-range output{min-width:54px;text-align:right;font-size:12px;color:#fff}
+.dds-mikael-signature-editor .dds-control-section{margin:0 0 12px}
+.dds-mikael-signature-editor .dds-mikael-signature-copy{
+ display:block!important;position:relative!important;flex:0 0 auto!important;
+ padding:12px 14px!important;margin:0!important;
+ border-width:1px 0 0!important;border-color:#362025!important;
+ background:#10090c!important;
+}
+.dds-mikael-signature-editor .dds-mikael-signature-copy .dds-protected-commission-copy-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.dds-mikael-signature-editor .dds-mikael-signature-copy [data-rr-copy]{width:100%;min-height:42px;color:#fff!important;background:linear-gradient(135deg,#b0121d,#720810)!important;border-color:#8f0e16!important;text-align:left}
+.dds-mikael-signature-editor .dds-mikael-signature-copy [data-rr-reset]{min-height:42px;flex:none}
+@media(max-width:900px){
+ .dds-mikael-signature-editor .dds-protected-commission-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}
+ .dds-mikael-signature-editor .dds-protected-commission-preview-column{min-height:340px!important}
+ .dds-mikael-signature-editor .dds-protected-commission-controls-column{height:75dvh!important;min-height:450px!important;max-height:none!important}
+ .dds-mikael-signature-editor .dds-rr-control-grid{grid-template-columns:1fr}
+}
