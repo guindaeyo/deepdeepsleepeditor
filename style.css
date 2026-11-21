@@ -16814,3 +16814,16 @@ body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-mikae
 .dds-rr-signature-card .dds-rr-card-host iframe[data-rr-card-frame]{
   top:70%!important;
 }
+
+body.dds-y2k-vampire .dds-panel :is(.dds-editor-actions,.dds-protected-commission-copy-actions) > :is(.dds-reset-button,[data-015-reset],[data-afrole-reset],[data-alan-reset],[data-aph-reset],[data-basil-reset],[data-code013-reset],[data-commission-reset],[data-crtz-reset],[data-eric-reset],[data-floyd-reset],[data-food-reset],[data-frp-reset],[data-hans-reset],[data-history-reset],[data-jewel-reset],[data-landon-file-reset],[data-lr-profile-reset],[data-mhp-reset],[data-mikael-reset],[data-rora-reset],[data-rr-reset],[data-vmac-reset]){
+  color:#797477!important;
+  background:#0a0809!important;
+  background-image:none!important;
+  border:1px solid #342a2e!important;
+  box-shadow:none!important;
+}
+body.dds-y2k-vampire .dds-panel :is(.dds-editor-actions,.dds-protected-commission-copy-actions) > :is(.dds-reset-button,[data-015-reset],[data-afrole-reset],[data-alan-reset],[data-aph-reset],[data-basil-reset],[data-code013-reset],[data-commission-reset],[data-crtz-reset],[data-eric-reset],[data-floyd-reset],[data-food-reset],[data-frp-reset],[data-hans-reset],[data-history-reset],[data-jewel-reset],[data-landon-file-reset],[data-lr-profile-reset],[data-mhp-reset],[data-mikael-reset],[data-rora-reset],[data-rr-reset],[data-vmac-reset]):hover{
+  color:#d7cfd1!important;
+  background:#151012!important;
+  border-color:#60434b!important;
+}
