@@ -16531,3 +16531,27 @@ html body.dds-y2k-vampire.dds-y2k-vampire.dds-y2k-vampire :is(
 .dds-rr-view .dds-rr-view-surface{display:flex;justify-content:center;padding:70px 15px 35px;min-height:100vh;box-sizing:border-box;overflow:auto;scrollbar-width:none}
 .dds-rr-view .dds-rr-view-host{position:relative;flex:none;width:min(100%,1000px);height:400px}
 @media(max-width:900px){.dds-rr-commission-editor .dds-rr-layout{grid-template-columns:1fr;height:auto}.dds-rr-commission-editor .dds-rr-preview-col{min-height:340px}.dds-rr-commission-editor .dds-rr-controls{max-height:80vh;min-height:450px}.dds-rr-commission-editor .dds-rr-control-grid{grid-template-columns:1fr}}
+
+
+/* v411 — only HANS draft controls and MIKAEL signature */
+.dds-hans-commission-editor .dds-protected-commission-draft > [data-hans-save],
+.dds-hans-commission-editor .dds-protected-commission-draft > [data-hans-delete]{display:none!important}
+.dds-hans-commission-editor .dds-protected-commission-draft.dds-named-save-host{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+.dds-hans-commission-editor .dds-protected-commission-draft.dds-named-save-host > div:first-child{width:100%}
+.dds-rr-signature-card .dds-roleplay-card-preview-frame[data-rr-card-frame]{
+ position:absolute!important;top:50%!important;left:50%!important;
+ inset:auto!important;max-width:none!important;max-height:none!important;
+ transform-origin:center center!important;opacity:1!important;
+ transition:none!important;border:0!important;background:transparent!important;
+}
+.dds-rr-signature-card .dds-rr-card-host{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}
+.dds-rr-commission-editor.dds-panel.is-active{min-height:0}
+.dds-rr-commission-editor .dds-rr-layout{height:calc(100dvh - 155px);min-height:560px;max-height:none;overflow:hidden;align-items:stretch}
+.dds-rr-commission-editor .dds-rr-controls{display:flex!important;flex-direction:column!important;min-height:0!important;max-height:100%!important;overflow:hidden!important}
+.dds-rr-commission-editor .dds-protected-commission-draft{flex:0 0 auto;min-height:0;padding:14px!important}
+.dds-rr-commission-editor .dds-rr-control-scroll{display:block!important;min-height:0!important;flex:1 1 0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;scrollbar-width:none}
+.dds-rr-commission-editor .dds-rr-control-scroll::-webkit-scrollbar{display:none}
+.dds-rr-commission-editor .dds-protected-commission-copy-actions{display:flex;gap:10px}
+.dds-rr-commission-editor [data-rr-copy]{flex:1;min-width:0}
+.dds-rr-commission-editor [data-rr-reset]{flex:0 0 auto}
+@media(max-width:900px){.dds-rr-commission-editor .dds-rr-layout{height:auto;overflow:visible}.dds-rr-commission-editor .dds-rr-controls{max-height:75dvh!important;min-height:450px!important}}
