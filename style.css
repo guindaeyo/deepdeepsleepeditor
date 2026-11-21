@@ -16758,3 +16758,23 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
     max-height:none!important;
   }
 }
+
+
+/* v420 — MIKAEL signature editor only: heading rhythm, unified preview, XY text controls */
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active .dds-editor-heading{
+  padding-bottom:8px!important;margin-bottom:8px!important;
+}
+body.dds-y2k-vampire .dds-panel.dds-mikael-signature-editor.is-active > .dds-protected-commission-layout{
+  margin-top:8px!important;
+}
+.dds-mikael-signature-editor .dds-protected-commission-preview-column,
+.dds-mikael-signature-editor .dds-mikael-signature-preview-stage,
+.dds-mikael-signature-editor .dds-rr-preview-host{
+  background:#202020!important;
+}
+.dds-mikael-signature-editor .dds-rr-text-position{
+  min-width:0;padding:10px 12px;margin-top:-5px;background:#150d11;border:1px solid #39232a;border-radius:5px;
+}
+.dds-mikael-signature-editor .dds-rr-text-position>span{display:block;font-size:12px;color:#c9b7ba;margin-bottom:10px}
+.dds-mikael-signature-editor .dds-rr-xy-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:600px){.dds-mikael-signature-editor .dds-rr-xy-pair{grid-template-columns:1fr}}
