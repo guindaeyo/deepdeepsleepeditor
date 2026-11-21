@@ -16667,7 +16667,23 @@ body.dds-y2k-vampire:has(.dds-rr-commission-editor.is-active) .dds-browser-chrom
  gap:0!important;overflow:hidden!important;background:#10090c;
  border:1px solid #362025;border-radius:6px;
 }
-.dds-mikael-signature-editor .dds-protected-commission-draft{display:flex!important;align-items:center!important;padding:14px!important;min-height:0!important}
+.dds-mikael-signature-editor .dds-protected-commission-draft.dds-named-save-host{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ align-items:stretch!important;
+ gap:6px!important;
+ padding:6px 9px!important;
+ min-height:0!important;
+}
+.dds-mikael-signature-editor .dds-protected-commission-draft.dds-named-save-host > div:first-child{
+ width:100%!important;
+ min-width:0!important;
+}
+.dds-mikael-signature-editor .dds-protected-commission-draft.dds-named-save-host > .dds-named-save-library{
+ width:100%!important;
+ min-width:0!important;
+ margin:0!important;
+}
 .dds-mikael-signature-editor .dds-mikael-signature-scroll{
  min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;
  padding:10px!important;scrollbar-width:none!important;
