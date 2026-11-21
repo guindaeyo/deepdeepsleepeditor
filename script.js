@@ -58787,7 +58787,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     frame.style.width=naturalWidth+'px';frame.style.height=naturalHeight+'px';
     frame.style.transform=`scale(${scale})`;
     frame.style.marginLeft=-(naturalWidth/2)+'px';
-    if(frame.hasAttribute('data-rr-card-frame')){frame.style.marginLeft='0px';frame.style.left='50%';frame.style.top='50%';frame.style.transform=`translate(-50%,-50%) scale(${scale})`;}
+    if(frame.hasAttribute('data-rr-card-frame')){frame.style.marginLeft='0px';frame.style.left='50%';frame.style.top='50%';frame.style.transform=`translate(-50%,-50%) scale(${Math.min(scale,(Math.max(1,host.clientHeight-16))/naturalHeight)})`;frame.dataset.rrFitted='yes';}
     if(!frame.hasAttribute('data-rr-card-frame'))host.style.height=Math.max(30,Math.ceil(naturalHeight*scale)+8)+'px';
     host.style.setProperty('--rr-fit-width',Math.ceil(naturalWidth*scale)+'px');
   }
