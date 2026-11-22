@@ -58963,7 +58963,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(editor);
     editor.querySelector('[data-ares-back]').onclick=back;
     editor.querySelector('[data-ares-copy]').onclick=copy;
-    editor.querySelector('[data-ares-reset]').onclick=()=>{if(!confirm('คืนค่าสีและล้างรูปภาพ/ข้อความที่แก้ไขหรือไม่?'))return;state=clone(blank);fill();patch(editorFrame,state);save();};
+    editor.querySelector('[data-ares-reset]').onclick=()=>{if(!confirm('คืนค่าสีและล้างรูปภาพ/ข้อความที่แก้ไขหรือไม่?'))return;state=clone(blank);fill();patch(editorFrame,state);save();if(editorFrame){editorFrame.style.left='50%';editorFrame.style.marginLeft='0';const stage=editorFrame.closest('.dds-ares-preview-stage');if(stage){stage.scrollLeft=0;stage.scrollTop=0;}requestAnimationFrame(()=>fit(editorFrame));}};
     editor.addEventListener('input',update);editor.addEventListener('change',update);
     return editor;
   }

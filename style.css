@@ -16883,3 +16883,7 @@ body.dds-y2k-vampire .dds-panel.dds-ares-editor .dds-protected-commission-copy-a
 /* v431 — Ares editor: requested heading and compact name-side text field */
 .dds-ares-editor .dds-editor-heading h1{font-size:15px!important;line-height:1.2!important}
 .dds-ares-editor textarea[data-ares-textfield="topnote"]{height:39px!important;min-height:39px!important;max-height:none;overflow-y:auto!important;resize:vertical}
+
+/* v432: Ares profile editor only — heading and compact top-note input */
+body.dds-y2k-vampire .dds-panel.dds-ares-editor .dds-editor-heading h1{font-size:13px!important;line-height:1.2!important}
+body.dds-y2k-vampire .dds-panel.dds-ares-editor textarea[data-ares-textfield="topnote"]{box-sizing:border-box!important;height:75px!important;min-height:75px!important;max-height:75px!important;overflow-y:auto!important;resize:none!important}
