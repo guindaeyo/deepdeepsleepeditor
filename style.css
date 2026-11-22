@@ -16879,3 +16879,7 @@ body.dds-y2k-vampire .dds-panel :is(.dds-editor-actions,.dds-protected-commissio
 .dds-ares-editor .dds-editor-heading h1{font-size:18px!important;line-height:1.2!important}
 body.dds-y2k-vampire .dds-panel.dds-ares-editor .dds-protected-commission-copy-actions > button[data-ares-reset]{background:#0a0809!important;background-image:none!important;color:#797477!important;border:1px solid #342a2e!important;box-shadow:none!important}
 body.dds-y2k-vampire .dds-panel.dds-ares-editor .dds-protected-commission-copy-actions > button[data-ares-reset]:hover{background:#151012!important;color:#d7cfd1!important;border-color:#60434b!important}
+
+/* v431 — Ares editor: requested heading and compact name-side text field */
+.dds-ares-editor .dds-editor-heading h1{font-size:15px!important;line-height:1.2!important}
+.dds-ares-editor textarea[data-ares-textfield="topnote"]{height:39px!important;min-height:39px!important;max-height:none;overflow-y:auto!important;resize:vertical}
