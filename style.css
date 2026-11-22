@@ -16891,3 +16891,22 @@ body.dds-y2k-vampire .dds-panel.dds-ares-editor textarea[data-ares-textfield="to
 /* Ares editor preview: fixed-size artboard, vertical scrolling without a visible scrollbar. */
 .dds-ares-editor .dds-ares-preview-stage{overflow-x:hidden!important;overflow-y:auto!important;scrollbar-width:none!important;-ms-overflow-style:none!important}
 .dds-ares-editor .dds-ares-preview-stage::-webkit-scrollbar{display:none!important}
+
+/* v435 — ARES editor preview only: override the shared red-scrollbar rule.
+   Preserve vertical scrolling and the established first-fit artboard scale. */
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-editor.is-active .dds-protected-commission-preview-column .dds-ares-preview-stage {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+  -ms-overflow-style: none !important;
+}
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-editor.is-active .dds-protected-commission-preview-column .dds-ares-preview-stage::-webkit-scrollbar,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-editor.is-active .dds-protected-commission-preview-column .dds-ares-preview-stage::-webkit-scrollbar-track,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-editor.is-active .dds-protected-commission-preview-column .dds-ares-preview-stage::-webkit-scrollbar-thumb,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-editor.is-active .dds-protected-commission-preview-column .dds-ares-preview-stage::-webkit-scrollbar-corner {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
