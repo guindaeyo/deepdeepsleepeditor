@@ -58941,21 +58941,31 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(isEditor)frame.style.visibility='hidden';
     frame.addEventListener('load',()=>{
       frame.dataset.aresReady='yes';
+      // Do not lock the editor scale while the 60/40 columns are still settling.
+      // A premature measurement used to make the first view smaller than after typing.
+      let lastWidth=-1,stableFrames=0,frames=0;
       const settle=()=>{
         if(!frame.isConnected)return;
+        if(!isEditor){fit(frame);return;}
         const stage=frame.closest('.dds-ares-preview-stage');
-        if(isEditor&&(!stage||stage.clientHeight<180||stage.clientWidth<180)){
-          requestAnimationFrame(settle);return;
-        }
+        const host=frame.closest('[data-ares-host]');
+        const width=host?.getBoundingClientRect().width||0;
+        if(stage?.clientHeight>=180&&stage.clientWidth>=180&&width>=180){
+          if(Math.abs(width-lastWidth)<0.5)stableFrames++;
+          else stableFrames=0;
+          lastWidth=width;
+        }else stableFrames=0;
+        frames++;
+        if(stableFrames<5&&frames<120){requestAnimationFrame(settle);return;}
         fit(frame);
-        if(isEditor)frame.style.visibility='visible';
+        frame.style.visibility='visible';
       };
-      // Wait for both the linked stylesheet and font metrics before the first visible fit.
+      // Keep the iframe invisible until fonts and the actual column width are ready.
       if(isEditor){
         Promise.resolve(frame.contentDocument?.fonts?.ready)
           .catch(()=>{})
-          .then(()=>requestAnimationFrame(()=>requestAnimationFrame(settle)));
-      }else requestAnimationFrame(()=>requestAnimationFrame(settle));
+          .then(()=>requestAnimationFrame(settle));
+      }else requestAnimationFrame(settle);
     },{once:true});
     frame.srcdoc=doc(s);
     // Only card/view previews need a resize observer. The editor is fixed after first fit.
