@@ -58872,7 +58872,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     ['date-rotate','หมุนกล่องวันที่',2,-180,180,.1,'deg']
   ];
   const TEXTS=[
-    ['top','ชื่อหลัก','ARES'],['topnote','ข้อความข้างชื่อ','THE WOLF\nEXPERIENCE'],
+    ['top','ชื่อหลัก','ARES'],['topnote','ข้อความข้างชื่อ (สอง–สามบรรทัดกำลังสวย)','THE WOLF\nEXPERIENCE'],
     ['second','นามสกุล','MONARQYN'],['info-small','ข้อมูลสั้น','IDENTITY / 001'],
     ['info-big','ประเภทตัวละคร','WEREWOLF'],['info-bottom','ข้อความใต้ข้อมูล','@4resm0_'],
     ['bottom-no','หมายเลข','NO. 01'],['bottom-small','คำใต้หมายเลข','THE WOLF ARCHIVE'],
@@ -58928,7 +58928,22 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     else host.style.height=Math.ceil(nativeHeight*scale)+'px';
   }
   function initFrame(frame,s){if(!frame)return;frame.dataset.aresReady='no';frame.style.width='900px';frame.style.height='1120px';
-    frame.addEventListener('load',()=>{frame.dataset.aresReady='yes';fit(frame);frame.contentDocument?.fonts?.ready?.then(()=>fit(frame));setTimeout(()=>fit(frame),350);},{once:true});
+    const isEditor=frame.hasAttribute('data-ares-editor');
+    if(isEditor)frame.style.visibility='hidden';
+    frame.addEventListener('load',()=>{
+      frame.dataset.aresReady='yes';
+      const settle=()=>{
+        if(!frame.isConnected)return;
+        const stage=frame.closest('.dds-ares-preview-stage');
+        if(isEditor&&(!stage||stage.clientHeight<180||stage.clientWidth<180)){
+          requestAnimationFrame(settle);return;
+        }
+        fit(frame);
+        if(isEditor)frame.style.visibility='visible';
+      };
+      requestAnimationFrame(()=>requestAnimationFrame(settle));
+      frame.contentDocument?.fonts?.ready?.then(()=>requestAnimationFrame(()=>fit(frame)));
+    },{once:true});
     frame.srcdoc=doc(s);
     if(typeof ResizeObserver!=='undefined'){const host=frame.closest('[data-ares-host]');if(host)new ResizeObserver(()=>fit(frame)).observe(host);}
   }
@@ -58939,8 +58954,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     editor=document.createElement('section');editor.className='dds-panel dds-protected-commission-editor dds-ares-editor';editor.dataset.panel=EDIT;
     const colors=COLORS.map(([k,label])=>`<label class="dds-ares-field"><span>${esc(label)} — --commitarzpfo-${k}</span><div class="dds-ares-color"><input type="color" data-ares-color="${k}"><input type="text" data-ares-hex="${k}" spellcheck="false"></div></label>`).join('');
     const numbers=SETTINGS.map(([k,label,,min,max,step,unit])=>`<label class="dds-ares-field"><span>${esc(label)}</span><div class="dds-ares-range"><input type="range" data-ares-setting="${k}" min="${min}" max="${max}" step="${step}"><output data-ares-output="${k}">${unit}</output></div></label>`).join('');
-    const texts=TEXTS.map(([k,label])=>`<label class="dds-ares-field"><span>${esc(label)}</span>${k==='topnote'?`<textarea rows="2" data-ares-textfield="${k}"></textarea>`:`<input type="text" data-ares-textfield="${k}" autocomplete="off">`}</label>`).join('');
-    editor.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-ares-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · ARES MONARQYN</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ARES / PROFILE</strong></div><div class="dds-protected-commission-preview-stage dds-ares-preview-stage"><div class="dds-ares-preview-host" data-ares-host><iframe data-ares-editor title="ARES profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-ares-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-ares-scroll">${section('01','สีทั้งหมด',`<div class="dds-ares-grid">${colors}</div>`)}${section('02','รูปภาพ',`<div class="dds-ares-grid"><label class="dds-ares-field dds-ares-wide"><span>ลิงก์รูปภาพ</span><input type="url" data-ares-image placeholder="วาง URL รูปภาพ"></label>${numbers.slice(0,0)}</div>`)}${section('03','ปรับรูปและองค์ประกอบ',`<div class="dds-ares-grid">${numbers}</div>`)}${section('04','แก้ข้อความทั้งหมด',`<div class="dds-ares-grid">${texts}</div>`)}</div><section class="dds-protected-commission-copy dds-ares-copy"><div class="dds-control-title"><span>05</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-ares-copy>COPY CODE <span>↗</span></button><button type="button" data-ares-reset>RESET</button></div></section></div></div>`;
+    const texts=TEXTS.map(([k,label])=>`<label class="dds-ares-field"><span>${esc(label)}</span>${k==='topnote'?`<textarea rows="3" data-ares-textfield="${k}" placeholder="แนะนำ 2–3 บรรทัด"></textarea>`:`<input type="text" data-ares-textfield="${k}" autocomplete="off">`}</label>`).join('');
+    editor.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-ares-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · ARES MONARQYN</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ARES / PROFILE</strong></div><div class="dds-protected-commission-preview-stage dds-ares-preview-stage"><div class="dds-ares-preview-host" data-ares-host><iframe data-ares-editor title="ARES profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-ares-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-ares-scroll">${section('01','สีทั้งหมด',`<div class="dds-ares-grid">${colors}</div>`)}${section('02','รูปภาพ',`<div class="dds-ares-grid"><label class="dds-ares-field dds-ares-wide"><span>ลิงก์รูปภาพ</span><input type="url" data-ares-image placeholder="วาง URL รูปภาพ"></label>${numbers.slice(0,0)}</div>`)}${section('03','ปรับรูปและองค์ประกอบ',`<div class="dds-ares-grid">${numbers}</div>`)}${section('04','แก้ข้อความทั้งหมด',`<div class="dds-ares-grid">${texts}</div>`)}</div><section class="dds-protected-commission-copy dds-ares-copy"><div class="dds-control-title"><span>05</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-ares-copy>COPY CODE <span>↗</span></button><button type="button" class="dds-reset-button" data-ares-reset>RESET</button></div></section></div></div>`;
     (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(editor);
     editor.querySelector('[data-ares-back]').onclick=back;
     editor.querySelector('[data-ares-copy]').onclick=copy;
