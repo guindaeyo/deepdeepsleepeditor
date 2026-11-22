@@ -58845,3 +58845,127 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function start(){let count=0;const timer=setInterval(()=>{if(install()||++count>100)clearInterval(timer);},120);window.addEventListener('resize',()=>{sizeEditorToViewport();document.querySelectorAll('[data-rr-card-frame],[data-rr-editor-frame],[data-rr-view-frame]').forEach(fit);});window.addEventListener('hashchange',route);window.addEventListener('popstate',route);document.querySelector('[data-work-tab="commission"]')?.addEventListener('click',()=>requestAnimationFrame(()=>document.querySelectorAll('[data-rr-card-frame]').forEach(fit)));setTimeout(route,500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
+
+/* COMMISSION — ARES MONARQYN / PROFILE POSTER (integrated module) */
+(() => {
+  'use strict';
+  if (window.__ddsAresPosterCommission) return;
+  window.__ddsAresPosterCommission = true;
+  const EDIT='commission-ares-profile-editor', VIEW='commission-ares-profile-view';
+  const STORAGE='dds:commission:ares-profile:draft', ACCESS='dds:commission:ares-profile:access';
+  const HASH='840a0243ff16caa5844ea4c6c8de4d24bda00a20a5f091fa2127f68b803e6acc';
+  const CSS='https://guindaeyo.github.io/commisdeepdcsh/comm-arezpfofile.css';
+  const FONTS='https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700;800;900&display=swap';
+  const COLORS=[
+    ['bg','พื้นหลัง','#141414'],['blue','สีน้ำเงิน','#3b38ff'],['white','สีขาว','#ffffff'],
+    ['text','สีข้อความ','#3b38ff'],['photo-bg','พื้นหลังรูป','#c7c7d1'],['photo-border','ขอบรูป','#3b38ff']
+  ];
+  const SETTINGS=[
+    ['photo-border-size','ความหนาขอบรูป',5,0,30,1,'px'],
+    ['img-x','ตำแหน่งรูป ซ้าย–ขวา',50,-200,300,1,'%'],
+    ['img-y','ตำแหน่งรูป ขึ้น–ลง',50,-200,300,1,'%'],
+    ['img-zoom','ซูมรูป',1,.2,5,.05,'×'],
+    ['top-rotate','หมุนชื่อบรรทัดบน',-1.7,-180,180,.1,'deg'],
+    ['second-rotate','หมุนชื่อบรรทัดสอง',2,-180,180,.1,'deg'],
+    ['photo-rotate','หมุนกรอบรูป',-2.5,-180,180,.1,'deg'],
+    ['info-rotate','หมุนกล่องข้อมูล',-1.8,-180,180,.1,'deg'],
+    ['date-rotate','หมุนกล่องวันที่',2,-180,180,.1,'deg']
+  ];
+  const TEXTS=[
+    ['top','ชื่อหลัก','ARES'],['topnote','ข้อความข้างชื่อ','THE WOLF\nEXPERIENCE'],
+    ['second','นามสกุล','MONARQYN'],['info-small','ข้อมูลสั้น','IDENTITY / 001'],
+    ['info-big','ประเภทตัวละคร','WEREWOLF'],['info-bottom','ข้อความใต้ข้อมูล','@4resm0_'],
+    ['bottom-no','หมายเลข','NO. 01'],['bottom-small','คำใต้หมายเลข','THE WOLF ARCHIVE'],
+    ['bottom-center','ข้อความล่างกลาง','@4resm0_'],['bottom-caption','คำบรรยายล่าง','THE NIGHT IS OURS'],
+    ['date','วันที่','20/07'],['date-season','ข้อความใต้วันที่','WOLF SEASON'],
+    ['date-name','ข้อความบรรทัดล่างสุด','ARES MONARQYN']
+  ];
+  const defaultColors=Object.fromEntries(COLORS.map(([k,,v])=>[k,v]));
+  const defaultSettings=Object.fromEntries(SETTINGS.map(([k,,v])=>[k,v]));
+  const example={colors:{...defaultColors}, settings:{...defaultSettings}, image:'https://i.pinimg.com/736x/51/65/3d/51653d419db697913049a830e8a784dc.jpg',text:Object.fromEntries(TEXTS.map(([k,,v])=>[k,v]))};
+  const blank={colors:{...defaultColors},settings:{...defaultSettings},image:'',text:Object.fromEntries(TEXTS.map(([k])=>[k,'']))};
+  const clone=s=>JSON.parse(JSON.stringify(s));
+  let state=clone(blank),card=null,editor=null,view=null,modal=null,editorFrame=null;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const url=s=>/^https?:\/\/[^\s"'<>]+$/i.test(String(s||'').trim())?String(s).trim():'';
+  const save=()=>{try{localStorage.setItem(STORAGE,JSON.stringify(state));}catch{}};
+  const load=()=>{try{const s=JSON.parse(localStorage.getItem(STORAGE));return s&&typeof s==='object'?{colors:{...defaultColors,...s.colors},settings:{...defaultSettings,...s.settings},image:s.image||'',text:{...blank.text,...s.text}}:clone(blank);}catch{return clone(blank);}};
+  function variableString(s){return [...COLORS.map(([key])=>`--commitarzpfo-${key}:${s.colors[key]||defaultColors[key]}`),...SETTINGS.map(([key,,,,,unit])=>`--commitarzpfo-${key}:${s.settings[key]}${unit==='×'?'':unit}`)].join(';');}
+  function html(s){
+    const field=k=>esc(s.text[k]);
+    return `<link href="${CSS}" rel="stylesheet"><link href="${FONTS}" rel="stylesheet"><div class="commitarzpfo-poster" style="${esc(variableString(s))}"><div class="commitarzpfo-photo"><img src="${esc(url(s.image))}" alt=""></div><div class="commitarzpfo-top"><span data-ares-text="top">${field('top')}</span></div><div class="commitarzpfo-topnote" data-ares-text="topnote" style="white-space:pre-line">${field('topnote')}</div><div class="commitarzpfo-second"><span data-ares-text="second">${field('second')}</span></div><div class="commitarzpfo-info"><div class="commitarzpfo-info-small" data-ares-text="info-small">${field('info-small')}</div><div class="commitarzpfo-info-big" data-ares-text="info-big">${field('info-big')}</div><div class="commitarzpfo-info-bottom" data-ares-text="info-bottom">${field('info-bottom')}</div></div><div class="commitarzpfo-bottom-left"><span data-ares-text="bottom-no">${field('bottom-no')}</span><small data-ares-text="bottom-small">${field('bottom-small')}</small></div><div class="commitarzpfo-bottom-center"><div data-ares-text="bottom-center">${field('bottom-center')}</div><span data-ares-text="bottom-caption">${field('bottom-caption')}</span></div><div class="commitarzpfo-date"><strong data-ares-text="date">${field('date')}</strong><span data-ares-text="date-season">${field('date-season')}</span><span data-ares-text="date-name">${field('date-name')}</span></div></div><div class="ddscomm-craaz"><span></span></div>`;
+  }
+  const doc=s=>`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;background:transparent!important;overflow:hidden!important}*,*::before,*::after{box-sizing:border-box}</style></head><body>${html(s)}</body></html>`;
+  function patch(frame,s){try{
+    const d=frame?.contentDocument,root=d?.querySelector('.commitarzpfo-poster');if(!root)return false;
+    COLORS.forEach(([k])=>root.style.setProperty('--commitarzpfo-'+k,s.colors[k]));
+    SETTINGS.forEach(([k,,,,,unit])=>root.style.setProperty('--commitarzpfo-'+k,String(s.settings[k])+(unit==='×'?'':unit)));
+    const img=root.querySelector('.commitarzpfo-photo img');if(img){const next=url(s.image);if(img.getAttribute('src')!==next){if(next)img.setAttribute('src',next);else img.removeAttribute('src');}}
+    TEXTS.forEach(([k])=>{const element=root.querySelector(`[data-ares-text="${k}"]`);if(element&&element.textContent!==s.text[k])element.textContent=s.text[k];});
+    return true;
+  }catch{return false;}}
+  function fit(frame){if(!frame?.isConnected||frame.dataset.aresReady!=='yes')return;
+    const host=frame.closest('[data-ares-host]');if(!host)return;
+    const w=host.getBoundingClientRect().width;if(w<70)return;
+    const d=frame.contentDocument,r=d?.querySelector('.commitarzpfo-poster');if(!r)return;
+    const rw=Math.max(1,Math.ceil(r.offsetWidth||r.getBoundingClientRect().width||900));
+    const rh=Math.max(1,Math.ceil(r.offsetHeight||r.getBoundingClientRect().height||500));
+    const scale=Math.min(1,(w-(frame.hasAttribute('data-ares-card')?16:36))/rw,frame.hasAttribute('data-ares-card')?(Math.max(60,host.clientHeight-18)/rh):1);
+    frame.style.width=rw+'px';frame.style.height=Math.max(rh+16,80)+'px';
+    frame.style.transform=`translateX(-50%) scale(${scale})`;
+    if(frame.hasAttribute('data-ares-card')){frame.style.top='50%';frame.style.transform=`translate(-50%,-50%) scale(${scale})`;frame.dataset.aresFitted='yes';}
+    else{frame.style.top='0';host.style.height=Math.ceil((rh+16)*scale+12)+'px';}
+  }
+  function initFrame(frame,s){if(!frame)return;frame.dataset.aresReady='no';frame.style.width='900px';frame.style.height='600px';
+    frame.addEventListener('load',()=>{frame.dataset.aresReady='yes';fit(frame);frame.contentDocument?.fonts?.ready?.then(()=>fit(frame));setTimeout(()=>fit(frame),350);},{once:true});
+    frame.srcdoc=doc(s);
+    if(typeof ResizeObserver!=='undefined'){const host=frame.closest('[data-ares-host]');if(host)new ResizeObserver(()=>fit(frame)).observe(host);}
+  }
+  function show(name){document.querySelectorAll('.dds-panel').forEach(p=>p.classList.toggle('is-active',p.dataset.panel===name));document.querySelectorAll('.dds-nav-button').forEach(b=>b.classList.toggle('is-active',b.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',name===VIEW);document.documentElement.classList.toggle('dds-editor-mode',name===VIEW);window.scrollTo(0,0);}
+  function back(e){e?.preventDefault();document.body.classList.remove('dds-editor-mode','dds-modal-open');document.documentElement.classList.remove('dds-editor-mode');history.replaceState({},'','#commission');show('commission');document.querySelector('[data-work-tab="commission"]')?.click();}
+  const section=(n,title,inside)=>`<section class="dds-control-section"><div class="dds-control-title"><span>${n}</span><h2>${title}</h2></div>${inside}</section>`;
+  function createEditor(){if(editor?.isConnected)return editor;
+    editor=document.createElement('section');editor.className='dds-panel dds-protected-commission-editor dds-ares-editor';editor.dataset.panel=EDIT;
+    const colors=COLORS.map(([k,label])=>`<label class="dds-ares-field"><span>${esc(label)} — --commitarzpfo-${k}</span><div class="dds-ares-color"><input type="color" data-ares-color="${k}"><input type="text" data-ares-hex="${k}" spellcheck="false"></div></label>`).join('');
+    const numbers=SETTINGS.map(([k,label,,min,max,step,unit])=>`<label class="dds-ares-field"><span>${esc(label)}</span><div class="dds-ares-range"><input type="range" data-ares-setting="${k}" min="${min}" max="${max}" step="${step}"><output data-ares-output="${k}">${unit}</output></div></label>`).join('');
+    const texts=TEXTS.map(([k,label])=>`<label class="dds-ares-field"><span>${esc(label)}</span>${k==='topnote'?`<textarea rows="2" data-ares-textfield="${k}"></textarea>`:`<input type="text" data-ares-textfield="${k}" autocomplete="off">`}</label>`).join('');
+    editor.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-ares-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ARES MONARQYN · สี รูปภาพ ข้อความ และการหมุน</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>ARES / PROFILE</strong></div><div class="dds-protected-commission-preview-stage dds-ares-preview-stage"><div class="dds-ares-preview-host" data-ares-host><iframe data-ares-editor title="ARES profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่าง</strong><small data-ares-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-ares-scroll">${section('01','สีทั้งหมด',`<div class="dds-ares-grid">${colors}</div>`)}${section('02','รูปภาพ',`<div class="dds-ares-grid"><label class="dds-ares-field dds-ares-wide"><span>ลิงก์รูปภาพ</span><input type="url" data-ares-image placeholder="วาง URL รูปภาพ"></label>${numbers.slice(0,0)}</div>`)}${section('03','ปรับรูปและองค์ประกอบ',`<div class="dds-ares-grid">${numbers}</div>`)}${section('04','แก้ข้อความทั้งหมด',`<div class="dds-ares-grid">${texts}</div>`)}</div><section class="dds-protected-commission-copy dds-ares-copy"><div class="dds-control-title"><span>05</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-ares-copy>COPY CODE <span>↗</span></button><button type="button" data-ares-reset>RESET</button></div></section></div></div>`;
+    (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(editor);
+    editor.querySelector('[data-ares-back]').onclick=back;
+    editor.querySelector('[data-ares-copy]').onclick=copy;
+    editor.querySelector('[data-ares-reset]').onclick=()=>{if(!confirm('คืนค่าสีและล้างรูปภาพ/ข้อความที่แก้ไขหรือไม่?'))return;state=clone(blank);fill();patch(editorFrame,state);save();};
+    editor.addEventListener('input',update);editor.addEventListener('change',update);
+    return editor;
+  }
+  function fill(){if(!editor)return;
+    COLORS.forEach(([k])=>{editor.querySelector(`[data-ares-color="${k}"]`).value=state.colors[k];editor.querySelector(`[data-ares-hex="${k}"]`).value=state.colors[k];});
+    SETTINGS.forEach(([k,,,,,unit])=>{editor.querySelector(`[data-ares-setting="${k}"]`).value=state.settings[k];editor.querySelector(`[data-ares-output="${k}"]`).textContent=state.settings[k]+(unit==='×'?'×':unit);});
+    TEXTS.forEach(([k])=>{editor.querySelector(`[data-ares-textfield="${k}"]`).value=state.text[k];});editor.querySelector('[data-ares-image]').value=state.image;
+  }
+  function update(e){const t=e.target;if(!(t instanceof HTMLInputElement||t instanceof HTMLTextAreaElement))return;
+    if(t.dataset.aresColor){const k=t.dataset.aresColor;state.colors[k]=t.value;editor.querySelector(`[data-ares-hex="${k}"]`).value=t.value;}
+    else if(t.dataset.aresHex){if(!/^#[0-9a-f]{6}$/i.test(t.value.trim()))return;const k=t.dataset.aresHex;state.colors[k]=t.value.trim();editor.querySelector(`[data-ares-color="${k}"]`).value=state.colors[k];}
+    else if(t.hasAttribute('data-ares-image'))state.image=t.value;
+    else if(t.dataset.aresSetting){const k=t.dataset.aresSetting;state.settings[k]=Number(t.value);const cfg=SETTINGS.find(([v])=>v===k);editor.querySelector(`[data-ares-output="${k}"]`).textContent=t.value+(cfg[6]==='×'?'×':cfg[6]);}
+    else if(t.dataset.aresTextfield)state.text[t.dataset.aresTextfield]=t.value;
+    else return;
+    patch(editorFrame,state);save();editor.querySelector('[data-ares-status]').textContent='บันทึกแล้ว';
+  }
+  function copy(){const result=html(state);const done=()=>{editor.querySelector('[data-ares-status]').textContent='คัดลอกโคดแล้ว';};if(navigator.clipboard?.writeText)navigator.clipboard.writeText(result).then(done).catch(()=>fallback(result));else fallback(result);
+    function fallback(s){const t=document.createElement('textarea');t.value=s;document.body.append(t);t.select();document.execCommand('copy');t.remove();done();}
+  }
+  function openEditor(route=false){createEditor();state=load();fill();show(EDIT);if(!route)history.pushState({},'','#'+EDIT);editorFrame=editor.querySelector('[data-ares-editor]');if(editorFrame.dataset.aresReady==='yes'){patch(editorFrame,state);fit(editorFrame);}else initFrame(editorFrame,state);}
+  function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-ares-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-ares-back>←</button></div><div class="dds-ares-view-surface"><div class="dds-ares-view-host" data-ares-host><iframe data-ares-view title="ARES profile view" scrolling="no"></iframe></div></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-ares-back]').onclick=back;}
+  function openView(route=false){makeView();show(VIEW);if(!route)history.pushState({},'','#'+VIEW);const f=view.querySelector('[data-ares-view]');if(f.dataset.aresReady==='yes')fit(f);else initFrame(f,example);}
+  function makeModal(){if(modal?.isConnected)return;modal=document.createElement('div');modal.className='dds-commission-lock-modal';modal.hidden=true;modal.innerHTML='<form class="dds-commission-lock-dialog"><small>CLIENT ACCESS / ARES MONARQYN</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อแก้ไขโคดโปรไฟล์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-ares-cancel>CANCEL</button></div></form>';document.body.append(modal);modal.querySelector('[data-ares-cancel]').onclick=()=>modal.hidden=true;modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});modal.querySelector('form').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('input');const err=modal.querySelector('.dds-commission-lock-error');try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input.value));const h=Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,'0')).join('');if(h!==HASH){err.textContent='รหัสผ่านไม่ถูกต้อง';return;}sessionStorage.setItem(ACCESS,'1');modal.hidden=true;openEditor(location.hash==='#'+EDIT);}catch{err.textContent='ไม่สามารถตรวจสอบรหัสในขณะนี้';}};}
+  function requestEdit(route=false){if(sessionStorage.getItem(ACCESS)==='1'){openEditor(route);return;}makeModal();modal.hidden=false;modal.querySelector('input').value='';modal.querySelector('.dds-commission-lock-error').textContent='';modal.querySelector('input').focus();}
+  function installCard(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector('.dds-commission-grid');if(!grid)return false;if(grid.querySelector('.dds-ares-card'))return true;
+    card=document.createElement('article');card.className='dds-roleplay-card dds-commission-card dds-ares-card';
+    card.innerHTML='<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live"><div class="dds-ares-card-host" data-ares-host><iframe data-ares-card title="ARES profile sample" scrolling="no" tabindex="-1"></iframe></div><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Ares Monarqyn</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-ares-open-view>VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-ares-open-edit>EDIT CODE <span>↗</span></button></div></div>';
+    grid.append(card);card.querySelector('[data-ares-open-view]').onclick=()=>openView();card.querySelector('[data-ares-open-edit]').onclick=()=>requestEdit();initFrame(card.querySelector('[data-ares-card]'),example);return true;
+  }
+  function route(){if(location.hash==='#'+EDIT&&!editor?.classList.contains('is-active'))requestEdit(true);else if(location.hash==='#'+VIEW&&!view?.classList.contains('is-active'))openView(true);}
+  function start(){let attempts=0;const interval=setInterval(()=>{if(installCard()||++attempts>120)clearInterval(interval);},130);window.addEventListener('resize',()=>document.querySelectorAll('[data-ares-card],[data-ares-editor],[data-ares-view]').forEach(fit));window.addEventListener('hashchange',route);window.addEventListener('popstate',route);setTimeout(route,500);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+

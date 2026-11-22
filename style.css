@@ -16827,3 +16827,39 @@ body.dds-y2k-vampire .dds-panel :is(.dds-editor-actions,.dds-protected-commissio
   background:#151012!important;
   border-color:#60434b!important;
 }
+
+/* v428 — Ares Monarqyn commission only */
+.dds-ares-card .dds-ares-card-host{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:transparent}
+.dds-ares-card .dds-ares-card-host iframe[data-ares-card]{position:absolute!important;left:50%!important;top:50%!important;transform-origin:center center!important;display:block!important;max-width:none!important;max-height:none!important;border:0!important;background:transparent!important;opacity:1!important;visibility:visible!important;transition:none!important}
+.dds-ares-editor.dds-panel.is-active{padding-top:8px!important;min-height:0}
+.dds-ares-editor .dds-editor-heading h1{font-size:clamp(20px,1.6vw,27px)!important;line-height:1.2!important}
+.dds-ares-editor .dds-protected-commission-layout{display:grid!important;grid-template-columns:minmax(0,3fr) minmax(320px,2fr)!important;gap:12px!important;height:calc(100dvh - 150px)!important;min-height:480px!important;align-items:stretch!important;margin-top:8px!important}
+.dds-ares-editor .dds-protected-commission-preview-column{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important;border:1px solid #342025;border-radius:6px;background:#202020!important}
+.dds-ares-editor .dds-ares-preview-stage{position:relative!important;flex:1 1 0!important;min-height:0!important;overflow:auto!important;padding:28px 20px!important;background:#202020!important;scrollbar-width:none!important}
+.dds-ares-editor .dds-ares-preview-stage::-webkit-scrollbar,.dds-ares-editor .dds-ares-scroll::-webkit-scrollbar{display:none}
+.dds-ares-editor .dds-ares-preview-host{position:relative;width:100%;height:200px;min-height:0;flex:none}
+.dds-ares-editor .dds-ares-preview-host iframe[data-ares-editor]{position:absolute;left:50%;top:0;transform-origin:top center;border:0!important;max-width:none!important;max-height:none!important;background:transparent!important;transition:none!important}
+.dds-ares-editor .dds-protected-commission-controls-column{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;min-height:0!important;overflow:hidden!important;background:#10090c;border:1px solid #362025;border-radius:6px}
+.dds-ares-editor .dds-protected-commission-draft{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:8px 10px;min-height:0}
+.dds-ares-editor .dds-ares-scroll{min-height:0!important;overflow:auto!important;overscroll-behavior:contain;padding:10px 12px;scrollbar-width:none}
+.dds-ares-editor .dds-ares-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:12px 4px 4px}
+.dds-ares-editor .dds-ares-wide{grid-column:1/-1}
+.dds-ares-editor .dds-ares-field{display:flex;flex-direction:column;gap:7px;min-width:0;color:#c9b7ba;font:400 13px 'Bai Jamjuree',sans-serif}
+.dds-ares-editor .dds-ares-field > span{line-height:1.45}
+.dds-ares-editor .dds-ares-field :is(input[type=text],input[type=url],textarea){box-sizing:border-box;width:100%;min-width:0;padding:11px 12px;color:#fff;background:#0a0709;border:1px solid #4a2b33;border-radius:2px;font:400 14px 'Bai Jamjuree',sans-serif}
+.dds-ares-editor .dds-ares-field textarea{resize:vertical;min-height:78px}
+.dds-ares-editor .dds-ares-color,.dds-ares-editor .dds-ares-range{display:flex;gap:8px;align-items:center;min-width:0}
+.dds-ares-editor .dds-ares-color input[type=color]{width:42px;height:40px;flex:none;padding:3px;border:1px solid #4a2b33;background:#0a0709}
+.dds-ares-editor .dds-ares-color input[type=text]{width:20px;flex:1}
+.dds-ares-editor .dds-ares-range input[type=range]{flex:1;min-width:0;accent-color:var(--dds-red-bright,#c11724)}
+.dds-ares-editor .dds-ares-range output{min-width:48px;text-align:right;font:400 12px 'Bai Jamjuree',sans-serif;color:#fff}
+.dds-ares-editor .dds-ares-scroll .dds-control-section{margin:0 0 12px}
+.dds-ares-editor .dds-ares-copy{flex:0 0 auto;margin:0!important;padding:12px 14px!important;border-top:1px solid #39252b}
+.dds-ares-editor .dds-ares-copy .dds-protected-commission-copy-actions{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important}
+.dds-ares-editor [data-ares-copy]{width:100%;min-width:0}
+.dds-ares-editor [data-ares-reset]{background:#0a0809!important;background-image:none!important;color:#797477!important;border:1px solid #342a2e!important;box-shadow:none!important}
+.dds-ares-view.dds-commission-view-panel.is-active{position:fixed!important;inset:0!important;z-index:1000;background:#080707!important;overflow:auto!important}
+.dds-ares-view .dds-ares-view-surface{min-height:100dvh;box-sizing:border-box;display:flex;justify-content:center;padding:80px 24px 32px;overflow:auto;scrollbar-width:none}
+.dds-ares-view .dds-ares-view-host{position:relative;width:min(100%,1050px);height:700px;flex:none}
+.dds-ares-view .dds-ares-view-host iframe[data-ares-view]{position:absolute;left:50%;top:0;transform-origin:top center;border:0;max-width:none!important;max-height:none!important;background:transparent}
+@media(max-width:900px){.dds-ares-editor .dds-protected-commission-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}.dds-ares-editor .dds-protected-commission-preview-column{height:58dvh;min-height:310px!important}.dds-ares-editor .dds-protected-commission-controls-column{height:74dvh;min-height:460px!important}.dds-ares-editor .dds-ares-grid{grid-template-columns:1fr}.dds-ares-editor .dds-ares-preview-stage{padding:18px 8px!important}.dds-ares-view .dds-ares-view-surface{padding:64px 12px 24px}}
