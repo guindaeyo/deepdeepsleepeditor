@@ -16863,3 +16863,14 @@ body.dds-y2k-vampire .dds-panel :is(.dds-editor-actions,.dds-protected-commissio
 .dds-ares-view .dds-ares-view-host{position:relative;width:min(100%,1050px);height:700px;flex:none}
 .dds-ares-view .dds-ares-view-host iframe[data-ares-view]{position:absolute;left:50%;top:0;transform-origin:top center;border:0;max-width:none!important;max-height:none!important;background:transparent}
 @media(max-width:900px){.dds-ares-editor .dds-protected-commission-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}.dds-ares-editor .dds-protected-commission-preview-column{height:58dvh;min-height:310px!important}.dds-ares-editor .dds-protected-commission-controls-column{height:74dvh;min-height:460px!important}.dds-ares-editor .dds-ares-grid{grid-template-columns:1fr}.dds-ares-editor .dds-ares-preview-stage{padding:18px 8px!important}.dds-ares-view .dds-ares-view-surface{padding:64px 12px 24px}}
+
+/* v429: Ares editor sizing only */
+.dds-ares-editor .dds-editor-heading h1{font-size:20px!important;line-height:1.2!important}
+@media(min-width:901px){
+  body.dds-y2k-vampire .dds-panel.dds-ares-editor.is-active>.dds-protected-commission-layout{
+    height:calc(100dvh - var(--dds-ares-layout-top,120px) - 4px)!important;
+    min-height:0!important;
+    padding-bottom:0!important;
+    margin-bottom:0!important;
+  }
+}
