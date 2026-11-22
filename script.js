@@ -58905,6 +58905,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     return true;
   }catch{return false;}}
   function fit(frame){if(!frame?.isConnected||frame.dataset.aresReady!=='yes')return;
+    if(frame.hasAttribute('data-ares-editor')&&frame.dataset.aresFitLocked==='yes')return;
     const host=frame.closest('[data-ares-host]');if(!host)return;
     const w=host.getBoundingClientRect().width;if(w<70)return;
     const d=frame.contentDocument,r=d?.querySelector('.commitarzpfo-poster');if(!r)return;
@@ -58930,8 +58931,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     frame.style.transform=isCard?`translate(-50%,-50%) scale(${scale})`:`translateX(-50%) scale(${scale})`;
     if(isCard)frame.dataset.aresFitted='yes';
     else host.style.height=Math.ceil(nativeHeight*scale)+'px';
+    if(frame.hasAttribute('data-ares-editor'))frame.dataset.aresFitLocked='yes';
   }
-  function initFrame(frame,s){if(!frame)return;frame.dataset.aresReady='no';frame.style.width='900px';frame.style.height='1120px';
+  function initFrame(frame,s){if(!frame||frame.dataset.aresInitialized==='yes')return;
+    frame.dataset.aresInitialized='yes';
+    frame.dataset.aresReady='no';
+    frame.style.width='900px';frame.style.height='1120px';
     const isEditor=frame.hasAttribute('data-ares-editor');
     if(isEditor)frame.style.visibility='hidden';
     frame.addEventListener('load',()=>{
@@ -58945,11 +58950,19 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
         fit(frame);
         if(isEditor)frame.style.visibility='visible';
       };
-      requestAnimationFrame(()=>requestAnimationFrame(settle));
-      frame.contentDocument?.fonts?.ready?.then(()=>requestAnimationFrame(()=>fit(frame)));
+      // Wait for both the linked stylesheet and font metrics before the first visible fit.
+      if(isEditor){
+        Promise.resolve(frame.contentDocument?.fonts?.ready)
+          .catch(()=>{})
+          .then(()=>requestAnimationFrame(()=>requestAnimationFrame(settle)));
+      }else requestAnimationFrame(()=>requestAnimationFrame(settle));
     },{once:true});
     frame.srcdoc=doc(s);
-    if(typeof ResizeObserver!=='undefined'){const host=frame.closest('[data-ares-host]');if(host)new ResizeObserver(()=>fit(frame)).observe(host);}
+    // Only card/view previews need a resize observer. The editor is fixed after first fit.
+    if(!isEditor&&typeof ResizeObserver!=='undefined'){
+      const host=frame.closest('[data-ares-host]');
+      if(host)new ResizeObserver(()=>fit(frame)).observe(host);
+    }
   }
   function show(name){document.querySelectorAll('.dds-panel').forEach(p=>p.classList.toggle('is-active',p.dataset.panel===name));document.querySelectorAll('.dds-nav-button').forEach(b=>b.classList.toggle('is-active',b.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',name===VIEW);document.documentElement.classList.toggle('dds-editor-mode',name===VIEW);window.scrollTo(0,0);}
   function back(e){e?.preventDefault();document.body.classList.remove('dds-editor-mode','dds-modal-open');document.documentElement.classList.remove('dds-editor-mode');history.replaceState({},'','#commission');show('commission');document.querySelector('[data-work-tab="commission"]')?.click();}
@@ -58963,7 +58976,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(editor);
     editor.querySelector('[data-ares-back]').onclick=back;
     editor.querySelector('[data-ares-copy]').onclick=copy;
-    editor.querySelector('[data-ares-reset]').onclick=()=>{if(!confirm('คืนค่าสีและล้างรูปภาพ/ข้อความที่แก้ไขหรือไม่?'))return;state=clone(blank);fill();patch(editorFrame,state);save();if(editorFrame){editorFrame.style.left='50%';editorFrame.style.marginLeft='0';const stage=editorFrame.closest('.dds-ares-preview-stage');if(stage){stage.scrollLeft=0;stage.scrollTop=0;}requestAnimationFrame(()=>fit(editorFrame));}};
+    editor.querySelector('[data-ares-reset]').onclick=()=>{if(!confirm('คืนค่าสีและล้างรูปภาพ/ข้อความที่แก้ไขหรือไม่?'))return;state=clone(blank);fill();patch(editorFrame,state);save();if(editorFrame){const stage=editorFrame.closest('.dds-ares-preview-stage');if(stage){stage.scrollLeft=0;stage.scrollTop=0;}}};
     editor.addEventListener('input',update);editor.addEventListener('change',update);
     return editor;
   }
@@ -58991,10 +59004,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     editor.style.setProperty('--dds-ares-layout-top',Math.ceil(layout.getBoundingClientRect().top)+'px');
   }
   function openEditor(route=false){createEditor();state=load();fill();show(EDIT);
-    sizeEditorLayout();requestAnimationFrame(()=>{sizeEditorLayout();fit(editorFrame);});
+    sizeEditorLayout();
     if(!route)history.pushState({},'','#'+EDIT);
     editorFrame=editor.querySelector('[data-ares-editor]');
-    if(editorFrame.dataset.aresReady==='yes'){patch(editorFrame,state);fit(editorFrame);}else initFrame(editorFrame,state);
+    if(editorFrame.dataset.aresReady==='yes')patch(editorFrame,state);
+    else initFrame(editorFrame,state);
   }
   function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-ares-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-ares-back>←</button></div><div class="dds-ares-view-surface"><div class="dds-ares-view-host" data-ares-host><iframe data-ares-view title="ARES profile view" scrolling="no"></iframe></div></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-ares-back]').onclick=back;}
   function openView(route=false){makeView();show(VIEW);if(!route)history.pushState({},'','#'+VIEW);const f=view.querySelector('[data-ares-view]');if(f.dataset.aresReady==='yes')fit(f);else initFrame(f,example);}
