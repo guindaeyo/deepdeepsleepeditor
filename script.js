@@ -59094,7 +59094,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   const doc=s=>`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0!important;padding:0!important;overflow:hidden!important;background:transparent!important} .qgpost{width:850px!important;max-width:none!important;margin:0!important}*,*::before,*::after{box-sizing:border-box}</style></head><body>${artwork(s)}</body></html>`;
   function patch(s,changed){
-    const d=frame?.contentDocument,root=d?.querySelector('.qgpost');
+    const d=frame?.shadowRoot,root=d?.querySelector('.qgpost');
     if(!root)return false;
     if(!changed){
       const props=vars(s).split(';');
@@ -59133,7 +59133,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
     return true;
   }
-  // v461: fresh viewport. No native scrolling element and no legacy Jasper stage.
+  // v462: persistent isolated shadow canvas; no iframe, no browser scrollbar, no reload.
   const ARTBOARD_WIDTH=850;
   let jasperLastWidth=0, jasperOffset=0, jasperTouchY=null;
   const jasperViewport=()=>panel?.querySelector('[data-jasper-viewport]');
@@ -59158,12 +59158,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     viewport.addEventListener('wheel',wheel,{passive:false});
     viewport.addEventListener('touchstart',touchstart,{passive:true});
     viewport.addEventListener('touchmove',touchmove,{passive:false});
-    const bindInner=()=>{const d=frame?.contentDocument;if(!d||d.__jasperV461Wheel)return;d.__jasperV461Wheel=true;
+    const bindInner=()=>{const d=frame?.shadowRoot;if(!d||d.__jasperV461Wheel)return;d.__jasperV461Wheel=true;
       d.addEventListener('wheel',wheel,{capture:true,passive:false});
       d.addEventListener('touchstart',touchstart,{passive:true});
       d.addEventListener('touchmove',touchmove,{passive:false});
     };
-    frame.addEventListener('load',bindInner);
     bindInner();
   }
   function fit(force=false){
@@ -59175,7 +59174,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(!force&&jasperLastWidth&&Math.abs(jasperLastWidth-width)<2)return;
     jasperLastWidth=width;
     const scale=width/ARTBOARD_WIDTH;
-    const root=frame.contentDocument?.querySelector('.qgpost');
+    const root=frame.shadowRoot?.querySelector('.qgpost');
     const naturalHeight=Math.max(ARTBOARD_WIDTH,root?.scrollHeight||0);
     frame.style.setProperty('width',ARTBOARD_WIDTH+'px','important');
     frame.style.setProperty('height',naturalHeight+'px','important');
@@ -59200,7 +59199,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const pngs=PNGS.map(pngField).join('');
     const texts=TEXTS.map(([k,label])=>`<label class="dds-jasper-field"><span>${esc(label)}</span><input type="text" data-jasper-value="texts.${k}"></label>`).join('');
     const colors=COLORS.map(([k,label])=>`<label class="dds-jasper-field"><span>${label}</span><div class="dds-jasper-color"><input type="color" data-jasper-picker="colors.${k}"><input type="text" data-jasper-value="colors.${k}" spellcheck="false"></div></label>`).join('');
-    panel.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-jasper-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · Jasper Surgeyev</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>JASPER / PROFILE</strong></div><div class="jasper-v461-viewport" data-jasper-viewport><div class="jasper-v461-artboard" data-jasper-artboard><iframe data-jasper-frame title="Jasper profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่างอัตโนมัติ</strong><small data-jasper-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-jasper-scroll">${section('01','สีทั้งหมด',`<div class="dds-jasper-grid">${colors}</div>`)}${section('02','ภาพพื้นหลังและรูปภาพ',photos)}${section('03','PNG ทั้งหมด — ตำแหน่ง ขนาด หมุน',pngs)}${section('04','ข้อความและข้อมูลการ์ด',`<div class="dds-jasper-grid">${texts}</div><div class="dds-jasper-group"><strong>APPROVED — ปรับตำแหน่ง</strong><div class="dds-jasper-grid">${slider('APPROVED ซ้าย–ขวา','approved.x',-300,300,1,0,'px')}${slider('APPROVED ขึ้น–ลง','approved.y',-300,300,1,0,'px')}</div></div>`)}${section('05','ขนาดแท็บโฟลเดอร์',`<div class="dds-jasper-grid">${slider('ความกว้างแท็บ','folder.width',5,100,1,46,'%')}${slider('ความสูงแท็บ','folder.height',1,50,1,9,'%')}</div>`)}</div><section class="dds-protected-commission-copy dds-jasper-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-jasper-copy>COPY CODE <span>↗</span></button><button type="button" class="dds-reset-button" data-jasper-reset>RESET</button></div></section></div></div>`;
+    panel.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-jasper-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · Jasper Surgeyev</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>JASPER / PROFILE</strong></div><div class="jasper-v461-viewport" data-jasper-viewport><div class="jasper-v461-artboard" data-jasper-artboard><div data-jasper-frame class="jasper-v462-canvas"></div></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่างอัตโนมัติ</strong><small data-jasper-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-jasper-scroll">${section('01','สีทั้งหมด',`<div class="dds-jasper-grid">${colors}</div>`)}${section('02','ภาพพื้นหลังและรูปภาพ',photos)}${section('03','PNG ทั้งหมด — ตำแหน่ง ขนาด หมุน',pngs)}${section('04','ข้อความและข้อมูลการ์ด',`<div class="dds-jasper-grid">${texts}</div><div class="dds-jasper-group"><strong>APPROVED — ปรับตำแหน่ง</strong><div class="dds-jasper-grid">${slider('APPROVED ซ้าย–ขวา','approved.x',-300,300,1,0,'px')}${slider('APPROVED ขึ้น–ลง','approved.y',-300,300,1,0,'px')}</div></div>`)}${section('05','ขนาดแท็บโฟลเดอร์',`<div class="dds-jasper-grid">${slider('ความกว้างแท็บ','folder.width',5,100,1,46,'%')}${slider('ความสูงแท็บ','folder.height',1,50,1,9,'%')}</div>`)}</div><section class="dds-protected-commission-copy dds-jasper-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-jasper-copy>COPY CODE <span>↗</span></button><button type="button" class="dds-reset-button" data-jasper-reset>RESET</button></div></section></div></div>`;
     (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(panel);
     panel.querySelector('[data-jasper-back]').onclick=back;
     panel.querySelector('[data-jasper-copy]').onclick=async()=>{const code=artwork(state);try{await navigator.clipboard.writeText(code);panel.querySelector('[data-jasper-status]').textContent='คัดลอกโคดแล้ว';}catch{const area=document.createElement('textarea');area.value=code;document.body.append(area);area.select();document.execCommand('copy');area.remove();}};
@@ -59237,7 +59236,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     set(key,v);patch(state,key);save();
   }
   function fitLayoutHeight(){if(!panel?.classList.contains('is-active'))return;const layout=panel.querySelector(':scope > .dds-protected-commission-layout');if(!layout)return;const top=Math.max(0,layout.getBoundingClientRect().top);layout.style.setProperty('--jasper-layout-top',top+'px');}
-  function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';frame.addEventListener('load',()=>{ready=true;patch(state);requestAnimationFrame(()=>fit(true));},{once:true});frame.srcdoc=doc(state);}else{patch(state);requestAnimationFrame(fit);}}
+  function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';const root=frame.attachShadow({mode:'open'});root.innerHTML='<style>:host{display:block;contain:layout style;overflow:visible}*,*::before,*::after{box-sizing:border-box}.qgpost{width:850px!important;max-width:none!important;margin:0!important}</style>'+artwork(state);ready=true;patch(state);requestAnimationFrame(()=>fit(true));}else{patch(state);requestAnimationFrame(fit);}}
   function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-jasper-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-jasper-back>←</button></div><div class="dds-jasper-empty-view"></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-jasper-back]').onclick=back;}
   function openView(routed=false){makeView();show(VIEW);if(!routed)history.pushState({},'','#'+VIEW);}
   function makeModal(){if(modal?.isConnected)return;modal=document.createElement('div');modal.className='dds-commission-lock-modal';modal.hidden=true;modal.innerHTML='<form class="dds-commission-lock-dialog"><small>CLIENT ACCESS / JASPER SURGEYEV</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อแก้ไขโคดโปรไฟล์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-jasper-cancel>CANCEL</button></div></form>';document.body.append(modal);modal.querySelector('[data-jasper-cancel]').onclick=()=>modal.hidden=true;modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});modal.querySelector('form').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('input');try{const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input.value));const h=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');if(h!==HASH){modal.querySelector('.dds-commission-lock-error').textContent='รหัสผ่านไม่ถูกต้อง';return;}sessionStorage.setItem(ACCESS,'1');modal.hidden=true;openEdit(location.hash==='#'+EDIT);}catch{modal.querySelector('.dds-commission-lock-error').textContent='ไม่สามารถตรวจสอบรหัสได้';}};}

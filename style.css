@@ -17203,7 +17203,7 @@ html body.dds-y2k-vampire .dds-panel.is-active :is(
   transition:none!important;
   animation:none!important;
 }
-.dds-panel.dds-jasper-editor .jasper-v461-artboard iframe[data-jasper-frame]{
+.dds-panel.dds-jasper-editor .jasper-v461-artboard .jasper-v462-canvas[data-jasper-frame]{
   display:block!important;
   position:absolute!important;
   top:0!important;
@@ -17227,3 +17227,10 @@ html body.dds-y2k-vampire .dds-panel.is-active :is(
 @media(max-width:900px){
   .dds-panel.dds-jasper-editor .jasper-v461-viewport{padding:14px 8px!important}
 }
+
+/* v462: Jasper preview is a Shadow DOM canvas, not an iframe or scroll container. */
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column{overflow:hidden!important;scrollbar-width:none!important}
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active .jasper-v461-viewport{overflow:clip!important;scrollbar-width:none!important;scrollbar-gutter:auto!important}
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active .jasper-v461-artboard{overflow:visible!important;min-width:0!important}
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active .jasper-v462-canvas[data-jasper-frame]{position:absolute!important;display:block!important;left:0!important;top:0!important;width:850px!important;min-width:850px!important;max-width:none!important;height:850px;max-height:none!important;transform-origin:top left!important;overflow:visible!important;transition:none!important;animation:none!important}
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column::after{content:none!important;display:none!important}

@@ -1,1 +1,1 @@
-Jasper v461: Rebuilt left preview viewport and artboard. Removed legacy Jasper v457-v460 scrollbar overrides. Keeps same persistent iframe; edits patch DOM only. Right-side editing controls unchanged. Upload all files together.
+v462 Jasper editor preview: iframe removed, persistent Shadow DOM canvas. Updates patch the existing artwork directly; zoom/position controls do not recreate the canvas. No native scrollbar in left viewport. Right controls unchanged. Upload complete set.
