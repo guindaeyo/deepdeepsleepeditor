@@ -16910,3 +16910,36 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
   height: 0 !important;
   background: transparent !important;
 }
+
+/* COMMISSION — Jasper Surgeyev, central editor layout only */
+.dds-jasper-card .dds-jasper-blank-card{background:#080708!important;background-image:none!important}
+.dds-jasper-editor.dds-panel.is-active{padding-top:8px!important}
+.dds-jasper-editor .dds-editor-heading h1{font-size:15px!important;line-height:1.25!important}
+.dds-jasper-editor>.dds-protected-commission-layout{display:grid!important;grid-template-columns:minmax(0,3fr) minmax(320px,2fr)!important;gap:12px!important;height:calc(100dvh - 125px)!important;min-height:420px!important;align-items:stretch!important;margin-top:8px!important}
+.dds-jasper-editor .dds-protected-commission-preview-column{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important;background:#202020!important;border:1px solid #38262b;border-radius:5px}
+.dds-jasper-editor .dds-jasper-stage{position:relative;flex:1 1 0;min-height:0;overflow-y:auto!important;overflow-x:hidden!important;background:#202020!important;padding:18px 14px!important;scrollbar-width:none!important;-ms-overflow-style:none!important;overscroll-behavior:contain}
+.dds-jasper-editor .dds-jasper-stage::-webkit-scrollbar,.dds-jasper-editor .dds-jasper-scroll::-webkit-scrollbar{display:none!important}
+.dds-jasper-editor .dds-jasper-preview-host{position:relative;width:100%;height:240px;min-height:0}
+.dds-jasper-editor .dds-jasper-preview-host iframe[data-jasper-frame]{position:absolute!important;left:50%!important;top:0!important;transform-origin:top center!important;border:0!important;max-width:none!important;max-height:none!important;background:transparent!important;transition:none!important;display:block!important}
+.dds-jasper-editor .dds-protected-commission-controls-column{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;min-height:0!important;overflow:hidden!important;background:#10090c;border:1px solid #39252a;border-radius:5px}
+.dds-jasper-editor .dds-protected-commission-draft{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;padding:9px 12px!important;min-height:0!important}
+.dds-jasper-editor .dds-jasper-scroll{min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;padding:10px 12px!important;scrollbar-width:none!important}
+.dds-jasper-editor .dds-jasper-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px 4px 5px}
+.dds-jasper-editor .dds-jasper-field{display:flex;flex-direction:column;min-width:0;gap:7px;font:400 13px 'Bai Jamjuree',sans-serif;color:#cbb9bf}
+.dds-jasper-editor .dds-jasper-field>span{line-height:1.4}
+.dds-jasper-editor .dds-jasper-field :is(input[type=text],input[type=url],select){box-sizing:border-box;width:100%;min-width:0;padding:10px 11px;color:#fff;background:#0a0709;border:1px solid #452830;border-radius:2px;font:400 14px 'Bai Jamjuree',sans-serif}
+.dds-jasper-editor .dds-jasper-color,.dds-jasper-editor .dds-jasper-range{display:flex;align-items:center;gap:8px;min-width:0}
+.dds-jasper-editor .dds-jasper-color input[type=color]{width:42px;height:40px;flex:none;background:#0a0709;border:1px solid #452830;padding:3px}
+.dds-jasper-editor .dds-jasper-color input[type=text]{flex:1;min-width:0}
+.dds-jasper-editor .dds-jasper-range input[type=range]{min-width:0;flex:1;accent-color:var(--dds-red-bright,#c11724)}
+.dds-jasper-editor .dds-jasper-range output{min-width:48px;text-align:right;color:#fff;font:400 12px 'Bai Jamjuree',sans-serif}
+.dds-jasper-editor .dds-jasper-group{padding:14px 12px 16px;margin:12px 0;background:#150e11;border:1px solid #39252b;border-radius:5px}
+.dds-jasper-editor .dds-jasper-group>strong{display:block;color:#f2dde4;font:600 13px 'Bai Jamjuree',sans-serif;margin-bottom:14px}
+.dds-jasper-editor .dds-jasper-group>.dds-jasper-field{margin-bottom:10px}
+.dds-jasper-editor .dds-jasper-scroll .dds-control-section{margin:0 0 12px}
+.dds-jasper-editor .dds-jasper-copy{margin:0!important;padding:12px 14px!important;flex:none!important;border-top:1px solid #39252b}
+.dds-jasper-editor .dds-jasper-copy .dds-protected-commission-copy-actions{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important}
+.dds-jasper-editor [data-jasper-copy]{min-width:0;width:100%}
+.dds-jasper-editor [data-jasper-reset]{background:#0a0809!important;background-image:none!important;color:#797477!important;border:1px solid #342a2e!important;box-shadow:none!important}
+.dds-jasper-view .dds-jasper-empty-view{min-height:100dvh;background:#090909}
+@media(max-width:900px){.dds-jasper-editor>.dds-protected-commission-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}.dds-jasper-editor .dds-protected-commission-preview-column{height:60dvh;min-height:300px!important}.dds-jasper-editor .dds-protected-commission-controls-column{height:75dvh;min-height:450px!important}.dds-jasper-editor .dds-jasper-grid{grid-template-columns:1fr}.dds-jasper-editor .dds-jasper-stage{padding:14px 8px!important}}
