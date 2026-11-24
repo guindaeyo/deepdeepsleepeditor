@@ -16943,3 +16943,11 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
 .dds-jasper-editor [data-jasper-reset]{background:#0a0809!important;background-image:none!important;color:#797477!important;border:1px solid #342a2e!important;box-shadow:none!important}
 .dds-jasper-view .dds-jasper-empty-view{min-height:100dvh;background:#090909}
 @media(max-width:900px){.dds-jasper-editor>.dds-protected-commission-layout{grid-template-columns:1fr!important;height:auto!important;min-height:0!important}.dds-jasper-editor .dds-protected-commission-preview-column{height:60dvh;min-height:300px!important}.dds-jasper-editor .dds-protected-commission-controls-column{height:75dvh;min-height:450px!important}.dds-jasper-editor .dds-jasper-grid{grid-template-columns:1fr}.dds-jasper-editor .dds-jasper-stage{padding:14px 8px!important}}
+
+/* Jasper editor: fit both existing columns to the viewport without adding a wrapper */
+@media (min-width:901px){
+  html body .dds-panel.dds-jasper-editor.is-active > .dds-protected-commission-layout{
+    height:calc(100dvh - var(--jasper-layout-top,125px) - 6px)!important;
+    min-height:0!important;
+  }
+}
