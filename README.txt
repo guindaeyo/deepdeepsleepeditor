@@ -1,1 +1,1 @@
-v361 Aphrodi roleplay commission added to existing central editor. Upload index.html, script.js, style.css and existing cloud bridge/config. Existing profile commission retained. Access: AphdFders.
+Jasper v457: Removed contradictory v444-v455 preview scroll rules and wheel interception. Jasper preview scrolls natively with invisible scrollbar. Right controls scrollbar unchanged. Based on user uploads from 2026-11-24.

@@ -59152,12 +59152,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     panel.querySelector('[data-jasper-copy]').onclick=async()=>{const code=artwork(state);try{await navigator.clipboard.writeText(code);panel.querySelector('[data-jasper-status]').textContent='คัดลอกโคดแล้ว';}catch{const area=document.createElement('textarea');area.value=code;document.body.append(area);area.select();document.execCommand('copy');area.remove();}};
     panel.querySelector('[data-jasper-reset]').onclick=()=>{if(!confirm('คืนค่าโคด Jasper เริ่มต้นหรือไม่?'))return;state=clone(defaults);fill();patch(state);save();};
     panel.addEventListener('input',onChange);panel.addEventListener('change',onChange);
-    const jasperPreviewStage=panel.querySelector('.dds-jasper-stage');
-    jasperPreviewStage.addEventListener('wheel',event=>{
-      if(!event.deltaY)return;
-      const maxScroll=Math.max(0,jasperPreviewStage.scrollHeight-jasperPreviewStage.clientHeight);
-      if(maxScroll>0){event.preventDefault();jasperPreviewStage.scrollTop=Math.max(0,Math.min(maxScroll,jasperPreviewStage.scrollTop+event.deltaY));}
-    },{passive:false});
   }
   function get(path){return path.split('.').reduce((o,k)=>o?.[k],state);}
   function set(path,value){const keys=path.split('.');let o=state;for(let i=0;i<keys.length-1;i++)o=o[keys[i]];o[keys[keys.length-1]]=value;}
