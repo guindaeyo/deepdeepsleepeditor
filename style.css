@@ -17011,3 +17011,43 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
   background:#b51a30!important;
   border-radius:8px!important;
 }
+
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-preview-host{
+  overflow:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  scrollbar-color:transparent transparent!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-preview-host::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-thumb,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-track,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-corner{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:transparent!important;
+  border:0!important;
+}
+.dds-panel.dds-jasper-editor .dds-jasper-number-wrap{
+  display:flex;align-items:center;flex:0 0 auto;min-width:0;
+  background:#0a0709;border:1px solid #452830;border-radius:2px;
+}
+.dds-panel.dds-jasper-editor .dds-jasper-number-wrap input[type=number]{
+  width:55px;min-width:0;height:34px;padding:4px 3px 4px 6px;
+  background:transparent;border:0;color:#fff;font:400 12px 'Bai Jamjuree',sans-serif;
+  text-align:right;appearance:textfield;-moz-appearance:textfield;
+}
+.dds-panel.dds-jasper-editor .dds-jasper-number-wrap input[type=number]::-webkit-inner-spin-button,
+.dds-panel.dds-jasper-editor .dds-jasper-number-wrap input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}
+.dds-panel.dds-jasper-editor .dds-jasper-number-wrap span{
+  padding:0 5px 0 1px;color:#a9979e;font:400 11px 'Bai Jamjuree',sans-serif;
+}
