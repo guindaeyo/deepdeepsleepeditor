@@ -1,1 +1,1 @@
-v463 Jasper font correction: restores Luxurious Script for the Who are you? title inside Shadow DOM; retains v462 preview behavior. Replace all files together.
+v464 — based on working v463. Added X/Y offset sliders for Jasper card title and top/bottom photo captions, identical to APPROVED controls. Persists in Jasper draft and exported code. All preview/font behavior unchanged.
