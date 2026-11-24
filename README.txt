@@ -1,1 +1,1 @@
-v462 Jasper editor preview: iframe removed, persistent Shadow DOM canvas. Updates patch the existing artwork directly; zoom/position controls do not recreate the canvas. No native scrollbar in left viewport. Right controls unchanged. Upload complete set.
+v463 Jasper font correction: restores Luxurious Script for the Who are you? title inside Shadow DOM; retains v462 preview behavior. Replace all files together.
