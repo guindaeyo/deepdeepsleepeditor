@@ -16930,7 +16930,7 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host{
 }
 html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host iframe[data-jasper-frame]{
   position:absolute!important;
-  left:var(--jasper-preview-left,0px)!important;
+  left:50%!important;
   right:auto!important;
   top:0!important;
   width:850px!important;
@@ -16938,8 +16938,8 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host iframe
   max-width:none!important;
   margin:0!important;
   translate:none!important;
-  transform-origin:top left!important;
-  transform:scale(var(--jasper-preview-scale,1))!important;
+  transform-origin:top center!important;
+  transform:translateX(-50%) scale(var(--jasper-preview-scale,1))!important;
   transition:none!important;
 }
 .dds-jasper-editor .dds-protected-commission-controls-column{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;min-height:0!important;overflow:hidden!important;background:#10090c;border:1px solid #39252a;border-radius:5px}
