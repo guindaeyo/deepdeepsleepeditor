@@ -17142,3 +17142,34 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host iframe
   transition:none!important;
   overflow:hidden!important;
 }
+
+/* v455 Jasper: hide LEFT native scrollbars while retaining programmatic vertical scrolling. */
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-stage,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-preview-host{
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage{
+  overflow-y:hidden!important;
+  scrollbar-width:none!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-stage::-webkit-scrollbar,
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-preview-host::-webkit-scrollbar{
+  display:none!important;width:0!important;height:0!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-jasper-preview-host{
+  display:block!important;
+  position:relative!important;
+  margin-inline:auto!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active iframe[data-jasper-frame]{
+  position:absolute!important;left:0!important;top:0!important;
+  transform-origin:top left!important;
+  transform:scale(var(--jasper-preview-scale,1))!important;
+  translate:none!important;margin:0!important;
+}
