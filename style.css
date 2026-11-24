@@ -17051,3 +17051,9 @@ html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active
 .dds-panel.dds-jasper-editor .dds-jasper-number-wrap span{
   padding:0 5px 0 1px;color:#a9979e;font:400 11px 'Bai Jamjuree',sans-serif;
 }
+
+/* v444 Jasper: scroll invisibly via scrollTop, never draw a left scrollbar. */
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage{
+  overflow-y:hidden!important;overflow-x:hidden!important;scrollbar-width:none!important;
+}
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}

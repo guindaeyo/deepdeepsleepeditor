@@ -59139,7 +59139,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function show(id){document.querySelectorAll('.dds-panel').forEach(el=>el.classList.toggle('is-active',el.dataset.panel===id));document.querySelectorAll('.dds-nav-button').forEach(el=>el.classList.toggle('is-active',el.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',id===VIEW);document.documentElement.classList.toggle('dds-editor-mode',id===VIEW);window.scrollTo(0,0);}
   function back(e){e?.preventDefault();document.body.classList.remove('dds-editor-mode');document.documentElement.classList.remove('dds-editor-mode');history.replaceState({},'','#commission');show('commission');document.querySelector('[data-work-tab="commission"]')?.click();}
   function section(n,title,body){return `<section class="dds-control-section"><div class="dds-control-title"><span>${n}</span><h2>${title}</h2></div>${body}</section>`;}
-  function slider(label,field,min,max,step,initial,unit){const zoom=field.endsWith('.zoom');return `<label class="dds-jasper-field"><span>${label}</span><div class="dds-jasper-range"><input type="range" data-jasper-value="${field}" min="${min}" max="${max}" step="${step}" value="${initial}"><div class="dds-jasper-number-wrap"><input type="number" data-jasper-number="${field}" min="${zoom?Math.round(min*100):min}" max="${zoom?Math.round(max*100):max}" step="1" value="${zoom?Math.round(initial*100):initial}" aria-label="กรอก${label}เป็นตัวเลข"><span>${zoom?'%':unit==='°'?'°':unit==='px'?'px':'%'}</span></div></div></label>`;}
+  function slider(label,field,min,max,step,initial,unit){const zoom=field.endsWith('.zoom');const percentage=zoom||unit==='%';const preciseStep=zoom?0.001:percentage?0.1:step;return `<label class="dds-jasper-field"><span>${label}</span><div class="dds-jasper-range"><input type="range" data-jasper-value="${field}" min="${min}" max="${max}" step="${preciseStep}" value="${initial}"><div class="dds-jasper-number-wrap"><input type="number" data-jasper-number="${field}" min="${zoom?Math.round(min*100):min}" max="${zoom?Math.round(max*100):max}" step="${percentage?0.1:step}" value="${zoom?Math.round(initial*1000)/10:initial}" aria-label="กรอก${label}เป็นตัวเลข"><span>${zoom?'%':unit==='°'?'°':unit==='px'?'px':'%'}</span></div></div></label>`;}
   const pngField=([k,label])=>`<div class="dds-jasper-group"><strong>${esc(label)}</strong><label class="dds-jasper-field"><span>ลิงก์ PNG</span><input type="url" data-jasper-value="pngs.${k}.url"></label><div class="dds-jasper-grid">${slider('ซ้าย–ขวา',`pngs.${k}.x`,-200,300,1,0,'%')}${slider('ขึ้น–ลง',`pngs.${k}.y`,-200,300,1,0,'%')}${slider('ขนาด PNG',`pngs.${k}.size`,5,300,1,100,'%')}${slider('หมุน PNG',`pngs.${k}.rotate`,-180,180,1,0,'°')}</div></div>`;
   function editorPanel(){if(panel?.isConnected)return;panel=document.createElement('section');panel.className='dds-panel dds-protected-commission-editor dds-jasper-editor';panel.dataset.panel=EDIT;
     const photos=PHOTOS.map(([k,label])=>`<div class="dds-jasper-group"><strong>${label}</strong><label class="dds-jasper-field"><span>ลิงก์รูปภาพ</span><input type="url" data-jasper-value="photos.${k}.url"></label><div class="dds-jasper-grid">${slider('ซ้าย–ขวา',`photos.${k}.x`,-200,300,1,50,'%')}${slider('ขึ้น–ลง',`photos.${k}.y`,-200,300,1,50,'%')}${slider('ซูม',`photos.${k}.zoom`,.2,5,.01,1,'×')}<label class="dds-jasper-field"><span>ฟิลเตอร์ภาพ</span><select data-jasper-value="photos.${k}.filter"><option value="none">ไม่มีฟิลเตอร์</option><option value="grayscale(1)">ขาวดำ</option><option value="sepia(1)">ซีเปีย</option><option value="contrast(1.12) saturate(.75)">ฟิล์มวินเทจ</option></select></label></div></div>`).join('');
@@ -59151,12 +59151,20 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     panel.querySelector('[data-jasper-back]').onclick=back;
     panel.querySelector('[data-jasper-copy]').onclick=async()=>{const code=artwork(state);try{await navigator.clipboard.writeText(code);panel.querySelector('[data-jasper-status]').textContent='คัดลอกโคดแล้ว';}catch{const area=document.createElement('textarea');area.value=code;document.body.append(area);area.select();document.execCommand('copy');area.remove();}};
     panel.querySelector('[data-jasper-reset]').onclick=()=>{if(!confirm('คืนค่าโคด Jasper เริ่มต้นหรือไม่?'))return;state=clone(defaults);fill();patch(state);save();};
+    const previewScroll=panel.querySelector('.dds-jasper-stage');
+    if(previewScroll){
+      previewScroll.addEventListener('wheel',e=>{if(!e.deltaY&&!e.deltaX)return;previewScroll.scrollTop+=e.deltaY||e.deltaX;e.preventDefault();},{passive:false});
+      let touchY=null;
+      previewScroll.addEventListener('touchstart',e=>{if(e.touches.length===1)touchY=e.touches[0].clientY;},{passive:true});
+      previewScroll.addEventListener('touchmove',e=>{if(touchY===null||e.touches.length!==1)return;const y=e.touches[0].clientY;previewScroll.scrollTop+=touchY-y;touchY=y;e.preventDefault();},{passive:false});
+      previewScroll.addEventListener('touchend',()=>{touchY=null;},{passive:true});
+    }
     panel.addEventListener('input',onChange);panel.addEventListener('change',onChange);
   }
   function get(path){return path.split('.').reduce((o,k)=>o?.[k],state);}
   function set(path,value){const keys=path.split('.');let o=state;for(let i=0;i<keys.length-1;i++)o=o[keys[i]];o[keys[keys.length-1]]=value;}
-  const sliderDisplay=(key,value)=>key.endsWith('.zoom')?Math.round(Number(value)*100)+'%':String(value)+(key.endsWith('.rotate')?'°':key.startsWith('approved.')?'px':'%');
-  function fill(){if(!panel)return;panel.querySelectorAll('[data-jasper-value]').forEach(el=>{const key=el.dataset.jasperValue;el.value=get(key)??'';if(el.type==='range'){const num=panel.querySelector(`[data-jasper-number="${key}"]`);if(num)num.value=key.endsWith('.zoom')?Math.round(Number(el.value)*100):el.value;}});panel.querySelectorAll('[data-jasper-picker]').forEach(el=>el.value=get(el.dataset.jasperPicker)||'#ffffff');}
+  const sliderDisplay=(key,value)=>key.endsWith('.zoom')?Math.round(Number(value)*1000)/10+'%':String(value)+(key.endsWith('.rotate')?'°':key.startsWith('approved.')?'px':'%');
+  function fill(){if(!panel)return;panel.querySelectorAll('[data-jasper-value]').forEach(el=>{const key=el.dataset.jasperValue;el.value=get(key)??'';if(el.type==='range'){const num=panel.querySelector(`[data-jasper-number="${key}"]`);if(num)num.value=key.endsWith('.zoom')?Math.round(Number(el.value)*1000)/10:el.value;}});panel.querySelectorAll('[data-jasper-picker]').forEach(el=>el.value=get(el.dataset.jasperPicker)||'#ffffff');}
   function onChange(e){const t=e.target;if(!t.matches('[data-jasper-value],[data-jasper-picker],[data-jasper-number]'))return;const key=t.dataset.jasperValue||t.dataset.jasperPicker||t.dataset.jasperNumber;let v=t.value;
     if(t.dataset.jasperNumber){
       if(v.trim()===''||!Number.isFinite(Number(v)))return;
@@ -59166,8 +59174,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       const raw=zoom?Number(v)/100:Number(v);
       const min=Number(range.min),max=Number(range.max);
       v=Math.max(min,Math.min(max,raw));
-      v=zoom?Math.round(v*100)/100:Math.round(v);
-      if(e.type==='change')t.value=zoom?Math.round(v*100):v;
+      v=zoom?Math.round(v*1000)/1000:(range.step==='0.1'?Math.round(v*10)/10:Math.round(v));
+      if(e.type==='change')t.value=zoom?Math.round(v*1000)/10:v;
       range.value=String(v);
     }else if(t.dataset.jasperPicker){
       set(key,v);const input=panel.querySelector(`[data-jasper-value="${key}"]`);if(input)input.value=v;
@@ -59175,7 +59183,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       if(t.type==='range'){
         v=Number(v);
         const num=panel.querySelector(`[data-jasper-number="${key}"]`);
-        if(num)num.value=key.endsWith('.zoom')?Math.round(v*100):v;
+        if(num)num.value=key.endsWith('.zoom')?Math.round(v*1000)/10:v;
       }
       if(key.startsWith('colors.')&&!/^#[\da-f]{6}$/i.test(v))return;
       if(key.startsWith('colors.')){const input=panel.querySelector(`[data-jasper-picker="${key}"]`);if(input)input.value=v;}
