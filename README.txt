@@ -1,1 +1,1 @@
-v460 Jasper: artboard locked to full preview width, iframe only initial load, clipped preview with custom wheel/touch scrolling. Right editor unchanged. Replace files together.
+Jasper v461: Rebuilt left preview viewport and artboard. Removed legacy Jasper v457-v460 scrollbar overrides. Keeps same persistent iframe; edits patch DOM only. Right-side editing controls unchanged. Upload all files together.

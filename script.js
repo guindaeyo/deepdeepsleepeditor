@@ -59133,55 +59133,59 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
     return true;
   }
-  // v460 Jasper: the artboard stays mounted and its fitted dimensions never change on input.
-  // The viewport is a clipped canvas, not a native scroll container.
-  let jasperFittedWidth=0, jasperOffset=0, jasperTouchY=null;
-  function jasperViewport(){return panel?.querySelector('.dds-jasper-stage');}
-  function jasperHost(){return panel?.querySelector('.dds-jasper-preview-host');}
+  // v461: fresh viewport. No native scrolling element and no legacy Jasper stage.
+  const ARTBOARD_WIDTH=850;
+  let jasperLastWidth=0, jasperOffset=0, jasperTouchY=null;
+  const jasperViewport=()=>panel?.querySelector('[data-jasper-viewport]');
+  const jasperHost=()=>panel?.querySelector('[data-jasper-artboard]');
   function moveJasperPreview(delta){
-    const stage=jasperViewport(),host=jasperHost();
-    if(!stage||!host||!panel?.classList.contains('is-active'))return false;
-    const max=Math.max(0,host.offsetHeight-stage.clientHeight+32);
+    const viewport=jasperViewport(),host=jasperHost();
+    if(!viewport||!host||!panel?.classList.contains('is-active'))return false;
+    const max=Math.max(0,host.offsetHeight-viewport.clientHeight);
     const next=Math.max(0,Math.min(max,jasperOffset+delta));
-    if(Math.abs(next-jasperOffset)<.05)return false;
+    if(Math.abs(next-jasperOffset)<.1)return false;
     jasperOffset=next;
-    host.style.setProperty('--jasper-vertical-shift',-jasperOffset+'px');
+    host.style.transform=`translate3d(0,${-jasperOffset}px,0)`;
     return true;
   }
   function bindJasperPreviewScroll(){
-    const stage=jasperViewport();if(!stage||stage.dataset.jasperWheelBound==='1')return;
-    stage.dataset.jasperWheelBound='1';
-    const onWheel=e=>{const delta=e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?stage.clientHeight:1);if(moveJasperPreview(delta))e.preventDefault();};
-    stage.addEventListener('wheel',onWheel,{capture:true,passive:false});
-    stage.addEventListener('touchstart',e=>{jasperTouchY=e.touches?.[0]?.clientY??null;},{passive:true});
-    stage.addEventListener('touchmove',e=>{const y=e.touches?.[0]?.clientY;if(y==null||jasperTouchY==null)return;const changed=moveJasperPreview(jasperTouchY-y);jasperTouchY=y;if(changed)e.preventDefault();},{passive:false});
-    const inner=()=>{const d=frame?.contentDocument;if(!d||d.__jasperScrollLocked)return;d.__jasperScrollLocked=true;
-      d.addEventListener('wheel',onWheel,{capture:true,passive:false});
-      d.addEventListener('touchstart',e=>{jasperTouchY=e.touches?.[0]?.clientY??null;},{passive:true});
-      d.addEventListener('touchmove',e=>{const y=e.touches?.[0]?.clientY;if(y==null||jasperTouchY==null)return;const changed=moveJasperPreview(jasperTouchY-y);jasperTouchY=y;if(changed)e.preventDefault();},{passive:false});
+    const viewport=jasperViewport();
+    if(!viewport||viewport.dataset.jasperLockBound==='1')return;
+    viewport.dataset.jasperLockBound='1';
+    const wheel=e=>{const d=e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?viewport.clientHeight:1);if(moveJasperPreview(d))e.preventDefault();};
+    const touchstart=e=>{jasperTouchY=e.touches?.[0]?.clientY??null;};
+    const touchmove=e=>{const y=e.touches?.[0]?.clientY;if(y==null||jasperTouchY==null)return;const changed=moveJasperPreview(jasperTouchY-y);jasperTouchY=y;if(changed)e.preventDefault();};
+    viewport.addEventListener('wheel',wheel,{passive:false});
+    viewport.addEventListener('touchstart',touchstart,{passive:true});
+    viewport.addEventListener('touchmove',touchmove,{passive:false});
+    const bindInner=()=>{const d=frame?.contentDocument;if(!d||d.__jasperV461Wheel)return;d.__jasperV461Wheel=true;
+      d.addEventListener('wheel',wheel,{capture:true,passive:false});
+      d.addEventListener('touchstart',touchstart,{passive:true});
+      d.addEventListener('touchmove',touchmove,{passive:false});
     };
-    frame.addEventListener('load',inner);inner();
+    frame.addEventListener('load',bindInner);
+    bindInner();
   }
   function fit(force=false){
     if(!frame||!ready||!panel?.classList.contains('is-active'))return;
-    const host=jasperHost(),stage=jasperViewport(),root=frame.contentDocument?.querySelector('.qgpost');
-    if(!host||!stage||!root)return;
-    const width=850, stageStyle=getComputedStyle(stage);
-    const available=Math.max(1,stage.clientWidth-(parseFloat(stageStyle.paddingLeft)||0)-(parseFloat(stageStyle.paddingRight)||0));
-    // Only redo layout when real viewport width changes; not when editing text, colors or images.
-    if(!force && jasperFittedWidth && Math.abs(jasperFittedWidth-available)<2)return;
-    jasperFittedWidth=available;
-    const scale=available/width;
-    const height=Math.ceil(Math.max(root.scrollHeight,root.getBoundingClientRect().height,850));
-    frame.style.width=width+'px';frame.style.height=height+'px';
-    host.style.width=available+'px';
-    host.style.setProperty('--jasper-visible-width',available+'px');
-    host.style.setProperty('--jasper-preview-scale',String(scale));
-    host.style.height=Math.ceil(height*scale+26)+'px';
-    frame.style.visibility='visible';
-    const max=Math.max(0,host.offsetHeight-stage.clientHeight+32);
+    const viewport=jasperViewport(),host=jasperHost();
+    if(!viewport||!host)return;
+    const style=getComputedStyle(viewport);
+    const width=Math.max(1,viewport.clientWidth-(parseFloat(style.paddingLeft)||0)-(parseFloat(style.paddingRight)||0));
+    if(!force&&jasperLastWidth&&Math.abs(jasperLastWidth-width)<2)return;
+    jasperLastWidth=width;
+    const scale=width/ARTBOARD_WIDTH;
+    const root=frame.contentDocument?.querySelector('.qgpost');
+    const naturalHeight=Math.max(ARTBOARD_WIDTH,root?.scrollHeight||0);
+    frame.style.setProperty('width',ARTBOARD_WIDTH+'px','important');
+    frame.style.setProperty('height',naturalHeight+'px','important');
+    frame.style.setProperty('transform',`scale(${scale})`,'important');
+    host.style.setProperty('width',width+'px','important');
+    host.style.setProperty('height',Math.ceil(naturalHeight*scale)+'px','important');
+    const max=Math.max(0,host.offsetHeight-viewport.clientHeight);
     jasperOffset=Math.min(jasperOffset,max);
-    host.style.setProperty('--jasper-vertical-shift',-jasperOffset+'px');
+    host.style.transform=`translate3d(0,${-jasperOffset}px,0)`;
+    frame.style.visibility='visible';
     bindJasperPreviewScroll();
   }
   function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE));if(s&&typeof s==='object')return {colors:{...defaults.colors,...s.colors},photos:Object.fromEntries(PHOTOS.map(([k])=>[k,{...defaults.photos[k],...s.photos?.[k]}])),pngs:Object.fromEntries(PNGS.map(([k])=>[k,{...defaults.pngs[k],...s.pngs?.[k]}])),texts:{...defaults.texts,...s.texts},folder:{...defaults.folder,...s.folder},approved:{...defaults.approved,...s.approved}};}catch{}return clone(defaults);}
@@ -59196,7 +59200,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const pngs=PNGS.map(pngField).join('');
     const texts=TEXTS.map(([k,label])=>`<label class="dds-jasper-field"><span>${esc(label)}</span><input type="text" data-jasper-value="texts.${k}"></label>`).join('');
     const colors=COLORS.map(([k,label])=>`<label class="dds-jasper-field"><span>${label}</span><div class="dds-jasper-color"><input type="color" data-jasper-picker="colors.${k}"><input type="text" data-jasper-value="colors.${k}" spellcheck="false"></div></label>`).join('');
-    panel.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-jasper-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · Jasper Surgeyev</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>JASPER / PROFILE</strong></div><div class="dds-jasper-stage"><div class="dds-jasper-preview-host"><iframe data-jasper-frame title="Jasper profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่างอัตโนมัติ</strong><small data-jasper-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-jasper-scroll">${section('01','สีทั้งหมด',`<div class="dds-jasper-grid">${colors}</div>`)}${section('02','ภาพพื้นหลังและรูปภาพ',photos)}${section('03','PNG ทั้งหมด — ตำแหน่ง ขนาด หมุน',pngs)}${section('04','ข้อความและข้อมูลการ์ด',`<div class="dds-jasper-grid">${texts}</div><div class="dds-jasper-group"><strong>APPROVED — ปรับตำแหน่ง</strong><div class="dds-jasper-grid">${slider('APPROVED ซ้าย–ขวา','approved.x',-300,300,1,0,'px')}${slider('APPROVED ขึ้น–ลง','approved.y',-300,300,1,0,'px')}</div></div>`)}${section('05','ขนาดแท็บโฟลเดอร์',`<div class="dds-jasper-grid">${slider('ความกว้างแท็บ','folder.width',5,100,1,46,'%')}${slider('ความสูงแท็บ','folder.height',1,50,1,9,'%')}</div>`)}</div><section class="dds-protected-commission-copy dds-jasper-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-jasper-copy>COPY CODE <span>↗</span></button><button type="button" class="dds-reset-button" data-jasper-reset>RESET</button></div></section></div></div>`;
+    panel.innerHTML=`<div class="dds-editor-heading"><button type="button" class="dds-back-button" data-jasper-back>←</button><div><p class="dds-eyebrow">PROFILE CODE EDITOR</p><h1>COMMISSION — โคดประเภทโปรไฟล์</h1><p>ผู้จ้าง · Jasper Surgeyev</p></div></div><div class="dds-protected-commission-layout"><div class="dds-protected-commission-preview-column"><div class="dds-editor-preview-top"><span>LIVE PREVIEW</span><strong>JASPER / PROFILE</strong></div><div class="jasper-v461-viewport" data-jasper-viewport><div class="jasper-v461-artboard" data-jasper-artboard><iframe data-jasper-frame title="Jasper profile editor preview" scrolling="no"></iframe></div></div></div><div class="dds-protected-commission-controls-column"><div class="dds-protected-commission-draft"><div><strong>บันทึกแบบร่างอัตโนมัติ</strong><small data-jasper-status>พร้อมแก้ไข</small></div></div><div class="dds-protected-commission-scroll dds-jasper-scroll">${section('01','สีทั้งหมด',`<div class="dds-jasper-grid">${colors}</div>`)}${section('02','ภาพพื้นหลังและรูปภาพ',photos)}${section('03','PNG ทั้งหมด — ตำแหน่ง ขนาด หมุน',pngs)}${section('04','ข้อความและข้อมูลการ์ด',`<div class="dds-jasper-grid">${texts}</div><div class="dds-jasper-group"><strong>APPROVED — ปรับตำแหน่ง</strong><div class="dds-jasper-grid">${slider('APPROVED ซ้าย–ขวา','approved.x',-300,300,1,0,'px')}${slider('APPROVED ขึ้น–ลง','approved.y',-300,300,1,0,'px')}</div></div>`)}${section('05','ขนาดแท็บโฟลเดอร์',`<div class="dds-jasper-grid">${slider('ความกว้างแท็บ','folder.width',5,100,1,46,'%')}${slider('ความสูงแท็บ','folder.height',1,50,1,9,'%')}</div>`)}</div><section class="dds-protected-commission-copy dds-jasper-copy"><div class="dds-control-title"><span>06</span><h2>คัดลอกโคด</h2></div><div class="dds-protected-commission-copy-actions"><button type="button" data-jasper-copy>COPY CODE <span>↗</span></button><button type="button" class="dds-reset-button" data-jasper-reset>RESET</button></div></section></div></div>`;
     (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(panel);
     panel.querySelector('[data-jasper-back]').onclick=back;
     panel.querySelector('[data-jasper-copy]').onclick=async()=>{const code=artwork(state);try{await navigator.clipboard.writeText(code);panel.querySelector('[data-jasper-status]').textContent='คัดลอกโคดแล้ว';}catch{const area=document.createElement('textarea');area.value=code;document.body.append(area);area.select();document.execCommand('copy');area.remove();}};
@@ -59255,7 +59259,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   let scanQueued=false;
   const normalize=(e)=>e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?window.innerHeight:1);
   function scrollElements(column){
-    if(!column)return [];
+    if(!column||column.closest('.dds-jasper-editor'))return [];
     const nodes=[...column.querySelectorAll('*'),column];
     return nodes.filter(el=>{
       if(el.tagName==='IFRAME'||el.classList.contains('dds-jasper-stage')||el.closest('.dds-protected-commission-controls-column'))return false;
@@ -59272,7 +59276,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     el.style.setProperty('-ms-overflow-style','none','important');
   }
   function scrollColumn(column,delta){
-    if(!column||!delta)return false;
+    if(!column||!delta||column.closest('.dds-jasper-editor'))return false;
     const elements=scrollElements(column);
     // Prefer the deepest (inner) scroll surface so that a large artboard remains stationary horizontally.
     for(const el of elements){
