@@ -17057,3 +17057,20 @@ html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active
   overflow-y:hidden!important;overflow-x:hidden!important;scrollbar-width:none!important;
 }
 html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+/* v445 — Jasper LEFT preview only: cover the browser-painted scrollbar track.
+   Scrolling continues in the existing stage; RIGHT controls remain untouched. */
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column{
+  position:relative!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column::after{
+  content:"";
+  position:absolute;
+  right:0;
+  top:36px;
+  bottom:0;
+  width:25px;
+  background:#202020;
+  pointer-events:none;
+  z-index:60;
+}
