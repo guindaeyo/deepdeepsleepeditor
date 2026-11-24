@@ -16921,25 +16921,25 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
 .dds-jasper-editor .dds-jasper-stage::-webkit-scrollbar,.dds-jasper-editor .dds-jasper-scroll::-webkit-scrollbar{display:none!important}
 .dds-jasper-editor .dds-jasper-preview-host{position:relative;width:100%;height:240px;min-height:0}
 .dds-jasper-editor .dds-jasper-preview-host iframe[data-jasper-frame]{position:absolute!important;left:50%!important;top:0!important;transform-origin:top center!important;border:0!important;max-width:none!important;max-height:none!important;background:transparent!important;transition:none!important;display:block!important}
-/* Jasper editor: center the iframe in the existing host without offset/translation. */
+/* Jasper: center the scaled 850px iframe on the visible preview stage. */
 html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host{
-  display:flex!important;
-  justify-content:center!important;
-  align-items:flex-start!important;
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
 }
 html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host iframe[data-jasper-frame]{
-  position:relative!important;
-  left:auto!important;
+  position:absolute!important;
+  left:50%!important;
   right:auto!important;
-  top:auto!important;
-  margin:0!important;
-  translate:none!important;
-  flex:0 0 850px!important;
+  top:0!important;
   width:850px!important;
   min-width:850px!important;
   max-width:none!important;
+  margin:0!important;
+  translate:none!important;
   transform-origin:top center!important;
-  transform:scale(var(--jasper-preview-scale,1))!important;
+  transform:translateX(-50%) scale(var(--jasper-preview-scale,1))!important;
   transition:none!important;
 }
 .dds-jasper-editor .dds-protected-commission-controls-column{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;min-height:0!important;overflow:hidden!important;background:#10090c;border:1px solid #39252a;border-radius:5px}
