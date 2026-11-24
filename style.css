@@ -17095,3 +17095,50 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-previ
   pointer-events:none;
   z-index:60;
 }
+
+/* v454 — Jasper: one native vertical scroll container; iframe itself never scrolls.
+   The scaled artwork gets a real-width centered host, avoiding translate/margin offsets. */
+html body .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  scrollbar-color:transparent transparent!important;
+  scroll-behavior:auto!important;
+  scrollbar-gutter:auto!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-stage::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column::after{
+  content:none!important;
+  display:none!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host{
+  position:relative!important;
+  display:block!important;
+  box-sizing:border-box!important;
+  max-width:none!important;
+  min-width:0!important;
+  width:var(--jasper-visible-width,100%)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  overflow:visible!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-preview-host iframe[data-jasper-frame]{
+  position:absolute!important;
+  top:0!important;
+  left:0!important;
+  right:auto!important;
+  width:850px!important;
+  min-width:850px!important;
+  max-width:none!important;
+  margin:0!important;
+  translate:none!important;
+  transform-origin:top left!important;
+  transform:scale(var(--jasper-preview-scale,1))!important;
+  transition:none!important;
+  overflow:hidden!important;
+}
