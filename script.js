@@ -14059,7 +14059,7 @@ ${stylesheetLinks}
       editor: editorKey(panel),
       savedAt: Date.now(),
       fields,
-      special: captureSpecial(panel)
+      special: { ...captureSpecial(panel), ...(panel.dataset.panel === "commission-jasper-profile-editor" && window.DDSJasperNamedSaves ? { jasperState: window.DDSJasperNamedSaves.capture() } : {}) }
     };
   }
 
@@ -14185,6 +14185,9 @@ ${stylesheetLinks}
 
   function restoreSnapshot(panel, snapshot) {
     if (!snapshot || !Array.isArray(snapshot.fields)) return false;
+    if (panel.dataset.panel === "commission-jasper-profile-editor" && window.DDSJasperNamedSaves) {
+      return window.DDSJasperNamedSaves.restore(snapshot, panel);
+    }
     rebuildSpecial(panel, snapshot.special || {});
 
     snapshot.fields.forEach((entry) => {
@@ -43403,7 +43406,7 @@ ${stylesheetLinks}
       editor: editorKey(panel),
       savedAt: Date.now(),
       fields,
-      special: captureSpecial(panel)
+      special: { ...captureSpecial(panel), ...(panel.dataset.panel === "commission-jasper-profile-editor" && window.DDSJasperNamedSaves ? { jasperState: window.DDSJasperNamedSaves.capture() } : {}) }
     };
   }
 
@@ -43529,6 +43532,9 @@ ${stylesheetLinks}
 
   function restoreSnapshot(panel, snapshot) {
     if (!snapshot || !Array.isArray(snapshot.fields)) return false;
+    if (panel.dataset.panel === "commission-jasper-profile-editor" && window.DDSJasperNamedSaves) {
+      return window.DDSJasperNamedSaves.restore(snapshot, panel);
+    }
     rebuildSpecial(panel, snapshot.special || {});
 
     snapshot.fields.forEach((entry) => {
@@ -59238,6 +59244,61 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
     set(key,v);patch(state,key);save();
   }
+  // v465 — Jasper named saves must preserve the editor state, not re-play every field's input event.
+  // Legacy v464 saves are reconstructed using their original (unfiltered) field indices.
+  window.DDSJasperNamedSaves = {
+    capture(){ return clone(state); },
+    restore(snapshot, editorPanel){
+      if(!snapshot || !Array.isArray(snapshot.fields)) return false;
+      let data=snapshot.special?.jasperState;
+      if(!data || typeof data!=='object'){
+        data=clone(defaults);
+        const all=Array.from(editorPanel.querySelectorAll('input, textarea, select, [contenteditable="true"]'));
+        let recovered=0;
+        for(const entry of snapshot.fields){
+          const id=entry.identity;
+          let field=null;
+          if(id?.type==='index')field=all[Number(id.value)];
+          else if(id?.type==='id')field=editorPanel.querySelector('#'+CSS.escape(id.value));
+          else if(id?.type==='data-dds-field-key')field=editorPanel.querySelector('[data-dds-field-key="'+CSS.escape(id.value)+'"]');
+          if(!field || !field.dataset.jasperValue)continue;
+          const key=field.dataset.jasperValue;
+          const parts=key.split('.');
+          if(parts.length!==2 || !Object.prototype.hasOwnProperty.call(data,parts[0]) || !Object.prototype.hasOwnProperty.call(data[parts[0]],parts[1])){
+            if(parts.length!==3 || !Object.prototype.hasOwnProperty.call(data,parts[0]) || !Object.prototype.hasOwnProperty.call(data[parts[0]],parts[1]) || !Object.prototype.hasOwnProperty.call(data[parts[0]][parts[1]],parts[2]))continue;
+          }
+          let value=entry.value;
+          const original=parts.reduce((o,k)=>o?.[k],defaults);
+          if(typeof original==='number'){
+            value=Number(value);
+            if(!Number.isFinite(value))continue;
+          }else value=String(value??'');
+          if(parts[0]==='colors' && !/^#[0-9a-f]{6}$/i.test(value))continue;
+          let node=data;
+          for(let i=0;i<parts.length-1;i++)node=node[parts[i]];
+          node[parts[parts.length-1]]=value;
+          recovered++;
+        }
+        if(recovered<10)return false;
+      }
+      const restored=clone(defaults);
+      for(const group of ['colors','texts','folder','approved']){
+        if(data[group] && typeof data[group]==='object')Object.assign(restored[group],data[group]);
+      }
+      for(const group of ['photos','pngs','positions']){
+        if(!data[group] || typeof data[group]!=='object')continue;
+        for(const key of Object.keys(restored[group])){
+          if(data[group][key] && typeof data[group][key]==='object')Object.assign(restored[group][key],data[group][key]);
+        }
+      }
+      // Atomic commit: no dispatchRefresh(), no duplicate input/change events.
+      state=restored;
+      fill();
+      patch(state);
+      save();
+      return true;
+    }
+  };
   function fitLayoutHeight(){if(!panel?.classList.contains('is-active'))return;const layout=panel.querySelector(':scope > .dds-protected-commission-layout');if(!layout)return;const top=Math.max(0,layout.getBoundingClientRect().top);layout.style.setProperty('--jasper-layout-top',top+'px');}
   function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';const root=frame.attachShadow({mode:'open'});root.innerHTML='<style>:host{display:block;contain:layout style;overflow:visible}*,*::before,*::after{box-sizing:border-box}.qgpost{width:850px!important;max-width:none!important;margin:0!important}.qgpost .qg-card-title,.qgpost .qg-card-title [data-jasper-text]{font-family:"Luxurious Script",cursive!important;font-weight:400!important;font-style:normal!important}</style>'+artwork(state);ready=true;patch(state);requestAnimationFrame(()=>fit(true));}else{patch(state);requestAnimationFrame(fit);}}
   function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-jasper-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-jasper-back>←</button></div><div class="dds-jasper-empty-view"></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-jasper-back]').onclick=back;}
