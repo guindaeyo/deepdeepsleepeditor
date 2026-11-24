@@ -59133,7 +59133,57 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
     return true;
   }
-  function fit(){if(!frame||!ready||!panel?.classList.contains('is-active'))return;const host=panel.querySelector('.dds-jasper-preview-host');const stage=panel.querySelector('.dds-jasper-stage');const root=frame.contentDocument?.querySelector('.qgpost');if(!host||!stage||!root)return;const width=850;const height=Math.max(root.scrollHeight,root.getBoundingClientRect().height,850);const stageStyle=getComputedStyle(stage);const innerWidth=stage.clientWidth-(parseFloat(stageStyle.paddingLeft)||0)-(parseFloat(stageStyle.paddingRight)||0);const scale=Math.min(1,Math.max(1,innerWidth-2)/width);const visibleWidth=width*scale;frame.style.width=width+'px';frame.style.height=Math.ceil(height)+'px';host.style.width=visibleWidth+'px';host.style.setProperty('--jasper-visible-width',visibleWidth+'px');host.style.setProperty('--jasper-preview-scale',String(scale));host.style.height=Math.ceil(height*scale+26)+'px';frame.style.visibility='visible';}
+  // v460 Jasper: the artboard stays mounted and its fitted dimensions never change on input.
+  // The viewport is a clipped canvas, not a native scroll container.
+  let jasperFittedWidth=0, jasperOffset=0, jasperTouchY=null;
+  function jasperViewport(){return panel?.querySelector('.dds-jasper-stage');}
+  function jasperHost(){return panel?.querySelector('.dds-jasper-preview-host');}
+  function moveJasperPreview(delta){
+    const stage=jasperViewport(),host=jasperHost();
+    if(!stage||!host||!panel?.classList.contains('is-active'))return false;
+    const max=Math.max(0,host.offsetHeight-stage.clientHeight+32);
+    const next=Math.max(0,Math.min(max,jasperOffset+delta));
+    if(Math.abs(next-jasperOffset)<.05)return false;
+    jasperOffset=next;
+    host.style.setProperty('--jasper-vertical-shift',-jasperOffset+'px');
+    return true;
+  }
+  function bindJasperPreviewScroll(){
+    const stage=jasperViewport();if(!stage||stage.dataset.jasperWheelBound==='1')return;
+    stage.dataset.jasperWheelBound='1';
+    const onWheel=e=>{const delta=e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?stage.clientHeight:1);if(moveJasperPreview(delta))e.preventDefault();};
+    stage.addEventListener('wheel',onWheel,{capture:true,passive:false});
+    stage.addEventListener('touchstart',e=>{jasperTouchY=e.touches?.[0]?.clientY??null;},{passive:true});
+    stage.addEventListener('touchmove',e=>{const y=e.touches?.[0]?.clientY;if(y==null||jasperTouchY==null)return;const changed=moveJasperPreview(jasperTouchY-y);jasperTouchY=y;if(changed)e.preventDefault();},{passive:false});
+    const inner=()=>{const d=frame?.contentDocument;if(!d||d.__jasperScrollLocked)return;d.__jasperScrollLocked=true;
+      d.addEventListener('wheel',onWheel,{capture:true,passive:false});
+      d.addEventListener('touchstart',e=>{jasperTouchY=e.touches?.[0]?.clientY??null;},{passive:true});
+      d.addEventListener('touchmove',e=>{const y=e.touches?.[0]?.clientY;if(y==null||jasperTouchY==null)return;const changed=moveJasperPreview(jasperTouchY-y);jasperTouchY=y;if(changed)e.preventDefault();},{passive:false});
+    };
+    frame.addEventListener('load',inner);inner();
+  }
+  function fit(force=false){
+    if(!frame||!ready||!panel?.classList.contains('is-active'))return;
+    const host=jasperHost(),stage=jasperViewport(),root=frame.contentDocument?.querySelector('.qgpost');
+    if(!host||!stage||!root)return;
+    const width=850, stageStyle=getComputedStyle(stage);
+    const available=Math.max(1,stage.clientWidth-(parseFloat(stageStyle.paddingLeft)||0)-(parseFloat(stageStyle.paddingRight)||0));
+    // Only redo layout when real viewport width changes; not when editing text, colors or images.
+    if(!force && jasperFittedWidth && Math.abs(jasperFittedWidth-available)<2)return;
+    jasperFittedWidth=available;
+    const scale=available/width;
+    const height=Math.ceil(Math.max(root.scrollHeight,root.getBoundingClientRect().height,850));
+    frame.style.width=width+'px';frame.style.height=height+'px';
+    host.style.width=available+'px';
+    host.style.setProperty('--jasper-visible-width',available+'px');
+    host.style.setProperty('--jasper-preview-scale',String(scale));
+    host.style.height=Math.ceil(height*scale+26)+'px';
+    frame.style.visibility='visible';
+    const max=Math.max(0,host.offsetHeight-stage.clientHeight+32);
+    jasperOffset=Math.min(jasperOffset,max);
+    host.style.setProperty('--jasper-vertical-shift',-jasperOffset+'px');
+    bindJasperPreviewScroll();
+  }
   function load(){try{const s=JSON.parse(localStorage.getItem(STORAGE));if(s&&typeof s==='object')return {colors:{...defaults.colors,...s.colors},photos:Object.fromEntries(PHOTOS.map(([k])=>[k,{...defaults.photos[k],...s.photos?.[k]}])),pngs:Object.fromEntries(PNGS.map(([k])=>[k,{...defaults.pngs[k],...s.pngs?.[k]}])),texts:{...defaults.texts,...s.texts},folder:{...defaults.folder,...s.folder},approved:{...defaults.approved,...s.approved}};}catch{}return clone(defaults);}
   function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));}catch{}const t=panel?.querySelector('[data-jasper-status]');if(t)t.textContent='บันทึกแล้ว';}
   function show(id){document.querySelectorAll('.dds-panel').forEach(el=>el.classList.toggle('is-active',el.dataset.panel===id));document.querySelectorAll('.dds-nav-button').forEach(el=>el.classList.toggle('is-active',el.dataset.page==='commission'));document.body.classList.toggle('dds-editor-mode',id===VIEW);document.documentElement.classList.toggle('dds-editor-mode',id===VIEW);window.scrollTo(0,0);}
@@ -59183,7 +59233,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     set(key,v);patch(state,key);save();
   }
   function fitLayoutHeight(){if(!panel?.classList.contains('is-active'))return;const layout=panel.querySelector(':scope > .dds-protected-commission-layout');if(!layout)return;const top=Math.max(0,layout.getBoundingClientRect().top);layout.style.setProperty('--jasper-layout-top',top+'px');}
-  function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';frame.addEventListener('load',()=>{ready=true;patch(state);requestAnimationFrame(fit);},{once:true});frame.srcdoc=doc(state);}else{patch(state);requestAnimationFrame(fit);}}
+  function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';frame.addEventListener('load',()=>{ready=true;patch(state);requestAnimationFrame(()=>fit(true));},{once:true});frame.srcdoc=doc(state);}else{patch(state);requestAnimationFrame(fit);}}
   function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-jasper-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-jasper-back>←</button></div><div class="dds-jasper-empty-view"></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-jasper-back]').onclick=back;}
   function openView(routed=false){makeView();show(VIEW);if(!routed)history.pushState({},'','#'+VIEW);}
   function makeModal(){if(modal?.isConnected)return;modal=document.createElement('div');modal.className='dds-commission-lock-modal';modal.hidden=true;modal.innerHTML='<form class="dds-commission-lock-dialog"><small>CLIENT ACCESS / JASPER SURGEYEV</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อแก้ไขโคดโปรไฟล์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-jasper-cancel>CANCEL</button></div></form>';document.body.append(modal);modal.querySelector('[data-jasper-cancel]').onclick=()=>modal.hidden=true;modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});modal.querySelector('form').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('input');try{const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input.value));const h=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');if(h!==HASH){modal.querySelector('.dds-commission-lock-error').textContent='รหัสผ่านไม่ถูกต้อง';return;}sessionStorage.setItem(ACCESS,'1');modal.hidden=true;openEdit(location.hash==='#'+EDIT);}catch{modal.querySelector('.dds-commission-lock-error').textContent='ไม่สามารถตรวจสอบรหัสได้';}};}
@@ -59208,7 +59258,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(!column)return [];
     const nodes=[...column.querySelectorAll('*'),column];
     return nodes.filter(el=>{
-      if(el.tagName==='IFRAME'||el.closest('.dds-protected-commission-controls-column'))return false;
+      if(el.tagName==='IFRAME'||el.classList.contains('dds-jasper-stage')||el.closest('.dds-protected-commission-controls-column'))return false;
       const cs=getComputedStyle(el);
       const scrollable=/(auto|scroll|overlay)/.test(cs.overflowY)||el.dataset.ddsPreviewScrollHost==='true'||el.classList.contains('dds-jasper-stage');
       return scrollable&&el.scrollHeight>el.clientHeight+1&&el.clientHeight>0;

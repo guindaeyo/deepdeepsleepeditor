@@ -17222,3 +17222,29 @@ html body.dds-y2k-vampire .dds-panel.is-active :is(
   width:0!important;
   height:0!important;
 }
+
+
+/* v460: Jasper editor uses a clipped, non-scrollable viewport and a stable artboard. */
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage {
+  overflow:clip!important;
+  overflow-clip-margin:0!important;
+  scrollbar-width:none!important;
+  scrollbar-gutter:auto!important;
+  position:relative!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-preview-host {
+  transform:translate3d(0,var(--jasper-vertical-shift,0px),0)!important;
+  transition:none!important;
+  will-change:transform;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-stage::before,
+html body .dds-panel.dds-jasper-editor.is-active .dds-jasper-stage::after {
+  content:none!important;
+  display:none!important;
+}
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-preview-host iframe[data-jasper-frame] {
+  transition:none!important;
+  animation:none!important;
+}
