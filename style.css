@@ -16951,3 +16951,35 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
     min-height:0!important;
   }
 }
+
+/* Jasper editor only: full-height columns and invisible scrollbars */
+@media (min-width:901px){
+  html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active > .dds-protected-commission-layout{
+    height:calc(100dvh - var(--jasper-layout-top,125px) - 4px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:0!important;
+    padding-bottom:0!important;
+    margin-bottom:0!important;
+    align-items:stretch!important;
+  }
+  html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active :is(.dds-protected-commission-preview-column,.dds-protected-commission-controls-column){
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:stretch!important;
+  }
+}
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active :is(.dds-jasper-stage,.dds-jasper-scroll,.dds-protected-commission-preview-column,.dds-protected-commission-controls-column){
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  scrollbar-color:transparent transparent!important;
+}
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active :is(.dds-jasper-stage,.dds-jasper-scroll,.dds-protected-commission-preview-column,.dds-protected-commission-controls-column)::-webkit-scrollbar,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active :is(.dds-jasper-stage,.dds-jasper-scroll,.dds-protected-commission-preview-column,.dds-protected-commission-controls-column)::-webkit-scrollbar-thumb,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active :is(.dds-jasper-stage,.dds-jasper-scroll,.dds-protected-commission-preview-column,.dds-protected-commission-controls-column)::-webkit-scrollbar-track{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:transparent!important;
+}
