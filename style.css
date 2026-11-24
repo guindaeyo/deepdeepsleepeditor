@@ -17132,3 +17132,39 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-previ
   height:0!important;
   background:transparent!important;
 }
+
+
+/* v458 — ALL LEFT EDITOR PREVIEWS: no native vertical scrollbar surface. */
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"]),
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"]) * {
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"])::-webkit-scrollbar,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"]) *::-webkit-scrollbar {
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:transparent!important;
+}
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"]) *::-webkit-scrollbar-thumb,
+html body .dds-panel :is(.dds-editor-preview-column,.dds-protected-commission-preview-column,.dds-aph-preview-column,[class*="preview-column"]) *::-webkit-scrollbar-track {
+  display:none!important;
+  width:0!important;
+  background:transparent!important;
+}
+html body .dds-panel .dds-jasper-stage,
+html body .dds-panel .dds-jasper-editor .dds-jasper-stage,
+html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage,
+html body .dds-panel [data-dds-preview-scroll-host="true"] {
+  overflow-y:hidden!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  scrollbar-gutter:auto!important;
+}
+html body .dds-panel .dds-jasper-stage::-webkit-scrollbar,
+html body .dds-panel [data-dds-preview-scroll-host="true"]::-webkit-scrollbar {
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}

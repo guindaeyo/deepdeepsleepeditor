@@ -1,1 +1,1 @@
-Jasper v457: Removed contradictory v444-v455 preview scroll rules and wheel interception. Jasper preview scrolls natively with invisible scrollbar. Right controls scrollbar unchanged. Based on user uploads from 2026-11-24.
+v458: All left editor preview scrollbar tracks removed; wheel/touch scrolling retained via JS. Right editor tools scrollbar unchanged. Upload all files together.
