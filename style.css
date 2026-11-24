@@ -16983,3 +16983,22 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-
   height:0!important;
   background:transparent!important;
 }
+
+/* Jasper EDIT CODE: hide preview scrollbar only, retain scrolling and tools scrollbar. */
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage {
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  scrollbar-color:transparent transparent!important;
+}
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-track,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-thumb,
+html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-jasper-editor.is-active .dds-protected-commission-preview-column .dds-jasper-stage::-webkit-scrollbar-corner {
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:transparent!important;
+  border:0!important;
+}
