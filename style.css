@@ -16917,7 +16917,7 @@ html body.dds-y2k-vampire .dds-panel.dds-protected-commission-editor.dds-ares-ed
 .dds-jasper-editor .dds-editor-heading h1{font-size:15px!important;line-height:1.25!important}
 .dds-jasper-editor>.dds-protected-commission-layout{display:grid!important;grid-template-columns:minmax(0,3fr) minmax(320px,2fr)!important;gap:12px!important;height:calc(100dvh - 125px)!important;min-height:420px!important;align-items:stretch!important;margin-top:8px!important}
 .dds-jasper-editor .dds-protected-commission-preview-column{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important;background:#202020!important;border:1px solid #38262b;border-radius:5px}
-.dds-jasper-editor .dds-jasper-stage{position:relative;flex:1 1 0;min-height:0;overflow-y:auto!important;overflow-x:hidden!important;background:#202020!important;padding:18px 14px!important;scrollbar-width:none!important;-ms-overflow-style:none!important;overscroll-behavior:contain}
+.dds-jasper-editor .dds-jasper-stage{position:relative;flex:1 1 0;min-height:0;overflow-y:hidden!important;overflow-x:hidden!important;background:#202020!important;padding:18px 14px!important;scrollbar-width:none!important;-ms-overflow-style:none!important;overscroll-behavior:contain}
 .dds-jasper-editor .dds-jasper-stage::-webkit-scrollbar,.dds-jasper-editor .dds-jasper-scroll::-webkit-scrollbar{display:none!important}
 .dds-jasper-editor .dds-jasper-preview-host{position:relative;width:100%;height:240px;min-height:0}
 .dds-jasper-editor .dds-jasper-preview-host iframe[data-jasper-frame]{position:absolute!important;left:50%!important;top:0!important;transform-origin:top center!important;border:0!important;max-width:none!important;max-height:none!important;background:transparent!important;transition:none!important;display:block!important}
@@ -17093,7 +17093,7 @@ html body .dds-panel.dds-jasper-editor.is-active .dds-protected-commission-previ
   flex:1 1 0!important;
   min-height:0!important;
   overflow-x:hidden!important;
-  overflow-y:auto!important;
+  overflow-y:hidden!important;
   overscroll-behavior-y:contain!important;
   scrollbar-gutter:auto!important;
   scrollbar-width:none!important;
@@ -17164,6 +17164,60 @@ html body .dds-panel [data-dds-preview-scroll-host="true"] {
 }
 html body .dds-panel .dds-jasper-stage::-webkit-scrollbar,
 html body .dds-panel [data-dds-preview-scroll-host="true"]::-webkit-scrollbar {
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+
+
+/* v459 — fix at source: preview surfaces are programmatically scrollable,
+   but do not create any native scrollbar. Tool controls remain untouched. */
+html body.dds-y2k-vampire .dds-panel.is-active :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  .dds-aph-preview-column,
+  [class*="preview-column"]
+) :is(
+  .dds-jasper-stage,
+  [class*="preview-stage"],
+  [class*="editor-stage"],
+  [data-dds-preview-scroll-host="true"]
+),
+html body.dds-y2k-vampire .dds-panel.dds-jasper-editor.is-active
+.dds-protected-commission-preview-column .dds-jasper-stage {
+  overflow-y:hidden!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  scrollbar-gutter:auto!important;
+}
+html body.dds-y2k-vampire .dds-panel.is-active :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  .dds-aph-preview-column,
+  [class*="preview-column"]
+),
+html body.dds-y2k-vampire .dds-panel.is-active :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  .dds-aph-preview-column,
+  [class*="preview-column"]
+) * {
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body.dds-y2k-vampire .dds-panel.is-active :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  .dds-aph-preview-column,
+  [class*="preview-column"]
+)::-webkit-scrollbar,
+html body.dds-y2k-vampire .dds-panel.is-active :is(
+  .dds-editor-preview-column,
+  .dds-protected-commission-preview-column,
+  .dds-aph-preview-column,
+  [class*="preview-column"]
+) *::-webkit-scrollbar {
   display:none!important;
   width:0!important;
   height:0!important;

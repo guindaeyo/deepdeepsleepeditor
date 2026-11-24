@@ -1,1 +1,1 @@
-v458: All left editor preview scrollbar tracks removed; wheel/touch scrolling retained via JS. Right editor tools scrollbar unchanged. Upload all files together.
+v459: Fixed Jasper native scrollbar at the original higher-specificity v457 rule. All left editor preview scrollbars hidden; wheel/touch scrolling retained by v458 script. Right controls unchanged. Deploy all files and hard-refresh.
