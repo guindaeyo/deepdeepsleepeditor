@@ -361,14 +361,11 @@
       pageHeading.textContent = "COMMISSION & ACTIVITY";
     }
 
-    const contactBox = commissionPanel.querySelector(
-      ".dds-commission-contact-box"
-    );
     const commissionGrid = commissionPanel.querySelector(
       ".dds-commission-grid"
     );
 
-    if (!contactBox || !commissionGrid) {
+    if (!commissionGrid) {
       return;
     }
 
@@ -428,10 +425,9 @@
       </div>
     `;
 
-    contactBox.before(tabs);
+    commissionGrid.before(tabs);
     commissionWorkPanel.append(
       commissionSectionHeading,
-      contactBox,
       commissionGrid
     );
     tabs.after(commissionWorkPanel);
@@ -29708,14 +29704,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       pageHeading.textContent = "COMMISSION & ACTIVITY";
     }
 
-    const contactBox = commissionPanel.querySelector(
-      ".dds-commission-contact-box"
-    );
     const commissionGrid = commissionPanel.querySelector(
       ".dds-commission-grid"
     );
 
-    if (!contactBox || !commissionGrid) {
+    if (!commissionGrid) {
       return;
     }
 
@@ -29775,10 +29768,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       </div>
     `;
 
-    contactBox.before(tabs);
+    commissionGrid.before(tabs);
     commissionWorkPanel.append(
       commissionSectionHeading,
-      contactBox,
       commissionGrid
     );
     tabs.after(commissionWorkPanel);
@@ -59047,7 +59039,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.__ddsJasperProfileCommission = true;
   const EDIT='commission-jasper-profile-editor',VIEW='commission-jasper-profile-view';
   const STORAGE='dds:commission:jasper-profile:draft',ACCESS='dds:commission:jasper-profile:access';
-  const HASH='944c0533242b363788a46eae05b982069f17724030ca780af603d478b4d461e9';
+  const HASH='c6fc81a6116bb70eae40389743571260487695321f09a414d77c8d6b4c1e889d';
   const CSS='https://guindaeyo.github.io/commisdeepdcsh/comm-jasperprof.css';
   const FONTS='https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500;1,600&family=Luxurious+Script&family=DM+Sans:wght@400;500;600;700&display=swap';
   const COLORS=[['pink','สีชมพู','#ff91bd'],['blue','สีฟ้า','#86d8fa'],['yellow','สีเหลือง','#f0ce56'],['paper','สีกระดาษ','#faf6eb']];

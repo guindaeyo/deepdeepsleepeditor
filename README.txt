@@ -1,1 +1,1 @@
-v464 — based on working v463. Added X/Y offset sliders for Jasper card title and top/bottom photo captions, identical to APPROVED controls. Persists in Jasper draft and exported code. All preview/font behavior unchanged.
+v468 — CONTACT FOR COMMISSION moved into top browser navigation. Removed hero contact block from COMMISSION & SHOWCASE. Existing editors, previews, saves, and Jasper password unchanged.
