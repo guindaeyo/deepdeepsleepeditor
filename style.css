@@ -17255,9 +17255,6 @@ body.dds-y2k-vampire .dds-browser-contact {
   white-space: nowrap;
   text-decoration: none;
 }
-body.dds-y2k-vampire .dds-browser-contact > i:last-child {
-  font-size: 11px;
-}
 @media (max-width: 760px) {
   body.dds-y2k-vampire .dds-browser-contact {
     min-width: 194px;
