@@ -59082,6 +59082,26 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const defaults={colors:Object.fromEntries(COLORS.map(([k,,v])=>[k,v])),photos:{},pngs:{},texts:Object.fromEntries(TEXTS.map(([k,,v])=>[k,v])),folder:{width:46,height:9},approved:{x:0,y:0},positions:{cardTitle:{x:0,y:0},topCaption:{x:0,y:0},bottomCaption:{x:0,y:0}}};
   PHOTOS.forEach(([k,,v])=>defaults.photos[k]={url:v,x:50,y:50,zoom:1,filter:'none'});
   PNGS.forEach(([k,,v,x,y,size,rotate])=>defaults.pngs[k]={url:v,x:x??0,y:y??0,size,rotate});
+
+  // Jasper's approved source artwork, shared by editor, View Work and grid preview.
+  Object.assign(defaults.colors,{pink:'#ff91bd',blue:'#86d8fa',yellow:'#f0ce56',paper:'#faf6eb'});
+  Object.assign(defaults.photos.bg,{url:'https://iili.io/oK6aK3G.jpg',x:50,y:50,zoom:1,filter:'none'});
+  Object.assign(defaults.photos.card,{url:'https://iili.io/oK6cWW7.jpg',x:50,y:50,zoom:1,filter:'grayscale(1)'});
+  Object.assign(defaults.photos.top,{url:'https://iili.io/oK6cEOl.md.jpg',x:24.8,y:50,zoom:1,filter:'grayscale(1)'});
+  Object.assign(defaults.photos.bottom,{url:'https://iili.io/oK6cVxS.jpg',x:50,y:50,zoom:1,filter:'grayscale(1)'});
+  Object.assign(defaults.pngs.camera,{url:'https://iili.io/ofYIucX.png',x:16,y:27.4,size:22,rotate:-14});
+  Object.assign(defaults.pngs.megaphone,{url:'https://iili.io/ofYRad7.png',x:69,y:34,size:11,rotate:5});
+  Object.assign(defaults.pngs.paperclip,{url:'https://iili.io/ofY875P.png',x:51,y:27.8,size:16.6,rotate:0});
+  Object.assign(defaults.pngs.rays,{url:'https://iili.io/ofYN9ku.png',x:65.8,y:12.7,size:14,rotate:27});
+  Object.assign(defaults.pngs.png01,{url:'https://iili.io/ofYgQQn.png',x:68.7,y:-34.1,size:65,rotate:0});
+  Object.assign(defaults.pngs.png02,{url:'https://iili.io/ofYMszN.png',x:-10.4,y:12.7,size:100,rotate:13});
+  Object.assign(defaults.pngs.png03,{url:'',x:0,y:0,size:100,rotate:0});
+  Object.assign(defaults.pngs.signature,{url:'',x:0,y:0,size:100,rotate:0});
+  Object.assign(defaults.folder,{width:46,height:9});
+  Object.assign(defaults.approved,{x:32,y:-4});
+  Object.assign(defaults.positions.cardTitle,{x:35,y:10});
+  Object.assign(defaults.positions.topCaption,{x:0,y:31});
+  Object.assign(defaults.positions.bottomCaption,{x:0,y:53});
   let state=clone(defaults),panel=null,view=null,card=null,modal=null,frame=null,ready=false;
   const vars=s=>[
     ...COLORS.map(([k])=>`--qg-${k}:${s.colors[k]}`),
@@ -59300,12 +59320,49 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   };
   function fitLayoutHeight(){if(!panel?.classList.contains('is-active'))return;const layout=panel.querySelector(':scope > .dds-protected-commission-layout');if(!layout)return;const top=Math.max(0,layout.getBoundingClientRect().top);layout.style.setProperty('--jasper-layout-top',top+'px');}
-  function openEdit(routed=false){editorPanel();state=load();fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';const root=frame.attachShadow({mode:'open'});root.innerHTML='<style>:host{display:block;contain:layout style;overflow:visible}*,*::before,*::after{box-sizing:border-box}.qgpost{width:850px!important;max-width:none!important;margin:0!important}.qgpost .qg-card-title,.qgpost .qg-card-title [data-jasper-text]{font-family:"Luxurious Script",cursive!important;font-weight:400!important;font-style:normal!important}</style>'+artwork(state);ready=true;patch(state);requestAnimationFrame(()=>fit(true));}else{patch(state);requestAnimationFrame(fit);}}
-  function makeView(){if(view?.isConnected)return;view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-jasper-view';view.dataset.panel=VIEW;view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-jasper-back>←</button></div><div class="dds-jasper-empty-view"></div>'; (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);view.querySelector('[data-jasper-back]').onclick=back;}
-  function openView(routed=false){makeView();show(VIEW);if(!routed)history.pushState({},'','#'+VIEW);}
+  function openEdit(routed=false){editorPanel();state=clone(defaults);fill();show(EDIT);if(!routed)history.pushState({},'','#'+EDIT);frame=panel.querySelector('[data-jasper-frame]');requestAnimationFrame(fitLayoutHeight);if(!ready){frame.style.visibility='hidden';const root=frame.attachShadow({mode:'open'});root.innerHTML='<style>:host{display:block;contain:layout style;overflow:visible}*,*::before,*::after{box-sizing:border-box}.qgpost{width:850px!important;max-width:none!important;margin:0!important}.qgpost .qg-card-title,.qgpost .qg-card-title [data-jasper-text]{font-family:"Luxurious Script",cursive!important;font-weight:400!important;font-style:normal!important}</style>'+artwork(state);ready=true;patch(state);requestAnimationFrame(()=>fit(true));}else{patch(state);requestAnimationFrame(fit);}}
+  const JASPER_SHADOW_CSS='<style>:host{display:block;position:relative;overflow:visible}*,*::before,*::after{box-sizing:border-box}.qgpost{width:850px!important;max-width:none!important;margin:0!important}.qgpost .qg-card-title,.qgpost .qg-card-title [data-jasper-text]{font-family:"Luxurious Script",cursive!important;font-weight:400!important;font-style:normal!important}</style>';
+  function createJasperReadonlyCanvas(container,mode){
+    if(!container)return;
+    const mount=document.createElement('div');
+    mount.className='jasper-v466-mount';
+    const canvas=document.createElement('div');
+    canvas.className='jasper-v466-canvas';
+    mount.append(canvas);container.append(mount);
+    const shadow=canvas.attachShadow({mode:'open'});
+    shadow.innerHTML=JASPER_SHADOW_CSS+artwork(defaults);
+    let measured=850;
+    const fitReadonly=()=>{
+      if(!container.isConnected)return;
+      const width=container.clientWidth;
+      if(!width)return;
+      const natural=Math.max(850,shadow.querySelector('.qgpost')?.scrollHeight||850);
+      const scale=mode==='card'?Math.min(width/850,(container.clientHeight||260)/natural):Math.min(1,width/850);
+      measured=natural;
+      canvas.style.width='850px';canvas.style.height=natural+'px';
+      canvas.style.transform=`scale(${scale})`;
+      mount.style.width=850*scale+'px';mount.style.height=natural*scale+'px';
+    };
+    fitReadonly();
+    if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(fitReadonly);observer.observe(container);container.__jasperObserver=observer;}
+    const fontLink=shadow.querySelector(`link[href*="fonts.googleapis.com"]`);
+    if(fontLink)fontLink.addEventListener('load',fitReadonly,{once:true});
+    const styleLink=shadow.querySelector(`link[href*="comm-jasperprof.css"]`);
+    if(styleLink)styleLink.addEventListener('load',fitReadonly,{once:true});
+    return fitReadonly;
+  }
+  function makeView(){
+    if(view?.isConnected)return;
+    view=document.createElement('section');view.className='dds-panel dds-commission-view-panel dds-jasper-view';view.dataset.panel=VIEW;
+    view.innerHTML='<div class="dds-commission-view-toolbar"><button type="button" class="dds-back-button" data-jasper-back>←</button></div><div class="jasper-v466-view-content"><div class="jasper-v466-view-canvas"></div></div>';
+    (document.querySelector('.dds-footer')||document.querySelector('.dds-main')||document.body).before(view);
+    view.querySelector('[data-jasper-back]').onclick=back;
+    view.__jasperFit=createJasperReadonlyCanvas(view.querySelector('.jasper-v466-view-canvas'),'view');
+  }
+  function openView(routed=false){makeView();show(VIEW);if(!routed)history.pushState({},'','#'+VIEW);requestAnimationFrame(()=>view.__jasperFit?.());}
   function makeModal(){if(modal?.isConnected)return;modal=document.createElement('div');modal.className='dds-commission-lock-modal';modal.hidden=true;modal.innerHTML='<form class="dds-commission-lock-dialog"><small>CLIENT ACCESS / JASPER SURGEYEV</small><h2>Protected editor</h2><p>กรอกรหัสเพื่อแก้ไขโคดโปรไฟล์</p><label class="dds-commission-lock-field"><span>PASSWORD</span><input type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน"></label><p class="dds-commission-lock-error" aria-live="polite"></p><div class="dds-commission-lock-actions"><button type="submit">UNLOCK CODE</button><button type="button" data-jasper-cancel>CANCEL</button></div></form>';document.body.append(modal);modal.querySelector('[data-jasper-cancel]').onclick=()=>modal.hidden=true;modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});modal.querySelector('form').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('input');try{const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input.value));const h=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');if(h!==HASH){modal.querySelector('.dds-commission-lock-error').textContent='รหัสผ่านไม่ถูกต้อง';return;}sessionStorage.setItem(ACCESS,'1');modal.hidden=true;openEdit(location.hash==='#'+EDIT);}catch{modal.querySelector('.dds-commission-lock-error').textContent='ไม่สามารถตรวจสอบรหัสได้';}};}
   function requestEdit(routed=false){if(sessionStorage.getItem(ACCESS)==='1'){openEdit(routed);return;}makeModal();modal.hidden=false;modal.querySelector('input').value='';modal.querySelector('.dds-commission-lock-error').textContent='';modal.querySelector('input').focus();}
-  function install(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector('[data-panel="commission"] .dds-commission-grid');if(!grid)return false;if(grid.querySelector('.dds-jasper-card'))return true;card=document.createElement('article');card.className='dds-roleplay-card dds-commission-card dds-jasper-card';card.innerHTML='<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-jasper-blank-card"><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Jasper Surgeyev</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-jasper-view>VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-jasper-edit>EDIT CODE <span>↗</span></button></div></div>';grid.append(card);const putAfterAres=()=>{const ares=grid.querySelector('.dds-ares-card');if(!ares)return false;if(card.previousElementSibling!==ares)ares.insertAdjacentElement('afterend',card);return true;};if(!putAfterAres()){const orderObserver=new MutationObserver(()=>{if(putAfterAres())orderObserver.disconnect();});orderObserver.observe(grid,{childList:true});}card.querySelector('[data-jasper-view]').onclick=()=>openView();card.querySelector('[data-jasper-edit]').onclick=()=>requestEdit();return true;}
+  function install(){if(card?.isConnected)return true;const grid=document.querySelector('[data-work-panel="commission"] .dds-commission-grid')||document.querySelector('[data-panel="commission"] .dds-commission-grid');if(!grid)return false;if(grid.querySelector('.dds-jasper-card'))return true;card=document.createElement('article');card.className='dds-roleplay-card dds-commission-card dds-jasper-card';card.innerHTML='<div class="dds-roleplay-card-preview dds-roleplay-card-preview-live dds-jasper-blank-card"><span class="dds-roleplay-preview-badge">COMPLETED</span></div><div class="dds-roleplay-card-body dds-commission-card-body"><h2 class="dds-commission-card-title">COMMISSION</h2><p class="dds-commission-card-type">โคดประเภทโปรไฟล์</p><p class="dds-commission-card-client">ผู้จ้าง <strong>Jasper Surgeyev</strong></p><div class="dds-commission-card-actions"><button class="dds-roleplay-edit" data-jasper-view>VIEW WORK <span>↗</span></button><button class="dds-roleplay-edit dds-commission-protected-edit" data-jasper-edit>EDIT CODE <span>↗</span></button></div></div>';grid.append(card);createJasperReadonlyCanvas(card.querySelector('.dds-jasper-blank-card'),'card');const putAfterAres=()=>{const ares=grid.querySelector('.dds-ares-card');if(!ares)return false;if(card.previousElementSibling!==ares)ares.insertAdjacentElement('afterend',card);return true;};if(!putAfterAres()){const orderObserver=new MutationObserver(()=>{if(putAfterAres())orderObserver.disconnect();});orderObserver.observe(grid,{childList:true});}card.querySelector('[data-jasper-view]').onclick=()=>openView();card.querySelector('[data-jasper-edit]').onclick=()=>requestEdit();return true;}
   function route(){if(location.hash==='#'+EDIT&&!panel?.classList.contains('is-active'))requestEdit(true);else if(location.hash==='#'+VIEW&&!view?.classList.contains('is-active'))openView(true);}
   function start(){let n=0;const id=setInterval(()=>{if(install()||++n>100)clearInterval(id);},120);window.addEventListener('hashchange',route);window.addEventListener('popstate',route);window.addEventListener('resize',()=>{if(panel?.classList.contains('is-active')){fitLayoutHeight();fit();}});setTimeout(route,500);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
